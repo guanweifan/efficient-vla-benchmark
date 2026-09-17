@@ -68,3 +68,25 @@ def test_empty_metadata_is_not_a_fake_implementation():
                 "implementations": {},
             }
         )
+
+
+@pytest.mark.parametrize(
+    "implementation",
+    [
+        {"variants": "libero_joint", "factory": "x:y"},
+        {"variants": ["default", "default"], "factory": "x:y"},
+        {"variants": ["default"], "factory": 42},
+        {"variants": ["default"], "factory": "x:y", "requires": "llama_decoder"},
+    ],
+)
+def test_compatibility_metadata_cannot_use_ambiguous_strings(implementation):
+    with pytest.raises(ValueError):
+        parse_method(
+            {
+                "schema_version": 1,
+                "name": "example",
+                "category": "caching",
+                "config": "example:Config",
+                "implementations": {"example": implementation},
+            }
+        )

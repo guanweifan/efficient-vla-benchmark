@@ -59,14 +59,35 @@ def parse_method(data: dict) -> MethodSpec:
             raise ValueError("Method names and categories must use snake_case")
     if not isinstance(data.get("config"), str) or ":" not in data["config"]:
         raise ValueError("Method metadata must declare a configuration entry")
+    if type(data.get("requires_artifact", False)) is not bool:
+        raise ValueError("requires_artifact must be boolean")
     implementations = data.get("implementations")
     if not isinstance(implementations, dict) or not implementations:
         raise ValueError("A method must have at least one explicit backend implementation")
     for backend, implementation in implementations.items():
-        if not IDENTIFIER.fullmatch(backend) or not isinstance(implementation, dict):
+        if (
+            not isinstance(backend, str)
+            or not IDENTIFIER.fullmatch(backend)
+            or not isinstance(implementation, dict)
+        ):
             raise ValueError("Invalid backend implementation metadata")
-        if not implementation.get("variants") or not implementation.get("factory"):
+        variants = implementation.get("variants")
+        if (
+            not isinstance(variants, list)
+            or not variants
+            or any(not isinstance(item, str) or not IDENTIFIER.fullmatch(item) for item in variants)
+        ):
+            raise ValueError("Implementations declare an explicit list of model variants")
+        if len(set(variants)) != len(variants):
+            raise ValueError("Model variants must be unique")
+        factory = implementation.get("factory")
+        if not isinstance(factory, str) or ":" not in factory:
             raise ValueError("Implementations declare model variants and a factory")
+        required = implementation.get("requires", [])
+        if not isinstance(required, list) or any(
+            not isinstance(item, str) or not IDENTIFIER.fullmatch(item) for item in required
+        ):
+            raise ValueError("Required capabilities must be an explicit list")
     return MethodSpec(
         data["name"],
         data["category"],
