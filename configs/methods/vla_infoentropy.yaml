@@ -1,0 +1,10 @@
+method: vla_infoentropy
+parameters:
+  attention_backend: eager
+  static_budget_per_view: 150
+  similarity_threshold: 0.996
+  low_quota: 40
+  high_quota: 60
+  transition_steps: 100
+  reuse_layers: [2, 6, 9, 11]
+  growth_factor: 0.55

@@ -1,0 +1,11 @@
+schema_version: 1
+name: vla_infoentropy
+category: caching
+description: Entropy-guided task protection and timestep allocation for KV reuse.
+config: efficient_vla_benchmark.methods.caching.vla_infoentropy.config:InfoEntropyConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout, l1_action_head, control_hooks]
+    factory: efficient_vla_benchmark.methods.caching.vla_infoentropy.implementations.openvla_oft.api:build
