@@ -1,0 +1,9 @@
+method: vla_cache
+parameters:
+  static_budget_per_view: 150
+  similarity_threshold: 0.996
+  protected_tokens_per_view: 100
+  task_attention_layer: 15
+  reuse_layers: [2, 6, 9, 11]
+  weighted_growth: true
+  growth_factor: 0.55

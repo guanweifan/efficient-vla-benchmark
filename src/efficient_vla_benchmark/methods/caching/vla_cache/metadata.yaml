@@ -1,0 +1,12 @@
+schema_version: 1
+name: vla_cache
+category: caching
+description: Task-aware visual-token reuse with layer-adaptive KV caching.
+config: efficient_vla_benchmark.methods.caching.vla_cache.config:VLACacheConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout, l1_action_head]
+    factory: efficient_vla_benchmark.methods.caching.vla_cache.implementations.openvla_oft.api:build
+    preflight: efficient_vla_benchmark.methods.caching.vla_cache.implementations.openvla_oft.api:preflight
