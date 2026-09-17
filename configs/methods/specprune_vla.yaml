@@ -1,0 +1,24 @@
+method: specprune_vla
+parameters:
+  static_pruning: true
+  dynamic_pruning: true
+  action_controller: true
+  static_ratio: 0.8
+  dynamic_keep_ratio: 0.9
+  importance_beta: 0.2
+  min_visual_tokens: 60
+  importance_layers: [14, 19, 24]
+  pruning_layers: [10, 15, 20, 25]
+  global_layers: [14, 30]
+  primary_similarity: 0.986
+  wrist_similarity: 0.98
+  primary_static_budget: 236
+  wrist_static_budget: 230
+  primary_precise_static_budget: 240
+  wrist_precise_static_budget: 236
+  velocity_threshold: 0.35
+  rotation_threshold: 0.2
+  xy_threshold: 0.1
+  z_threshold: 0.1
+  exit_z_threshold: 0.2
+  exit_rotation_threshold: 0.3
