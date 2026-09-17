@@ -105,13 +105,12 @@ class VLACache(InferenceMethod, DecoderStrategy):
             and layer in self.config.reuse_layers
         ):
             count = max(1, int(self.previous_schedule[layer] * self.reusable.numel()))
-            if count >= self.last_skipped:
+            if count > self.last_skipped:
                 keep = ~torch.isin(state.positions, self.reusable[:count])
                 self.last_skipped = count
-        # Record final computed counts after this layer's incremental selection.
-        self.layer_sizes.append(
-            int(keep.sum().item()) if keep is not None else state.positions.numel()
-        )
+        # Candidates are unique visual positions and reuse removes a growing
+        # prefix. Its exact size is known on CPU; do not synchronize a GPU sum.
+        self.layer_sizes.append(state.layout.length - self.last_skipped)
         return keep
 
     def key_positions(self, layer, state):
@@ -145,14 +144,16 @@ class VLACache(InferenceMethod, DecoderStrategy):
             for view in range(2):
                 start = 1 + 256 * view
                 order = torch.argsort(scores[start : start + 256], descending=True, stable=True)
-                self.next_protected.append(order[: self.config.protected_tokens_per_view].tolist())
+                self.next_protected.append(order[: self.config.protected_tokens_per_view])
         return None
 
     def finish(self, state):
         self.previous_schedule = reuse_schedule(
             self.entropies, self.config.weighted_growth, self.config.growth_factor
         )
-        self.previous_protected = self.next_protected
+        # Both views are consumed only by the next query. Avoid mid-decoder
+        # device-to-host barriers, and transfer the indices together here.
+        self.previous_protected = torch.stack(self.next_protected).tolist()
         self.backend.query_diagnostics = {
             "cache_cold": self.cold,
             "reusable_candidates": self.reusable.numel(),

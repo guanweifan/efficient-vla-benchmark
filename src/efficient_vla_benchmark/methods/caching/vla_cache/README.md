@@ -1,5 +1,11 @@
 # VLA-Cache on OpenVLA-OFT
 
+The decoder records selected-row counts from the exact unique-prefix invariant,
+avoiding a redundant device scalar synchronization. Task-protection indices for
+both camera views transfer together after the decoder finishes. These changes
+do not sample/freeze entropy or remove any mechanism; controlled old/new comparisons
+check identical actions, schedules, protected sets and computed-row counts.
+
 Reference: [paper](https://arxiv.org/abs/2502.02175),
 [author implementation](https://github.com/siyuhsu/vla-cache/tree/a4909880573868dee2769343d52e793c0341678b),
 [author Transformers fork](https://github.com/siyuhsu/transformers/tree/9a90a37acacf453433168db8d7769b7ea3c40c06).
