@@ -1,0 +1,6 @@
+method: st_merge
+parameters:
+  merging_layer: 1
+  tokens_per_view: 128
+  queues: 4
+  spatial_sigma: 2.0
