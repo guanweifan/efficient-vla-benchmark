@@ -3,6 +3,44 @@
 import numpy as np
 
 
+class VisionAttentionProbe:
+    """Capture normalized timm Q/K for each view without changing attention output.
+
+    The consumer chooses the encoder/block and owns every scoring decision. Stored
+    tensors last only until take()/clear(); close restores the unmodified instance.
+    """
+
+    def __init__(self, attention):
+        self.clear()
+        self.handles = [
+            attention.q_norm.register_forward_hook(self._query),
+            attention.k_norm.register_forward_hook(self._key),
+        ]
+
+    def _query(self, module, args, output):
+        self.queries.append(output.detach())
+
+    def _key(self, module, args, output):
+        self.keys.append(output.detach())
+
+    def clear(self):
+        self.queries, self.keys = [], []
+
+    def take(self):
+        if len(self.queries) != len(self.keys):
+            self.clear()
+            raise RuntimeError("Incomplete vision Q/K probe")
+        result = list(zip(self.queries, self.keys))
+        self.clear()
+        return result
+
+    def close(self):
+        for handle in self.handles:
+            handle.remove()
+        self.handles.clear()
+        self.clear()
+
+
 def patch_cosine_similarity(current, previous):
     """Cosines of row-major 14x14 RGB patches in policy-preprocessed images."""
 
