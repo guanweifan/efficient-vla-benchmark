@@ -39,7 +39,7 @@ class Observation:
 
 @dataclass
 class ActionDecision:
-    """One simulator-ready action; gripper convention is -1 open, +1 closed."""
+    """One environment-ready action, in the selected environment's convention."""
 
     action: np.ndarray
     queried: bool

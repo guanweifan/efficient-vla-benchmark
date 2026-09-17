@@ -4,6 +4,24 @@ import ast
 from pathlib import Path
 
 
+def import_names(path, root):
+    parts = path.relative_to(root).with_suffix("").parts
+    if "src" not in parts:
+        package = ()
+    else:
+        package = parts[parts.index("src") + 1 : -1]
+    names = []
+    for node in ast.walk(ast.parse(path.read_text())):
+        if isinstance(node, ast.Import):
+            names.extend(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            prefix = package[: len(package) - node.level + 1] if node.level else ()
+            module = (*prefix, *(node.module or "").split("."))
+            names.append(".".join(part for part in module if part))
+            names.extend(".".join((*module, alias.name)) for alias in node.names)
+    return names
+
+
 def violations(root):
     failures = []
     package = root / "src" / "efficient_vla_benchmark"
@@ -12,15 +30,16 @@ def violations(root):
             relative = path.relative_to(root)
             if "upstream" in relative.parts or "tests" in relative.parts:
                 continue
-            imported = []
-            for node in ast.walk(ast.parse(path.read_text())):
-                if isinstance(node, ast.Import):
-                    imported.extend(alias.name for alias in node.names)
-                elif isinstance(node, ast.ImportFrom) and node.level == 0:
-                    imported.append(node.module or "")
+            imported = import_names(path, root)
             common = path.is_relative_to(package) and relative.parts[2] != "methods"
             plugin = relative.parts[0] == "backends"
             for name in imported:
+                if (
+                    "methods" in relative.parts
+                    and "implementations" not in relative.parts
+                    and name.startswith("efficient_vla_backend_")
+                ):
+                    failures.append(f"{relative}: shared method code imports a backend")
                 if common and (
                     name.startswith(("efficient_vla_backend_", "efficient_vla_benchmark.methods."))
                     or name.split(".")[0] in {"torch", "transformers", "prismatic", "starVLA"}
@@ -36,7 +55,7 @@ def violations(root):
                     target = name.split(".")
                     if len(target) > 3 and target[3] != own:
                         failures.append(f"{relative}: imports another method {name}")
-    return failures
+    return sorted(set(failures))
 
 
 if __name__ == "__main__":

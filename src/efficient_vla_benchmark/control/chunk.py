@@ -13,7 +13,7 @@ from efficient_vla_benchmark.core.types import (
 
 
 class ChunkPolicy:
-    def __init__(self, predictor: ChunkPredictor, execution_horizon: int = 8):
+    def __init__(self, predictor: ChunkPredictor, execution_horizon: int):
         if type(execution_horizon) is not int or execution_horizon < 1:
             raise ValueError("Execution horizon must be a positive integer")
         self.predictor = predictor

@@ -85,7 +85,7 @@ def test_method_controller_receives_every_frame_and_can_replan():
             return self.frames == 2 and remaining > 0
 
     predictor = Controller()
-    policy = ChunkPolicy(predictor)
+    policy = ChunkPolicy(predictor, 8)
     context = EpisodeContext("libero_spatial", 0, 0)
     policy.reset(context)
     decisions = [policy.step(observation()) for _ in range(3)]
