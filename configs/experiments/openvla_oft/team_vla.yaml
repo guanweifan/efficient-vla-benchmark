@@ -1,0 +1,3 @@
+extends:
+  - baseline.yaml
+  - ../../methods/team_vla.yaml

@@ -1,0 +1,10 @@
+method: team_vla
+parameters:
+  enabled: true
+  context_ratio: 0.25
+  expansion_kernel: 3
+  density_threshold: 1.0
+  merging_layer: 15
+  merge_tokens: 80
+  rms_epsilon: 0.000001
+  seed: 0
