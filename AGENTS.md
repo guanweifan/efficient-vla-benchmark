@@ -47,12 +47,14 @@ files. Update documentation when behavior or the interface contract changes.
 
 ## Implemented scope
 
-OpenVLA-OFT native baseline; token methods SpecPrune-VLA, ADP, VLA-Pruner,
-SAFE-Pruner, TEAM-VLA and VLA-IAP; plus VLA-Cache, AWQ, SP-VLA scheduling core
-and VOTE trajectory ensemble core. TEAM-VLA and VLA-IAP are independent paper-based
-implementations with unverified author-code conventions, not published-score
-reproductions. Preserve this qualification in reports. The two control cores exclude
-the papers' other components; use their explicit IDs and documented coverage. CogACT and starVLA
+OpenVLA-OFT native baseline; nine token methods including EfficientVLA's token core,
+ST-Merge and FlashVLA's ICS core; VLA-Cache and VLA-InfoEntropy; AWQ; SP-VLA visual
+pruning plus scheduling; and VOTE's trajectory ensemble core. Independent paper-based
+implementations disclose unverified conventions, not published-score reproductions.
+Preserve these qualifications in reports. FlashVLA action reuse remains unresolved;
+EfficientVLA excludes layer pruning and DiT caching; VOTE excludes its other paper
+components. SP-VLA uses one canonical directory and offers scheduling-only as an
+ablation preset, not a second method. CogACT and starVLA
 retain pinned sources for subsequent implementations; do not advertise runtime
 support until their own model checks have passed. Do not fabricate an empty plugin
 that only registers a name and cannot perform inference.

@@ -20,7 +20,7 @@ One run uses the native baseline or exactly one method with explicitly declared 
 
 | Backend / variant | Native baseline | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|---|
-| OpenVLA-OFT / libero_joint | Native SDPA | Six methods below | VLA-Cache | SP-VLA scheduling core | VOTE ensemble core | AWQ W4A16 |
+| OpenVLA-OFT / libero_joint | Native SDPA | Nine methods below | VLA-Cache, VLA-InfoEntropy | SP-VLA pruning + scheduling | VOTE ensemble core | AWQ W4A16 |
 | CogACT | Source pinned; runtime not implemented | — | — | — | — | — |
 | starVLA | Source pinned; runtime not implemented | — | — | — | — | — |
 
@@ -42,10 +42,22 @@ paper-specific policy, and no method imports another method's implementation.
 | `safe_pruner` | Forecast saliency and adaptive full-reference refresh | Pinned source port |
 | `team_vla` | Early spatial expansion and mid-layer soft merging | Independent paper implementation |
 | `vla_iap` | Semantic/motion alignment and geometric token protection | Independent paper implementation |
+| `efficient_vla` | Task-relevance and diversity token selection only | Independent paper implementation |
+| `st_merge` | Shared spatial token groups in both vision encoders | Independent paper implementation |
+| `flash_vla` | Attention-output SVD/ICS pruning only | Independent paper implementation |
 
-The last two retain explicit unresolved paper conventions in their method READMEs;
-they are not verified author-code reproductions. Integration and speed do not prove
+Paper-based methods retain explicit unresolved conventions in their method READMEs;
+they are not verified author-code reproductions. EfficientVLA excludes layer pruning
+and DiT caching. FlashVLA excludes action reuse pending clarification of contradictory
+paper equations. ST-Merge retains a dense projector bridge and reports its cost.
+Integration and speed do not prove
 task reliability. Failed smoke episodes remain visible in the measurement ledger.
+
+SP-VLA also contributes token pruning, but lives once under `model_routing/sp_vla/`.
+Its `sp_vla_scheduling` experiment remains a scheduling-only ablation; both presets
+use method ID `sp_vla`. VLA-InfoEntropy lives under `caching/vla_infoentropy/`: it
+skips visual query computation while retaining visual KV context. Both cross-reference
+Section 5.1 without duplicating their implementations or evidence rows.
 
 ## Start with one backend
 
