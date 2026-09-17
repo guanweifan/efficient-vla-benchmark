@@ -28,3 +28,12 @@
 [submodule "third_party/methods/vla_cache_transformers"]
 	path = third_party/methods/vla_cache_transformers
 	url = https://github.com/siyuhsu/transformers.git
+[submodule "third_party/methods/adp"]
+	path = third_party/methods/adp
+	url = https://github.com/chen7086/VLA-ADP.git
+[submodule "third_party/methods/vla_pruner"]
+	path = third_party/methods/vla_pruner
+	url = https://github.com/MINT-SJTU/VLA-Pruner.git
+[submodule "third_party/methods/safe_pruner"]
+	path = third_party/methods/safe_pruner
+	url = https://github.com/msssl/SAFE-Pruner.git
