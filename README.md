@@ -16,7 +16,43 @@ No backend is a mandatory dependency of the main package. Install only the backe
 you use. A source-only integration is not an implemented or validated backend.
 One run uses the native baseline or exactly one complete acceleration method.
 
-Read [installation](docs/installation.md), [architecture](docs/architecture.md)
-and [contribution rules](CONTRIBUTING.md). Validation records will distinguish
-development smoke checks, measured timing and formal success-rate campaigns.
+## Implemented scope
 
+| Backend / variant | Native baseline | Token reduction | Caching | Quantization |
+|---|---|---|---|---|
+| OpenVLA-OFT / libero_joint | Native SDPA | SpecPrune-VLA | VLA-Cache | AWQ W4A16 |
+| CogACT | Source pinned; runtime not implemented | — | — | — |
+| starVLA | Source pinned; runtime not implemented | — | — | — |
+
+Algorithms retain their full implemented mechanism and disclose adaptations in
+their READMEs. This is a common-checkpoint comparison, not a claim to reproduce
+each paper's original numbers. Quantization uses real packed kernels, not fake quantization.
+
+## Start with one backend
+
+Read [installation](docs/installation.md) and the [OFT recipe](backends/openvla_oft/INSTALL.md).
+After installation, inspect supported combinations without loading a model:
+
+```bash
+evb list
+evb validate-config --config configs/experiments/openvla_oft/specprune_vla.yaml
+
+evb evaluate --config configs/experiments/openvla_oft/baseline.yaml \
+  --model-path "$MODEL_DIR" --libero-root third_party/benchmarks/libero \
+  --output-dir "$SMOKE_DIR"
+
+evb benchmark --config configs/experiments/openvla_oft/specprune_vla.yaml \
+  --model-path "$MODEL_DIR" \
+  --traces "$SPATIAL_TRACE" "$OBJECT_TRACE" "$GOAL_TRACE" "$LONG_TRACE" \
+  --output-dir "$TIMING_DIR"
+```
+
+The caller supplies all resource variables. Change the experiment config to select
+one algorithm; AWQ also requires `--artifact-path`. Configs expose method parameters
+and compose backend/evaluation/profiling presets. CLI overrides are saved in results.
+Evaluation defaults to four smoke episodes; formal campaigns require explicit scheduling.
+
+See [architecture](docs/architecture.md), [contribution rules](CONTRIBUTING.md),
+[adding a backend](docs/adding_backend.md) and [adding a method](docs/adding_method.md).
+Installable templates demonstrate external plugins without editing the core. They
+are contract fixtures, not VLA models or benchmark-performance evidence.
