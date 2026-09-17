@@ -1,0 +1,30 @@
+[submodule "backends/openvla_oft/upstream"]
+	path = backends/openvla_oft/upstream
+	url = https://github.com/moojink/openvla-oft.git
+[submodule "backends/cogact/upstream"]
+	path = backends/cogact/upstream
+	url = https://github.com/microsoft/CogACT.git
+[submodule "backends/starvla/upstream"]
+	path = backends/starvla/upstream
+	url = https://github.com/starVLA/starVLA.git
+[submodule "third_party/benchmarks/libero"]
+	path = third_party/benchmarks/libero
+	url = https://github.com/Lifelong-Robot-Learning/LIBERO.git
+[submodule "third_party/runtimes/transformers_openvla_oft"]
+	path = third_party/runtimes/transformers_openvla_oft
+	url = https://github.com/moojink/transformers-openvla-oft.git
+[submodule "third_party/runtimes/dlimp"]
+	path = third_party/runtimes/dlimp
+	url = https://github.com/moojink/dlimp_openvla.git
+[submodule "third_party/runtimes/llm_awq"]
+	path = third_party/runtimes/llm_awq
+	url = https://github.com/mit-han-lab/llm-awq.git
+[submodule "third_party/methods/specprune_vla"]
+	path = third_party/methods/specprune_vla
+	url = https://github.com/alexwhz-sjtu/SpecPrune-VLA.git
+[submodule "third_party/methods/vla_cache"]
+	path = third_party/methods/vla_cache
+	url = https://github.com/siyuhsu/vla-cache.git
+[submodule "third_party/methods/vla_cache_transformers"]
+	path = third_party/methods/vla_cache_transformers
+	url = https://github.com/siyuhsu/transformers.git
