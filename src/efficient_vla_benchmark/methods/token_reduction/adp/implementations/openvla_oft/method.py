@@ -55,8 +55,8 @@ class ADP(InferenceMethod, DecoderStrategy):
 
         preflight(config, None)
         self.backend, self.config = backend, config
-        self.requires_control_history = config.enabled and config.dynamic
         self.active = config.enabled and config.keep_ratio < 1
+        self.requires_control_history = self.active and config.dynamic
         self.reset(None)
         self.adapter = (
             DecoderAdapter(backend.model.language_model.model, self) if self.active else None

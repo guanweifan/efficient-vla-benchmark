@@ -131,7 +131,7 @@ def test_real_oft_disabled_parity_active_pruning_and_reset(model_path, trace_pat
     for params in ({"enabled": False}, {"keep_ratio": 1.0}):
         backend.attach_method(ADP(backend, ADPConfig.parse(params)))
         backend.reset(context)
-        backend.observe(samples[0])
+        assert not backend.method.requires_control_history
         np.testing.assert_array_equal(backend.predict_chunk(samples[0]), expected)
         backend.detach_method()
     backend.attach_method(ADP(backend, ADPConfig.parse({"dynamic": False})))
@@ -144,3 +144,16 @@ def test_real_oft_disabled_parity_active_pruning_and_reset(model_path, trace_pat
     np.testing.assert_array_equal(backend.predict_chunk(samples[0]), active)
     backend.detach_method()
     np.testing.assert_array_equal(backend.predict_chunk(samples[0]), expected)
+
+
+@pytest.mark.parametrize("parameters", [{"enabled": False}, {"keep_ratio": 1}])
+def test_noop_does_not_require_control_observations(parameters):
+    from types import SimpleNamespace
+
+    from ..implementations.openvla_oft.method import ADP
+
+    backend = SimpleNamespace()
+    method = ADP(backend, ADPConfig.parse(parameters))
+    assert method.adapter is None and not method.requires_control_history
+    method.before_query({})
+    assert not backend.query_diagnostics["pruned"]
