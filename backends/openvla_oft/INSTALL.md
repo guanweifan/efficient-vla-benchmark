@@ -77,6 +77,11 @@ metadata requires different Torch/Transformers versions. Selected source
 primitives are loaded under a private namespace; their actual packed kernels
 receive numerical tests on the installed runtime.
 
+The same AWQ extension includes BF16 and FP16 execution branches with different
+accumulation precision. The optional `awq_fp16_kernel.yaml` preset exposes FP16
+execution explicitly; it needs no replacement Torch/Transformers package or new
+calibration. See the method README for numeric and measurement caveats.
+
 After installation, run `python -m pip check`, CPU tests, the privacy scanner and
 explicit GPU checks. Configure LIBERO through the CLI's `--libero-root` and output
 directory; do not overwrite a user's global LIBERO configuration. The dataset is

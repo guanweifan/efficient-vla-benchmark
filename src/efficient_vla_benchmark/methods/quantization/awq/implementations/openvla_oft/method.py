@@ -9,6 +9,9 @@ class AWQ(InferenceMethod):
 
     def __init__(self, backend, config, artifact_path):
         self.backend, self.config = backend, config
+        self.kernel_precision = (
+            backend.precision if config.kernel_precision == "auto" else config.kernel_precision
+        )
         self.artifact_sha256 = load_artifact(backend, artifact_path, config)
 
     def metadata(self):
@@ -19,6 +22,9 @@ class AWQ(InferenceMethod):
             "scope": "language_decoder_block_linears",
             "packed_linears": 224,
             "calibration_samples": self.config.calibration_samples,
+            "kernel_precision": self.kernel_precision,
+            "gemm_accumulation": "float16" if self.kernel_precision == "float16" else "float32",
+            "kernel_boundary_casts": self.kernel_precision != self.backend.precision,
         }
 
     def before_query(self, prepared):

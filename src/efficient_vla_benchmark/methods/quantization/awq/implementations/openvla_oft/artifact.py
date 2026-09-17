@@ -1,13 +1,14 @@
 """Portable, checksummed packed decoder artifacts; base checkpoints stay read-only."""
 
 import json
-from dataclasses import asdict
 from pathlib import Path
 
+import torch
 from safetensors.torch import load_file
 
 from efficient_vla_benchmark.core.provenance import digest_file, stable_hash
 
+from .runtime import KernelPrecisionLinear
 from .vendor import reference_module
 
 LINEARS = (
@@ -37,7 +38,7 @@ def read_manifest(root: Path, config):
         or manifest.get("complete") is not True
     ):
         raise ValueError("Unsupported or incomplete AWQ artifact")
-    if manifest.get("config") != asdict(config):
+    if manifest.get("config") != config.calibration_parameters():
         raise ValueError("AWQ artifact settings do not match the supplied experiment configuration")
     if manifest.get("scope") != "language_decoder_block_linears":
         raise ValueError("Unexpected AWQ quantization scope")
@@ -69,4 +70,14 @@ def load_artifact(backend, root: Path, config):
             packed = WQLinear.from_linear(original, config.bits, config.group_size, init_only=True)
             replace_linear(layer, name, packed)
         layer.load_state_dict(load_file(str(root / component["file"])), strict=True)
+        kernel_dtype = (
+            backend.dtype
+            if config.kernel_precision == "auto"
+            else getattr(torch, config.kernel_precision)
+        )
+        if kernel_dtype != backend.dtype:
+            for name in LINEARS:
+                replace_linear(
+                    layer, name, KernelPrecisionLinear(layer.get_submodule(name), kernel_dtype)
+                )
     return stable_hash(manifest)

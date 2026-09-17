@@ -1,4 +1,5 @@
 import gc
+from dataclasses import replace
 
 import numpy as np
 import pytest
@@ -8,8 +9,9 @@ from efficient_vla_benchmark.core.resources import project_source
 
 
 @pytest.mark.gpu
+@pytest.mark.parametrize("kernel_precision", ["auto", "float16"])
 def test_awq_real_checkpoint_packed_scope_and_independent_reload(
-    model_path, trace_path, artifact_path
+    model_path, trace_path, artifact_path, kernel_precision
 ):
     from efficient_vla_benchmark.core.config import ExperimentConfig
     from efficient_vla_benchmark.core.registry import build_backend
@@ -20,6 +22,7 @@ def test_awq_real_checkpoint_packed_scope_and_independent_reload(
     )
 
     config = ExperimentConfig.load(project_source("configs/experiments/openvla_oft") / "awq.yaml")
+    config = replace(config, parameters={**config.parameters, "kernel_precision": kernel_precision})
     context, samples, _ = load_trace(trace_path)
     WQLinear = reference_module("quantize.qmodule").WQLinear
     outputs = []
@@ -41,6 +44,12 @@ def test_awq_real_checkpoint_packed_scope_and_independent_reload(
             for prediction in predictions
         )
         assert backend.metadata()["method_details"]["packed_linears"] == 224
+        assert backend.metadata()["method_details"]["kernel_precision"] == (
+            "bfloat16" if kernel_precision == "auto" else kernel_precision
+        )
+        assert backend.metadata()["method_details"]["kernel_boundary_casts"] == (
+            kernel_precision == "float16"
+        )
         with pytest.raises(ValueError, match="fresh backend"):
             backend.detach_method()
         outputs.append(predictions)

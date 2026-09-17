@@ -1,5 +1,5 @@
 import json
-from dataclasses import asdict
+from dataclasses import replace
 
 import pytest
 import torch
@@ -29,6 +29,7 @@ from ..implementations.openvla_oft.search import (
         {"clip_max_shrink": float("nan")},
         {"calibration_seed": -1},
         {"unknown": 1},
+        {"kernel_precision": "int8"},
     ],
 )
 def test_awq_configuration_validation(parameters):
@@ -111,7 +112,7 @@ def test_artifact_rejects_incomplete_and_path_traversal(tmp_path):
         "schema_version": 1,
         "algorithm": "awq",
         "complete": True,
-        "config": asdict(config),
+        "config": config.calibration_parameters(),
         "scope": "language_decoder_block_linears",
         "components": [{"file": f"layer_{index:02d}.safetensors"} for index in range(32)],
     }
@@ -119,3 +120,18 @@ def test_artifact_rejects_incomplete_and_path_traversal(tmp_path):
     (tmp_path / "manifest.json").write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="filename"):
         read_manifest(tmp_path, config)
+
+
+def test_runtime_precision_does_not_change_calibration_identity():
+    config = AWQConfig.parse({})
+    runtime = replace(config, kernel_precision="float16")
+    assert config.calibration_parameters() == runtime.calibration_parameters()
+    assert replace(config, scale_grid=3).calibration_parameters() != config.calibration_parameters()
+
+
+@pytest.mark.parametrize("group_size", [32, 64])
+def test_runtime_rejects_groups_not_supported_by_pinned_gemm(group_size):
+    from ..implementations.openvla_oft.api import preflight
+
+    with pytest.raises(ValueError, match="group_size=128"):
+        preflight(AWQConfig.parse({"group_size": group_size}), None)

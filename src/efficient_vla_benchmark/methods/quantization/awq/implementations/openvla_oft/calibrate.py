@@ -3,7 +3,6 @@
 import gc
 import json
 import time
-from dataclasses import asdict
 from pathlib import Path
 
 import torch
@@ -167,7 +166,7 @@ def calibrate(backend, config, dataset_root: Path, output: Path):
         "backend": "openvla_oft",
         "precision": backend.precision,
         "scope": "language_decoder_block_linears",
-        "config": asdict(config),
+        "config": config.calibration_parameters(),
         "checkpoint_sha256": backend._model_manifest["sha256"],
         "source": provenance,
         "calibration": identities,

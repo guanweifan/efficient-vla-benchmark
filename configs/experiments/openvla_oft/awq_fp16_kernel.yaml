@@ -1,0 +1,5 @@
+# Explicit mixed-precision runtime: native BF16 model, official FP16 AWQ kernels.
+# This uses FP16 accumulation, not the BF16 kernel's FP32 accumulation.
+extends: awq.yaml
+parameters:
+  kernel_precision: float16

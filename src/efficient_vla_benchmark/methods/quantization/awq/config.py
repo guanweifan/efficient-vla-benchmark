@@ -1,9 +1,10 @@
 import math
-from dataclasses import dataclass, fields
+from dataclasses import asdict, dataclass, fields
 
 
 @dataclass(frozen=True)
 class AWQConfig:
+    kernel_precision: str = "auto"
     bits: int = 4
     group_size: int = 128
     calibration_samples: int = 32
@@ -13,12 +14,24 @@ class AWQConfig:
     clip_max_shrink: float = 0.5
     clip_sample_tokens: int = 512
 
+    def calibration_parameters(self):
+        """Runtime execution precision does not change offline artifact identity."""
+        values = asdict(self)
+        values.pop("kernel_precision")
+        return values
+
     @classmethod
     def parse(cls, parameters):
         allowed = {field.name for field in fields(cls)}
         if set(parameters) - allowed:
             raise ValueError(f"Unknown AWQ parameters: {sorted(set(parameters) - allowed)}")
         config = cls(**parameters)
+        if not isinstance(config.kernel_precision, str) or config.kernel_precision not in {
+            "auto",
+            "bfloat16",
+            "float16",
+        }:
+            raise ValueError("kernel_precision must be auto, bfloat16 or float16")
         if type(config.bits) is not int or config.bits != 4:
             raise ValueError("The pinned AWQ kernel supports four-bit weights")
         if type(config.group_size) is not int or config.group_size not in (32, 64, 128):
