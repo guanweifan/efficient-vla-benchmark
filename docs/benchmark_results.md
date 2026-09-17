@@ -23,12 +23,20 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 | [Native BF16 / SDPA](results/control-methods-final-benchmark-baseline-001.json) | openvla_oft | 8 | 216 / 0 | 197.86 / 199.86 | 25.10 | 1.000× | 14.98 | 4/4; errors 0 |
 | [Native BF16 / SDPA, matched H=1](results/control-methods-final-benchmark-baseline_horizon1-001.json) | openvla_oft | 1 | 1704 / 0 | 199.83 / 201.42 | 199.83 | 1.000× | 14.98 | Not run |
 | [Native BF16 / SDPA, end recheck](results/control-methods-final-benchmark-baseline_recheck-001.json) | openvla_oft | 8 | 216 / 0 | 198.91 / 201.15 | 25.23 | 0.995× | 14.98 | Not run |
+| [Native H=8 (token batch 1)](results/token-batch-final-benchmark-baseline-001.json) | openvla_oft | 8 | 216 / 0 | 200.57 / 203.81 | 25.44 | 1.000× | 14.98 | Not run |
+| [Native H=8 end recheck (token batch 1)](results/token-batch-final-benchmark-baseline_recheck-001.json) | openvla_oft | 8 | 216 / 0 | 198.77 / 200.57 | 25.21 | 1.009× | 14.98 | Not run |
 
 ## 5.1 Token Pruning and Context Compression
 
 | Method / configuration | Backend | H | Queries / replacements | Query mean / p95 ms | ms/control step | Replay speedup | Peak GiB | Smoke |
 |---|---|---:|---:|---:|---:|---:|---:|---|
 | [SpecPrune-VLA](results/control-methods-final-benchmark-specprune_vla-001.json) | openvla_oft | 8 | 237 / 0 | 146.91 / 163.52 | 20.51 | 1.224× | 14.60 | 3/4; errors 0 |
+| [ADP](results/token-batch-final-benchmark-adp-001.json) | openvla_oft | 8 | 216 / 0 | 195.37 / 200.98 | 24.80 | 1.026× | 14.68 | 4/4; errors 0 |
+| [SAFE-Pruner](results/token-batch-final-benchmark-safe_pruner-001.json) | openvla_oft | 8 | 216 / 0 | 148.28 / 200.16 | 18.82 | 1.352× | 14.68 | 4/4; errors 0 |
+| [SpecPrune-VLA (token batch 1)](results/token-batch-final-benchmark-specprune_vla-001.json) | openvla_oft | 8 | 237 / 0 | 147.06 / 163.44 | 20.53 | 1.239× | 14.60 | 3/4; errors 0 |
+| [TEAM-VLA (paper-based)](results/token-batch-final-benchmark-team_vla-001.json) | openvla_oft | 8 | 216 / 0 | 139.47 / 148.07 | 17.70 | 1.438× | 14.61 | 1/4; errors 0 |
+| [VLA-IAP (paper-based)](results/token-batch-final-benchmark-vla_iap-001.json) | openvla_oft | 8 | 216 / 0 | 196.31 / 204.09 | 24.90 | 1.022× | 14.69 | 3/4; errors 0 |
+| [VLA-Pruner](results/token-batch-final-benchmark-vla_pruner-001.json) | openvla_oft | 8 | 216 / 0 | 165.05 / 199.81 | 20.94 | 1.215× | 14.68 | 4/4; errors 0 |
 
 ## 5.2 Caching and Computation Reuse
 
@@ -55,6 +63,21 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 | [AWQ W4A16, BF16 kernel](results/control-methods-final-benchmark-awq-001.json) | openvla_oft | 8 | 216 / 0 | 204.95 / 206.69 | 26.00 | 0.965× | 6.12 | 4/4; errors 0 |
 | [AWQ W4A16, explicit FP16 kernel](results/control-methods-final-benchmark-awq_fp16_kernel-001.json) | openvla_oft | 8 | 216 / 0 | 170.32 / 171.73 | 21.61 | 1.162× | 6.12 | 4/4; errors 0 |
 
+## Observed visual-token retention
+
+Query-weighted measured counts, including warmup/refresh queries; these
+are not configured keep ratios or FLOPs. Final counts do not describe
+earlier-layer cost. Per-layer sequence lengths remain in raw diagnostics.
+
+| Method | Final mean / min / max | Early mean | Mode counts (true/observed) |
+|---|---:|---:|---|
+| ADP | 458.7 / 384 / 512 | — | pruned 90/216 |
+| SAFE-Pruner | 170.7 / 128 / 512 | — | keyframe 24/216 |
+| SpecPrune-VLA (token batch 1) | 68.5 / 60 / 108 | — | — |
+| TEAM-VLA (paper-based) | 80.0 / 80 / 80 | 269.1 | — |
+| VLA-IAP (paper-based) | 438.0 / 174 / 512 | — | warmup 24/216 |
+| VLA-Pruner | 192.0 / 128 / 512 | — | — |
+
 ## Traceability
 
 Raw files remain under `outputs/<run ID>/`; the linked JSON preserves their
@@ -74,6 +97,14 @@ earlier source revision is explicitly marked, never silently relabeled.
 | SpecPrune-VLA | [specprune_vla](../configs/experiments/openvla_oft/specprune_vla.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
 | VLA-Cache, full statistics / eager | [vla_cache](../configs/experiments/openvla_oft/vla_cache.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
 | VOTE ensemble core | [vote_ensemble](../configs/experiments/openvla_oft/vote_ensemble.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline_horizon1-001` |
+| ADP | [adp](../configs/experiments/openvla_oft/adp.yaml) | `ff880edb449d` | `token-batch-final-benchmark-baseline-001` |
+| Native H=8 (token batch 1) | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `ff880edb449d` | `token-batch-final-benchmark-baseline-001` |
+| Native H=8 end recheck (token batch 1) | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `ff880edb449d` | `token-batch-final-benchmark-baseline-001` |
+| SAFE-Pruner | [safe_pruner](../configs/experiments/openvla_oft/safe_pruner.yaml) | `ff880edb449d` | `token-batch-final-benchmark-baseline-001` |
+| SpecPrune-VLA (token batch 1) | [specprune_vla](../configs/experiments/openvla_oft/specprune_vla.yaml) | `ff880edb449d` | `token-batch-final-benchmark-baseline-001` |
+| TEAM-VLA (paper-based) | [team_vla](../configs/experiments/openvla_oft/team_vla.yaml) | `ff880edb449d` | `token-batch-final-benchmark-baseline-001` |
+| VLA-IAP (paper-based) | [vla_iap](../configs/experiments/openvla_oft/vla_iap.yaml) | `ff880edb449d` | `token-batch-final-benchmark-baseline-001` |
+| VLA-Pruner | [vla_pruner](../configs/experiments/openvla_oft/vla_pruner.yaml) | `ff880edb449d` | `token-batch-final-benchmark-baseline-001` |
 
 ## Timing protocols
 
@@ -88,6 +119,14 @@ earlier source revision is explicitly marked, never silently relabeled.
 | SpecPrune-VLA | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | VLA-Cache, full statistics / eager | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | VOTE ensemble core | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| ADP | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| Native H=8 (token batch 1) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| Native H=8 end recheck (token batch 1) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| SAFE-Pruner | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| SpecPrune-VLA (token batch 1) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| TEAM-VLA (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| VLA-IAP (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| VLA-Pruner | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 
 ## Interpretation boundaries
 
@@ -100,3 +139,6 @@ earlier source revision is explicitly marked, never silently relabeled.
   boundary casts are timed. Accuracy equivalence is not established.
 - Cache regressions, failed smoke episodes and all precision variants remain
   visible. Historical runs in other validation reports are separate cohorts.
+- TEAM-VLA and VLA-IAP are independent paper-based implementations with
+  explicit unresolved author-code conventions; consult their method READMEs.
+  Their rows are not verified reproductions of the published implementations.

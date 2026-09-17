@@ -92,3 +92,7 @@ for every future integration; formal success rate stays separate from smoke.
 The [control-method validation report](docs/control_methods_validation.md) details
 the cache follow-up, the two independent core contributions, matched-cadence
 comparisons and clean-checkout verification.
+
+The [token-reduction validation report](docs/token_reduction_validation.md) records
+the five-method Section 5.1 batch, source-fidelity limitations, smoke failures,
+observed token budgets, paired measurements and independent regression checks.
