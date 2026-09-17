@@ -1,4 +1,23 @@
-# SP-VLA scheduling core
+# SP-VLA: scheduling and visual token pruning
+
+The canonical method ID/directory is now `sp_vla`. The existing experiment file
+`sp_vla_scheduling.yaml` remains a scheduling-only preset using this same method;
+`sp_vla.yaml` enables both contributions. Old recorded run IDs are unchanged.
+Direct users of the old method ID must change it to `sp_vla`. There is one owned
+implementation, not two independently composable methods.
+Primary category remains model_routing; cross-reference survey 5.1 for token pruning.
+
+The full preset additionally reads the released last-block SigLIP Q/K, selects by
+cumulative attention mass and protects Canny-edge patches in each camera. DINO
+and SigLIP share selected patch indices; the LLM retains original positions. The
+native vision output is second-to-last-block features; the last-block probe follows
+the author's executable scorer, not a guessed replacement. All probe/edge costs
+are timed. The author's code REDUCES attention mass as absolute Z increases,
+contrary to comments in that repository. We preserve the code formula and label
+it in runtime metadata. Cold/low-Z queries retain every token; we do not reverse
+the rule to manufacture a speedup. One fixed spatial preset is used across suites.
+
+The following describes the retained scheduling-only ablation:
 
 Category: model_routing (survey §5.3, cross-reference §5.5).
 Inference-only on the unmodified joint-suite OpenVLA-OFT checkpoint.

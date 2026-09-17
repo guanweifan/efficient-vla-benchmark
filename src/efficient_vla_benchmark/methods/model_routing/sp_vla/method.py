@@ -22,7 +22,7 @@ def extrapolate(history, ridge, translation_clip):
 
 
 class SPVLAScheduling(InferenceMethod):
-    name = "sp_vla_scheduling"
+    name = "sp_vla"
     requires_control_history = True
 
     def __init__(self, config):
@@ -39,6 +39,7 @@ class SPVLAScheduling(InferenceMethod):
         self.generated = True
         if (
             not self.config.enabled
+            or not self.config.scheduling
             or len(self.history) < max(2, self.config.gate_steps)
             or sum(self.origins) < self.config.min_model_actions
         ):

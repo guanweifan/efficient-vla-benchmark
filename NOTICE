@@ -7,6 +7,11 @@ protected original token positions and explicit per-instance state. This notice
 retains upstream terms; it does not select a license for unrelated first-party code.
 
 ADP/OpenVLA-OFT: Copyright (c) 2025 Moo Jin Kim, Chelsea Finn, Percy Liang.
+SP-VLA/OpenVLA: Copyright (c) 2024 Moo Jin Kim, Karl Pertsch, Siddharth Karamcheti.
+The SP-VLA visual-pruning port also adapts the MIT-licensed ChildTang/SP-VLA
+repository at 61872a4d6d8e9c18f08b6474ceca2ff2fe08e942. Its patch geometry,
+attention-mass selection and scheduling were reorganized into instance-local
+OFT interfaces; reference comments inconsistent with code are explicitly documented.
 VLA-Pruner: Copyright (c) 2025 MINT-SJTU.
 SAFE-Pruner: Copyright (c) 2026 Shinlin.
 The MIT terms below apply to the corresponding MIT-licensed source portions.
@@ -239,4 +244,3 @@ SOFTWARE.
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-

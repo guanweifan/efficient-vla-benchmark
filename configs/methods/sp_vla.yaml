@@ -1,0 +1,8 @@
+method: sp_vla
+parameters:
+  scheduling: true
+  token_pruning: true
+  z_prune_threshold: 0.5
+  max_prune_fraction: 0.9
+  canny_low: 100
+  canny_high: 200

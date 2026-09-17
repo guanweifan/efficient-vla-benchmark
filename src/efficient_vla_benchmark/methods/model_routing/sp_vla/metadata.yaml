@@ -1,0 +1,11 @@
+schema_version: 1
+name: sp_vla
+category: model_routing
+description: SP-VLA scheduling and visual pruning, with a scheduling-only ablation.
+config: efficient_vla_benchmark.methods.model_routing.sp_vla.config:SPVLAConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [control_hooks, libero_cartesian_delta_actions, llama_decoder, visual_token_layout]
+    factory: efficient_vla_benchmark.methods.model_routing.sp_vla.implementations.openvla_oft.api:build

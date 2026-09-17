@@ -1,4 +1,4 @@
-method: sp_vla_scheduling
+method: sp_vla
 parameters:
   enabled: true
   history_size: 6
