@@ -9,5 +9,13 @@ def register():
         factory="efficient_vla_backend_openvla_oft.backend:build",
         validator="efficient_vla_backend_openvla_oft.config:validate",
         variants=("libero_joint",),
-        capabilities=frozenset({"llama_decoder", "visual_token_layout", "l1_action_head"}),
+        capabilities=frozenset(
+            {
+                "llama_decoder",
+                "visual_token_layout",
+                "l1_action_head",
+                "control_hooks",
+                "libero_cartesian_delta_actions",
+            }
+        ),
     )

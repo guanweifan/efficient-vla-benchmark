@@ -8,6 +8,25 @@ class InferenceMethod:
     requires_control_history = False
     reversible = True
 
+    def before_plan(self, observation, step: int):
+        """Optionally replace a queued-chunk refill with ONE environment action.
+
+        None requests native prediction. Called only when the queue is empty;
+        a replacement is not a model query and is never padded into a chunk.
+        """
+        return None
+
+    def on_plan(self, actions, step: int):
+        """Inspect a copied full environment-ready chunk at its start step."""
+        pass
+
+    def transform_action(self, action, step: int):
+        """Return one environment-ready command; called on every control step."""
+        return action
+
+    def control_diagnostics(self) -> dict:
+        return {}
+
     def reset(self, context: EpisodeContext) -> None:
         pass
 

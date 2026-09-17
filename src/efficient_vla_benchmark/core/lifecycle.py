@@ -30,6 +30,22 @@ class MethodHost:
         self._ensure_open()
         return self.method.after_action(action, remaining) if self.method else False
 
+    def before_plan(self, observation, step):
+        self._ensure_open()
+        return self.method.before_plan(observation, step) if self.method else None
+
+    def on_plan(self, actions, step):
+        self._ensure_open()
+        if self.method:
+            self.method.on_plan(actions, step)
+
+    def transform_action(self, action, step):
+        self._ensure_open()
+        return self.method.transform_action(action, step) if self.method else action
+
+    def control_diagnostics(self):
+        return self.method.control_diagnostics() if self.method else {}
+
     def detach_method(self):
         self._ensure_open()
         if self.method is not None:

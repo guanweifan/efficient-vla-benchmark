@@ -139,6 +139,8 @@ def select_method(config: ExperimentConfig, spec: BackendSpec):
     if not required.issubset(spec.capabilities):
         raise ValueError("Backend lacks capabilities required by this method")
     method_config = resolve(method.config).parse(config.parameters)
+    if implementation.get("validate_experiment"):
+        resolve(implementation["validate_experiment"])(config, method_config)
     return method, implementation, method_config
 
 

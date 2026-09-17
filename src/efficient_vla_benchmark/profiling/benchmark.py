@@ -55,7 +55,7 @@ def benchmark(
     ]
     output_dir.mkdir(parents=True, exist_ok=True)
     metadata = {
-        "schema_version": 2,
+        "schema_version": 3,
         "kind": "sequential_policy_timing",
         "backend": backend.metadata(),
         "config": asdict(config),
@@ -73,6 +73,7 @@ def benchmark(
             "episode_state_reset": True,
             "controller_included": mode == "control",
             "observations": "fixed_reference_trajectory_not_closed_loop",
+            "query_definition": "native_model_call_not_controller_refill",
         },
         "hardware": monitor.hardware(),
         "traces": [{"name": path.name, "sha256": digest_file(path)} for path in trace_paths],
@@ -184,6 +185,15 @@ def benchmark(
         result["all_control_steps"] = latency_summary([row["latency_ms"] for row in rows])
         result["replay_policy_time_ms"] = sum(row["latency_ms"] for row in rows)
         result["query_fraction"] = len(query_rows) / len(rows)
+        replacement_rows = [
+            row for row in rows if row["diagnostics"].get("action_source") == "replacement"
+        ]
+        result["replacement_steps"] = len(replacement_rows)
+        result["replacement_latency"] = (
+            latency_summary([row["latency_ms"] for row in replacement_rows])
+            if replacement_rows
+            else None
+        )
     (output_dir / "summary.json").write_text(json.dumps(result, indent=2, sort_keys=True))
     print(json.dumps(result, indent=2), flush=True)
     return result

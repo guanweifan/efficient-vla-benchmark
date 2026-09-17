@@ -6,7 +6,9 @@ method READMEs before changing code. Upstream submodules keep their own instruct
 ## Invariants
 
 - Keep this repository independent of the survey manuscript.
-- One complete paper method per run; do not compose independently published methods.
+- One method per run; do not compose independently published methods. An independently
+  meaningful core contribution may be ported without the paper's other components,
+  but its ID, README and runtime metadata must explicitly disclose that scope.
 - One canonical method directory under its principal category. Cross-category labels
   are metadata, never duplicated implementations.
 - Methods never import another method's implementation. Backend plugins never import
@@ -29,6 +31,9 @@ method READMEs before changing code. Upstream submodules keep their own instruct
   to the agreed four-episode smoke set. No training or large downloads by implication.
 - One feature per commit, with tests/config/docs. Shared infrastructure has separate
   commits. Do not describe partial mechanisms or smoke outcomes as paper reproductions.
+- Every measured algorithm updates docs/benchmark_results.md through the audited
+  result-recording workflow; preserve the paired baseline, source/config/raw hashes,
+  negative outcomes and the distinction between smoke and formal success rate.
 - No pushes, remote history replacement, new remote forks, or unrelated deletions
   without explicit authority.
 
@@ -46,4 +51,3 @@ OpenVLA-OFT native baseline, SpecPrune-VLA, VLA-Cache and AWQ. CogACT and starVL
 retain pinned sources for subsequent implementations; do not advertise runtime
 support until their own model checks have passed. Do not fabricate an empty plugin
 that only registers a name and cannot perform inference.
-
