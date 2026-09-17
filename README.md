@@ -69,3 +69,7 @@ The [measurement ledger](docs/benchmark_results.md) groups measured methods by
 survey section/category and links configuration, source identity, paired baseline,
 raw-result hashes and smoke records. Use [result recording](docs/recording_results.md)
 for every future integration; formal success rate stays separate from smoke.
+
+The [control-method validation report](docs/control_methods_validation.md) details
+the cache follow-up, the two independent core contributions, matched-cadence
+comparisons and clean-checkout verification.
