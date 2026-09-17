@@ -1,0 +1,13 @@
+schema_version: 1
+name: awq
+category: quantization
+description: Activation-aware W4 decoder quantization with offline calibration.
+config: efficient_vla_benchmark.methods.quantization.awq.config:AWQConfig
+requires_artifact: true
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout, l1_action_head]
+    factory: efficient_vla_benchmark.methods.quantization.awq.implementations.openvla_oft.api:build
+    preflight: efficient_vla_benchmark.methods.quantization.awq.implementations.openvla_oft.api:preflight
+    calibrate: efficient_vla_benchmark.methods.quantization.awq.implementations.openvla_oft.api:calibrate

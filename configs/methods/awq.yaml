@@ -1,0 +1,10 @@
+method: awq
+parameters:
+  bits: 4
+  group_size: 128
+  calibration_samples: 32
+  calibration_seed: 0
+  scale_grid: 20
+  clip_grid: 20
+  clip_max_shrink: 0.5
+  clip_sample_tokens: 512
