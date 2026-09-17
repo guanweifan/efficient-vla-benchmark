@@ -60,3 +60,7 @@ are contract fixtures, not VLA models or benchmark-performance evidence.
 Fresh timing, smoke outcomes and migration checks are recorded in
 [migration validation](docs/migration_validation.md). Preserve negative results;
 these development checks are not formal success-rate measurements.
+
+The subsequent [source audit and retest](docs/performance_validation.md) records
+the VLA-Cache attention correction and AWQ's explicit FP16-kernel option, including
+precision differences, native controls and remaining negative speed results.

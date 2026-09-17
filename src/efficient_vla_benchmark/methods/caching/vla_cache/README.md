@@ -70,6 +70,7 @@ not call SDPA again. Matching the author execution pattern does not guarantee
 a speedup over an optimized native SDPA baseline; token-count savings are not
 necessarily proportional to GPU latency savings.
 
-Fresh migration timing is recorded centrally in `docs/migration_validation.md`.
+Historical migration timing is recorded in `docs/migration_validation.md`;
+the corrected implementation's retest is in `docs/performance_validation.md`.
 Retain negative results: do not compare only against an artificially slow eager
 baseline or omit the full entropy mechanism to manufacture a speedup.

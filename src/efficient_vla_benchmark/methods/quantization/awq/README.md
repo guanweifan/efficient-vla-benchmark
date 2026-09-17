@@ -97,3 +97,7 @@ For a separate native precision control, `baseline_fp16.yaml` changes the whole
 native model to FP16 without AWQ. It is not a replacement for the common BF16
 reference. Report these conditions separately, never hide a precision switch
 inside an AWQ-versus-native speedup.
+
+The source audit and fresh comparisons of both kernel precisions are recorded in
+`docs/performance_validation.md`. BF16 remains slower in that retest; the explicit
+FP16-kernel option is faster, without a formal task-accuracy claim.
