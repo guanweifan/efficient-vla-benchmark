@@ -20,13 +20,32 @@ One run uses the native baseline or exactly one method with explicitly declared 
 
 | Backend / variant | Native baseline | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|---|
-| OpenVLA-OFT / libero_joint | Native SDPA | SpecPrune-VLA | VLA-Cache | SP-VLA scheduling core | VOTE ensemble core | AWQ W4A16 |
+| OpenVLA-OFT / libero_joint | Native SDPA | Six methods below | VLA-Cache | SP-VLA scheduling core | VOTE ensemble core | AWQ W4A16 |
 | CogACT | Source pinned; runtime not implemented | — | — | — | — | — |
 | starVLA | Source pinned; runtime not implemented | — | — | — | — | — |
 
 Algorithms retain their full implemented mechanism and disclose adaptations in
 their READMEs. This is a common-checkpoint comparison, not a claim to reproduce
 each paper's original numbers. Quantization uses real packed kernels, not fake quantization.
+
+### Token-reduction methods
+
+Every row is one independent plugin under `methods/token_reduction/`, selected by
+the correspondingly named experiment YAML. Shared backend hooks do not contain
+paper-specific policy, and no method imports another method's implementation.
+
+| Method ID | Mechanism | Implementation basis |
+|---|---|---|
+| `specprune_vla` | Temporal/global and layerwise pruning with action control | Pinned source port |
+| `adp` | Text Q/K selection and observed-motion pruning gate | Pinned source port |
+| `vla_pruner` | Semantic/action saliency, history and diversity | Pinned source port |
+| `safe_pruner` | Forecast saliency and adaptive full-reference refresh | Pinned source port |
+| `team_vla` | Early spatial expansion and mid-layer soft merging | Independent paper implementation |
+| `vla_iap` | Semantic/motion alignment and geometric token protection | Independent paper implementation |
+
+The last two retain explicit unresolved paper conventions in their method READMEs;
+they are not verified author-code reproductions. Integration and speed do not prove
+task reliability. Failed smoke episodes remain visible in the measurement ledger.
 
 ## Start with one backend
 
