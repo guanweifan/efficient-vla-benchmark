@@ -1,0 +1,5 @@
+extends:
+  - ../../backends/openvla_oft.yaml
+  - ../../evaluation/libero_smoke.yaml
+  - ../../profiling/control_replay.yaml
+method: none

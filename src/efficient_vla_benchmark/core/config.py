@@ -83,6 +83,22 @@ class ExperimentConfig:
         timing_keys = {"repeats", "warmup", "mode"}
         if set(self.evaluation) - eval_keys or set(self.profiling) - timing_keys:
             raise ValueError("Unknown evaluation or profiling setting")
+        for name in ("repeats", "warmup"):
+            if name in self.profiling:
+                value = self.profiling[name]
+                if type(value) is not int or value < 1:
+                    raise ValueError(f"{name} must be a positive integer")
+        if self.profiling.get("mode", "control") not in {"control", "query", "prepared"}:
+            raise ValueError("Unknown profiling mode")
+        if "seed" in self.evaluation:
+            value = self.evaluation["seed"]
+            if type(value) is not int or not 0 <= value < 2**32:
+                raise ValueError("Evaluation seed must be an unsigned 32-bit integer")
+        if (
+            "record_traces" in self.evaluation
+            and type(self.evaluation["record_traces"]) is not bool
+        ):
+            raise ValueError("record_traces must be boolean")
 
     @classmethod
     def load(cls, path: Path) -> "ExperimentConfig":
