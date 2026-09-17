@@ -71,3 +71,18 @@ def test_rejects_incomparable_baseline(tmp_path, recorder):
     (baseline / "metadata.json").write_text(json.dumps(meta))
     with pytest.raises(ValueError, match="baseline trace"):
         recorder.make_record(run, baseline, "5.3 Routing", "Example", "configs/example.yaml")
+
+
+def test_token_diagnostics_only_count_queries(recorder):
+    rows = [
+        {"queried": True, "diagnostics": {"visual_tokens_final": 512, "keyframe": True}},
+        {"queried": False, "diagnostics": {"visual_tokens_final": 512, "keyframe": True}},
+        {"queried": True, "diagnostics": {"visual_tokens_final": 128, "keyframe": False}},
+    ]
+    summary = recorder.token_evidence(rows)
+    assert summary["queries_with_diagnostics"] == 2
+    assert summary["final_visual_tokens"] == {"mean": 320, "min": 128, "max": 512}
+    assert summary["keyframe"] == {"true": 1, "observed": 2}
+    assert recorder.token_evidence([{"queried": True}]) is None
+    with pytest.raises(ValueError, match="visual-token"):
+        recorder.token_evidence([{"queried": True, "diagnostics": {"visual_tokens_final": -1}}])

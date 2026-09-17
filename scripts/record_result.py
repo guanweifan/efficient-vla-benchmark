@@ -19,6 +19,47 @@ def digest(path):
     return value.hexdigest()
 
 
+def token_evidence(rows):
+    """Summarize query diagnostics, never counting queued-action rows twice."""
+    observations = []
+    for row in rows:
+        if not row["queried"]:
+            continue
+        diag = row.get("diagnostics", {})
+        # Accept the original diagnostic spelling for historical integrations.
+        count = diag.get("visual_tokens_final", diag.get("final_visual_tokens"))
+        if count is None:
+            continue
+        if type(count) is not int or count < 0:
+            raise ValueError("Invalid visual-token diagnostic")
+        observations.append((count, diag))
+    if not observations:
+        return None
+    counts = [count for count, _ in observations]
+    result = {
+        "queries_with_diagnostics": len(counts),
+        "final_visual_tokens": {
+            "mean": sum(counts) / len(counts),
+            "min": min(counts),
+            "max": max(counts),
+        },
+    }
+    for key in ("pruned", "keyframe", "warmup"):
+        values = [d[key] for _, d in observations if key in d]
+        if values:
+            if any(type(value) is not bool for value in values):
+                raise ValueError("Invalid token-mode diagnostic")
+            result[key] = {"true": sum(values), "observed": len(values)}
+    early = [d["visual_tokens_early"] for _, d in observations if "visual_tokens_early" in d]
+    if early:
+        result["early_visual_tokens"] = {
+            "mean": sum(early) / len(early),
+            "min": min(early),
+            "max": max(early),
+        }
+    return result
+
+
 def timing_evidence(directory):
     metadata = read_json(directory / "metadata.json")
     summary = read_json(directory / "summary.json")
@@ -49,6 +90,7 @@ def timing_evidence(directory):
         "run_id": directory.name,
         "metadata": metadata,
         "summary": summary,
+        "token_diagnostics": token_evidence(rows),
         "files_sha256": {
             name: digest(directory / name)
             for name in ("metadata.json", "summary.json", "timings.jsonl")
@@ -176,6 +218,36 @@ def render(records):
                 f"{memory_text} | {smoke_text} |"
             )
         lines.append("")
+    token_records = [r for r in records if r["run"].get("token_diagnostics")]
+    if token_records:
+        lines += [
+            "## Observed visual-token retention",
+            "",
+            "Query-weighted measured counts, including warmup/refresh queries; these",
+            "are not configured keep ratios or FLOPs. Final counts do not describe",
+            "earlier-layer cost. Per-layer sequence lengths remain in raw diagnostics.",
+            "",
+            "| Method | Final mean / min / max | Early mean | Mode counts (true/observed) |",
+            "|---|---:|---:|---|",
+        ]
+        for record in token_records:
+            diag = record["run"]["token_diagnostics"]
+            final = diag["final_visual_tokens"]
+            early = diag.get("early_visual_tokens")
+            early_text = f"{early['mean']:.1f}" if early else "—"
+            modes = (
+                "; ".join(
+                    f"{key} {diag[key]['true']}/{diag[key]['observed']}"
+                    for key in ("pruned", "keyframe", "warmup")
+                    if key in diag
+                )
+                or "—"
+            )
+            lines.append(
+                f"| {record['label']} | {final['mean']:.1f} / {final['min']} / "
+                f"{final['max']} | {early_text} | {modes} |"
+            )
+        lines.append("")
     lines += [
         "## Traceability",
         "",
@@ -224,6 +296,9 @@ def render(records):
         "  boundary casts are timed. Accuracy equivalence is not established.",
         "- Cache regressions, failed smoke episodes and all precision variants remain",
         "  visible. Historical runs in other validation reports are separate cohorts.",
+        "- TEAM-VLA and VLA-IAP are independent paper-based implementations with",
+        "  explicit unresolved author-code conventions; consult their method READMEs.",
+        "  Their rows are not verified reproductions of the published implementations.",
         "",
     ]
     return "\n".join(lines)
