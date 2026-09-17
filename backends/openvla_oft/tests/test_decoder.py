@@ -137,3 +137,60 @@ def test_indexed_reuse_preserves_dense_output_for_identical_frames():
     torch.testing.assert_close(cold, reference, atol=1e-6, rtol=0)
     torch.testing.assert_close(warm[:, 5:], reference[:, 5:], atol=1e-6, rtol=0)
     adapter.close()
+
+
+@pytest.mark.parametrize("attention_backend", ["eager", "sdpa"])
+@torch.inference_mode()
+def test_full_attention_probe_matches_reference_and_does_not_recompute(
+    attention_backend, monkeypatch
+):
+    from transformers.models.llama.modeling_llama import LlamaAttention
+
+    class FullProbe(DecoderStrategy):
+        def probes(self, layer, state):
+            return {"full": state.positions}
+
+    torch.manual_seed(31)
+    model = tiny_decoder()
+    original = model.layers[0].self_attn
+    hidden = torch.randn(1, 12, 32)
+    positions = torch.arange(12).unsqueeze(0)
+    mask = torch.zeros(1, 1, 12, 12)
+    mask[..., -1] = torch.finfo(hidden.dtype).min
+    expected, probabilities, _ = LlamaAttention.forward(
+        original, hidden, attention_mask=mask, position_ids=positions, output_attentions=True
+    )
+    strategy = FullProbe()
+    strategy.attention_backend = attention_backend
+    adapter = DecoderAdapter(model, strategy, tiny_layout)
+    from efficient_vla_backend_openvla_oft.decoder import DecoderState
+
+    adapter.state = DecoderState(tiny_layout(12), positions[0])
+    if attention_backend == "eager":
+
+        def forbidden(*args, **kwargs):
+            raise AssertionError("Eager output must reuse probabilities, not call SDPA")
+
+        monkeypatch.setattr(torch.nn.functional, "scaled_dot_product_attention", forbidden)
+    output, _, _ = model.layers[0].self_attn(hidden, attention_mask=mask, position_ids=positions)
+    torch.testing.assert_close(output, expected, atol=1e-6, rtol=0)
+    torch.testing.assert_close(
+        model.layers[0].self_attn.last_attention["full"],
+        probabilities.mean(dim=1)[0],
+        atol=1e-7,
+        rtol=0,
+    )
+    adapter.close()
+
+
+@torch.inference_mode()
+def test_probe_outside_active_range_is_rejected():
+    class InvalidProbe(DecoderStrategy):
+        def probes(self, layer, state):
+            return {"invalid": state.positions.new_tensor([state.layout.length + 1])}
+
+    model = tiny_decoder()
+    adapter = DecoderAdapter(model, InvalidProbe(), tiny_layout)
+    with pytest.raises(ValueError, match="removed query"):
+        model(inputs_embeds=torch.randn(1, 12, 32))
+    adapter.close()

@@ -64,6 +64,8 @@ class DecoderState:
 class DecoderStrategy:
     """Method-owned decisions. Returned keep masks refer to current query rows."""
 
+    attention_backend = "sdpa"
+
     def start(self, state: DecoderState) -> None:
         pass
 
@@ -114,8 +116,8 @@ class IndexedKVStore:
         return self.keys[layer], self.values[layer]
 
 
-class InspectableSDPA(nn.Module):
-    """Reuse native weights and SDPA; materialize only requested attention rows."""
+class InspectableAttention(nn.Module):
+    """Native SDPA probes, or shared eager probabilities for full-map consumers."""
 
     def __init__(self, original, owner, layer):
         super().__init__()
@@ -172,31 +174,56 @@ class InspectableSDPA(nn.Module):
         if attention_mask is not None:
             queries, keys, values = queries.contiguous(), keys.contiguous(), values.contiguous()
         self.last_attention = {}
-        for name, requested in strategy.probes(self.layer, state).items():
-            row_indices = torch.searchsorted(state.positions, requested)
+        probes = strategy.probes(self.layer, state)
+        probabilities = None
+        if strategy.attention_backend == "eager":
+            # Same execution pattern as the reference LlamaAttention: compute
+            # probabilities once, then reuse them for both P @ V and statistics.
+            logits = torch.matmul(queries, keys.transpose(2, 3)) / self.head_dim**0.5
+            if attention_mask is not None:
+                logits = logits + attention_mask
+            probabilities = F.softmax(logits, dim=-1, dtype=torch.float32).to(queries.dtype)
+            output = torch.matmul(probabilities, values)
+        for name, requested in probes.items():
             if requested.numel() == 0:
                 self.last_attention[name] = queries.new_empty(
                     (0, keys.shape[2]), dtype=torch.float32
                 )
                 continue
-            if not torch.equal(state.positions[row_indices], requested):
-                raise ValueError("An attention probe requested a removed query token")
-            logits = (
-                torch.matmul(queries.index_select(2, row_indices), keys.transpose(2, 3))
-                / self.head_dim**0.5
+            # Identity is a safe full-row request, not a disabled validity check.
+            # It avoids a redundant GPU search/gather/equality synchronization.
+            if requested is state.positions:
+                row_indices = None
+            else:
+                row_indices = torch.searchsorted(state.positions, requested).clamp_max(
+                    state.positions.numel() - 1
+                )
+                if not torch.equal(state.positions[row_indices], requested):
+                    raise ValueError("An attention probe requested a removed query token")
+            if probabilities is not None:
+                selected = (
+                    probabilities
+                    if row_indices is None
+                    else probabilities.index_select(2, row_indices)
+                )
+            else:
+                probe_queries = (
+                    queries if row_indices is None else queries.index_select(2, row_indices)
+                )
+                logits = torch.matmul(probe_queries, keys.transpose(2, 3)) / self.head_dim**0.5
+                if attention_mask is not None:
+                    logits = logits + attention_mask[:, :, :1, :]
+                selected = F.softmax(logits, dim=-1, dtype=torch.float32).to(queries.dtype)
+            self.last_attention[name] = selected.mean(dim=1, dtype=torch.float32)[0]
+        if probabilities is None:
+            output = F.scaled_dot_product_attention(
+                queries,
+                keys,
+                values,
+                attn_mask=attention_mask,
+                dropout_p=0.0,
+                is_causal=False,
             )
-            if attention_mask is not None:
-                logits = logits + attention_mask[:, :, :1, :]
-            probabilities = F.softmax(logits, dim=-1, dtype=torch.float32).to(queries.dtype)
-            self.last_attention[name] = probabilities.mean(dim=1, dtype=torch.float32)[0]
-        output = F.scaled_dot_product_attention(
-            queries,
-            keys,
-            values,
-            attn_mask=attention_mask,
-            dropout_p=0.0,
-            is_causal=False,
-        )
         output = output.transpose(1, 2).contiguous().view(batch, length, self.hidden_size)
         return self.o_proj(output), None, None
 
@@ -205,6 +232,8 @@ class DecoderAdapter:
     """Attach reversible hooks and attention modules to one LlamaModel instance."""
 
     def __init__(self, decoder, strategy: DecoderStrategy, layout_factory=TokenLayout):
+        if strategy.attention_backend not in {"sdpa", "eager"}:
+            raise ValueError("Unsupported inspectable attention backend")
         if getattr(decoder, "_evb_adapter", None) is not None:
             raise ValueError("Only one decoder strategy may be attached")
         if decoder.config._attn_implementation != "sdpa" or decoder.training:
@@ -217,7 +246,7 @@ class DecoderAdapter:
         self.handles.append(decoder.register_forward_pre_hook(self._start, with_kwargs=True))
         for index, layer in enumerate(decoder.layers):
             self.original_attention.append(layer.self_attn)
-            layer.self_attn = InspectableSDPA(layer.self_attn, self, index)
+            layer.self_attn = InspectableAttention(layer.self_attn, self, index)
             self.handles.append(
                 layer.register_forward_pre_hook(self._before(index), with_kwargs=True)
             )

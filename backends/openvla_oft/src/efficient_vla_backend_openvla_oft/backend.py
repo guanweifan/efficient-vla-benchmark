@@ -148,12 +148,19 @@ class OpenVLAOFTBackend(MethodHost):
                 torch.cuda.empty_cache()
 
     def metadata(self):
+        adapter = getattr(self.model.language_model.model, "_evb_adapter", None)
+        attention_backend = (
+            adapter.strategy.attention_backend
+            if adapter is not None
+            else self.model.config._attn_implementation
+        )
         return {
             "backend": "openvla_oft",
             "model_variant": "libero_joint",
             "method": self.method_name,
             "precision": self.precision,
-            "attention_implementation": self.model.config._attn_implementation,
+            "attention_implementation": attention_backend,
+            "native_attention_implementation": self.model.config._attn_implementation,
             "predicted_horizon": 8,
             "action_dim": 7,
             "camera_views": 2,
