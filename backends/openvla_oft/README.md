@@ -24,7 +24,7 @@ After installing the pinned native dependencies and main package:
 python -m pip install --no-deps --no-build-isolation -e backends/openvla_oft
 ```
 
-The environment installer and complete commands are documented in docs/installation.md.
+The environment installer and complete commands are documented in [INSTALL.md](INSTALL.md).
 Model and dataset locations are CLI arguments, never defaults. The plugin supports
 API version 1. A new model variant requires explicit configuration, parity tests and
 method-compatibility metadata; do not silently treat an arbitrary OFT checkpoint as
