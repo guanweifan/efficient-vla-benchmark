@@ -1,0 +1,11 @@
+schema_version: 1
+name: flash_vla
+category: token_reduction
+description: FlashVLA (2025) SVD/ICS token-pruning core; action reuse unresolved.
+config: efficient_vla_benchmark.methods.token_reduction.flash_vla.config:FlashVLAConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout, l1_action_head]
+    factory: efficient_vla_benchmark.methods.token_reduction.flash_vla.implementations.openvla_oft.api:build
