@@ -1,0 +1,6 @@
+method: efficient_vla
+parameters:
+  pruning_layer: 1
+  tokens_per_view: 128
+  key_tokens_per_view: 8
+  task_fraction: 0.5

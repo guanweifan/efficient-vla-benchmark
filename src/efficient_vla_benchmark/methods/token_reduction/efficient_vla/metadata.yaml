@@ -1,0 +1,11 @@
+schema_version: 1
+name: efficient_vla
+category: token_reduction
+description: EfficientVLA task-relevance and diversity token-pruning core only.
+config: efficient_vla_benchmark.methods.token_reduction.efficient_vla.config:EfficientVLAConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout, l1_action_head]
+    factory: efficient_vla_benchmark.methods.token_reduction.efficient_vla.implementations.openvla_oft.api:build
