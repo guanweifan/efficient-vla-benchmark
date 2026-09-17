@@ -1,0 +1,8 @@
+method: vla_pruner
+parameters:
+  keep_ratio: 0.25
+  pruning_layer: 3
+  history_layer: 15
+  temporal: true
+  history_size: 3
+  decay: 0.8

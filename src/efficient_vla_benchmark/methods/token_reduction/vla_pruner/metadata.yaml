@@ -1,0 +1,12 @@
+schema_version: 1
+name: vla_pruner
+category: token_reduction
+description: Temporal semantic/action token selection with diversity filtering.
+config: efficient_vla_benchmark.methods.token_reduction.vla_pruner.config:VLAPrunerConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout, l1_action_head]
+    factory: efficient_vla_benchmark.methods.token_reduction.vla_pruner.implementations.openvla_oft.api:build
+    preflight: efficient_vla_benchmark.methods.token_reduction.vla_pruner.implementations.openvla_oft.api:preflight
