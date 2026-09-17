@@ -43,6 +43,7 @@ class VLACache(InferenceMethod, DecoderStrategy):
 
         preflight(config, None)
         self.backend, self.config = backend, config
+        self.attention_backend = config.attention_backend
         decoder = backend.model.language_model.model
         if len(decoder.layers) != 32:
             raise ValueError("VLA-Cache presets require the 32-layer OFT backbone")
@@ -162,6 +163,13 @@ class VLACache(InferenceMethod, DecoderStrategy):
 
     def after_query(self, actions):
         self.previous_images = self.current_images
+
+    def metadata(self):
+        return {
+            "attention_backend": self.attention_backend,
+            "full_layer_entropy": True,
+            "statistics_queries": "all_active_rows",
+        }
 
     def close(self):
         self.adapter.close()

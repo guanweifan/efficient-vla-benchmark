@@ -1,4 +1,5 @@
 from dataclasses import replace
+from types import MethodType
 
 import numpy as np
 import pytest
@@ -6,7 +7,8 @@ import torch
 
 
 @pytest.mark.gpu
-def test_vla_cache_real_cold_parity_reuse_and_reset(model_path, trace_path):
+@pytest.mark.parametrize("attention_backend", ["eager", "sdpa"])
+def test_vla_cache_real_cold_parity_reuse_and_reset(model_path, trace_path, attention_backend):
     from efficient_vla_backend_openvla_oft.backend import OpenVLAOFTBackend
 
     from efficient_vla_benchmark.evaluation.traces import load_trace
@@ -19,8 +21,20 @@ def test_vla_cache_real_cold_parity_reuse_and_reset(model_path, trace_path):
     context, samples, _ = load_trace(trace_path, require_control_steps=True)
     backend = OpenVLAOFTBackend(model_path)
     backend.reset(context)
+    originals = []
+    if attention_backend == "eager":
+        from transformers.models.llama.modeling_llama import LlamaAttention
+
+        # Independent reference: the author's stock eager LlamaAttention, not
+        # the adapter under test. These unpadded cold observations need no mask.
+        for layer in backend.model.language_model.model.layers:
+            attention = layer.self_attn
+            originals.append((attention, attention.forward))
+            attention.forward = MethodType(LlamaAttention.forward, attention)
     reference = backend.predict_chunk(samples[0])
-    method = VLACache(backend, VLACacheConfig.parse({}))
+    for attention, forward in originals:
+        attention.forward = forward
+    method = VLACache(backend, VLACacheConfig.parse({"attention_backend": attention_backend}))
     backend.attach_method(method)
     backend.reset(context)
     np.testing.assert_allclose(backend.predict_chunk(samples[0]), reference, atol=1e-6, rtol=0)

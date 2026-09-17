@@ -4,6 +4,7 @@ from dataclasses import dataclass, fields
 
 @dataclass(frozen=True)
 class VLACacheConfig:
+    attention_backend: str = "eager"
     static_budget_per_view: int = 150
     similarity_threshold: float = 0.996
     protected_tokens_per_view: int = 100
@@ -23,6 +24,11 @@ class VLACacheConfig:
                 raise ValueError("reuse_layers must be a sequence")
             values["reuse_layers"] = tuple(values["reuse_layers"])
         config = cls(**values)
+        if not isinstance(config.attention_backend, str) or config.attention_backend not in {
+            "eager",
+            "sdpa",
+        }:
+            raise ValueError("attention_backend must be eager or sdpa")
         for name in ("static_budget_per_view", "protected_tokens_per_view"):
             value = getattr(config, name)
             if type(value) is not int or value < 0:

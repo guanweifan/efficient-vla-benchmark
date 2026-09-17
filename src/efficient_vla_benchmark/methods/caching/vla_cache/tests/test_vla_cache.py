@@ -37,6 +37,7 @@ def reference_utils():
         {"task_attention_layer": -1},
         {"weighted_growth": 1},
         {"protected_tokens_per_view": -1},
+        {"attention_backend": "unknown"},
     ],
 )
 def test_cache_config_rejects_invalid_parameters(parameters):

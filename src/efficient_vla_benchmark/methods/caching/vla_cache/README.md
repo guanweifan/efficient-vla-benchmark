@@ -36,10 +36,14 @@ the unchanged native action-head boundary. No dependency on another algorithm.
 - Derive text positions from the true prompt/proprio layout instead of a fixed
   34-token range. Keep the native baseline action readout rather than adopting
   the fork's shifted action slice.
-- Preserve native bidirectional SDPA for action computation. Additional attention
-  probabilities are collected for all layers to compute the complete entropy
-  schedule. This overhead is timed; text-only entropy, frozen schedules and sparse
-  layer sampling are not silently substituted to manufacture a speedup.
+- Preserve native bidirectional masking and action boundaries. The default
+  `attention_backend: eager` follows the author's attention execution pattern:
+  compute probabilities once and reuse them for output and complete statistics.
+  `attention_backend: sdpa` remains an explicit comparison path that computes
+  separate statistics while retaining fused SDPA outputs. Eager and SDPA have
+  different low-precision rounding; both paths are identified in metadata.
+  Neither removes layers/query rows from entropy collection, freezes schedules
+  or changes task protection. All online overhead remains timed.
 - BF16 entropy arithmetic follows the reference. FP16 runs upcast this statistic
   to FP32 to avoid underflow of its small epsilon; this is a numeric adaptation.
 - Remove reference visualization/printing/internal timers, not mechanism costs.
@@ -58,6 +62,13 @@ Initial development checks passed cold-query native parity at 1e-6, bitwise reus
 of skipped KV rows on real observations, and episode/instruction invalidation.
 All four small LIBERO smoke episodes completed successfully without runtime errors;
 this is not a formal success-rate estimate.
+
+The standard-attention correction has additional real-model cold/reset parity
+checks against an independent eager LlamaAttention reference at 1e-6; the SDPA
+option retains its native-parity check. Shared backend tests ensure eager does
+not call SDPA again. Matching the author execution pattern does not guarantee
+a speedup over an optimized native SDPA baseline; token-count savings are not
+necessarily proportional to GPU latency savings.
 
 Fresh migration timing is recorded centrally in `docs/migration_validation.md`.
 Retain negative results: do not compare only against an artificially slow eager
