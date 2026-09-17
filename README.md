@@ -56,3 +56,7 @@ See [architecture](docs/architecture.md), [contribution rules](CONTRIBUTING.md),
 [adding a backend](docs/adding_backend.md) and [adding a method](docs/adding_method.md).
 Installable templates demonstrate external plugins without editing the core. They
 are contract fixtures, not VLA models or benchmark-performance evidence.
+
+Fresh timing, smoke outcomes and migration checks are recorded in
+[migration validation](docs/migration_validation.md). Preserve negative results;
+these development checks are not formal success-rate measurements.
