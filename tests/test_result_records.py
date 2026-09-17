@@ -86,3 +86,13 @@ def test_token_diagnostics_only_count_queries(recorder):
     assert recorder.token_evidence([{"queried": True}]) is None
     with pytest.raises(ValueError, match="visual-token"):
         recorder.token_evidence([{"queried": True, "diagnostics": {"visual_tokens_final": -1}}])
+
+
+def test_cache_query_skipping_is_not_reported_as_context_pruning(recorder):
+    rows = [
+        {
+            "queried": True,
+            "diagnostics": {"visual_query_tokens_final": 300, "visual_kv_tokens": 512},
+        }
+    ]
+    assert recorder.token_evidence(rows) is None

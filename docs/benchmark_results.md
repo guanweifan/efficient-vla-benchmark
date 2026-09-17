@@ -20,6 +20,8 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 
 | Method / configuration | Backend | H | Queries / replacements | Query mean / p95 ms | ms/control step | Replay speedup | Peak GiB | Smoke |
 |---|---|---:|---:|---:|---:|---:|---:|---|
+| [Native H=8 (token batch 2)](results/batch2-final-benchmark-baseline-001.json) | openvla_oft | 8 | 216 / 0 | 197.31 / 199.10 | 25.03 | 1.000× | 14.98 | Not run |
+| [Native H=8 end recheck (token batch 2)](results/batch2-final-benchmark-baseline_recheck-001.json) | openvla_oft | 8 | 216 / 0 | 198.63 / 200.64 | 25.20 | 0.993× | 14.98 | Not run |
 | [Native BF16 / SDPA](results/control-methods-final-benchmark-baseline-001.json) | openvla_oft | 8 | 216 / 0 | 197.86 / 199.86 | 25.10 | 1.000× | 14.98 | 4/4; errors 0 |
 | [Native BF16 / SDPA, matched H=1](results/control-methods-final-benchmark-baseline_horizon1-001.json) | openvla_oft | 1 | 1704 / 0 | 199.83 / 201.42 | 199.83 | 1.000× | 14.98 | Not run |
 | [Native BF16 / SDPA, end recheck](results/control-methods-final-benchmark-baseline_recheck-001.json) | openvla_oft | 8 | 216 / 0 | 198.91 / 201.15 | 25.23 | 0.995× | 14.98 | Not run |
@@ -30,6 +32,9 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 
 | Method / configuration | Backend | H | Queries / replacements | Query mean / p95 ms | ms/control step | Replay speedup | Peak GiB | Smoke |
 |---|---|---:|---:|---:|---:|---:|---:|---|
+| [EfficientVLA token core (paper-based)](results/batch2-final-benchmark-efficient_vla-001.json) | openvla_oft | 8 | 216 / 0 | 170.08 / 171.33 | 21.58 | 1.160× | 14.62 | 4/4; errors 0 |
+| [FlashVLA ICS core (paper-based)](results/batch2-final-benchmark-flash_vla-001.json) | openvla_oft | 8 | 216 / 0 | 238.64 / 241.15 | 30.27 | 0.827× | 14.64 | 4/4; errors 0 |
+| [ST-Merge spatial VLA (paper-based)](results/batch2-final-benchmark-st_merge-001.json) | openvla_oft | 8 | 216 / 0 | 171.42 / 172.94 | 21.75 | 1.151× | 14.62 | 4/4; errors 0 |
 | [SpecPrune-VLA](results/control-methods-final-benchmark-specprune_vla-001.json) | openvla_oft | 8 | 237 / 0 | 146.91 / 163.52 | 20.51 | 1.224× | 14.60 | 3/4; errors 0 |
 | [ADP](results/token-batch-final-benchmark-adp-001.json) | openvla_oft | 8 | 216 / 0 | 195.37 / 200.98 | 24.80 | 1.026× | 14.68 | 4/4; errors 0 |
 | [SAFE-Pruner](results/token-batch-final-benchmark-safe_pruner-001.json) | openvla_oft | 8 | 216 / 0 | 148.28 / 200.16 | 18.82 | 1.352× | 14.68 | 4/4; errors 0 |
@@ -42,12 +47,16 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 
 | Method / configuration | Backend | H | Queries / replacements | Query mean / p95 ms | ms/control step | Replay speedup | Peak GiB | Smoke |
 |---|---|---:|---:|---:|---:|---:|---:|---|
+| [VLA-Cache full statistics / eager (token batch 2)](results/batch2-final-benchmark-vla_cache-001.json) | openvla_oft | 8 | 216 / 0 | 207.43 / 217.93 | 26.31 | 0.951× | 15.03 | Not run |
+| [VLA-InfoEntropy KV reuse (paper-based)](results/batch2-final-benchmark-vla_infoentropy-001.json) | openvla_oft | 8 | 216 / 0 | 213.14 / 222.39 | 27.04 | 0.926× | 15.03 | 4/4; errors 0 |
 | [VLA-Cache, full statistics / eager](results/control-methods-final-benchmark-vla_cache-001.json) | openvla_oft | 8 | 216 / 0 | 207.64 / 219.38 | 26.34 | 0.953× | 15.03 | 4/4; errors 0 |
 
 ## 5.3 Layer Skipping, Early Exit, and Model Routing
 
 | Method / configuration | Backend | H | Queries / replacements | Query mean / p95 ms | ms/control step | Replay speedup | Peak GiB | Smoke |
 |---|---|---:|---:|---:|---:|---:|---:|---|
+| [SP-VLA pruning + scheduling](results/batch2-final-benchmark-sp_vla-001.json) | openvla_oft | 8 | 201 / 153 | 189.63 / 201.81 | 22.41 | 1.117× | 14.68 | 4/4; errors 0 |
+| [SP-VLA scheduling-only ablation (token batch 2)](results/batch2-final-benchmark-sp_vla_scheduling-001.json) | openvla_oft | 8 | 201 / 153 | 197.93 / 200.72 | 23.39 | 1.070× | 14.98 | Not run |
 | [SP-VLA scheduling core](results/control-methods-final-benchmark-sp_vla_scheduling-001.json) | openvla_oft | 8 | 201 / 153 | 197.51 / 199.26 | 23.34 | 1.076× | 14.98 | 4/4; errors 0 |
 
 ## 5.5 Action Chunking and Replanning
@@ -71,6 +80,10 @@ earlier-layer cost. Per-layer sequence lengths remain in raw diagnostics.
 
 | Method | Final mean / min / max | Early mean | Mode counts (true/observed) |
 |---|---:|---:|---|
+| EfficientVLA token core (paper-based) | 256.0 / 256 / 256 | — | — |
+| FlashVLA ICS core (paper-based) | 320.0 / 320 / 320 | — | — |
+| SP-VLA pruning + scheduling | 418.9 / 158 / 512 | — | — |
+| ST-Merge spatial VLA (paper-based) | 256.0 / 256 / 256 | — | — |
 | ADP | 458.7 / 384 / 512 | — | pruned 90/216 |
 | SAFE-Pruner | 170.7 / 128 / 512 | — | keyframe 24/216 |
 | SpecPrune-VLA (token batch 1) | 68.5 / 60 / 108 | — | — |
@@ -88,6 +101,15 @@ earlier source revision is explicitly marked, never silently relabeled.
 
 | Method | Preset | Timing commit | Baseline run |
 |---|---|---|---|
+| Native H=8 (token batch 2) | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
+| Native H=8 end recheck (token batch 2) | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
+| EfficientVLA token core (paper-based) | [efficient_vla](../configs/experiments/openvla_oft/efficient_vla.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
+| FlashVLA ICS core (paper-based) | [flash_vla](../configs/experiments/openvla_oft/flash_vla.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
+| SP-VLA pruning + scheduling | [sp_vla](../configs/experiments/openvla_oft/sp_vla.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
+| SP-VLA scheduling-only ablation (token batch 2) | [sp_vla_scheduling](../configs/experiments/openvla_oft/sp_vla_scheduling.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
+| ST-Merge spatial VLA (paper-based) | [st_merge](../configs/experiments/openvla_oft/st_merge.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
+| VLA-Cache full statistics / eager (token batch 2) | [vla_cache](../configs/experiments/openvla_oft/vla_cache.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
+| VLA-InfoEntropy KV reuse (paper-based) | [vla_infoentropy](../configs/experiments/openvla_oft/vla_infoentropy.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
 | AWQ W4A16, BF16 kernel | [awq](../configs/experiments/openvla_oft/awq.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
 | AWQ W4A16, explicit FP16 kernel | [awq_fp16_kernel](../configs/experiments/openvla_oft/awq_fp16_kernel.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
 | Native BF16 / SDPA | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
@@ -110,6 +132,15 @@ earlier source revision is explicitly marked, never silently relabeled.
 
 | Method | Hardware | Measured frames | Repeats | Warmup queries |
 |---|---|---:|---:|---:|
+| Native H=8 (token batch 2) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| Native H=8 end recheck (token batch 2) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| EfficientVLA token core (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| FlashVLA ICS core (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| SP-VLA pruning + scheduling | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| SP-VLA scheduling-only ablation (token batch 2) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| ST-Merge spatial VLA (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| VLA-Cache full statistics / eager (token batch 2) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| VLA-InfoEntropy KV reuse (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | AWQ W4A16, BF16 kernel | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | AWQ W4A16, explicit FP16 kernel | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | Native BF16 / SDPA | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
@@ -130,8 +161,9 @@ earlier source revision is explicitly marked, never silently relabeled.
 
 ## Interpretation boundaries
 
-- SP-VLA means scheduling core only: no token pruning. Its fitted actions can
-  reduce query count, but success loss still requires formal evaluation.
+- SP-VLA scheduling-only rows exclude pruning; pruning + scheduling rows
+  include both mechanisms in one implementation. Fitted actions change query
+  counts; compare full replay cost and evaluate success loss separately.
 - VOTE means trajectory ensemble only: no ACT-token/head retraining and no
   claim to reproduce the full paper's acceleration. H=1 costs substantially
   more than native H=8 even if the voting overhead itself is small.
@@ -142,3 +174,9 @@ earlier source revision is explicitly marked, never silently relabeled.
 - TEAM-VLA and VLA-IAP are independent paper-based implementations with
   explicit unresolved author-code conventions; consult their method READMEs.
   Their rows are not verified reproductions of the published implementations.
+- EfficientVLA token core excludes layer pruning and DiT caching; FlashVLA
+  ICS core excludes unresolved action reuse. ST-Merge is a paper-based spatial
+  VLA port with shared two-encoder grouping and a timed dense projector bridge.
+- VLA-InfoEntropy skips visual QUERY rows while retaining visual KV context.
+  It is not context pruning; its query counts do not belong in the retention
+  table. Paper-based methods disclose reconstruction choices in their READMEs.

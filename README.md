@@ -108,3 +108,8 @@ comparisons and clean-checkout verification.
 The [token-reduction validation report](docs/token_reduction_validation.md) records
 the five-method Section 5.1 batch, source-fidelity limitations, smoke failures,
 observed token budgets, paired measurements and independent regression checks.
+
+The [second token-reduction batch report](docs/token_reduction_batch2_validation.md)
+records EfficientVLA's token core, full SP-VLA integration, ST-Merge, VLA-InfoEntropy
+and FlashVLA's ICS core, with matched ablations, retained regressions and the
+unresolved FlashTrigger action-reuse boundary.
