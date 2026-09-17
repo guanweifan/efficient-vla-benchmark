@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "efficient-vla-benchmark"
+version = "0.2.0.dev0"
+description = "Modular VLA acceleration with optional model backends and shared evaluation"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24,<2", "PyYAML>=6", "packaging>=23"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.6"]
+
+[project.scripts]
+evb = "efficient_vla_benchmark.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["*.tests", "*.tests.*"]
+
+[tool.setuptools.package-data]
+efficient_vla_benchmark = ["methods/**/metadata.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "src/efficient_vla_benchmark/methods", "backends/openvla_oft/tests"]
+addopts = "--import-mode=importlib"
+markers = ["gpu: requires an explicitly selected real model and GPU", "libero: requires LIBERO"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
