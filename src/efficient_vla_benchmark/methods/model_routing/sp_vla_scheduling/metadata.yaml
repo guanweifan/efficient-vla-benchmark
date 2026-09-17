@@ -1,0 +1,11 @@
+schema_version: 1
+name: sp_vla_scheduling
+category: model_routing
+description: SP-VLA scheduling core, without the paper's token-pruning component.
+config: efficient_vla_benchmark.methods.model_routing.sp_vla_scheduling.config:SPVLAConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [control_hooks, libero_cartesian_delta_actions]
+    factory: efficient_vla_benchmark.methods.model_routing.sp_vla_scheduling.implementations.openvla_oft.api:build
