@@ -1,0 +1,9 @@
+method: adp
+parameters:
+  keep_ratio: 0.75
+  view_weights: [0.4, 0.6]
+  dynamic: true
+  decision: adjacent
+  window: 3
+  delta: net
+  max_consecutive_pruned: 3

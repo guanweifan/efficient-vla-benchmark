@@ -1,0 +1,12 @@
+schema_version: 1
+name: adp
+category: token_reduction
+description: Text-guided embedding pruning with observed-motion gating.
+config: efficient_vla_benchmark.methods.token_reduction.adp.config:ADPConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout, l1_action_head]
+    factory: efficient_vla_benchmark.methods.token_reduction.adp.implementations.openvla_oft.api:build
+    preflight: efficient_vla_benchmark.methods.token_reduction.adp.implementations.openvla_oft.api:preflight
