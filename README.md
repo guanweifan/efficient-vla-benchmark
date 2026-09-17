@@ -1,6 +1,6 @@
 # efficient-vla-benchmark
 
-Reproduce complete VLA acceleration methods on pinned native model code, with
+Port VLA acceleration methods and independent core contributions onto pinned native code, with
 optional backend packages and one shared control/evaluation/profiling contract.
 This repository contains no survey manuscript, model weights or datasets.
 
@@ -14,15 +14,15 @@ This repository contains no survey manuscript, model weights or datasets.
 
 No backend is a mandatory dependency of the main package. Install only the backend
 you use. A source-only integration is not an implemented or validated backend.
-One run uses the native baseline or exactly one complete acceleration method.
+One run uses the native baseline or exactly one method with explicitly declared scope.
 
 ## Implemented scope
 
-| Backend / variant | Native baseline | Token reduction | Caching | Quantization |
-|---|---|---|---|---|
-| OpenVLA-OFT / libero_joint | Native SDPA | SpecPrune-VLA | VLA-Cache | AWQ W4A16 |
-| CogACT | Source pinned; runtime not implemented | — | — | — |
-| starVLA | Source pinned; runtime not implemented | — | — | — |
+| Backend / variant | Native baseline | Token reduction | Caching | Model routing | Action chunking | Quantization |
+|---|---|---|---|---|---|---|
+| OpenVLA-OFT / libero_joint | Native SDPA | SpecPrune-VLA | VLA-Cache | SP-VLA scheduling core | VOTE ensemble core | AWQ W4A16 |
+| CogACT | Source pinned; runtime not implemented | — | — | — | — | — |
+| starVLA | Source pinned; runtime not implemented | — | — | — | — | — |
 
 Algorithms retain their full implemented mechanism and disclose adaptations in
 their READMEs. This is a common-checkpoint comparison, not a claim to reproduce
@@ -64,3 +64,8 @@ these development checks are not formal success-rate measurements.
 The subsequent [source audit and retest](docs/performance_validation.md) records
 the VLA-Cache attention correction and AWQ's explicit FP16-kernel option, including
 precision differences, native controls and remaining negative speed results.
+
+The [measurement ledger](docs/benchmark_results.md) groups measured methods by
+survey section/category and links configuration, source identity, paired baseline,
+raw-result hashes and smoke records. Use [result recording](docs/recording_results.md)
+for every future integration; formal success rate stays separate from smoke.
