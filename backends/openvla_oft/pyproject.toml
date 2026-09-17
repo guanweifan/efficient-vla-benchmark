@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "efficient-vla-backend-openvla-oft"
+version = "0.2.0.dev0"
+description = "Optional pinned OpenVLA-OFT integration for efficient-vla-benchmark"
+requires-python = ">=3.10,<3.11"
+dependencies = ["efficient-vla-benchmark>=0.2.0.dev0,<0.3", "torch==2.2.0", "transformers==4.40.1"]
+
+[project.entry-points."efficient_vla_benchmark.backends"]
+openvla_oft = "efficient_vla_backend_openvla_oft.registration:register"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,4 @@
+backend: openvla_oft
+model_variant: libero_joint
+precision: bfloat16
+execution_horizon: 8
