@@ -59,6 +59,22 @@ class TokenLayout:
 class DecoderState:
     layout: TokenLayout
     positions: torch.Tensor
+    # Current layer input/output, before the corresponding strategy callback.
+    # A strategy must not retain this full tensor across queries.
+    hidden: torch.Tensor | None = None
+
+
+@dataclass(frozen=True)
+class TokenReduction:
+    """Select rows and optionally replace retained visual features for merging.
+
+    keep refers to CURRENT rows. visual_features has shape [retained_visual, D]
+    in their original-position order; nonvisual features cannot be replaced.
+    The surviving positions remain the anchors for RoPE and the native readout.
+    """
+
+    keep: torch.Tensor
+    visual_features: torch.Tensor | None = None
 
 
 class DecoderStrategy:
@@ -265,7 +281,12 @@ class DecoderAdapter:
         kwargs = dict(kwargs, use_cache=False, output_attentions=False, return_dict=True)
         return args, kwargs
 
-    def _select(self, hidden, keep):
+    def _select(self, hidden, selection):
+        replacement = None
+        if isinstance(selection, TokenReduction):
+            keep, replacement = selection.keep, selection.visual_features
+        else:
+            keep = selection
         if keep is None:
             return hidden
         if keep.dtype != torch.bool or keep.shape != self.state.positions.shape:
@@ -274,11 +295,23 @@ class DecoderAdapter:
         if not bool(keep[protected].all()):
             raise ValueError("Methods may not remove non-visual tokens")
         self.state.positions = self.state.positions[keep]
-        return hidden[:, keep, :]
+        selected = hidden[:, keep, :]
+        if replacement is not None:
+            visual_ids = self.state.layout.visual_mask(self.state.positions).nonzero().flatten()
+            if (
+                replacement.shape != (visual_ids.numel(), hidden.shape[-1])
+                or replacement.device != hidden.device
+                or replacement.dtype != hidden.dtype
+            ):
+                raise ValueError("Merged features must match the retained visual rows and dtype")
+            selected.index_copy_(1, visual_ids, replacement.unsqueeze(0))
+        return selected
 
     def _before(self, index):
         def hook(module, args, kwargs):
+            self.state.hidden = args[0]
             hidden = self._select(args[0], self.strategy.before_layer(index, self.state))
+            self.state.hidden = hidden
             positions = self.state.positions
             keys = self.strategy.key_positions(index, self.state)
             mask = kwargs.get("attention_mask")
@@ -301,13 +334,17 @@ class DecoderAdapter:
 
     def _after(self, index):
         def hook(module, args, kwargs, output):
+            self.state.hidden = output[0]
             keep = self.strategy.after_layer(index, self.state, module.self_attn.last_attention)
-            return (self._select(output[0], keep), *output[1:])
+            hidden = self._select(output[0], keep)
+            self.state.hidden = hidden
+            return (hidden, *output[1:])
 
         return hook
 
     def _finish(self, module, args, kwargs, output):
         self.strategy.finish(self.state)
+        self.state.hidden = None
         if self.state.positions.numel() != self.state.layout.length:
             full = output.last_hidden_state.new_zeros(
                 (1, self.state.layout.length, output.last_hidden_state.shape[-1])
@@ -319,6 +356,7 @@ class DecoderAdapter:
         return output
 
     def close(self):
+        self.state = None
         for handle in self.handles:
             handle.remove()
         self.handles.clear()

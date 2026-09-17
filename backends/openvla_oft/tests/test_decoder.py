@@ -5,6 +5,7 @@ from efficient_vla_backend_openvla_oft.decoder import (
     DecoderStrategy,
     IndexedKVStore,
     TokenLayout,
+    TokenReduction,
 )
 from transformers import LlamaConfig
 from transformers.models.llama.modeling_llama import LlamaModel
@@ -192,5 +193,46 @@ def test_probe_outside_active_range_is_rejected():
     model = tiny_decoder()
     adapter = DecoderAdapter(model, InvalidProbe(), tiny_layout)
     with pytest.raises(ValueError, match="removed query"):
+        model(inputs_embeds=torch.randn(1, 12, 32))
+    adapter.close()
+
+
+@torch.inference_mode()
+def test_feature_merging_preserves_nonvisual_rows_and_anchor_positions():
+    class Merge(DecoderStrategy):
+        def before_layer(self, layer, state):
+            if layer == 0:
+                self.original = state.hidden.clone()
+                keep = state.positions != 2
+                visual = state.hidden[0, [1, 3, 4]].clone()
+                visual[0] = state.hidden[0, [1, 2]].mean(0)
+                return TokenReduction(keep, visual)
+            if layer == 1:
+                assert state.hidden.shape[1] == 11
+
+    model, strategy = tiny_decoder(), Merge()
+    adapter = DecoderAdapter(model, strategy, tiny_layout)
+    seen = []
+    handle = model.layers[0].register_forward_pre_hook(lambda m, a: seen.append(a[0].clone()))
+    data = torch.randn(1, 12, 32)
+    model(inputs_embeds=data)
+    torch.testing.assert_close(seen[0][:, 4:], data[:, 5:])
+    torch.testing.assert_close(seen[0][:, 1], data[:, [1, 2]].mean(1))
+    torch.testing.assert_close(seen[0][:, 0], data[:, 0])
+    assert adapter.state.positions.tolist() == [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    assert adapter.state.hidden is None
+    handle.remove()
+    adapter.close()
+
+
+@torch.inference_mode()
+def test_invalid_merge_features_are_rejected():
+    class InvalidMerge(DecoderStrategy):
+        def before_layer(self, layer, state):
+            return TokenReduction(state.positions != 2, state.hidden[0])
+
+    model = tiny_decoder()
+    adapter = DecoderAdapter(model, InvalidMerge(), tiny_layout)
+    with pytest.raises(ValueError, match="Merged features"):
         model(inputs_embeds=torch.randn(1, 12, 32))
     adapter.close()
