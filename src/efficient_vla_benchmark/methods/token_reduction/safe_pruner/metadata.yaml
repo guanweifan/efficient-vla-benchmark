@@ -1,0 +1,12 @@
+schema_version: 1
+name: safe_pruner
+category: token_reduction
+description: Forecast deep token saliency from adaptive full-reference frames.
+config: efficient_vla_benchmark.methods.token_reduction.safe_pruner.config:SAFEPrunerConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout, l1_action_head]
+    factory: efficient_vla_benchmark.methods.token_reduction.safe_pruner.implementations.openvla_oft.api:build
+    preflight: efficient_vla_benchmark.methods.token_reduction.safe_pruner.implementations.openvla_oft.api:preflight

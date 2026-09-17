@@ -1,0 +1,7 @@
+method: safe_pruner
+parameters:
+  keep_ratio: 0.25
+  pruning_layer: 3
+  reference_layers: [0, 31]
+  forecast_weight: 1.0
+  similarity_threshold: 0.92
