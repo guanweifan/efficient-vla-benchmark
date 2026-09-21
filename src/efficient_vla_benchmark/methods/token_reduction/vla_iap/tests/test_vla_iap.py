@@ -80,6 +80,66 @@ def test_temporal_equation_and_semantic_finiteness():
     assert torch.isfinite(semantic).all() and semantic.min() >= 0 and semantic.max() <= 1
 
 
+def test_semantic_prior_matches_numpy_under_disclosed_alignment_convention():
+    import torch
+
+    from ..implementations.openvla_oft.method import semantic_prior
+
+    rng = np.random.default_rng(29)
+    visual, text = rng.normal(size=(2, 256, 8)), rng.normal(size=(5, 8))
+    cfg = VLAIAPConfig()
+    center = visual.mean(1, keepdims=True)
+    v, t = visual - center, text.mean(0)[None, None] - center
+    v /= np.maximum(np.linalg.norm(v, axis=-1, keepdims=True), cfg.epsilon)
+    t /= np.maximum(np.linalg.norm(t, axis=-1, keepdims=True), cfg.epsilon)
+    logits = (v * t).sum(-1) / cfg.temperature
+    exp = np.exp(logits - logits.max(-1, keepdims=True))
+    p = (exp / exp.sum(-1, keepdims=True)).reshape(2, 16, 16)
+    pooled = np.zeros_like(p)
+    for row in range(16):
+        for col in range(16):
+            pooled[:, row, col] = p[:, max(0, row - 1) : row + 2, max(0, col - 1) : col + 2].mean(
+                (1, 2)
+            )
+    low, high = pooled.min((1, 2), keepdims=True), pooled.max((1, 2), keepdims=True)
+    expected = (pooled - low) / np.maximum(high - low, cfg.epsilon)
+    actual = semantic_prior(torch.tensor(visual), torch.tensor(text), cfg)
+    np.testing.assert_allclose(actual.numpy(), expected, rtol=2e-5, atol=2e-6)
+    # Shared centering must be invariant to a common feature-space translation.
+    shift = torch.arange(8).float()
+    shifted = semantic_prior(
+        torch.tensor(visual).float() + shift, torch.tensor(text).float() + shift, cfg
+    )
+    torch.testing.assert_close(actual, shifted, rtol=2e-4, atol=1e-5)
+
+
+def test_motion_filters_linear_feature_drift_without_future_frames():
+    import torch
+
+    from ..implementations.openvla_oft.method import motion_prior
+
+    old = torch.arange(2 * 256 * 4).reshape(2, 256, 4).float()
+    previous, current = old + 2, old + 4
+    motion, history = motion_prior(current, previous, old, torch.zeros(2, 16, 16), VLAIAPConfig())
+    assert not motion.any() and not history.any()
+
+
+def test_iou_equality_uses_conservative_branch_and_no_forced_ratio():
+    import torch
+
+    from ..implementations.openvla_oft.method import interaction_selection
+
+    semantic = torch.zeros(2, 16, 16)
+    semantic[:, 2:4, 2:4] = 1
+    # Exact equality at theta_iou=1 belongs to Eq. 12's conservative branch.
+    selected, iou, aggressive = interaction_selection(
+        semantic, semantic, torch.zeros_like(semantic), VLAIAPConfig(iou_threshold=1)
+    )
+    assert iou.tolist() == [1.0, 1.0]
+    assert not aggressive.any()
+    assert selected.all()
+
+
 @pytest.mark.gpu
 def test_real_oft_warmup_history_and_reset(model_path, trace_path, request):
     from efficient_vla_backend_openvla_oft.backend import OpenVLAOFTBackend

@@ -19,3 +19,12 @@ Compute semantic similarity, second-order visual feature differences with tempor
 ## Use and limitations
 
 Select `configs/experiments/openvla_oft/vla_iap.yaml` through the shared CLI, supplying model and environment paths externally. Disabled mode leaves native prediction unchanged. Tests cover equations, mask switching, geometric rescue, numerical cases, real-model warmup/reset/detach, and bounded history. Four smoke episodes do not establish formal success rate. Validate the missing conventions against future author code before citing this run as faithful numerical reproduction.
+
+The 2026-09-21 author-source recheck at
+[`3131851f`](https://github.com/Chengjt1999/VLA-IAP/tree/3131851f1b2c5cbd3e7a861a52062d717f4e0637)
+still contains no algorithm implementation. Independent NumPy semantic-score
+checks validate the disclosed centering/pooling convention, not its authorship.
+Additional tests cover linear-motion cancellation and the conservative branch at
+exact IoU-threshold equality. No new encoder or fixed-ratio top-k override is
+invented to match the paper's performance table. Feature alignment and the missing
+threshold calibration remain the main fidelity limits, despite executable equations.
