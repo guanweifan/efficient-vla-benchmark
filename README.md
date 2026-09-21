@@ -113,3 +113,9 @@ The [second token-reduction batch report](docs/token_reduction_batch2_validation
 records EfficientVLA's token core, full SP-VLA integration, ST-Merge, VLA-InfoEntropy
 and FlashVLA's ICS core, with matched ablations, retained regressions and the
 unresolved FlashTrigger action-reuse boundary.
+
+The subsequent [mechanism fidelity audit](docs/mechanism_fidelity.md) corrects
+EfficientVLA's attention direction and ST-Merge's key similarity, optimizes complete
+FlashVLA SVD, and strengthens equation tests for TEAM-VLA, VLA-IAP and InfoEntropy.
+It records a fresh paired cohort and explicitly supersedes the two corrected
+implementation rows without deleting their historical evidence.

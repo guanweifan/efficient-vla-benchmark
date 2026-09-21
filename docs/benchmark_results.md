@@ -2,6 +2,9 @@
 
 Generated from the versioned JSON evidence in `results/`. This is a development
 measurement ledger, not a final paper comparison or a formal success-rate table.
+Superseded rows preserve earlier, corrected implementations for traceability;
+do not use them as results of the current implementation. Their raw records
+are unchanged. Mechanism scope and limits are detailed in the method READMEs.
 
 Backend, hardware and protocol are recorded per row below. Policy timing
 includes preprocessing, transfer, all method/control overhead and postprocessing,
@@ -25,6 +28,8 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 | [Native BF16 / SDPA](results/control-methods-final-benchmark-baseline-001.json) | openvla_oft | 8 | 216 / 0 | 197.86 / 199.86 | 25.10 | 1.000× | 14.98 | 4/4; errors 0 |
 | [Native BF16 / SDPA, matched H=1](results/control-methods-final-benchmark-baseline_horizon1-001.json) | openvla_oft | 1 | 1704 / 0 | 199.83 / 201.42 | 199.83 | 1.000× | 14.98 | Not run |
 | [Native BF16 / SDPA, end recheck](results/control-methods-final-benchmark-baseline_recheck-001.json) | openvla_oft | 8 | 216 / 0 | 198.91 / 201.15 | 25.23 | 0.995× | 14.98 | Not run |
+| [Native H=8 (fidelity audit)](results/fidelity-final-benchmark-baseline-001.json) | openvla_oft | 8 | 216 / 0 | 196.74 / 198.44 | 24.96 | 1.000× | 14.98 | Not run |
+| [Native H=8 end recheck (fidelity audit)](results/fidelity-final-benchmark-baseline_recheck-001.json) | openvla_oft | 8 | 216 / 0 | 197.84 / 199.24 | 25.10 | 0.994× | 14.98 | Not run |
 | [Native H=8 (token batch 1)](results/token-batch-final-benchmark-baseline-001.json) | openvla_oft | 8 | 216 / 0 | 200.57 / 203.81 | 25.44 | 1.000× | 14.98 | Not run |
 | [Native H=8 end recheck (token batch 1)](results/token-batch-final-benchmark-baseline_recheck-001.json) | openvla_oft | 8 | 216 / 0 | 198.77 / 200.57 | 25.21 | 1.009× | 14.98 | Not run |
 
@@ -32,10 +37,20 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 
 | Method / configuration | Backend | H | Queries / replacements | Query mean / p95 ms | ms/control step | Replay speedup | Peak GiB | Smoke |
 |---|---|---:|---:|---:|---:|---:|---:|---|
-| [EfficientVLA token core (paper-based)](results/batch2-final-benchmark-efficient_vla-001.json) | openvla_oft | 8 | 216 / 0 | 170.08 / 171.33 | 21.58 | 1.160× | 14.62 | 4/4; errors 0 |
+| [Superseded — EfficientVLA token core (paper-based)](results/batch2-final-benchmark-efficient_vla-001.json) | openvla_oft | 8 | 216 / 0 | 170.08 / 171.33 | 21.58 | 1.160× | 14.62 | 4/4; errors 0 |
 | [FlashVLA ICS core (paper-based)](results/batch2-final-benchmark-flash_vla-001.json) | openvla_oft | 8 | 216 / 0 | 238.64 / 241.15 | 30.27 | 0.827× | 14.64 | 4/4; errors 0 |
-| [ST-Merge spatial VLA (paper-based)](results/batch2-final-benchmark-st_merge-001.json) | openvla_oft | 8 | 216 / 0 | 171.42 / 172.94 | 21.75 | 1.151× | 14.62 | 4/4; errors 0 |
+| [Superseded — ST-Merge spatial VLA (paper-based)](results/batch2-final-benchmark-st_merge-001.json) | openvla_oft | 8 | 216 / 0 | 171.42 / 172.94 | 21.75 | 1.151× | 14.62 | 4/4; errors 0 |
 | [SpecPrune-VLA](results/control-methods-final-benchmark-specprune_vla-001.json) | openvla_oft | 8 | 237 / 0 | 146.91 / 163.52 | 20.51 | 1.224× | 14.60 | 3/4; errors 0 |
+| [ADP / control recheck](results/fidelity-final-benchmark-adp-001.json) | openvla_oft | 8 | 216 / 0 | 193.63 / 198.37 | 24.58 | 1.015× | 14.68 | 4/4; errors 0 |
+| [EfficientVLA token core / corrected Q-K direction](results/fidelity-final-benchmark-efficient_vla-001.json) | openvla_oft | 8 | 216 / 0 | 170.19 / 172.02 | 21.59 | 1.156× | 14.63 | 4/4; errors 0 |
+| [FlashVLA ICS / automatic complete SVD](results/fidelity-final-benchmark-flash_vla-001.json) | openvla_oft | 8 | 216 / 0 | 208.73 / 210.37 | 26.48 | 0.943× | 14.64 | 4/4; errors 0 |
+| [FlashVLA ICS / gesvd reference](results/fidelity-final-benchmark-flash_vla_gesvd-001.json) | openvla_oft | 8 | 216 / 0 | 237.86 / 240.28 | 30.17 | 0.827× | 14.64 | Not run |
+| [SAFE-Pruner / control recheck](results/fidelity-final-benchmark-safe_pruner-001.json) | openvla_oft | 8 | 216 / 0 | 146.76 / 198.59 | 18.62 | 1.340× | 14.68 | 4/4; errors 0 |
+| [SpecPrune-VLA / control recheck](results/fidelity-final-benchmark-specprune_vla-001.json) | openvla_oft | 8 | 237 / 0 | 146.13 / 162.17 | 20.42 | 1.222× | 14.60 | 3/4; errors 0 |
+| [ST-Merge spatial VLA / key dot product](results/fidelity-final-benchmark-st_merge-001.json) | openvla_oft | 8 | 216 / 0 | 171.36 / 172.73 | 21.74 | 1.148× | 14.62 | 3/4; errors 0 |
+| [TEAM-VLA / audited paper-based port](results/fidelity-final-benchmark-team_vla-001.json) | openvla_oft | 8 | 216 / 0 | 139.58 / 148.03 | 17.71 | 1.409× | 14.61 | 1/4; errors 0 |
+| [VLA-IAP / audited paper-based port](results/fidelity-final-benchmark-vla_iap-001.json) | openvla_oft | 8 | 216 / 0 | 193.23 / 200.12 | 24.51 | 1.018× | 14.69 | 3/4; errors 0 |
+| [VLA-Pruner / control recheck](results/fidelity-final-benchmark-vla_pruner-001.json) | openvla_oft | 8 | 216 / 0 | 163.52 / 198.05 | 20.75 | 1.203× | 14.68 | 4/4; errors 0 |
 | [ADP](results/token-batch-final-benchmark-adp-001.json) | openvla_oft | 8 | 216 / 0 | 195.37 / 200.98 | 24.80 | 1.026× | 14.68 | 4/4; errors 0 |
 | [SAFE-Pruner](results/token-batch-final-benchmark-safe_pruner-001.json) | openvla_oft | 8 | 216 / 0 | 148.28 / 200.16 | 18.82 | 1.352× | 14.68 | 4/4; errors 0 |
 | [SpecPrune-VLA (token batch 1)](results/token-batch-final-benchmark-specprune_vla-001.json) | openvla_oft | 8 | 237 / 0 | 147.06 / 163.44 | 20.53 | 1.239× | 14.60 | 3/4; errors 0 |
@@ -50,6 +65,8 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 | [VLA-Cache full statistics / eager (token batch 2)](results/batch2-final-benchmark-vla_cache-001.json) | openvla_oft | 8 | 216 / 0 | 207.43 / 217.93 | 26.31 | 0.951× | 15.03 | Not run |
 | [VLA-InfoEntropy KV reuse (paper-based)](results/batch2-final-benchmark-vla_infoentropy-001.json) | openvla_oft | 8 | 216 / 0 | 213.14 / 222.39 | 27.04 | 0.926× | 15.03 | 4/4; errors 0 |
 | [VLA-Cache, full statistics / eager](results/control-methods-final-benchmark-vla_cache-001.json) | openvla_oft | 8 | 216 / 0 | 207.64 / 219.38 | 26.34 | 0.953× | 15.03 | 4/4; errors 0 |
+| [VLA-Cache full statistics / control recheck](results/fidelity-final-benchmark-vla_cache-001.json) | openvla_oft | 8 | 216 / 0 | 206.24 / 216.85 | 26.16 | 0.954× | 15.03 | 4/4; errors 0 |
+| [VLA-InfoEntropy / audited entropy and KV reuse](results/fidelity-final-benchmark-vla_infoentropy-001.json) | openvla_oft | 8 | 216 / 0 | 213.47 / 222.80 | 27.08 | 0.922× | 15.03 | 4/4; errors 0 |
 
 ## 5.3 Layer Skipping, Early Exit, and Model Routing
 
@@ -80,10 +97,20 @@ earlier-layer cost. Per-layer sequence lengths remain in raw diagnostics.
 
 | Method | Final mean / min / max | Early mean | Mode counts (true/observed) |
 |---|---:|---:|---|
-| EfficientVLA token core (paper-based) | 256.0 / 256 / 256 | — | — |
+| Superseded — EfficientVLA token core (paper-based) | 256.0 / 256 / 256 | — | — |
 | FlashVLA ICS core (paper-based) | 320.0 / 320 / 320 | — | — |
 | SP-VLA pruning + scheduling | 418.9 / 158 / 512 | — | — |
-| ST-Merge spatial VLA (paper-based) | 256.0 / 256 / 256 | — | — |
+| Superseded — ST-Merge spatial VLA (paper-based) | 256.0 / 256 / 256 | — | — |
+| ADP / control recheck | 458.7 / 384 / 512 | — | pruned 90/216 |
+| EfficientVLA token core / corrected Q-K direction | 256.0 / 256 / 256 | — | — |
+| FlashVLA ICS / automatic complete SVD | 320.0 / 320 / 320 | — | — |
+| FlashVLA ICS / gesvd reference | 320.0 / 320 / 320 | — | — |
+| SAFE-Pruner / control recheck | 170.7 / 128 / 512 | — | keyframe 24/216 |
+| SpecPrune-VLA / control recheck | 68.5 / 60 / 108 | — | — |
+| ST-Merge spatial VLA / key dot product | 256.0 / 256 / 256 | — | — |
+| TEAM-VLA / audited paper-based port | 80.0 / 80 / 80 | 269.1 | — |
+| VLA-IAP / audited paper-based port | 438.0 / 174 / 512 | — | warmup 24/216 |
+| VLA-Pruner / control recheck | 192.0 / 128 / 512 | — | — |
 | ADP | 458.7 / 384 / 512 | — | pruned 90/216 |
 | SAFE-Pruner | 170.7 / 128 / 512 | — | keyframe 24/216 |
 | SpecPrune-VLA (token batch 1) | 68.5 / 60 / 108 | — | — |
@@ -103,11 +130,11 @@ earlier source revision is explicitly marked, never silently relabeled.
 |---|---|---|---|
 | Native H=8 (token batch 2) | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
 | Native H=8 end recheck (token batch 2) | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
-| EfficientVLA token core (paper-based) | [efficient_vla](../configs/experiments/openvla_oft/efficient_vla.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
+| Superseded — EfficientVLA token core (paper-based) | [efficient_vla](../configs/experiments/openvla_oft/efficient_vla.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
 | FlashVLA ICS core (paper-based) | [flash_vla](../configs/experiments/openvla_oft/flash_vla.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
 | SP-VLA pruning + scheduling | [sp_vla](../configs/experiments/openvla_oft/sp_vla.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
 | SP-VLA scheduling-only ablation (token batch 2) | [sp_vla_scheduling](../configs/experiments/openvla_oft/sp_vla_scheduling.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
-| ST-Merge spatial VLA (paper-based) | [st_merge](../configs/experiments/openvla_oft/st_merge.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
+| Superseded — ST-Merge spatial VLA (paper-based) | [st_merge](../configs/experiments/openvla_oft/st_merge.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
 | VLA-Cache full statistics / eager (token batch 2) | [vla_cache](../configs/experiments/openvla_oft/vla_cache.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
 | VLA-InfoEntropy KV reuse (paper-based) | [vla_infoentropy](../configs/experiments/openvla_oft/vla_infoentropy.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
 | AWQ W4A16, BF16 kernel | [awq](../configs/experiments/openvla_oft/awq.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
@@ -119,6 +146,20 @@ earlier source revision is explicitly marked, never silently relabeled.
 | SpecPrune-VLA | [specprune_vla](../configs/experiments/openvla_oft/specprune_vla.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
 | VLA-Cache, full statistics / eager | [vla_cache](../configs/experiments/openvla_oft/vla_cache.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
 | VOTE ensemble core | [vote_ensemble](../configs/experiments/openvla_oft/vote_ensemble.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline_horizon1-001` |
+| ADP / control recheck | [adp](../configs/experiments/openvla_oft/adp.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| Native H=8 (fidelity audit) | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| Native H=8 end recheck (fidelity audit) | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| EfficientVLA token core / corrected Q-K direction | [efficient_vla](../configs/experiments/openvla_oft/efficient_vla.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| FlashVLA ICS / automatic complete SVD | [flash_vla](../configs/experiments/openvla_oft/flash_vla.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| FlashVLA ICS / gesvd reference | [flash_vla_gesvd](../configs/experiments/openvla_oft/flash_vla_gesvd.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| SAFE-Pruner / control recheck | [safe_pruner](../configs/experiments/openvla_oft/safe_pruner.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| SpecPrune-VLA / control recheck | [specprune_vla](../configs/experiments/openvla_oft/specprune_vla.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| ST-Merge spatial VLA / key dot product | [st_merge](../configs/experiments/openvla_oft/st_merge.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| TEAM-VLA / audited paper-based port | [team_vla](../configs/experiments/openvla_oft/team_vla.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| VLA-Cache full statistics / control recheck | [vla_cache](../configs/experiments/openvla_oft/vla_cache.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| VLA-IAP / audited paper-based port | [vla_iap](../configs/experiments/openvla_oft/vla_iap.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| VLA-InfoEntropy / audited entropy and KV reuse | [vla_infoentropy](../configs/experiments/openvla_oft/vla_infoentropy.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
+| VLA-Pruner / control recheck | [vla_pruner](../configs/experiments/openvla_oft/vla_pruner.yaml) | `b2d91319e440` | `fidelity-final-benchmark-baseline-001` |
 | ADP | [adp](../configs/experiments/openvla_oft/adp.yaml) | `ff880edb449d` | `token-batch-final-benchmark-baseline-001` |
 | Native H=8 (token batch 1) | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `ff880edb449d` | `token-batch-final-benchmark-baseline-001` |
 | Native H=8 end recheck (token batch 1) | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `ff880edb449d` | `token-batch-final-benchmark-baseline-001` |
@@ -134,11 +175,11 @@ earlier source revision is explicitly marked, never silently relabeled.
 |---|---|---:|---:|---:|
 | Native H=8 (token batch 2) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | Native H=8 end recheck (token batch 2) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
-| EfficientVLA token core (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| Superseded — EfficientVLA token core (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | FlashVLA ICS core (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | SP-VLA pruning + scheduling | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | SP-VLA scheduling-only ablation (token batch 2) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
-| ST-Merge spatial VLA (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| Superseded — ST-Merge spatial VLA (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | VLA-Cache full statistics / eager (token batch 2) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | VLA-InfoEntropy KV reuse (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | AWQ W4A16, BF16 kernel | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
@@ -150,6 +191,20 @@ earlier source revision is explicitly marked, never silently relabeled.
 | SpecPrune-VLA | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | VLA-Cache, full statistics / eager | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | VOTE ensemble core | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| ADP / control recheck | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| Native H=8 (fidelity audit) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| Native H=8 end recheck (fidelity audit) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| EfficientVLA token core / corrected Q-K direction | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| FlashVLA ICS / automatic complete SVD | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| FlashVLA ICS / gesvd reference | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| SAFE-Pruner / control recheck | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| SpecPrune-VLA / control recheck | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| ST-Merge spatial VLA / key dot product | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| TEAM-VLA / audited paper-based port | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| VLA-Cache full statistics / control recheck | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| VLA-IAP / audited paper-based port | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| VLA-InfoEntropy / audited entropy and KV reuse | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| VLA-Pruner / control recheck | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | ADP | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | Native H=8 (token batch 1) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | Native H=8 end recheck (token batch 1) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
