@@ -4,7 +4,7 @@ Paper-based port of [ST-Merge](https://arxiv.org/html/2606.29350v1), section III
 single-frame multi-view VLA deployment, not its video-Qwen path. The linked author
 repository returned 404 during integration. No claim of verified source parity.
 
-Merge inside shallow vision blocks, using Gaussian spatial locality, key cosine
+Merge inside shallow vision blocks, using Gaussian spatial locality, key dot-product
 similarity, multi-queue matching and size-weighted averaging. As in the paper's
 SigLIP VLA path, no video history or vision RoPE correction is introduced.
 
@@ -14,6 +14,13 @@ highest score, ties are stable; top-scored unique sources merge into surviving
 anchors. Hence collisions can retain MORE than the nominal token budget. No forced
 extra merges from a different algorithm. We do not claim O(N) complexity for the
 pairwise matching implementation or borrow the paper's high-resolution speedup.
+
+The matching score follows Eq. 2 literally, without additional key L2 normalization.
+Earlier runs used cosine similarity; those results remain historical evidence and
+do not describe this corrected scoring path. The multi-queue collision policy and
+surviving-anchor convention remain unverified: Sec. III-A describes one-to-many
+matching, whereas Eq. 4 describes source-to-target fusion. Do not present this
+anchor-preserving OFT port as an exact reconstruction of all author choices.
 
 OFT adaptation: run SigLIP first using the unchanged native timm forward, derive
 one per-view mapping and apply the SAME mapping to DINOv2 at the selected block.

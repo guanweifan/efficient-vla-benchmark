@@ -27,6 +27,41 @@ def test_full_retention_is_identity():
     assert result.groups.tolist() == list(range(256))
 
 
+def test_dot_product_preserves_key_magnitude_in_matching():
+    # Anchor 0 prefers candidate 3 by Eq. 2, but cosine would pick candidate 1.
+    keys = torch.tensor([[1.0, 0], [1.0, 0], [0.0, 1], [10.0, 1]])
+    result = spatial_groups(keys, target=3, queues=2, sigma=100, side=2)
+    assert result.anchors.tolist() == [0, 1, 2]
+    assert result.groups.tolist() == [0, 1, 2, 0]
+
+
+def test_spatial_groups_match_independent_scalar_dot_product_reference():
+    import math
+
+    rng = np.random.default_rng(14)
+    keys = rng.normal(size=(16, 7)) * rng.uniform(0.2, 4, size=(16, 1))
+    proposals = []
+    for queue in range(1, 4):
+        for anchor in range(0, 16, 4):
+            candidates = list(range(queue, 16, 4))
+            scores = []
+            for candidate in candidates:
+                distance = (anchor // 4 - candidate // 4) ** 2 + (anchor % 4 - candidate % 4) ** 2
+                scores.append(float(keys[anchor] @ keys[candidate]) * math.exp(-distance / 8))
+            best = int(np.argmax(scores))
+            proposals.append((scores[best], candidates[best], anchor))
+    representatives = list(range(16))
+    used = set()
+    for _, source, anchor in sorted(proposals, key=lambda item: -item[0]):
+        if source not in used and len(used) < 8:
+            representatives[source] = anchor
+            used.add(source)
+    kept = [i for i, representative in enumerate(representatives) if i == representative]
+    result = spatial_groups(torch.tensor(keys), 8, 4, 2, side=4)
+    assert result.anchors.tolist() == kept
+    assert result.groups.tolist() == [kept.index(i) for i in representatives]
+
+
 @pytest.mark.parametrize(
     "parameters",
     [

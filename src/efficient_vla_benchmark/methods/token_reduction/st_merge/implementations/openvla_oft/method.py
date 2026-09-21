@@ -6,7 +6,6 @@ import torch
 from efficient_vla_backend_openvla_oft.decoder import DecoderAdapter, DecoderStrategy
 from efficient_vla_backend_openvla_oft.vision import VisionAttentionProbe
 from efficient_vla_backend_openvla_oft.vision_adapter import PairedVisionAdapter, VisionReduction
-from torch.nn import functional as F
 
 from efficient_vla_benchmark.core.method import InferenceMethod
 
@@ -20,13 +19,15 @@ def spatial_groups(keys, target, queues, sigma, side=16):
     count = keys.shape[0]
     ids = torch.arange(count, device=keys.device)
     anchors = ids[::queues]
-    normalized = F.normalize(keys.float(), dim=-1)
+    # Eq. 2 uses the encoder KEY dot product, not cosine similarity.
+    # Extra L2 normalization discards magnitude and can change the match.
+    features = keys.float()
     positions = torch.stack((ids // side, ids % side), -1).float()
     sources, destinations, scores = [], [], []
     for queue in range(1, queues):
         candidates = ids[queue::queues]
         distance = (positions[anchors, None] - positions[candidates][None]).square().sum(-1)
-        similarity = normalized[anchors] @ normalized[candidates].T
+        similarity = features[anchors] @ features[candidates].T
         weighted = similarity * torch.exp(-distance / (2 * sigma**2))
         score, best = weighted.max(-1)
         sources.append(candidates[best])
@@ -122,6 +123,7 @@ class STMerge(InferenceMethod, DecoderStrategy):
             "implementation_basis": "paper-based: arXiv:2606.29350v1, not verified author code",
             "config": asdict(self.config),
             "grouping": "row-major interleaved queues; highest-score source collision resolution",
+            "matching_score": "raw encoder-key dot product times Gaussian locality (Eq. 2)",
             "fusion": "SigLIP-derived grouping shared with DINOv2; size-weighted features",
             "position_policy": "anchor slots, native dense projector bridge then LLM selection",
             "requires_training": False,
