@@ -34,6 +34,33 @@ def test_attention_entropy_direction_and_small_information():
     assert not attention_information(torch.ones(1, 2)).any()
 
 
+def test_attention_information_matches_numpy_equations_four_to_six():
+    rng = np.random.default_rng(53)
+    attention = rng.uniform(0, 0.1, (2, 3, 5, 16))
+    mean = attention.mean((0, 1))
+    exp = np.exp(mean - mean.max(0, keepdims=True))
+    probability = exp / exp.sum(0, keepdims=True)
+    expected = 1 + (probability * np.log2(probability)).sum(0) / np.log2(5)
+    actual = attention_information(torch.tensor(mean))
+    np.testing.assert_allclose(actual.numpy(), expected, rtol=1e-8, atol=1e-14)
+    # A transpose or omission of the second softmax changes this distribution.
+    raw_probability = mean / mean.sum(0, keepdims=True)
+    wrong = 1 + (raw_probability * np.log2(raw_probability)).sum(0) / np.log2(5)
+    assert not np.allclose(actual.numpy(), wrong)
+
+
+def test_all_quota_steps_match_literal_floor_schedule():
+    import math
+
+    for step in range(121):
+        alpha = min(step / 100, 1)
+        assert quotas(step, 40, 60, 100) == (
+            math.floor(60 - 20 * alpha),
+            math.floor(40 + 20 * alpha),
+        )
+    assert quotas(-1, 40, 60, 100) == (60, 40)
+
+
 @pytest.mark.parametrize(
     "params",
     [

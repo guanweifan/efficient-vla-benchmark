@@ -32,3 +32,10 @@ from 512 retained visual KV tokens. `enabled: false` or static budget zero is na
 Use `configs/experiments/openvla_oft/vla_infoentropy.yaml`. Compare against native
 SDPA for practical speed, optionally against VLA-Cache to isolate the new selector.
 Do not hide attention-backend changes, histogram overhead or negative speed results.
+
+The 2026-09-21 re-audit adds an independent NumPy reference for Eq. 4-6 and
+exhaustive integer-step checks of Eq. 7, including floor and clamping behavior.
+These confirm the explicit second softmax, text-axis entropy and executed-step
+allocation; no evidence justified dropping full-layer statistics to improve speed.
+The inherited cache-engine schedule and two-camera extension remain disclosed
+adaptations, not verified author defaults or a claim of published-score reproduction.
