@@ -18,3 +18,11 @@ Before layer 0, select each language token's most cosine-similar visual patch, e
 ## Validation and use
 
 Select `configs/experiments/openvla_oft/team_vla.yaml` through the shared CLI; supply resource paths on the command line. Tests cover spatial expansion, interval sampling, weighted aggregation, identity, real-model pruning/merging, reset and detach. All selection, feature mixing, bookkeeping and transfer overhead is included in policy timing. Four smoke episodes are connectivity checks, not formal success-rate evidence.
+
+The 2026-09-21 re-audit inspected the author repository at
+[`a7d6e373`](https://github.com/Jasper-aaa/TEAM-VLA/tree/a7d6e373a1e2a8d6c37d12a26d44c232a73fda73):
+README and illustration only, no algorithm code. Independent neighborhood-union,
+RNG-isolation and received-mass tests supplement the scalar Eq. 5-9 reference.
+No evidence justified replacing the existing softmax/aggregation interpretation
+or tuning the preset to the four smoke tasks. Poor smoke outcomes therefore remain
+observations of this disclosed port, not proof that the published method fails.
