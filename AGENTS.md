@@ -3,6 +3,22 @@
 Read this file, CONTRIBUTING.md, docs/architecture.md and the relevant backend and
 method READMEs before changing code. Upstream submodules keep their own instructions.
 
+## Branch and workspace lifecycle
+
+- Develop on a short-lived task branch from current `main` in an existing authorized
+  checkout. Keep one feature per commit and validate before merging.
+- Merge completed work into `main`, preferably by fast-forward, preserving its
+  commits. Confirm every branch tip is reachable from `main`, then delete the
+  completed task branch. Do not retain merged branches or force-delete unmerged work.
+- Do not create additional project clones, Git worktrees, staging workspaces,
+  recovery copies or backups without the user's explicit request. This includes
+  Git bundles, archive copies and automatic pre-cleanup backups.
+- A clean-install test is not permission to create another checkout. Reuse an
+  existing authorized checkout/environment or ask before creating one.
+- Ordinary commits and canonical experiment outputs are not backups. Retain raw
+  measurement evidence, logs, models, datasets and runtime environments unless
+  their removal is separately authorized.
+
 ## Invariants
 
 - Keep this repository independent of the survey manuscript.
@@ -42,8 +58,9 @@ method READMEs before changing code. Upstream submodules keep their own instruct
 Run relevant CPU tests, formatting, import-boundary and privacy checks. Model changes
 also require real-model smoke checks; algorithm integrations additionally require the
 shared timing harness. Record commands using placeholders, not personal paths.
-Validate important boundaries from a clean checkout rather than relying on untracked
-files. Update documentation when behavior or the interface contract changes.
+Validate important boundaries without relying on untracked files, using an existing
+authorized checkout. Additional validation checkouts require explicit permission.
+Update documentation when behavior or the interface contract changes.
 
 ## Implemented scope
 
