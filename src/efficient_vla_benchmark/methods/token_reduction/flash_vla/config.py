@@ -6,6 +6,7 @@ class FlashVLAConfig:
     enabled: bool = True
     pruning_layer: int = 1
     tokens_per_view: int = 160
+    svd_driver: str = "auto"
 
     @classmethod
     def parse(cls, parameters):
@@ -18,4 +19,6 @@ class FlashVLAConfig:
             raise ValueError("pruning_layer must be in [0, 30]")
         if type(config.tokens_per_view) is not int or not 1 <= config.tokens_per_view <= 256:
             raise ValueError("tokens_per_view must be in [1, 256]")
+        if config.svd_driver not in ("auto", "gesvd", "gesvdj"):
+            raise ValueError("svd_driver must be auto, gesvd or gesvdj; no approximate SVD")
         return config

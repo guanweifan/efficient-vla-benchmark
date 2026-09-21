@@ -11,6 +11,17 @@ order. No Gram approximation, low-rank truncation or squared-energy replacement.
 Full-retention/disabled mode is native and installs no hooks. SVD runs ONLINE and
 its complete cost is included in timing, even if the method is slower.
 
+`svd_driver: auto` uses PyTorch's complete Jacobi SVD with `gesvd` fallback on
+nonconvergence. The earlier implementation forced the slower QR-based `gesvd`
+driver; `flash_vla_gesvd.yaml` retains it as a numerical/performance reference.
+Both keep every singular direction and use the same FP32 L1 scoring equation.
+`gesvda`, randomized SVD, rank truncation and Gram-matrix approximations are not
+supported. Floating-point scores need not be bitwise equal across solvers;
+nearly repeated singular values can rotate singular vectors and affect L1 ranks.
+Driver choice and any numerical discrepancies must remain visible in evidence.
+An explicit QR pre-reduction was investigated but not adopted: it added complexity
+without a meaningful improvement over direct `gesvd` on the measured shapes.
+
 OFT conventions: layer 1 (zero-based), 160/256 tokens per camera, all singular
 directions, native original RoPE/action positions. Per-camera scoring extends the
 paper's single-camera setup. The theoretical L1-score argument does not establish

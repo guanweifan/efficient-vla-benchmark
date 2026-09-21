@@ -2,3 +2,4 @@ method: flash_vla
 parameters:
   pruning_layer: 1
   tokens_per_view: 160
+  svd_driver: auto

@@ -22,11 +22,31 @@ def test_zero_input_is_finite_zero():
 
 @pytest.mark.parametrize(
     "params",
-    [{"enabled": 1}, {"tokens_per_view": 0}, {"pruning_layer": 31}, {"action_reuse": True}],
+    [
+        {"enabled": 1},
+        {"tokens_per_view": 0},
+        {"pruning_layer": 31},
+        {"action_reuse": True},
+        {"svd_driver": "gesvda"},
+        {"svd_driver": None},
+        {"svd_driver": []},
+    ],
 )
 def test_invalid_config(params):
     with pytest.raises(ValueError):
         FlashVLAConfig.parse(params)
+
+
+@pytest.mark.parametrize("driver", ["auto", "gesvd", "gesvdj"])
+def test_cpu_score_keeps_all_singular_directions(driver):
+    # Orthogonal rows have known scores, including small but nonzero directions.
+    matrix = torch.zeros(4, 8)
+    matrix[:, :4] = torch.diag(torch.tensor([8.0, 3.0, 0.5, 0.125]))
+    torch.testing.assert_close(
+        information_scores(matrix, driver), torch.tensor([8.0, 3.0, 0.5, 0.125])
+    )
+    with pytest.raises(ValueError):
+        information_scores(matrix, "gesvda")
 
 
 @pytest.mark.gpu
@@ -55,5 +75,9 @@ def test_real_oft_disabled_pruning_reset_and_restore(model_path, trace_path, req
     assert backend.method.attention_features is None
     backend.reset(context)
     np.testing.assert_array_equal(backend.predict_chunk(samples[0]), actual)
+    backend.detach_method()
+    backend.attach_method(FlashVLA(backend, FlashVLAConfig(svd_driver="gesvd")))
+    backend.reset(context)
+    np.testing.assert_allclose(backend.predict_chunk(samples[0]), actual, rtol=0, atol=1e-6)
     backend.detach_method()
     np.testing.assert_array_equal(backend.predict_chunk(samples[0]), expected)

@@ -1,0 +1,4 @@
+extends:
+  - flash_vla.yaml
+parameters:
+  svd_driver: gesvd
