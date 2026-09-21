@@ -25,6 +25,32 @@ def test_zero_features_and_full_retention():
     assert result.all()
 
 
+def test_relevance_uses_visual_queries_and_text_columns_not_transpose():
+    from types import SimpleNamespace
+
+    from efficient_vla_backend_openvla_oft.decoder import DecoderState, TokenLayout
+
+    from ..implementations.openvla_oft.method import EfficientVLA
+
+    method = EfficientVLA.__new__(EfficientVLA)
+    method.config = SimpleNamespace(
+        pruning_layer=1, tokens_per_view=2, key_tokens_per_view=1, task_fraction=1
+    )
+    method.layer_sizes = []
+    layout = TokenLayout(12, patches_per_view=3, action_tokens=1)
+    state = DecoderState(layout, torch.arange(12), torch.randn(1, 12, 4))
+    requested = method.probes(1, state)
+    assert requested["visual"].tolist() == [1, 2, 3, 4, 5, 6]
+    # Unrelated BOS/visual/action columns must not affect the task ranking.
+    attention = torch.full((6, 12), 100.0)
+    attention[:, layout.text_start : layout.text_end] = torch.tensor(
+        [[0.05], [0.45], [0.15], [0.30], [0.10], [0.40]]
+    )
+    keep = method.after_layer(1, state, {"visual": attention})
+    assert state.positions[keep & layout.visual_mask(state.positions)].tolist() == [2, 3, 4, 6]
+    assert keep[~layout.visual_mask(state.positions)].all()
+
+
 @pytest.mark.parametrize(
     "parameters",
     [

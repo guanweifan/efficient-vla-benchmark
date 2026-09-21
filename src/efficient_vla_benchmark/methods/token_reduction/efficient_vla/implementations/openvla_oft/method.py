@@ -45,14 +45,20 @@ class EfficientVLA(InferenceMethod, DecoderStrategy):
         self.layer_sizes.append(state.positions.numel())
         if layer == self.config.pruning_layer:
             p, layout = state.positions, state.layout
-            return {"text": p[(p >= layout.text_start) & (p < layout.text_end)]}
+            # Eq. 2 scores VISUAL queries attending to contextual TEXT keys.
+            # OFT is bidirectional, so this direction is available without
+            # changing its attention mask. Reversing Q/K changes the mechanism.
+            return {"visual": p[layout.visual_mask(p)]}
         return {}
 
     def after_layer(self, layer, state, attention):
         if layer != self.config.pruning_layer:
             return None
         layout, p = state.layout, state.positions
-        scores = attention["text"].sum(0)
+        visual_rows = layout.visual_mask(p)
+        text_columns = (p >= layout.text_start) & (p < layout.text_end)
+        scores = torch.zeros(p.numel(), dtype=torch.float32, device=p.device)
+        scores[visual_rows] = attention["visual"][:, text_columns].sum(-1)
         keep = ~layout.visual_mask(p)
         for view in range(layout.views):
             mask = layout.view_mask(p, view)
@@ -79,7 +85,7 @@ class EfficientVLA(InferenceMethod, DecoderStrategy):
         return {
             "scope": "token-pruning core only; no layer pruning or DiT caching",
             "implementation_basis": "paper-based: arXiv:2506.10100v1 section 3.3",
-            "attention_direction": "text queries to visual keys",
+            "attention_direction": "visual queries to text keys (Eq. 2)",
             "feature_source": "post-block hidden states at pruning_layer",
             "config": asdict(self.config),
             "requires_training": False,
