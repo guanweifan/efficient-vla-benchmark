@@ -18,7 +18,7 @@ def write_run(path):
     path.mkdir()
     meta = {
         "backend": {"backend": "fixture", "model_variant": "fixture", "checkpoint_sha256": "abc"},
-        "config": {"execution_horizon": 2},
+        "config": {"execution_horizon": 2, "method": "example"},
         "traces": [{"sha256": "xyz"}],
         "protocol": {"mode": "control", "repeats": 1, "warmup_queries": 1},
         "hardware": {"runtime": "fixture"},
@@ -96,3 +96,45 @@ def test_cache_query_skipping_is_not_reported_as_context_pruning(recorder):
         }
     ]
     assert recorder.token_evidence(rows) is None
+
+
+def test_superseded_evidence_is_preserved_and_labelled(tmp_path, recorder):
+    import copy
+
+    run = tmp_path / "example-run"
+    write_run(run)
+    old = recorder.make_record(run, run, "5.1 Tokens", "Old", "configs/example.yaml")
+    old_path = tmp_path / "example-run.json"
+    old_path.write_text(json.dumps(old))
+    original_bytes = old_path.read_bytes()
+    new = copy.deepcopy(old)
+    new["run"]["run_id"], new["label"] = "corrected-run", "Corrected"
+    recorder.annotate_supersedes(new, ["example-run"], tmp_path)
+    assert old_path.read_bytes() == original_bytes
+    assert new["supersedes"] == ["example-run"]
+    table = recorder.render([old, new])
+    assert "[Superseded — Old](results/example-run.json)" in table
+    assert "[Corrected](results/corrected-run.json)" in table
+
+
+@pytest.mark.parametrize("run_id", ["../example-run", "example-run", "not-found"])
+def test_reject_bad_superseded_reference(tmp_path, recorder, run_id):
+    run = tmp_path / "example-run"
+    write_run(run)
+    record = recorder.make_record(run, run, "5.1 Tokens", "Old", "configs/example.yaml")
+    with pytest.raises(ValueError):
+        recorder.annotate_supersedes(record, [run_id], tmp_path)
+
+
+def test_cannot_supersede_another_method(tmp_path, recorder):
+    import copy
+
+    run = tmp_path / "example-run"
+    write_run(run)
+    old = recorder.make_record(run, run, "5.1 Tokens", "Old", "configs/example.yaml")
+    (tmp_path / "example-run.json").write_text(json.dumps(old))
+    new = copy.deepcopy(old)
+    new["run"]["run_id"] = "new-run"
+    new["run"]["metadata"]["config"]["method"] = "another_method"
+    with pytest.raises(ValueError, match="another method"):
+        recorder.annotate_supersedes(new, ["example-run"], tmp_path)

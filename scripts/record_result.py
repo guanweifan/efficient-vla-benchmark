@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import math
+import re
 from pathlib import Path
 
 
@@ -163,12 +164,46 @@ def make_record(run_dir, baseline_dir, section, label, preset, smoke_dir=None):
     return record
 
 
+def annotate_supersedes(record, run_ids, records_dir):
+    """Annotate corrected implementations without rewriting historical evidence."""
+    if not run_ids:
+        return
+    if len(set(run_ids)) != len(run_ids):
+        raise ValueError("Duplicate superseded run ID")
+    current = record["run"]["metadata"]
+    for run_id in run_ids:
+        if not re.fullmatch(r"[A-Za-z0-9_-]+", run_id) or run_id == record["run"]["run_id"]:
+            raise ValueError("Invalid superseded run ID")
+        path = records_dir / f"{run_id}.json"
+        if not path.is_file():
+            raise ValueError("Superseded evidence must already exist")
+        previous = read_json(path)["run"]["metadata"]
+        for key in ("backend", "model_variant"):
+            if previous["backend"][key] != current["backend"][key]:
+                raise ValueError("Cannot supersede another backend or model variant")
+        if (
+            current["config"].get("method") is None
+            or previous["config"].get("method") != current["config"]["method"]
+        ):
+            raise ValueError("Cannot supersede another method")
+    record["supersedes"] = sorted(run_ids)
+
+
 def render(records):
+    superseded = {run_id for record in records for run_id in record.get("supersedes", [])}
+
+    def display_label(record):
+        prefix = "Superseded — " if record["run"]["run_id"] in superseded else ""
+        return prefix + record["label"]
+
     lines = [
         "# Algorithm measurement ledger",
         "",
         "Generated from the versioned JSON evidence in `results/`. This is a development",
         "measurement ledger, not a final paper comparison or a formal success-rate table.",
+        "Superseded rows preserve earlier, corrected implementations for traceability;",
+        "do not use them as results of the current implementation. Their raw records",
+        "are unchanged. Mechanism scope and limits are detailed in the method READMEs.",
         "",
         "Backend, hardware and protocol are recorded per row below. Policy timing",
         "includes preprocessing, transfer, all method/control overhead and postprocessing,",
@@ -208,7 +243,7 @@ def render(records):
             memory = summary["peak_allocated_bytes"]
             memory_text = f"{memory / 2**30:.2f}" if memory is not None else "—"
             lines.append(
-                f"| [{record['label']}](results/{run['run_id']}.json) | "
+                f"| [{display_label(record)}](results/{run['run_id']}.json) | "
                 f"{meta['backend']['backend']} | "
                 f"{meta['config']['execution_horizon']} | "
                 f"{query['count']} / {summary.get('replacement_steps', 0)} | "
@@ -244,7 +279,7 @@ def render(records):
                 or "—"
             )
             lines.append(
-                f"| {record['label']} | {final['mean']:.1f} / {final['min']} / "
+                f"| {display_label(record)} | {final['mean']:.1f} / {final['min']} / "
                 f"{final['max']} | {early_text} | {modes} |"
             )
         lines.append("")
@@ -264,7 +299,7 @@ def render(records):
         commit = record["run"]["metadata"]["source"]["commit"] or "unknown"
         dirty = " (dirty)" if record["run"]["metadata"]["source"]["dirty"] else ""
         lines.append(
-            f"| {record['label']} | [{Path(record['preset']).stem}](../{record['preset']}) | "
+            f"| {display_label(record)} | [{Path(record['preset']).stem}](../{record['preset']}) | "
             f"`{commit[:12]}`{dirty} | `{record['baseline']['run_id']}` |"
         )
     lines += [
@@ -279,7 +314,7 @@ def render(records):
         meta = run["metadata"]
         hardware = meta["hardware"].get("gpu", meta["hardware"].get("runtime", "unknown"))
         lines.append(
-            f"| {record['label']} | {hardware} | "
+            f"| {display_label(record)} | {hardware} | "
             f"{run['summary']['all_control_steps']['count']} | {meta['protocol']['repeats']} | "
             f"{meta['protocol']['warmup_queries']} |"
         )
@@ -318,6 +353,7 @@ def main():
     for name in ("run-dir", "baseline-dir", "records-dir"):
         export.add_argument(f"--{name}", type=Path, required=True)
     export.add_argument("--smoke-dir", type=Path)
+    export.add_argument("--supersedes", action="append", default=[], metavar="RUN_ID")
     for name in ("section", "label", "preset"):
         export.add_argument(f"--{name}", required=True)
     table = commands.add_parser("render")
@@ -330,6 +366,7 @@ def main():
         record = make_record(
             args.run_dir, args.baseline_dir, args.section, args.label, args.preset, args.smoke_dir
         )
+        annotate_supersedes(record, args.supersedes, args.records_dir)
         args.records_dir.mkdir(parents=True, exist_ok=True)
         destination = args.records_dir / f"{args.run_dir.name}.json"
         if destination.exists() and read_json(destination) != record:
