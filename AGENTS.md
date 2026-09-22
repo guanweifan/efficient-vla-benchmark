@@ -25,6 +25,9 @@ method READMEs before changing code. Upstream submodules keep their own instruct
 - One method per run; do not compose independently published methods. An independently
   meaningful core contribution may be ported without the paper's other components,
   but its ID, README and runtime metadata must explicitly disclose that scope.
+- Admit a port only after identifying and testing the paper/code's core mechanism.
+  Runnable proxies or small incidental tricks do not qualify. Unresolved core
+  semantics require deferral, not a guessed implementation with a disclaimer.
 - One canonical method directory under its principal category. Cross-category labels
   are metadata, never duplicated implementations.
 - Methods never import another method's implementation. Backend plugins never import
@@ -72,8 +75,10 @@ Preserve these qualifications in reports. FlashVLA action reuse remains unresolv
 EfficientVLA excludes layer pruning and DiT caching; VOTE excludes its other paper
 components. SP-VLA uses one canonical directory and offers scheduling-only as an
 ablation preset, not a second method. CogACT has a native joint-suite baseline
-with causal SDPA, a BF16 VLM and FP32 DiT-B; its existing OFT methods are not yet
-ported. Preserve the single-camera input, suite statistics and sampler conventions
+with causal SDPA, a BF16 VLM and FP32 DiT-B. ADP's released Q/K + observed-EEF
+mechanism and FlashVLA's independent ICS core now have explicit CogACT bindings;
+other OFT methods are not automatically ported. VLA-IAP's CogACT port is deferred
+until its core semantic-feature construction is verifiable. Preserve the single-camera input, suite statistics and sampler conventions
 in its README. starVLA retains pinned sources for subsequent implementation; do
 not advertise runtime support until its own model checks have passed. Do not
 fabricate an empty plugin that only registers a name and cannot perform inference.

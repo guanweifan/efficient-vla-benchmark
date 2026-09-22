@@ -56,3 +56,8 @@ forwards and full attention-probability output requests fail explicitly.
 Cross-frame KV caching and arbitrary autoregressive cached decoding are not
 advertised by this capability. Selection/probing policies belong to method
 bindings, not this backend. Closing hooks restores the original instance.
+
+Validated bindings are ADP (including observed-EEF gating) and FlashVLA's ICS core.
+See [token-port validation](../../docs/cogact_token_batch1_validation.md) for core
+mechanism checks, native-parity tests, paired timing and closed-loop smoke evidence.
+Other methods require their own CogACT bindings and fidelity checks.

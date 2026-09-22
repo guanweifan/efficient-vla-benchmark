@@ -28,6 +28,8 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 | [CogACT native DDIM / primary runtime](results/cogact-final-benchmark-baseline-001.json) | cogact | 8 | 321 / 0 | 183.69 / 184.81 | 23.39 | 1.000× | 14.73 | 3/4; errors 0 |
 | [CogACT native DDIM / secondary runtime](results/cogact-secondary-benchmark-baseline-001.json) | cogact | 8 | 321 / 0 | 194.39 / 204.01 | 24.75 | 1.000× | 14.73 | 3/4; errors 0 |
 | [CogACT native DDIM / secondary recheck (thermal throttling)](results/cogact-secondary-benchmark-recheck-001.json) | cogact | 8 | 321 / 0 | 195.57 / 209.94 | 24.90 | 1.000× | 14.73 | 3/4; errors 0 |
+| [CogACT native H=8 (token batch 1)](results/cogact-token-batch1-benchmark-baseline-001.json) | cogact | 8 | 321 / 0 | 183.86 / 184.84 | 23.41 | 1.000× | 14.73 | 3/4; errors 0 |
+| [CogACT native H=8 end recheck (token batch 1)](results/cogact-token-batch1-benchmark-baseline_recheck-001.json) | cogact | 8 | 321 / 0 | 184.36 / 185.67 | 23.47 | 0.997× | 14.73 | Not run |
 | [Native BF16 / SDPA](results/control-methods-final-benchmark-baseline-001.json) | openvla_oft | 8 | 216 / 0 | 197.86 / 199.86 | 25.10 | 1.000× | 14.98 | 4/4; errors 0 |
 | [Native BF16 / SDPA, matched H=1](results/control-methods-final-benchmark-baseline_horizon1-001.json) | openvla_oft | 1 | 1704 / 0 | 199.83 / 201.42 | 199.83 | 1.000× | 14.98 | Not run |
 | [Native BF16 / SDPA, end recheck](results/control-methods-final-benchmark-baseline_recheck-001.json) | openvla_oft | 8 | 216 / 0 | 198.91 / 201.15 | 25.23 | 0.995× | 14.98 | Not run |
@@ -43,6 +45,8 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 | [Superseded — EfficientVLA token core (paper-based)](results/batch2-final-benchmark-efficient_vla-001.json) | openvla_oft | 8 | 216 / 0 | 170.08 / 171.33 | 21.58 | 1.160× | 14.62 | 4/4; errors 0 |
 | [FlashVLA ICS core (paper-based)](results/batch2-final-benchmark-flash_vla-001.json) | openvla_oft | 8 | 216 / 0 | 238.64 / 241.15 | 30.27 | 0.827× | 14.64 | 4/4; errors 0 |
 | [Superseded — ST-Merge spatial VLA (paper-based)](results/batch2-final-benchmark-st_merge-001.json) | openvla_oft | 8 | 216 / 0 | 171.42 / 172.94 | 21.75 | 1.151× | 14.62 | 4/4; errors 0 |
+| [ADP / CogACT (observed EEF)](results/cogact-token-batch1-benchmark-adp-001.json) | cogact | 8 | 321 / 0 | 168.27 / 184.16 | 21.44 | 1.092× | 14.73 | 4/4; errors 0 |
+| [FlashVLA ICS / CogACT (complete SVD)](results/cogact-token-batch1-benchmark-flash_vla-001.json) | cogact | 8 | 321 / 0 | 157.56 / 166.44 | 20.07 | 1.167× | 14.66 | 4/4; errors 0 |
 | [SpecPrune-VLA](results/control-methods-final-benchmark-specprune_vla-001.json) | openvla_oft | 8 | 237 / 0 | 146.91 / 163.52 | 20.51 | 1.224× | 14.60 | 3/4; errors 0 |
 | [ADP / control recheck](results/fidelity-final-benchmark-adp-001.json) | openvla_oft | 8 | 216 / 0 | 193.63 / 198.37 | 24.58 | 1.015× | 14.68 | 4/4; errors 0 |
 | [EfficientVLA token core / corrected Q-K direction](results/fidelity-final-benchmark-efficient_vla-001.json) | openvla_oft | 8 | 216 / 0 | 170.19 / 172.02 | 21.59 | 1.156× | 14.63 | 4/4; errors 0 |
@@ -104,6 +108,8 @@ earlier-layer cost. Per-layer sequence lengths remain in raw diagnostics.
 | FlashVLA ICS core (paper-based) | 320.0 / 320 / 320 | — | — |
 | SP-VLA pruning + scheduling | 418.9 / 158 / 512 | — | — |
 | Superseded — ST-Merge spatial VLA (paper-based) | 256.0 / 256 / 256 | — | — |
+| ADP / CogACT (observed EEF) | 223.7 / 192 / 256 | — | pruned 162/321 |
+| FlashVLA ICS / CogACT (complete SVD) | 160.0 / 160 / 160 | — | — |
 | ADP / control recheck | 458.7 / 384 / 512 | — | pruned 90/216 |
 | EfficientVLA token core / corrected Q-K direction | 256.0 / 256 / 256 | — | — |
 | FlashVLA ICS / automatic complete SVD | 320.0 / 320 / 320 | — | — |
@@ -143,6 +149,10 @@ earlier source revision is explicitly marked, never silently relabeled.
 | CogACT native DDIM / primary runtime | [baseline](../configs/experiments/cogact/baseline.yaml) | `a984ef33c463` | `cogact-final-benchmark-baseline-001` |
 | CogACT native DDIM / secondary runtime | [baseline](../configs/experiments/cogact/baseline.yaml) | `a984ef33c463` | `cogact-secondary-benchmark-baseline-001` |
 | CogACT native DDIM / secondary recheck (thermal throttling) | [baseline](../configs/experiments/cogact/baseline.yaml) | `a984ef33c463` | `cogact-secondary-benchmark-recheck-001` |
+| ADP / CogACT (observed EEF) | [adp](../configs/experiments/cogact/adp.yaml) | `befad9866515` (dirty) | `cogact-token-batch1-benchmark-baseline-001` |
+| CogACT native H=8 (token batch 1) | [baseline](../configs/experiments/cogact/baseline.yaml) | `befad9866515` (dirty) | `cogact-token-batch1-benchmark-baseline-001` |
+| CogACT native H=8 end recheck (token batch 1) | [baseline](../configs/experiments/cogact/baseline.yaml) | `1d9d98ec3070` (dirty) | `cogact-token-batch1-benchmark-baseline-001` |
+| FlashVLA ICS / CogACT (complete SVD) | [flash_vla](../configs/experiments/cogact/flash_vla.yaml) | `b03667ab6362` (dirty) | `cogact-token-batch1-benchmark-baseline-001` |
 | AWQ W4A16, BF16 kernel | [awq](../configs/experiments/openvla_oft/awq.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
 | AWQ W4A16, explicit FP16 kernel | [awq_fp16_kernel](../configs/experiments/openvla_oft/awq_fp16_kernel.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
 | Native BF16 / SDPA | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
@@ -191,6 +201,10 @@ earlier source revision is explicitly marked, never silently relabeled.
 | CogACT native DDIM / primary runtime | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
 | CogACT native DDIM / secondary runtime | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
 | CogACT native DDIM / secondary recheck (thermal throttling) | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| ADP / CogACT (observed EEF) | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| CogACT native H=8 (token batch 1) | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| CogACT native H=8 end recheck (token batch 1) | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| FlashVLA ICS / CogACT (complete SVD) | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
 | AWQ W4A16, BF16 kernel | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | AWQ W4A16, explicit FP16 kernel | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | Native BF16 / SDPA | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |

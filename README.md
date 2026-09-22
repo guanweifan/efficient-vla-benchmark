@@ -21,7 +21,7 @@ One run uses the native baseline or exactly one method with explicitly declared 
 | Backend / variant | Native baseline | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|---|
 | OpenVLA-OFT / libero_joint | Native SDPA | Nine methods below | VLA-Cache, VLA-InfoEntropy | SP-VLA pruning + scheduling | VOTE ensemble core | AWQ W4A16 |
-| CogACT / libero_joint | Native causal SDPA + DDIM | — | — | — | — | — |
+| CogACT / libero_joint | Native causal SDPA + DDIM | ADP, FlashVLA ICS | — | — | — | — |
 | starVLA | Source pinned; runtime not implemented | — | — | — | — | — |
 
 Algorithms retain their full implemented mechanism and disclose adaptations in
@@ -33,6 +33,8 @@ each paper's original numbers. Quantization uses real packed kernels, not fake q
 Every row is one independent plugin under `methods/token_reduction/`, selected by
 the correspondingly named experiment YAML. Shared backend hooks do not contain
 paper-specific policy, and no method imports another method's implementation.
+All nine below have OFT bindings; only ADP and FlashVLA ICS currently have CogACT
+bindings. Supporting one backend never implies compatibility with another.
 
 | Method ID | Mechanism | Implementation basis |
 |---|---|---|
@@ -120,3 +122,8 @@ EfficientVLA's attention direction and ST-Merge's key similarity, optimizes comp
 FlashVLA SVD, and strengthens equation tests for TEAM-VLA, VLA-IAP and InfoEntropy.
 It records a fresh paired cohort and explicitly supersedes the two corrected
 implementation rows without deleting their historical evidence.
+
+The [CogACT token-port validation report](docs/cogact_token_batch1_validation.md)
+records the causal token-selection interface, source/equation tests, ADP and ICS
+measurements, and the evidence-based deferral of VLA-IAP. These ports preserve
+native cognition readout and diffusion sampling; they do not reuse OFT action slots.
