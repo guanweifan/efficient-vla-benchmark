@@ -33,6 +33,7 @@ def violations(root):
             imported = import_names(path, root)
             common = path.is_relative_to(package) and relative.parts[2] != "methods"
             plugin = relative.parts[0] == "backends"
+            optional_ops = path.is_relative_to(package) and relative.parts[2] == "model_ops"
             for name in imported:
                 if (
                     "methods" in relative.parts
@@ -42,7 +43,11 @@ def violations(root):
                     failures.append(f"{relative}: shared method code imports a backend")
                 if common and (
                     name.startswith(("efficient_vla_backend_", "efficient_vla_benchmark.methods."))
-                    or name.split(".")[0] in {"torch", "transformers", "prismatic", "starVLA"}
+                    or (
+                        not optional_ops
+                        and name.split(".")[0] in {"torch", "transformers", "prismatic", "starVLA"}
+                    )
+                    or (not optional_ops and name.startswith("efficient_vla_benchmark.model_ops"))
                 ):
                     failures.append(f"{relative}: common code imports runtime-specific {name}")
                 if plugin and name.startswith("efficient_vla_benchmark.methods."):

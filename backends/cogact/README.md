@@ -61,3 +61,14 @@ Validated bindings are ADP (including observed-EEF gating) and FlashVLA's ICS co
 See [token-port validation](../../docs/cogact_token_batch1_validation.md) for core
 mechanism checks, native-parity tests, paired timing and closed-loop smoke evidence.
 Other methods require their own CogACT bindings and fidelity checks.
+
+## Additional model-access capabilities
+
+`model_access.policy_image(image)` reproduces the native spatial transform in RGB
+for patch inspection (including 256px simulator images resized to the 224px grid).
+`attach_reuse_strategy()` is a separate causal indexed-KV adapter; it retains full
+key context while skipping only selected visual query/MLP rows. Causal masks use
+original query positions, not the last mask row or a triangle over sparse indices.
+Native cognition EOS is always computed, and the DiT sampler is unchanged.
+Attention inspection has an explicit eager/SDPA mode reported in runtime metadata.
+Fresh-prefill visual selection alone does not imply this caching capability.

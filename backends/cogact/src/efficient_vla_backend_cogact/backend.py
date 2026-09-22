@@ -101,7 +101,7 @@ class CogACTBackend(MethodHost):
             "method": self.method_name,
             "precision": "bfloat16",
             "action_head_precision": "float32",
-            "attention_implementation": "sdpa",
+            "attention_implementation": self.model_access.attention_implementation,
             "native_attention_implementation": "sdpa",
             "attention_mask": "causal",
             "predicted_horizon": 16,
