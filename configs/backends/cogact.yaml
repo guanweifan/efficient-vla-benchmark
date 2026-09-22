@@ -1,0 +1,7 @@
+backend: cogact
+model_variant: libero_joint
+precision: bfloat16
+execution_horizon: 8
+backend_parameters:
+  num_ddim_steps: 10
+  cfg_scale: 1.5

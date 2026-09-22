@@ -1,0 +1,5 @@
+extends:
+  - ../../backends/cogact.yaml
+  - ../../evaluation/libero_smoke.yaml
+  - ../../profiling/control_replay.yaml
+method: none

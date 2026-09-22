@@ -21,7 +21,7 @@ One run uses the native baseline or exactly one method with explicitly declared 
 | Backend / variant | Native baseline | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|---|
 | OpenVLA-OFT / libero_joint | Native SDPA | Nine methods below | VLA-Cache, VLA-InfoEntropy | SP-VLA pruning + scheduling | VOTE ensemble core | AWQ W4A16 |
-| CogACT | Source pinned; runtime not implemented | — | — | — | — | — |
+| CogACT / libero_joint | Native causal SDPA + DDIM | — | — | — | — | — |
 | starVLA | Source pinned; runtime not implemented | — | — | — | — | — |
 
 Algorithms retain their full implemented mechanism and disclose adaptations in
@@ -61,7 +61,8 @@ Section 5.1 without duplicating their implementations or evidence rows.
 
 ## Start with one backend
 
-Read [installation](docs/installation.md) and the [OFT recipe](backends/openvla_oft/INSTALL.md).
+Read [installation](docs/installation.md) and your selected backend recipe:
+[OFT](backends/openvla_oft/INSTALL.md) or [CogACT](backends/cogact/INSTALL.md).
 After installation, inspect supported combinations without loading a model:
 
 ```bash

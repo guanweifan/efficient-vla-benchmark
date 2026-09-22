@@ -1,0 +1,26 @@
+# Tested key runtime pins. Install pinned native submodules separately with --no-deps.
+# Use stock Transformers, never the OFT fork sharing this version number.
+torch==2.2.0
+torchvision==0.17.0
+transformers==4.40.1
+tokenizers==0.19.1
+timm==0.9.10
+accelerate==1.13.0
+draccus==0.8.0
+einops==0.8.2
+huggingface-hub==0.36.2
+peft==0.11.1
+sentencepiece==0.1.99
+numpy==1.24.4
+Pillow==12.2.0
+tensorflow==2.15.0
+tensorflow-datasets==4.9.3
+tensorflow-graphics==2021.12.3
+robosuite==1.4.0
+mujoco==2.3.7
+numba==0.65.1
+rich==15.0.0
+json-numpy==2.1.1
+jsonlines==4.0.0
+wandb==0.26.1
+matplotlib==3.10.9

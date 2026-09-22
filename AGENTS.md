@@ -71,7 +71,9 @@ implementations disclose unverified conventions, not published-score reproductio
 Preserve these qualifications in reports. FlashVLA action reuse remains unresolved;
 EfficientVLA excludes layer pruning and DiT caching; VOTE excludes its other paper
 components. SP-VLA uses one canonical directory and offers scheduling-only as an
-ablation preset, not a second method. CogACT and starVLA
-retain pinned sources for subsequent implementations; do not advertise runtime
-support until their own model checks have passed. Do not fabricate an empty plugin
-that only registers a name and cannot perform inference.
+ablation preset, not a second method. CogACT has a native joint-suite baseline
+with causal SDPA, a BF16 VLM and FP32 DiT-B; its existing OFT methods are not yet
+ported. Preserve the single-camera input, suite statistics and sampler conventions
+in its README. starVLA retains pinned sources for subsequent implementation; do
+not advertise runtime support until its own model checks have passed. Do not
+fabricate an empty plugin that only registers a name and cannot perform inference.
