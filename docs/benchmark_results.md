@@ -13,7 +13,7 @@ task completion time. Different protocol cohorts must not be pooled.
 
 Speedup = paired native baseline total replay time / method total replay time.
 H is the executed prefix, distinct from the backend's full prediction length.
-The present OFT VOTE preset uses its matched H=1 baseline; the other OFT presets
+VOTE presets use a matched H=1 baseline on each backend; the other current presets
 use native H=8. Do not compare their speedup
 ratios as if query cadence were identical. Peak GiB is runtime allocated tensor
 memory, not loading peak or total process memory. Smoke is successes/episodes,
@@ -25,6 +25,9 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 |---|---|---:|---:|---:|---:|---:|---:|---|
 | [Native H=8 (token batch 2)](results/batch2-final-benchmark-baseline-001.json) | openvla_oft | 8 | 216 / 0 | 197.31 / 199.10 | 25.03 | 1.000× | 14.98 | Not run |
 | [Native H=8 end recheck (token batch 2)](results/batch2-final-benchmark-baseline_recheck-001.json) | openvla_oft | 8 | 216 / 0 | 198.63 / 200.64 | 25.20 | 0.993× | 14.98 | Not run |
+| [CogACT native H8 / category examples](results/cogact-category-final-baseline-001.json) | cogact | 8 | 321 / 0 | 185.37 / 186.99 | 23.60 | 1.000× | 14.73 | 3/4; errors 0 |
+| [CogACT native H1 / matched VOTE reference](results/cogact-category-final-baseline_horizon1-001.json) | cogact | 1 | 2523 / 0 | 185.82 / 186.85 | 185.82 | 1.000× | 14.73 | 4/4; errors 0 |
+| [CogACT native H8 / end-of-cohort recheck](results/cogact-category-final-baseline_recheck-001.json) | cogact | 8 | 321 / 0 | 184.56 / 185.72 | 23.50 | 1.004× | 14.73 | Not run |
 | [CogACT native DDIM / primary runtime](results/cogact-final-benchmark-baseline-001.json) | cogact | 8 | 321 / 0 | 183.69 / 184.81 | 23.39 | 1.000× | 14.73 | 3/4; errors 0 |
 | [CogACT native DDIM / secondary runtime](results/cogact-secondary-benchmark-baseline-001.json) | cogact | 8 | 321 / 0 | 194.39 / 204.01 | 24.75 | 1.000× | 14.73 | 3/4; errors 0 |
 | [CogACT native DDIM / secondary recheck (thermal throttling)](results/cogact-secondary-benchmark-recheck-001.json) | cogact | 8 | 321 / 0 | 195.57 / 209.94 | 24.90 | 1.000× | 14.73 | 3/4; errors 0 |
@@ -71,6 +74,8 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 |---|---|---:|---:|---:|---:|---:|---:|---|
 | [VLA-Cache full statistics / eager (token batch 2)](results/batch2-final-benchmark-vla_cache-001.json) | openvla_oft | 8 | 216 / 0 | 207.43 / 217.93 | 26.31 | 0.951× | 15.03 | Not run |
 | [VLA-InfoEntropy KV reuse (paper-based)](results/batch2-final-benchmark-vla_infoentropy-001.json) | openvla_oft | 8 | 216 / 0 | 213.14 / 222.39 | 27.04 | 0.926× | 15.03 | 4/4; errors 0 |
+| [VLA-Cache full statistics eager / CogACT](results/cogact-category-final-vla_cache-001.json) | cogact | 8 | 321 / 0 | 158.58 / 167.35 | 20.20 | 1.169× | 14.75 | 3/4; errors 0 |
+| [VLA-Cache full statistics SDPA / CogACT](results/cogact-category-final-vla_cache_sdpa-001.json) | cogact | 8 | 321 / 0 | 159.88 / 168.24 | 20.36 | 1.159× | 14.75 | Not run |
 | [VLA-Cache, full statistics / eager](results/control-methods-final-benchmark-vla_cache-001.json) | openvla_oft | 8 | 216 / 0 | 207.64 / 219.38 | 26.34 | 0.953× | 15.03 | 4/4; errors 0 |
 | [VLA-Cache full statistics / control recheck](results/fidelity-final-benchmark-vla_cache-001.json) | openvla_oft | 8 | 216 / 0 | 206.24 / 216.85 | 26.16 | 0.954× | 15.03 | 4/4; errors 0 |
 | [VLA-InfoEntropy / audited entropy and KV reuse](results/fidelity-final-benchmark-vla_infoentropy-001.json) | openvla_oft | 8 | 216 / 0 | 213.47 / 222.80 | 27.08 | 0.922× | 15.03 | 4/4; errors 0 |
@@ -81,18 +86,22 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 |---|---|---:|---:|---:|---:|---:|---:|---|
 | [SP-VLA pruning + scheduling](results/batch2-final-benchmark-sp_vla-001.json) | openvla_oft | 8 | 201 / 153 | 189.63 / 201.81 | 22.41 | 1.117× | 14.68 | 4/4; errors 0 |
 | [SP-VLA scheduling-only ablation (token batch 2)](results/batch2-final-benchmark-sp_vla_scheduling-001.json) | openvla_oft | 8 | 201 / 153 | 197.93 / 200.72 | 23.39 | 1.070× | 14.98 | Not run |
+| [SP-VLA pruning + scheduling / CogACT](results/cogact-category-final-sp_vla-001.json) | cogact | 8 | 306 / 141 | 171.98 / 189.20 | 20.89 | 1.130× | 14.73 | 4/4; errors 0 |
 | [SP-VLA scheduling core](results/control-methods-final-benchmark-sp_vla_scheduling-001.json) | openvla_oft | 8 | 201 / 153 | 197.51 / 199.26 | 23.34 | 1.076× | 14.98 | 4/4; errors 0 |
 
 ## 5.5 Action Chunking and Replanning
 
 | Method / configuration | Backend | H | Queries / replacements | Query mean / p95 ms | ms/control step | Replay speedup | Peak GiB | Smoke |
 |---|---|---:|---:|---:|---:|---:|---:|---|
+| [VOTE ensemble core / CogACT](results/cogact-category-final-vote_ensemble-001.json) | cogact | 1 | 2523 / 0 | 186.53 / 187.57 | 186.53 | 0.996× | 14.73 | 3/4; errors 0 |
 | [VOTE ensemble core](results/control-methods-final-benchmark-vote_ensemble-001.json) | openvla_oft | 1 | 1704 / 0 | 199.62 / 201.47 | 199.62 | 1.001× | 14.98 | 3/4; errors 0 |
 
 ## 6.1 Quantization and Low-Precision Inference
 
 | Method / configuration | Backend | H | Queries / replacements | Query mean / p95 ms | ms/control step | Replay speedup | Peak GiB | Smoke |
 |---|---|---:|---:|---:|---:|---:|---:|---|
+| [AWQ W4A16 BF16 kernel / CogACT](results/cogact-category-final-awq-001.json) | cogact | 8 | 321 / 0 | 155.51 / 156.42 | 19.81 | 1.192× | 5.90 | 3/4; errors 0 |
+| [AWQ W4A16 explicit FP16 kernel / CogACT](results/cogact-category-final-awq_fp16_kernel-001.json) | cogact | 8 | 321 / 0 | 135.92 / 136.99 | 17.31 | 1.363× | 5.90 | 4/4; errors 0 |
 | [AWQ W4A16, BF16 kernel](results/control-methods-final-benchmark-awq-001.json) | openvla_oft | 8 | 216 / 0 | 204.95 / 206.69 | 26.00 | 0.965× | 6.12 | 4/4; errors 0 |
 | [AWQ W4A16, explicit FP16 kernel](results/control-methods-final-benchmark-awq_fp16_kernel-001.json) | openvla_oft | 8 | 216 / 0 | 170.32 / 171.73 | 21.61 | 1.162× | 6.12 | 4/4; errors 0 |
 
@@ -108,6 +117,7 @@ earlier-layer cost. Per-layer sequence lengths remain in raw diagnostics.
 | FlashVLA ICS core (paper-based) | 320.0 / 320 / 320 | — | — |
 | SP-VLA pruning + scheduling | 418.9 / 158 / 512 | — | — |
 | Superseded — ST-Merge spatial VLA (paper-based) | 256.0 / 256 / 256 | — | — |
+| SP-VLA pruning + scheduling / CogACT | 219.0 / 108 / 256 | — | — |
 | ADP / CogACT (observed EEF) | 223.7 / 192 / 256 | — | pruned 162/321 |
 | FlashVLA ICS / CogACT (complete SVD) | 160.0 / 160 / 160 | — | — |
 | ADP / control recheck | 458.7 / 384 / 512 | — | pruned 90/216 |
@@ -126,6 +136,15 @@ earlier-layer cost. Per-layer sequence lengths remain in raw diagnostics.
 | TEAM-VLA (paper-based) | 80.0 / 80 / 80 | 269.1 | — |
 | VLA-IAP (paper-based) | 438.0 / 174 / 512 | — | warmup 24/216 |
 | VLA-Pruner | 192.0 / 128 / 512 | — | — |
+
+## Computed visual queries and retained KV context
+
+Query-weighted last-layer counts; skipping query/MLP rows does not remove KV context.
+
+| Method | Computed queries: mean / min / max | Retained KV: mean / min / max |
+|---|---:|---:|
+| VLA-Cache full statistics eager / CogACT | 162.4 / 145 / 256 | 256.0 / 256 / 256 |
+| VLA-Cache full statistics SDPA / CogACT | 162.4 / 145 / 256 | 256.0 / 256 / 256 |
 
 ## Traceability
 
@@ -146,6 +165,15 @@ earlier source revision is explicitly marked, never silently relabeled.
 | Superseded — ST-Merge spatial VLA (paper-based) | [st_merge](../configs/experiments/openvla_oft/st_merge.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
 | VLA-Cache full statistics / eager (token batch 2) | [vla_cache](../configs/experiments/openvla_oft/vla_cache.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
 | VLA-InfoEntropy KV reuse (paper-based) | [vla_infoentropy](../configs/experiments/openvla_oft/vla_infoentropy.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
+| AWQ W4A16 BF16 kernel / CogACT | [awq](../configs/experiments/cogact/awq.yaml) | `ba55950deca5` | `cogact-category-final-baseline-001` |
+| AWQ W4A16 explicit FP16 kernel / CogACT | [awq_fp16_kernel](../configs/experiments/cogact/awq_fp16_kernel.yaml) | `ba55950deca5` | `cogact-category-final-baseline-001` |
+| CogACT native H8 / category examples | [baseline](../configs/experiments/cogact/baseline.yaml) | `ba55950deca5` | `cogact-category-final-baseline-001` |
+| CogACT native H1 / matched VOTE reference | [baseline_horizon1](../configs/experiments/cogact/baseline_horizon1.yaml) | `ba55950deca5` | `cogact-category-final-baseline_horizon1-001` |
+| CogACT native H8 / end-of-cohort recheck | [baseline](../configs/experiments/cogact/baseline.yaml) | `ba55950deca5` | `cogact-category-final-baseline-001` |
+| SP-VLA pruning + scheduling / CogACT | [sp_vla](../configs/experiments/cogact/sp_vla.yaml) | `ba55950deca5` | `cogact-category-final-baseline-001` |
+| VLA-Cache full statistics eager / CogACT | [vla_cache](../configs/experiments/cogact/vla_cache.yaml) | `ba55950deca5` | `cogact-category-final-baseline-001` |
+| VLA-Cache full statistics SDPA / CogACT | [vla_cache_sdpa](../configs/experiments/cogact/vla_cache_sdpa.yaml) | `ba55950deca5` | `cogact-category-final-baseline-001` |
+| VOTE ensemble core / CogACT | [vote_ensemble](../configs/experiments/cogact/vote_ensemble.yaml) | `ba55950deca5` | `cogact-category-final-baseline_horizon1-001` |
 | CogACT native DDIM / primary runtime | [baseline](../configs/experiments/cogact/baseline.yaml) | `a984ef33c463` | `cogact-final-benchmark-baseline-001` |
 | CogACT native DDIM / secondary runtime | [baseline](../configs/experiments/cogact/baseline.yaml) | `a984ef33c463` | `cogact-secondary-benchmark-baseline-001` |
 | CogACT native DDIM / secondary recheck (thermal throttling) | [baseline](../configs/experiments/cogact/baseline.yaml) | `a984ef33c463` | `cogact-secondary-benchmark-recheck-001` |
@@ -198,6 +226,15 @@ earlier source revision is explicitly marked, never silently relabeled.
 | Superseded — ST-Merge spatial VLA (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | VLA-Cache full statistics / eager (token batch 2) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | VLA-InfoEntropy KV reuse (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| AWQ W4A16 BF16 kernel / CogACT | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| AWQ W4A16 explicit FP16 kernel / CogACT | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| CogACT native H8 / category examples | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| CogACT native H1 / matched VOTE reference | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| CogACT native H8 / end-of-cohort recheck | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| SP-VLA pruning + scheduling / CogACT | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| VLA-Cache full statistics eager / CogACT | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| VLA-Cache full statistics SDPA / CogACT | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| VOTE ensemble core / CogACT | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
 | CogACT native DDIM / primary runtime | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
 | CogACT native DDIM / secondary runtime | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
 | CogACT native DDIM / secondary recheck (thermal throttling) | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
