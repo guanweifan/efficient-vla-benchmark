@@ -79,3 +79,11 @@ original query positions, not the last mask row or a triangle over sparse indice
 Native cognition EOS is always computed, and the DiT sampler is unchanged.
 Attention inspection has an explicit eager/SDPA mode reported in runtime metadata.
 Fresh-prefill visual selection alone does not imply this caching capability.
+
+`attach_vision_strategy()` provides one-view paired DINO/SigLIP block transforms.
+It shares group/mass bookkeeping with the OFT adapter but consumes native CogACT
+image dictionaries. SigLIP supplies a method's grouping before DINO runs; both
+branches must retain identical original patch memberships and protected prefixes.
+Sparse output is restored to native patch slots for the unmodified projector;
+the selected method then removes empty slots before LLM layer zero. The dense
+projector and bridge overhead remain part of timing.

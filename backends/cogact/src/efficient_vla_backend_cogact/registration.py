@@ -14,6 +14,7 @@ def register():
                 "control_hooks",
                 "libero_cartesian_delta_actions",
                 "causal_visual_token_selection",
+                "paired_vision_transform",
                 "causal_indexed_kv_reuse",
                 "llama_decoder",
             }

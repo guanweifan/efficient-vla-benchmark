@@ -70,8 +70,11 @@ seven dimensions. Nonfinite/invalid hook outputs fail before environment executi
   cognition call does not permit changes to generation/readout or DiT sampling.
 - `VisionAttentionProbe` provides reversible per-view Q/K inspection without
   changing attention output. Paired vision grouping preserves patch membership,
-  prefix/register tokens and anchors across SigLIP/DINO. The current OFT bridge
+  prefix/register tokens and anchors across SigLIP/DINO. The OFT/CogACT bridge
   restores native patch slots for projection; do not claim dense projector savings.
+  `PairedVisionTransform` owns grouping/mass bookkeeping; backend bindings only
+  unpack native per-camera images. Both branches must share original patch members,
+  not merely the same number of anchors. CogACT exposes `attach_vision_strategy()`.
 - CogACT `policy_image()` exposes native spatial RGB transforms before normalization,
   not an extra crop or reconstruction from normalized pixels.
 - `model_ops/` is optional tensor infrastructure. It may import Torch/Transformers,

@@ -25,6 +25,11 @@ class CogACTModelAccess:
 
         return policy_image(self.vision, image)
 
+    def attach_vision_strategy(self, callback):
+        from .vision_adapter import PairedVisionAdapter
+
+        return PairedVisionAdapter(self.vision, callback)
+
     def attach_reuse_strategy(self, strategy):
         from .reuse import CausalReuseAdapter
 
