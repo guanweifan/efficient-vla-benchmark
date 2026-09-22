@@ -5,6 +5,11 @@ description: Static and dynamic token pruning with its action-aware controller.
 config: efficient_vla_benchmark.methods.token_reduction.specprune_vla.config:SpecPruneConfig
 requires_artifact: false
 implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [causal_visual_token_selection, libero_cartesian_delta_actions, control_hooks]
+    factory: efficient_vla_benchmark.methods.token_reduction.specprune_vla.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.token_reduction.specprune_vla.implementations.cogact.api:preflight
   openvla_oft:
     variants: [libero_joint]
     requires: [llama_decoder, visual_token_layout, l1_action_head]

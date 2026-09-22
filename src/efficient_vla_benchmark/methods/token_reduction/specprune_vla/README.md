@@ -1,4 +1,4 @@
-# SpecPrune-VLA on OpenVLA-OFT
+# SpecPrune-VLA
 
 Reference: [paper](https://arxiv.org/abs/2509.05614),
 [author code](https://github.com/alexwhz-sjtu/SpecPrune-VLA/tree/8091adc4b574ce9008d49a1dc9a210f4eec314c1).
@@ -14,8 +14,9 @@ dependent lookback, switches profiles and requests early replanning. It never
 steps the simulator itself. Optional layer skipping is not enabled in the author
 default and is not implemented here.
 
-`config.py` owns validated parameters; `implementations/openvla_oft/method.py` owns state and
-decisions. The backend decoder owns token-layout/RoPE/attention/cache primitives;
+`config.py` owns validated parameters; `method.py` owns shared state and decisions.
+Backend bindings own native image preparation and query-token definitions.
+The backend decoder owns token-layout/RoPE/attention/cache primitives;
 the common controller owns execution. No other method's code is imported.
 
 Use `configs/experiments/openvla_oft/specprune_vla.yaml` with the shared evaluation and
@@ -64,3 +65,26 @@ four-episode smoke is not a success-rate estimate.
 Timing and historical cohorts are recorded in `docs/benchmark_results.md`.
 Report both per-query latency and total replay time: extra controller queries can
 reduce the overall benefit. These are not closed-loop task-completion times.
+
+## CogACT binding
+
+The [v3 paper](https://arxiv.org/html/2509.05614v3#A1.SS4) reports CogACT separately
+from an optional action-expert cache. This binding ports all three SpecPrune
+mechanisms without that cache: global/local static pruning, progressive rank/entropy
+importance and the physical emitted-action controller with early replanning.
+
+Global/local probes use text-to-visual attention as in pinned executable code;
+the v3 Eq. 2 image-to-text notation conflicts with that code and native causal
+ordering. This implementation follows the code, not an unmasked attention forward.
+Dynamic saliency uses the native final cognition EOS, which conditions the DiT.
+It is an explicit single-condition backend adaptation, not a claim to observe
+action-to-patch attention inside CogACT's DiT or reproduce unpublished author code.
+
+Use `configs/experiments/cogact/specprune_vla.yaml`. One 256-patch grid uses the
+primary-camera settings only; wrist parameters do not participate. The global
+minimum is 30 rather than the two-camera preset's 60, retaining the per-view floor.
+Other released control/selection settings stay fixed, including the early tied-score
+pruning schedule. Raw-frame lookback uses native RGB preprocessing without an OFT
+crop. Original causal visibility, positions, final cognition and DDIM remain intact.
+Reset clears frames, confidence, global saliency and controller state. Probe costs
+and any extra model queries are included in control-replay timing.

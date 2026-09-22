@@ -1,0 +1,5 @@
+extends:
+  - baseline.yaml
+  - ../../methods/specprune_vla.yaml
+parameters:
+  min_visual_tokens: 30
