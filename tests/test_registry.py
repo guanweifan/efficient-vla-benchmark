@@ -9,6 +9,7 @@ from efficient_vla_benchmark.core.config import ExperimentConfig
 from efficient_vla_benchmark.core.registry import (
     backend_entries,
     backend_spec,
+    builtin_method_specs,
     method_catalog,
     parse_method,
     select_method,
@@ -55,6 +56,35 @@ def test_all_builtin_metadata_is_valid():
     for name, spec in method_catalog().items():
         assert name == spec.name
         assert spec.implementations
+
+
+def test_components_keep_one_paper_owner_and_explicit_identity(tmp_path):
+    import yaml
+
+    paper = tmp_path / "example"
+    paper.mkdir()
+    data = {
+        "schema_version": 1,
+        "name": "example",
+        "category": "token_reduction",
+        "config": "example:Config",
+        "implementations": {"example": {"variants": ["default"], "factory": "x:y"}},
+    }
+    (paper / "metadata.yaml").write_text(yaml.safe_dump(data))
+    components = paper / "components"
+    components.mkdir()
+    data.update(name="example_feature_cache", category="caching")
+    component = components / "feature_cache.yaml"
+    component.write_text(yaml.safe_dump(data))
+    specs = builtin_method_specs(paper, "token_reduction")
+    assert [(s.name, s.category) for s in specs] == [
+        ("example", "token_reduction"),
+        ("example_feature_cache", "caching"),
+    ]
+    data["name"] = "another_paper"
+    component.write_text(yaml.safe_dump(data))
+    with pytest.raises(ValueError, match="owning paper"):
+        builtin_method_specs(paper, "token_reduction")
 
 
 def test_empty_metadata_is_not_a_fake_implementation():

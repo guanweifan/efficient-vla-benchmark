@@ -20,7 +20,7 @@ where = ["src"]
 exclude = ["*.tests", "*.tests.*"]
 
 [tool.setuptools.package-data]
-efficient_vla_benchmark = ["methods/**/metadata.yaml"]
+efficient_vla_benchmark = ["methods/**/metadata.yaml", "methods/**/components/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "src/efficient_vla_benchmark/methods", "backends/openvla_oft/tests"]
@@ -33,4 +33,3 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
-

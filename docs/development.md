@@ -99,6 +99,10 @@ Create `src/efficient_vla_benchmark/methods/<category>/<paper_id>/`:
   in that binding's preflight.
 - `implementations/<backend>/`: factory and backend-specific behavior.
 - Shared equation/controller modules only where actually shared; no empty scaffolds.
+- Independently evaluated core contributions may add `components/<scope>.yaml`
+  in the same paper directory, with ID `<paper_id>_<scope>` and explicit supported
+  backends, category and exclusions. This selects ONE core, not a combination;
+  it never duplicates the paper directory or silently upgrades partial coverage.
 - `tests/`: independent mechanism references, reset/detach, unsupported inputs
   and real model/kernel checks. Optional backend tests skip if that plugin is absent.
 

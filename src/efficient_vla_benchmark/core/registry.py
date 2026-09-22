@@ -98,6 +98,30 @@ def parse_method(data: dict) -> MethodSpec:
     )
 
 
+def builtin_method_specs(method, category):
+    """One canonical paper directory, optionally with independently runnable cores."""
+    metadata = method.joinpath("metadata.yaml")
+    if not method.is_dir() or not metadata.is_file():
+        return []
+    primary = parse_method(yaml.safe_load(metadata.read_text()))
+    if primary.category != category or primary.name != method.name:
+        raise ValueError("Method directory and metadata identities disagree")
+    specs = [primary]
+    components = method.joinpath("components")
+    if components.is_dir():
+        for component in sorted(components.iterdir(), key=lambda item: item.name):
+            if not component.is_file() or not component.name.endswith(".yaml"):
+                continue
+            suffix = component.name[:-5]
+            if not IDENTIFIER.fullmatch(suffix):
+                raise ValueError("Paper component names must use snake_case")
+            spec = parse_method(yaml.safe_load(component.read_text()))
+            if spec.name != f"{primary.name}_{suffix}":
+                raise ValueError("Component identity must include its owning paper and scope")
+            specs.append(spec)
+    return specs
+
+
 def method_catalog() -> dict[str, MethodSpec]:
     catalog = {}
     root = files("efficient_vla_benchmark").joinpath("methods")
@@ -106,11 +130,7 @@ def method_catalog() -> dict[str, MethodSpec]:
             if not category.is_dir() or category.name.startswith("_"):
                 continue
             for method in category.iterdir():
-                metadata = method.joinpath("metadata.yaml")
-                if method.is_dir() and metadata.is_file():
-                    spec = parse_method(yaml.safe_load(metadata.read_text()))
-                    if spec.category != category.name or spec.name != method.name:
-                        raise ValueError("Method directory and metadata identities disagree")
+                for spec in builtin_method_specs(method, category.name):
                     if spec.name in catalog:
                         raise ValueError("Duplicate method identity")
                     catalog[spec.name] = spec
