@@ -9,6 +9,7 @@ This repository contains no survey manuscript, model weights or datasets.
 - `src/efficient_vla_benchmark/`: lightweight contracts, method catalog and shared harnesses.
 - `backends/<backend>/`: independently installed backend plugin; its `upstream/` is a pinned submodule.
 - `methods/<category>/<method>/` inside the main package: one paper, with explicit per-backend implementations.
+- `model_ops/` inside the main package: optional tensor/vision primitives, not imported by core or harnesses.
 - `configs/`: portable presets; filesystem resources are supplied only on the command line.
 - `third_party/`: pinned algorithm references, runtime libraries and benchmark sources.
 
@@ -21,7 +22,7 @@ One run uses the native baseline or exactly one method with explicitly declared 
 | Backend / variant | Native baseline | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|---|
 | OpenVLA-OFT / libero_joint | Native SDPA | Nine methods below | VLA-Cache, VLA-InfoEntropy | SP-VLA pruning + scheduling | VOTE ensemble core | AWQ W4A16 |
-| CogACT / libero_joint | Native causal SDPA + DDIM | ADP, FlashVLA ICS | — | — | — | — |
+| CogACT / libero_joint | Native causal SDPA + DDIM | ADP, FlashVLA ICS | VLA-Cache | SP-VLA pruning + scheduling | VOTE ensemble core | AWQ W4A16 |
 | starVLA | Source pinned; runtime not implemented | — | — | — | — | — |
 
 Algorithms retain their full implemented mechanism and disclose adaptations in
@@ -127,3 +128,10 @@ The [CogACT token-port validation report](docs/cogact_token_batch1_validation.md
 records the causal token-selection interface, source/equation tests, ADP and ICS
 measurements, and the evidence-based deferral of VLA-IAP. These ports preserve
 native cognition readout and diffusion sampling; they do not reuse OFT action slots.
+
+The [CogACT category-example report](docs/cogact_category_examples_validation.md)
+records the four additional bindings, native mask/image boundaries, packed AWQ
+calibration, matched-horizon timing and all smoke outcomes. VOTE remains an
+independent ensemble contribution; scheduling-only and precision/kernel variants
+are ablations, not extra algorithms. No diffusion/flow sampler method is yet
+advertised merely by reducing the native step count.

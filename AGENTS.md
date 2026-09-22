@@ -76,9 +76,14 @@ EfficientVLA excludes layer pruning and DiT caching; VOTE excludes its other pap
 components. SP-VLA uses one canonical directory and offers scheduling-only as an
 ablation preset, not a second method. CogACT has a native joint-suite baseline
 with causal SDPA, a BF16 VLM and FP32 DiT-B. ADP's released Q/K + observed-EEF
-mechanism and FlashVLA's independent ICS core now have explicit CogACT bindings;
-other OFT methods are not automatically ported. VLA-IAP's CogACT port is deferred
-until its core semantic-feature construction is verifiable. Preserve the single-camera input, suite statistics and sampler conventions
+mechanism and FlashVLA's independent ICS core have explicit CogACT bindings.
+CogACT also supports complete VLA-Cache, SP-VLA pruning plus scheduling, AWQ's
+packed decoder core and VOTE's independent ensemble core. Preserve causal KV
+visibility, native spatial RGB preprocessing and VOTE's matched H1 comparison.
+AWQ calibration uses training data only and artifacts are backend/checkpoint-bound.
+Other OFT methods are not automatically ported. VLA-IAP's CogACT port is deferred
+until its core semantic-feature construction is verifiable. Preserve the single-camera
+input, suite statistics and sampler conventions
 in its README. starVLA retains pinned sources for subsequent implementation; do
 not advertise runtime support until its own model checks have passed. Do not
 fabricate an empty plugin that only registers a name and cannot perform inference.
