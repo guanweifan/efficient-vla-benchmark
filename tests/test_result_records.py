@@ -184,7 +184,8 @@ def test_summary_uses_local_record_digest_without_private_file_links(tmp_path, r
     table = recorder.render([record])
     payload = json.dumps(record, indent=2, sort_keys=True) + "\n"
     assert hashlib.sha256(payload.encode()).hexdigest() in table
-    assert "(results/" not in table and ".json)" not in table
+    assert "(results/" not in table and f"{run.name}.json)" not in table
+    assert "(../scripts/history_commit_map.json)" in table
     assert "[R01](#r01)" in table and '<a id="r01"></a>R01' in table
     assert "`example-run`" in table
     assert "[example](../configs/example.yaml)" in table
@@ -238,3 +239,35 @@ def test_record_commands_default_to_ignored_outputs(tmp_path):
     )
     assert "Example" in (tmp_path / "summary.md").read_text()
     assert not (tmp_path / "docs/results").exists()
+
+
+def test_history_mapping_preserves_original_evidence(tmp_path, recorder):
+    import copy
+
+    run = tmp_path / "example-run"
+    write_run(run)
+    record = recorder.make_record(run, run, "5.1 Tokens", "Example", "configs/example.yaml")
+    old, new = "a" * 40, "b" * 40
+    record["run"]["metadata"]["source"] = {"commit": old, "dirty": True}
+    before = copy.deepcopy(record)
+    digest = recorder.record_digest(record)
+    table = recorder.render([record], commit_map={old: new})
+    assert f"`{old}` (dirty) → `{new}`" in table
+    assert digest in table
+    assert record == before
+    assert "not a new measurement" in table
+    assert recorder.revision_text({"commit": new, "dirty": False}, {old: new}) == f"`{new}`"
+    assert recorder.revision_text({"commit": None, "dirty": True}, {}) == "`unknown` (dirty)"
+
+
+@pytest.mark.parametrize("mapping", [[], {"bad": "b" * 40}, {"a" * 40: "0" * 40}])
+def test_history_map_rejects_invalid_revisions(tmp_path, recorder, mapping):
+    path = tmp_path / "map.json"
+    path.write_text(json.dumps(mapping))
+    with pytest.raises(ValueError, match="history commit map"):
+        recorder.load_history_map(path)
+
+
+def test_tracked_history_map_contains_full_revisions(recorder):
+    mapping = recorder.load_history_map()
+    assert len(mapping) == 81

@@ -191,6 +191,13 @@ checkpoint/source/runtime/hardware/traces/protocol. Omit `--smoke-dir` if unavai
 Each summary row retains a run ID, paired reference and record digest. Records are
 immutable: do not replace earlier evidence or manually edit generated metrics.
 
+The pre-publication history cleanup removed retired documents and exported JSON.
+[scripts/history_commit_map.json](../scripts/history_commit_map.json) maps all original
+commits to cleaned revisions; the one removed documentation-only commit resolves to
+its unchanged-source ancestor. Rendering shows both IDs without modifying evidence.
+Original source fingerprints and dirty flags remain authoritative; a mapped clean
+checkout cannot reconstruct uncommitted changes from a dirty measurement.
+
 Use `--supersedes OLD_RUN_ID` only for a corrected implementation of the same
 backend/variant/method. Rendering keeps obsolete rows visibly marked. Do not
 supersede a valid ablation or slower precision variant. Historical cohorts remain

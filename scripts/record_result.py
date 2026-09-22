@@ -12,6 +12,30 @@ def read_json(path):
     return json.loads(path.read_text())
 
 
+def load_history_map(path=None):
+    """Resolve historical IDs without changing immutable measurement evidence."""
+    path = path or Path(__file__).with_name("history_commit_map.json")
+    mapping = read_json(path)
+    if not isinstance(mapping, dict) or any(
+        not isinstance(old, str)
+        or not isinstance(new, str)
+        or not re.fullmatch(r"[0-9a-f]{40}", old)
+        or not re.fullmatch(r"[0-9a-f]{40}", new)
+        or new == "0" * 40
+        for old, new in mapping.items()
+    ):
+        raise ValueError("Invalid history commit map")
+    return mapping
+
+
+def revision_text(source, commit_map):
+    commit = source["commit"] or "unknown"
+    dirty = " (dirty)" if source["dirty"] else ""
+    original = f"`{commit}`{dirty}"
+    cleaned = commit_map.get(commit)
+    return f"{original} → `{cleaned}`" if cleaned and cleaned != commit else original
+
+
 def digest(path):
     value = hashlib.sha256()
     with path.open("rb") as stream:
@@ -218,7 +242,8 @@ def record_digest(record):
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
-def render(records):
+def render(records, commit_map=None):
+    commit_map = load_history_map() if commit_map is None else commit_map
     records = sorted(records, key=lambda record: record["run"]["run_id"])
     ids = {record["run"]["run_id"]: f"R{index:02d}" for index, record in enumerate(records, 1)}
     cohorts, cohort_ids = {}, {}
@@ -380,11 +405,16 @@ def render(records):
         "Raw runs: `outputs/<run ID>/`; exported records: `outputs/result_records/<run ID>.json`.",
         "The SHA256 identifies the full canonical JSON, which retains raw-file hashes,",
         "parameters, baseline, runtime/precision and per-episode smoke outcomes.",
-        "The preset links are current; use the recorded commit for measured source.",
+        "The preset links are current. Timing revisions show original → cleaned Git ID.",
+        "The [commit map](../scripts/history_commit_map.json) resolves pre-cleanup IDs;",
+        "a removed documentation-only commit maps to its unchanged-source ancestor.",
+        "This is source lookup, not a new measurement: original record hashes, source",
+        "fingerprints and dirty flags are unchanged. Dirty runs need their original",
+        "working-tree evidence; checking out the mapped commit alone is insufficient.",
         "Smoke-source labels: same / different / unknown / not run. Earlier smoke is",
         "never promoted to a final-source or formal evaluation.",
         "",
-        "| Record | Run ID | Cohort | Preset | Timing commit | Baseline | "
+        "| Record | Run ID | Cohort | Preset | Timing commit: original → cleaned | Baseline | "
         "Smoke source | Record SHA256 |",
         "|---|---|---|---|---|---|---|---|",
     ]
@@ -392,8 +422,7 @@ def render(records):
         run, meta = record["run"], record["run"]["metadata"]
         rid = ids[run["run_id"]]
         baseline_id = ids.get(record["baseline"]["run_id"], record["baseline"]["run_id"])
-        commit = meta["source"]["commit"] or "unknown"
-        dirty = " (dirty)" if meta["source"]["dirty"] else ""
+        revision = revision_text(meta["source"], commit_map)
         smoke = record.get("smoke")
         same = smoke.get("same_source_fingerprint") if smoke else None
         smoke_source = (
@@ -405,7 +434,7 @@ def render(records):
             f'| <a id="{rid.lower()}"></a>{rid} | `{run["run_id"]}` | '
             f"{cohort_ids[run['run_id']]} | "
             f"[{Path(record['preset']).stem}](../{record['preset']}) | "
-            f"`{commit}`{dirty} | {baseline_id} | {smoke_source} | "
+            f"{revision} | {baseline_id} | {smoke_source} | "
             f"`{record_digest(record)}` |"
         )
     lines += ["", "</details>"]
