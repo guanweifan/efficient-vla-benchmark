@@ -12,5 +12,3 @@ def decode(action):
     result = np.asarray(action).copy()
     result[-1] = -np.sign(2 * result[-1] - 1)
     return result
-
-

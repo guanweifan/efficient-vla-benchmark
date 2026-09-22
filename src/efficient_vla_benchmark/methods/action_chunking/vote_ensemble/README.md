@@ -38,3 +38,21 @@ Use `vote_ensemble.yaml` through the shared evaluate/benchmark commands. Control
 replay is mandatory; all history/codec/voting overhead is timed. `enabled: false`
 is a native horizon-1 no-op. Reset and instruction changes clear all predictions.
 Success-rate/trajectory benefits remain unmeasured until a scheduled formal run.
+
+## CogACT binding
+
+The independent ensemble equations and LIBERO action codec are shared without
+importing the OFT runtime. Native CogACT still predicts sixteen actions using
+the same DDIM/CFG sampler. The paper's committee spans adjacent observation times;
+the default K=3 cannot be used with H=8, even though two sixteen-step chunks would
+geometrically overlap. H=1 preserves all adjacent-time candidates; a dedicated
+native H=1 reference isolates voting overhead. Retain native H=8 as a deployment
+reference, not a denominator interchangeable with H=1.
+
+Use `configs/experiments/cogact/vote_ensemble.yaml`. History is limited to at most
+fifteen earlier control times for this model. No native adaptive ensemble is
+enabled. Raw gripper values are already discretized by native prediction; the
+shared codec maps signed LIBERO commands to 0-1 before voting and back once.
+Tests verify the committee against independent real-chunk calculations, no-op
+parity, reset and unchanged diffusion RNG consumption. This is the independent
+inference voting contribution, not VOTE's trained single-ACT architecture.

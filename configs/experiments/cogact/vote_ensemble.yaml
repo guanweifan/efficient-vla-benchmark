@@ -1,0 +1,3 @@
+extends:
+  - baseline_horizon1.yaml
+  - ../../methods/vote_ensemble.yaml

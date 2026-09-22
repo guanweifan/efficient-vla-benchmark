@@ -10,3 +10,8 @@ implementations:
     requires: [control_hooks, libero_cartesian_delta_actions]
     factory: efficient_vla_benchmark.methods.action_chunking.vote_ensemble.implementations.openvla_oft.api:build
     validate_experiment: efficient_vla_benchmark.methods.action_chunking.vote_ensemble.implementations.openvla_oft.api:validate_experiment
+  cogact:
+    variants: [libero_joint]
+    requires: [control_hooks, libero_cartesian_delta_actions]
+    factory: efficient_vla_benchmark.methods.action_chunking.vote_ensemble.implementations.cogact.api:build
+    validate_experiment: efficient_vla_benchmark.methods.action_chunking.vote_ensemble.implementations.cogact.api:validate_experiment
