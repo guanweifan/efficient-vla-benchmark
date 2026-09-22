@@ -138,3 +138,38 @@ def test_cannot_supersede_another_method(tmp_path, recorder):
     new["run"]["metadata"]["config"]["method"] = "another_method"
     with pytest.raises(ValueError, match="another method"):
         recorder.annotate_supersedes(new, ["example-run"], tmp_path)
+
+
+def test_cache_summary_keeps_all_context_and_skips_queued_rows(recorder):
+    rows = [
+        {
+            "queried": True,
+            "diagnostics": {"visual_query_tokens_final": 256, "visual_kv_tokens": 256},
+        },
+        {
+            "queried": False,
+            "diagnostics": {"visual_query_tokens_final": 256, "visual_kv_tokens": 256},
+        },
+        {
+            "queried": True,
+            "diagnostics": {"visual_query_tokens_final": 128, "visual_kv_tokens": 256},
+        },
+    ]
+    evidence = recorder.cache_evidence(rows)
+    assert evidence["queries_with_diagnostics"] == 2
+    assert evidence["computed_visual_queries"] == {"mean": 192, "min": 128, "max": 256}
+    assert evidence["retained_visual_kv"] == {"mean": 256, "min": 256, "max": 256}
+    assert recorder.cache_evidence([{"queried": True}]) is None
+    assert recorder.token_evidence(rows) is None
+    with pytest.raises(ValueError, match="cached-query"):
+        recorder.cache_evidence(
+            [
+                {
+                    "queried": True,
+                    "diagnostics": {
+                        "visual_query_tokens_final": 512,
+                        "visual_kv_tokens": 256,
+                    },
+                }
+            ]
+        )

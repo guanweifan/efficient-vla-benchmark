@@ -61,6 +61,28 @@ def token_evidence(rows):
     return result
 
 
+def cache_evidence(rows):
+    """Keep skipped queries distinct from retained KV context; ignore queued actions."""
+    counts = []
+    for row in rows:
+        if not row["queried"]:
+            continue
+        diag = row.get("diagnostics", {})
+        query, context = diag.get("visual_query_tokens_final"), diag.get("visual_kv_tokens")
+        if query is None and context is None:
+            continue
+        if type(query) is not int or type(context) is not int or not 0 <= query <= context:
+            raise ValueError("Invalid cached-query/context diagnostic")
+        counts.append((query, context))
+    if not counts:
+        return None
+    result = {"queries_with_diagnostics": len(counts)}
+    for index, name in enumerate(("computed_visual_queries", "retained_visual_kv")):
+        values = [pair[index] for pair in counts]
+        result[name] = {"mean": sum(values) / len(values), "min": min(values), "max": max(values)}
+    return result
+
+
 def timing_evidence(directory):
     metadata = read_json(directory / "metadata.json")
     summary = read_json(directory / "summary.json")
@@ -92,6 +114,7 @@ def timing_evidence(directory):
         "metadata": metadata,
         "summary": summary,
         "token_diagnostics": token_evidence(rows),
+        "cache_diagnostics": cache_evidence(rows),
         "files_sha256": {
             name: digest(directory / name)
             for name in ("metadata.json", "summary.json", "timings.jsonl")
@@ -212,7 +235,7 @@ def render(records):
         "",
         "Speedup = paired native baseline total replay time / method total replay time.",
         "H is the executed prefix, distinct from the backend's full prediction length.",
-        "The present OFT VOTE preset uses its matched H=1 baseline; the other OFT presets",
+        "VOTE presets use a matched H=1 baseline on each backend; the other current presets",
         "use native H=8. Do not compare their speedup",
         "ratios as if query cadence were identical. Peak GiB is runtime allocated tensor",
         "memory, not loading peak or total process memory. Smoke is successes/episodes,",
@@ -281,6 +304,25 @@ def render(records):
             lines.append(
                 f"| {display_label(record)} | {final['mean']:.1f} / {final['min']} / "
                 f"{final['max']} | {early_text} | {modes} |"
+            )
+        lines.append("")
+    cache_records = [r for r in records if r["run"].get("cache_diagnostics")]
+    if cache_records:
+        lines += [
+            "## Computed visual queries and retained KV context",
+            "",
+            "Query-weighted last-layer counts; skipping query/MLP rows does not remove KV context.",
+            "",
+            "| Method | Computed queries: mean / min / max | Retained KV: mean / min / max |",
+            "|---|---:|---:|",
+        ]
+        for record in cache_records:
+            diag = record["run"]["cache_diagnostics"]
+            query, context = diag["computed_visual_queries"], diag["retained_visual_kv"]
+            lines.append(
+                f"| {display_label(record)} | "
+                f"{query['mean']:.1f} / {query['min']} / {query['max']} | "
+                f"{context['mean']:.1f} / {context['min']} / {context['max']} |"
             )
         lines.append("")
     lines += [
