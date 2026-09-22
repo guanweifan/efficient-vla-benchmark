@@ -39,7 +39,7 @@ class InfoEntropyConfig:
             or any(type(i) is not int or not 0 <= i < 32 for i in layers)
             or tuple(sorted(set(layers))) != layers
         ):
-            raise ValueError("reuse_layers must be sorted unique OFT layer indices")
+            raise ValueError("reuse_layers must be sorted unique native Llama layer indices")
         for name, low in (("similarity_threshold", -1), ("growth_factor", 0)):
             value = getattr(config, name)
             if type(value) not in (float, int) or not math.isfinite(value) or not low <= value <= 1:

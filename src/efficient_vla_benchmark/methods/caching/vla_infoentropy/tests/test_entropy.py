@@ -4,7 +4,7 @@ import torch
 
 from ..config import InfoEntropyConfig
 from ..entropy import image_entropy, quotas
-from ..implementations.openvla_oft.method import attention_information
+from ..method import attention_information
 
 
 def test_histogram_entropy_against_explicit_patch_counts():

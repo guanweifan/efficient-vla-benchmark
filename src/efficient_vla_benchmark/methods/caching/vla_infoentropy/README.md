@@ -39,3 +39,17 @@ These confirm the explicit second softmax, text-axis entropy and executed-step
 allocation; no evidence justified dropping full-layer statistics to improve speed.
 The inherited cache-engine schedule and two-camera extension remain disclosed
 adaptations, not verified author defaults or a claim of published-score reproduction.
+
+## CogACT binding
+
+`configs/experiments/cogact/vla_infoentropy.yaml` uses the identical shared selector,
+quota equations and cache schedule on one 256-patch native policy RGB grid. Text
+entropy averages every layer/head over prompt rows after the visual prefix and
+before cognition EOS. No action-token proxy is used. The native cognition row is
+always recomputed; original per-query causal visibility and all visual keys remain.
+The existing causal indexed-KV adapter owns execution, independently of VLA-Cache's
+method implementation. DDIM, checkpoint weights and native spatial preprocessing
+are unchanged. Eager probabilities are shared with the statistics; their precision
+and overhead are reported rather than claimed identical to native SDPA.
+Cold/reset/disabled/detach checks, full-key versus sparse-query tests and executed
+step quota tests accompany this independent paper-based port.
