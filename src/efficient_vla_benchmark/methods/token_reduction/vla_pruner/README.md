@@ -37,3 +37,16 @@ invalid configs and real OFT warm-start/disabled parity, active pruning and rese
 Use `configs/experiments/openvla_oft/vla_pruner.yaml`; scoring/filtering/history
 overhead stays inside common timing. The central measurement ledger records the
 adaptation's outcomes, not the paper's exact success rate or published speedup.
+
+## CogACT fidelity boundary
+
+The 2026-09-22 audit does not register a CogACT binding. The defining dual-level
+criterion requires semantic-prefill scores AND independently observed action-
+decoder-to-patch attention. The paper's pi0 extension still measures this latter
+signal during flow steps; diffusion alone is not the incompatibility.
+Native CogACT compresses the VLM into one cognition condition before a separate
+DiT. Its action attention sees that condition and action positions, not the
+original patch keys. Reusing cognition-to-vision attention for both levels, or
+inventing a gradient/attention-rollout mapping, would not reproduce the claimed
+dual-system criterion. Reopen when a verifiable independent action-to-patch rule
+exists for this architecture; no retraining or proxy binding is supplied.

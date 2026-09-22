@@ -100,6 +100,13 @@ def test_empty_metadata_is_not_a_fake_implementation():
         )
 
 
+@pytest.mark.parametrize("name", ["vla_pruner", "team_vla", "efficient_vla", "vla_iap"])
+def test_unresolved_cogact_core_does_not_silently_use_oft_or_cache_component(name):
+    spec = BackendSpec("cogact", "x:y", "x:z", ("libero_joint",), frozenset())
+    with pytest.raises(ValueError, match="Unsupported"):
+        select_method(ExperimentConfig("cogact", method=name, model_variant="libero_joint"), spec)
+
+
 @pytest.mark.parametrize(
     "implementation",
     [

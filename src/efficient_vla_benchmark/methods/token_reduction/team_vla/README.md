@@ -26,3 +26,15 @@ RNG-isolation and received-mass tests supplement the scalar Eq. 5-9 reference.
 No evidence justified replacing the existing softmax/aggregation interpretation
 or tuning the preset to the four smoke tasks. Poor smoke outcomes therefore remain
 observations of this disclosed port, not proof that the published method fails.
+
+## CogACT fidelity boundary
+
+The 2026-09-22 recheck finds the same source-only project status and defers the
+complete CogACT port. Early foreground expansion/context sampling are portable,
+and implementing visual feature merging is ordinary engineering. The unresolved
+part is Section IV-C's joint text/action-token guidance in the shared LLM space:
+native CogACT has no LLM action slots; its separate DiT actions use another
+representation and receive only one compressed condition. Treating cognition as
+the missing action-token set or projecting DiT features back would introduce an
+unverified guidance rule. We do not label the early stage alone as full TEAM-VLA.
+This is a fidelity deferral, not proof that a new CogACT variant cannot be designed.

@@ -93,3 +93,21 @@ Its attention keys are one cognition condition plus sixteen action positions,
 not 256 image patches. CFG calls `forward_with_cfg()`, which directly invokes
 the instance's `forward()`; method wrappers must cover that path and restore
 instance attributes on close. Sampler/CFG/noise ownership remains native.
+
+## Audited ports and unresolved scopes
+
+The 2026-09-22 batch adds SAFE-Pruner, VLA-InfoEntropy, ST-Merge, SpecPrune-VLA
+and the explicitly separate EfficientVLA DiT cache core. SAFE/SpecPrune disclose
+native-cognition query adaptations; neither claims measured action-to-patch
+attention inside DiT. Read method READMEs for reference choices and tested scope.
+
+| Scope not registered on CogACT | Missing core condition |
+|---|---|
+| VLA-Pruner | Independent action-decoder-to-visual-patch attention for its dual scores |
+| TEAM-VLA | Verifiable joint text/action-token guidance for its mid-layer merging |
+| EfficientVLA token core | Eq. 2 visual-to-following-text attention conflicts with native causality |
+| VLA-IAP | Specified aligned semantic visual/text feature construction |
+
+These are scoped fidelity deferrals, not blanket claims of impossibility. Kernel,
+directory or hook work alone is not a reason to defer; inventing a different core
+score is. The existing OFT bindings and historical measurements remain unchanged.

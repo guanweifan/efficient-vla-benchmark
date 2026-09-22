@@ -28,3 +28,14 @@ Additional tests cover linear-motion cancellation and the conservative branch at
 exact IoU-threshold equality. No new encoder or fixed-ratio top-k override is
 invented to match the paper's performance table. Feature alignment and the missing
 threshold calibration remain the main fidelity limits, despite executable equations.
+
+## CogACT fidelity boundary
+
+The 2026-09-22 recheck at the same author revision still provides no semantic
+encoder/pooling implementation. Motion history, mask logic, geometry and Sobel
+operations are portable. The blocker is narrower: Eq. 4's aligned visual/text
+features define the semantic mask and therefore BOTH adaptive modes. Merely
+matching embedding widths or copying OFT's unverified mean-embedding assumption
+does not establish that construction for CogACT. The existing OFT implementation
+remains explicitly provisional; it is not evidence that a faithful CogACT binding
+has been verified. Keep CogACT unregistered until this core rule is grounded.
