@@ -50,3 +50,11 @@ before causal LLM layer zero, preserving original anchor positions and cognition
 EOS. DDIM and global RNG are unchanged. Nominal 128 patches is a target, not a
 guarantee when matching collisions leave additional anchors. The reconstruction
 conventions above remain disclosed; this port does not resolve missing author code.
+
+The fixed CogACT preset completed all four development episodes with zero runtime
+errors but **0/4 successes**, versus native 3/4 in the same-source cohort. Do not
+describe this configuration as accuracy-validated. Native no-op/reset/detach,
+independent matching/mass checks and shared DINO/SigLIP membership checks passed;
+the observed regression is retained, not tuned away. These checks do not prove
+that every author convention is recovered or that the published method fails.
+See the central ledger for its paired speed/memory measurements and run identity.

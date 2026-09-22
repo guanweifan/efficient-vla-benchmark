@@ -26,6 +26,11 @@ action reuse; VOTE implements the independent ensemble, not its trained architec
 No action-generation sampler is currently advertised. Read each
 [method README](src/efficient_vla_benchmark/methods/) before using its results.
 
+CogACT ST-Merge's current preset has 0/4 development-smoke successes (native 3/4),
+without runtime errors. It is a measured negative configuration, not accuracy-
+validated support; the other new CogACT presets each have 3/4. These tiny checks
+are not formal success-rate measurements.
+
 ## Install and run
 
 Install only the selected backend, following its pinned environment recipe:
