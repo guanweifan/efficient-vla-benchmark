@@ -1,4 +1,4 @@
-# ADP on OpenVLA-OFT
+# ADP
 
 [Paper](https://arxiv.org/abs/2509.22093v1),
 [released implementation](https://github.com/chen7086/VLA-ADP/tree/d7094b09a4996847772c1fa975f09d863e1b759a).
@@ -46,3 +46,26 @@ Tests compare the scorer and observed-motion gate against extracted pinned sourc
 exercise invalid configs and bounded state, and verify real-model native/disabled
 parity and active pruning. Timing and four-episode smoke are recorded centrally in
 `docs/benchmark_results.md`; they are not a claim to reproduce paper success rates.
+
+## CogACT binding
+
+`implementations/cogact/` reuses the same released Q/K scorer and observed-EEF
+motion controller; it never imports the OFT decoder. One 256-patch camera uses
+weight [1.0] and the unchanged 0.75 retention rule (192 when pruning is active).
+Language-Q includes the native nonvisual INPUT embeddings, including BOS,
+prompt/separator and cognition EOS, following the reference's non-action-token
+selection. This is not contextualized cognition/action attention. Native causal
+visibility, original patch/RoPE positions and the final cognition readout remain
+unchanged. No model output or diffusion settings are substituted.
+
+Dynamic ADP requires observed EEF XYZ from the shared observation history.
+CogACT itself remains image-and-language-only, but this complete acceleration
+method additionally consumes that existing sensor input; report the distinction.
+Missing observed state fails, rather than using zero or predicted trajectories.
+Windows close after the actual executed prefix of eight steps, not after the
+sixteen predicted actions. Initialization and dense refresh costs are timed.
+
+Use `configs/experiments/cogact/adp.yaml`. The separate `adp_static.yaml` disables
+the motion gate and is an ablation, not full ADP; it does not consume EEF history.
+Source/equation checks establish the core selector and controller, not published
+checkpoint scores or invariance of performance to different baselines.

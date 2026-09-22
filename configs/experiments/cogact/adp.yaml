@@ -1,0 +1,5 @@
+extends:
+  - baseline.yaml
+  - ../../methods/adp.yaml
+parameters:
+  view_weights: [1.0]

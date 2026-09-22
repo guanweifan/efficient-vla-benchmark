@@ -1,0 +1,4 @@
+extends:
+  - adp.yaml
+parameters:
+  dynamic: false

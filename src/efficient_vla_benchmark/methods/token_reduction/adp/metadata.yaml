@@ -10,3 +10,8 @@ implementations:
     requires: [llama_decoder, visual_token_layout, l1_action_head]
     factory: efficient_vla_benchmark.methods.token_reduction.adp.implementations.openvla_oft.api:build
     preflight: efficient_vla_benchmark.methods.token_reduction.adp.implementations.openvla_oft.api:preflight
+  cogact:
+    variants: [libero_joint]
+    requires: [causal_visual_token_selection, control_hooks]
+    factory: efficient_vla_benchmark.methods.token_reduction.adp.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.token_reduction.adp.implementations.cogact.api:preflight
