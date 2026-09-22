@@ -60,7 +60,8 @@ Cross-frame KV caching and arbitrary autoregressive cached decoding are not
 advertised by this capability. Selection/probing policies belong to method
 bindings, not this backend. Closing hooks restores the original instance.
 
-Validated bindings are ADP (including observed-EEF gating) and FlashVLA's ICS core.
+Bindings include ADP (including observed-EEF gating), FlashVLA's ICS core and
+SAFE-Pruner's forecast/refresh mechanism with explicit native-cognition queries.
 Their tests check original positions, protected cognition, causal/padding masks,
 full-retention/reset/detach parity and unchanged diffusion RNG consumption. Paired
 measurements and smoke are in [results](../../docs/benchmark_results.md). VLA-IAP is

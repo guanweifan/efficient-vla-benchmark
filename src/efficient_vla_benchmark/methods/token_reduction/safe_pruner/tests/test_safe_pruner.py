@@ -29,7 +29,7 @@ def test_invalid_config(bad):
 def test_correspondence_and_fusion_match_reference():
     import torch
 
-    from ..implementations.openvla_oft.method import (
+    from ..scoring import (
         correspondences,
         fused_selection,
         transfer_saliency,

@@ -10,7 +10,7 @@ weights, datasets or raw experiment artifacts.
 | Backend / variant | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|
 | OpenVLA-OFT / libero_joint | Nine methods below | VLA-Cache, VLA-InfoEntropy | SP-VLA | VOTE ensemble core | AWQ W4A16 |
-| CogACT / libero_joint | ADP, FlashVLA ICS | VLA-Cache | SP-VLA | VOTE ensemble core | AWQ W4A16 |
+| CogACT / libero_joint | ADP, FlashVLA ICS, SAFE-Pruner | VLA-Cache | SP-VLA | VOTE ensemble core | AWQ W4A16 |
 | starVLA | Source pinned only; runtime not implemented | — | — | — | — |
 
 OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,

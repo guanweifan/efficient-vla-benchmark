@@ -8,22 +8,8 @@ from torch.nn import functional as F
 
 from efficient_vla_benchmark.core.method import InferenceMethod
 
-
-def correspondences(current, reference):
-    # Match the reference's order: normalize in native dtype, then compare in FP32.
-    a = F.normalize(current, p=2, dim=1).float()
-    b = F.normalize(reference, p=2, dim=1).float()
-    return (a @ b.T).argmax(dim=1)
-
-
-def transfer_saliency(current, reference, saliency):
-    if reference.shape[0] != saliency.shape[-1]:
-        raise ValueError("Reference features and saliency must share visual patch IDs")
-    return saliency.index_select(1, correspondences(current, reference))
-
-
-def fused_selection(shallow, forecast, weight, count):
-    return (shallow + weight * forecast.mean(0)).topk(count).indices
+from ...scoring import correspondences as correspondences
+from ...scoring import fused_selection, transfer_saliency
 
 
 class SAFEPruner(InferenceMethod, DecoderStrategy):

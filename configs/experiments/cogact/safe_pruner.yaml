@@ -1,0 +1,5 @@
+extends:
+  - baseline.yaml
+  - ../../methods/safe_pruner.yaml
+parameters:
+  reference_layers: [0, 30, 31]
