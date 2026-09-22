@@ -36,3 +36,23 @@ modify upstream files, global model classes, or the supplied export.
 See [INSTALL.md](INSTALL.md) for setup and [validation](../../docs/cogact_validation.md)
 for the executed checks, results and limitations. Smoke outcomes must not be reported
 as formal success rates.
+
+## Causal visual-token selection
+
+`model_access.attach_token_strategy()` exposes before/after-layer selection hooks
+to the selected method. A strategy returns a boolean mask of current rows; only
+visual rows can be removed. Original patch/RoPE positions and all nonvisual tokens,
+including the final cognition EOS, remain protected. One camera has 256 fused
+DINO/SigLIP patch tokens, not two camera streams.
+
+This adapter keeps each native LlamaSdpaAttention module. Explicit masks retain
+each query's native causal and padding constraints; an absent mask uses the native
+causal SDPA path. Native generation, fresh-prefill KV construction, final
+normalization and diffusion conditioning are retained. It does not reconstruct
+OFT action slots, broadcast the final mask row or change the DDIM sampler.
+
+Only fresh batch-one native prefill is supported. External past KV, nested
+forwards and full attention-probability output requests fail explicitly.
+Cross-frame KV caching and arbitrary autoregressive cached decoding are not
+advertised by this capability. Selection/probing policies belong to method
+bindings, not this backend. Closing hooks restores the original instance.

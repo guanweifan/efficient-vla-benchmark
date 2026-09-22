@@ -10,6 +10,7 @@ from efficient_vla_benchmark.core.lifecycle import MethodHost
 from .checkpoint import checkpoint_files, model_manifest
 from .config import CogACTParameters, validate
 from .loader import load_native
+from .model_access import CogACTModelAccess
 from .processor import prepare_observation, process_actions
 from .runtime import TorchCUDAMonitor
 
@@ -33,6 +34,7 @@ class CogACTBackend(MethodHost):
         root, checkpoint, statistics, self.normalization_keys = checkpoint_files(model_path)
         self._model_manifest = model_manifest(root, checkpoint)
         self.model = load_native(root, checkpoint, statistics, self.device)
+        self.model_access = CogACTModelAccess(self.model)
         self.runtime = TorchCUDAMonitor(self.device)
         self.context = None
         self.unnorm_key = None
@@ -87,6 +89,7 @@ class CogACTBackend(MethodHost):
             self._closed = True
             self.method = None
             self.model = None
+            self.model_access = None
             gc.collect()
             with torch.cuda.device(self.device):
                 torch.cuda.empty_cache()
