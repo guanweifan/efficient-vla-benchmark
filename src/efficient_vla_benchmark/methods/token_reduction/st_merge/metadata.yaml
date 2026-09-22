@@ -5,6 +5,10 @@ description: Paper-based spatial multi-queue merging inside paired vision encode
 config: efficient_vla_benchmark.methods.token_reduction.st_merge.config:STMergeConfig
 requires_artifact: false
 implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [causal_visual_token_selection, paired_vision_transform]
+    factory: efficient_vla_benchmark.methods.token_reduction.st_merge.implementations.cogact.api:build
   openvla_oft:
     variants: [libero_joint]
     requires: [llama_decoder, visual_token_layout, l1_action_head]

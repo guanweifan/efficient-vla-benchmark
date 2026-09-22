@@ -3,7 +3,7 @@ import pytest
 import torch
 
 from ..config import STMergeConfig
-from ..implementations.openvla_oft.method import spatial_groups
+from ..method import spatial_groups
 
 
 def test_grouping_retains_anchors_and_complete_membership():

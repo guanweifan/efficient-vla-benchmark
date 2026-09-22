@@ -38,3 +38,15 @@ mode installs no hooks. Reset and close clear instance-local grouping/probes.
 Use `configs/experiments/openvla_oft/st_merge.yaml`. Report actual per-layer vision
 and language token counts, complete overhead, failures and original input 224
 resolution. Do not compare against the paper's trained high-resolution baseline.
+
+## CogACT binding
+
+`configs/experiments/cogact/st_merge.yaml` shares the same matching and fusion
+implementation on one native 224px DINO/SigLIP grid. No action-head-dependent
+saliency is introduced. The paired backend adapter accepts CogACT's native image
+dictionary and preserves DINO's prefix/register tokens and penultimate readout.
+The native dense projector bridge is retained; vacant visual slots are removed
+before causal LLM layer zero, preserving original anchor positions and cognition
+EOS. DDIM and global RNG are unchanged. Nominal 128 patches is a target, not a
+guarantee when matching collisions leave additional anchors. The reconstruction
+conventions above remain disclosed; this port does not resolve missing author code.
