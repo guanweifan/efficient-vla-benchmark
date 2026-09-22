@@ -1,4 +1,4 @@
-# AWQ on OpenVLA-OFT
+# AWQ decoder quantization
 
 Reference: [paper](https://arxiv.org/abs/2306.00978),
 [pinned implementation](https://github.com/mit-han-lab/llm-awq/tree/d6e797a42b9ef7778de8ee2352116e0f48a78d61).
@@ -102,3 +102,18 @@ inside an AWQ-versus-native speedup.
 The source audit and fresh comparisons of both kernel precisions are recorded in
 `docs/performance_validation.md`. BF16 remains slower in that retest; the explicit
 FP16-kernel option is faster, without a formal task-accuracy claim.
+
+## CogACT binding
+
+The CogACT preset captures native single-camera/language/cognition inputs and
+uses causal attention during every calibration forward and scale search. It
+quantizes only 224 Llama block linears; vision, projector, embeddings, LM head
+and the FP32 diffusion head remain native. DDIM10/CFG1.5 and the 16-predict/8-execute
+protocol are unchanged. Recalibrate on the joint-suite training data: OFT
+artifacts are rejected, never re-labelled or loaded into CogACT.
+
+Use the corresponding `configs/experiments/cogact/awq.yaml` with the same CLI
+resource arguments above. Build the pinned AWQ extension inside the CogACT runtime;
+compiled OFT binaries are not ABI-compatible substitutes. BF16 is the primary
+preset; the explicitly named FP16-kernel preset includes boundary casts and is
+reported separately. Neither option performs gradient updates.

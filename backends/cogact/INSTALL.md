@@ -45,3 +45,30 @@ python -m efficient_vla_benchmark.cli benchmark \
 GPU selection and CUDA/EGL device mapping are caller-controlled. Development
 evaluation is four episodes total, not a formal success-rate estimate. Do not
 compare timings from different trajectories/horizons as paired speedups.
+
+## Optional AWQ kernel
+
+Only AWQ needs the pinned `third_party/runtimes/llm_awq` extension. Compile it
+inside this CogACT environment against its Torch/CUDA ABI; do not copy the OFT
+binary or install the author's conflicting application dependency stack. Select
+a compatible CUDA toolkit through `CUDA_HOME` and its `bin` on `PATH`, then run:
+
+```bash
+MAX_JOBS=2 TORCH_CUDA_ARCH_LIST="$GPU_ARCH" \
+python -m pip install --no-deps --no-build-isolation third_party/runtimes/llm_awq/awq/kernels
+
+python -m efficient_vla_benchmark.cli calibrate \
+  --config configs/experiments/cogact/awq.yaml \
+  --model-path "$MODEL_DIR" --dataset-path "$RLDS_DIR" --artifact-dir "$ARTIFACT_DIR"
+```
+
+Supply `--artifact-path "$ARTIFACT_DIR"` for AWQ evaluate/benchmark runs. The
+completed artifact must match this backend, checkpoint, precision and calibration
+configuration. Its manifest and every packed layer are checked before mutation.
+It is separate from the original checkpoint and is not stored in Git. Calibration
+uses 32 training observations across four suites and no gradient updates.
+
+For rendering on a selected physical GPU, the installed robosuite version checks
+that `MUJOCO_EGL_DEVICE_ID` appears in `CUDA_VISIBLE_DEVICES`. A remapped Torch
+`cuda:0` is not necessarily physical EGL device zero; configure both variables
+consistently at launch. This mapping does not belong in experiment YAML.

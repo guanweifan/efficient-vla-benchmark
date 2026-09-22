@@ -11,3 +11,9 @@ implementations:
     factory: efficient_vla_benchmark.methods.quantization.awq.implementations.openvla_oft.api:build
     preflight: efficient_vla_benchmark.methods.quantization.awq.implementations.openvla_oft.api:preflight
     calibrate: efficient_vla_benchmark.methods.quantization.awq.implementations.openvla_oft.api:calibrate
+  cogact:
+    variants: [libero_joint]
+    requires: [llama_decoder]
+    factory: efficient_vla_benchmark.methods.quantization.awq.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.quantization.awq.implementations.cogact.api:preflight
+    calibrate: efficient_vla_benchmark.methods.quantization.awq.implementations.cogact.api:calibrate
