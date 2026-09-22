@@ -7,32 +7,12 @@ from efficient_vla_backend_openvla_oft.decoder import (
     DecoderStrategy,
     IndexedKVStore,
 )
-from efficient_vla_backend_openvla_oft.vision import patch_cosine_similarity
 
 from efficient_vla_benchmark.core.method import InferenceMethod
 
 from ...config import VLACacheConfig
-
-
-def static_patch_ids(current, previous, budget, threshold):
-    similarity = patch_cosine_similarity(current, previous)
-    # Match the reference's stable Python sort, not SpecPrune's argpartition.
-    eligible = np.flatnonzero(similarity >= threshold)
-    return eligible[np.argsort(-similarity[eligible], kind="stable")[:budget]]
-
-
-def reuse_schedule(entropies, weighted_growth=True, growth_factor=0.55):
-    entropies = torch.stack(entropies)
-    normalized = (entropies - entropies.min()) / (entropies.max() - entropies.min() + 1e-10)
-    reuse = 1 - normalized
-    if weighted_growth:
-        values = reuse.tolist()
-        for index in range(1, len(values)):
-            delta = values[index] - values[index - 1]
-            if delta > 0:
-                values[index] = values[index - 1] + delta * growth_factor
-        return values
-    return reuse.tolist()
+from ...selection import reuse_schedule as reuse_schedule
+from ...selection import static_patch_ids as static_patch_ids
 
 
 class VLACache(InferenceMethod, DecoderStrategy):
