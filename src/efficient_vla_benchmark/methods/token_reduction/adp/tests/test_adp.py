@@ -87,7 +87,7 @@ def test_qk_scores_match_pinned_source():
     import torch
     from transformers import LlamaConfig, LlamaForCausalLM
 
-    from ..implementations.openvla_oft.method import embedding_scores, view_quotas
+    from ..scoring import embedding_scores, view_quotas
 
     torch.manual_seed(8)
     model = LlamaForCausalLM(

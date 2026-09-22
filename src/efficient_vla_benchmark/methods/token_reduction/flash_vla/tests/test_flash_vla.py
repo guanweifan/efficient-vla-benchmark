@@ -3,7 +3,7 @@ import pytest
 import torch
 
 from ..config import FlashVLAConfig
-from ..implementations.openvla_oft.method import information_scores
+from ..scoring import information_scores
 
 
 def test_ics_against_independent_numpy_svd():
