@@ -28,9 +28,9 @@ The first query is dense. Episode, instruction and sequence-layout changes
 invalidate state. Nothing is appended across frames. Empty candidate sets are a
 valid dense-refresh case, not an error. Nonvisual tokens always update.
 
-`config.py` validates settings; `implementations/openvla_oft/method.py` owns selection and cache
-lifetime. The shared OFT decoder owns indexed KV storage, position bookkeeping and
-the unchanged native action-head boundary. No dependency on another algorithm.
+`config.py` validates settings; shared `method.py` owns the complete policy and
+cache lifetime. `implementations/<backend>/` supplies native text/image boundaries;
+backend adapters own indexed KV, positions and action readout. No other method is imported.
 
 ## Adaptation and measurement
 
@@ -76,8 +76,7 @@ not call SDPA again. Matching the author execution pattern does not guarantee
 a speedup over an optimized native SDPA baseline; token-count savings are not
 necessarily proportional to GPU latency savings.
 
-Historical migration timing is recorded in `docs/migration_validation.md`;
-the corrected implementation's retest is in `docs/performance_validation.md`.
+Measurements and separate historical cohorts are recorded in `docs/benchmark_results.md`.
 Retain negative results: do not compare only against an artificially slow eager
 baseline or omit the full entropy mechanism to manufacture a speedup.
 

@@ -1,8 +1,10 @@
+# Local runtimes and generated outputs
 .venv*/
 .runtime/
 outputs/
 artifacts/
 _private/
+.cache/
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -13,3 +15,36 @@ dist/
 .coverage
 htmlcov/
 
+# External model/data resources and retired result location
+/models/
+/datasets/
+/checkpoints/
+/docs/results/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.npy
+*.npz
+*.hdf5
+*.h5
+*.tfrecord*
+*.parquet
+*.mp4
+*.log
+
+# Credentials and local editor/OS files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*.bak
+*.orig
+*.rej

@@ -67,9 +67,9 @@ The migrated artifact was previously calibrated on 32 real training observations
 across four suites. Migration reuses it with full content/identity validation;
 it does not claim a new calibration run. GPU tests exercise real BF16/FP16 packed
 GEMM/GEMV and load 224 packed linears twice with matching predictions. Fresh smoke
-and timing results are recorded centrally in `docs/migration_validation.md`.
+and timing results are recorded centrally in `docs/benchmark_results.md`.
 
-The development measurement reduced peak allocated runtime memory substantially,
+The OFT BF16-kernel measurements reduced peak allocated runtime memory substantially,
 but did not improve query latency. Packed weight size does not guarantee speedup
 at OFT's multimodal sequence length. Do not replace the real result with a
 fake-quantization or synthetic GEMV claim. Formal task success rates and broad
@@ -99,9 +99,9 @@ native model to FP16 without AWQ. It is not a replacement for the common BF16
 reference. Report these conditions separately, never hide a precision switch
 inside an AWQ-versus-native speedup.
 
-The source audit and fresh comparisons of both kernel precisions are recorded in
-`docs/performance_validation.md`. BF16 remains slower in that retest; the explicit
-FP16-kernel option is faster, without a formal task-accuracy claim.
+Both kernel precisions and their native references are retained in
+`docs/benchmark_results.md`. OFT's BF16 kernel remained slower in its recorded cohort;
+CogACT's BF16 kernel was faster. Neither finding establishes formal task accuracy.
 
 ## CogACT binding
 

@@ -1,89 +1,94 @@
 # Development contract
 
-Read this file, CONTRIBUTING.md, docs/architecture.md and the relevant backend and
-method READMEs before changing code. Upstream submodules keep their own instructions.
+Read this file, [docs/development.md](docs/development.md), the selected backend
+README and the relevant method README before editing. This is the single source
+of development and Git rules; upstream submodules retain their own instructions.
 
-## Branch and workspace lifecycle
+## Scope and architecture
 
-- Develop on a short-lived task branch from current `main` in an existing authorized
-  checkout. Keep one feature per commit and validate before merging.
-- Merge completed work into `main`, preferably by fast-forward, preserving its
-  commits. Confirm every branch tip is reachable from `main`, then delete the
-  completed task branch. Do not retain merged branches or force-delete unmerged work.
-- Do not create additional project clones, Git worktrees, staging workspaces,
-  recovery copies or backups without the user's explicit request. This includes
-  Git bundles, archive copies and automatic pre-cleanup backups.
-- A clean-install test is not permission to create another checkout. Reuse an
-  existing authorized checkout/environment or ask before creating one.
-- Ordinary commits and canonical experiment outputs are not backups. Retain raw
-  measurement evidence, logs, models, datasets and runtime environments unless
-  their removal is separately authorized.
+- Keep the benchmark independent of the survey manuscript. One method or native
+  baseline per run; never compose independent papers to manufacture a gain.
+- Admit a port only after identifying and testing its core mechanism. An independent
+  core contribution is allowed with explicit exclusions in its ID, README and
+  metadata. An unresolved core rule requires deferral, not a runnable proxy.
+- One canonical directory per method under its principal category. Add backend
+  bindings there, not copies of the algorithm. Cross-category labels are metadata.
+- Methods never import other methods. Backends never import paper-specific code.
+  Shared control/evaluation/profiling never branch on backend or method names.
+- Core/discovery/harnesses work without Torch, Transformers or simulator packages.
+  Optional model operations may depend on tensor runtimes but not on backends or
+  papers. Incompatible backend dependencies belong in separate environments.
+- State is per policy instance and resets between episodes/instruction changes.
+  Hooks must be reversible and close idempotent. Quantization needs a fresh native
+  model to return to baseline; relabeling a converted model does not undo it.
+- Native mask visibility, token positions, action readout and preprocessing are
+  backend contracts. Supporting one model never implies all methods are compatible.
+  Declare supported variants/capabilities and reject unsupported pairs explicitly.
+- Python packages/IDs use snake_case; distribution/branch names use kebab-case.
+  Prefer descriptive modules over catch-all utils. Typed config owns validation;
+  YAML exposes portable parameters, never arbitrary unchecked keys.
 
-## Invariants
+## Resources and evidence
 
-- Keep this repository independent of the survey manuscript.
-- One method per run; do not compose independently published methods. An independently
-  meaningful core contribution may be ported without the paper's other components,
-  but its ID, README and runtime metadata must explicitly disclose that scope.
-- Admit a port only after identifying and testing the paper/code's core mechanism.
-  Runnable proxies or small incidental tricks do not qualify. Unresolved core
-  semantics require deferral, not a guessed implementation with a disclaimer.
-- One canonical method directory under its principal category. Cross-category labels
-  are metadata, never duplicated implementations.
-- Methods never import another method's implementation. Backend plugins never import
-  paper-specific code. Shared harnesses never branch on backend or method names.
-- Main-package installation, discovery and CPU contract tests must work without model
-  plugins, PyTorch, Transformers or simulation dependencies installed.
-- Backend dependencies are optional and may need separate environments. Never import
-  incompatible upstream packages in one process or modify global site-packages.
-- Model-specific computation lives in the backend or method implementation, not core.
-- State is per policy instance and resets between episodes. Converted weights require
-  a fresh baseline model; changing a method label cannot undo quantization.
-- All external resource paths come from CLI arguments. No private paths, machine names,
-  network addresses, credentials or environment dumps in source, commits or reports.
-- Original checkpoints and datasets are read-only. Derived artifacts are separate.
-- Preserve upstream revision/license information and explicitly report adaptations.
-- Evaluation and profiling use the same policy protocol for every method. Include
-  method selection, caching and control overhead in policy timing. Retain failures
-  and negative speed results. Native inference is the speed reference.
-- Full success-rate campaigns require explicit user scheduling. Development is limited
-  to the agreed four-episode smoke set. No training or large downloads by implication.
-- One feature per commit, with tests/config/docs. Shared infrastructure has separate
-  commits. Do not describe partial mechanisms or smoke outcomes as paper reproductions.
-- Every measured algorithm updates docs/benchmark_results.md through the audited
-  result-recording workflow; preserve the paired baseline, source/config/raw hashes,
-  negative outcomes and the distinction between smoke and formal success rate.
-- No pushes, remote history replacement, new remote forks, or unrelated deletions
-  without explicit authority.
+- Pass every external resource location through CLI arguments. Never commit private
+  filesystem paths, host/network identities, credentials or environment dumps.
+- Original checkpoints/datasets are read-only. Derived calibration artifacts stay
+  separate. No global site-package edits or global model-class monkey patches.
+- Keep weights, datasets, traces, logs, environments, binaries and exported result
+  JSON outside Git. Canonical result records live in ignored `outputs/result_records/`;
+  raw runs stay under their output IDs. Do not recreate `docs/results/`.
+- Commit the generated `docs/benchmark_results.md`, including negative outcomes,
+  actual measurement revisions and paired baselines. Preserve raw evidence locally;
+  an older smoke source must never be relabeled as the final timing source.
+- Use the common harness and actual native speed reference. Include preprocessing,
+  transfers, selection/cache/control work and postprocessing. Report precision,
+  cadence, hardware, protocol and full versus partial mechanism scope.
+- Four-episode smoke is not formal success rate. Preserve unsuccessful episodes and
+  errors; do not retry/tune until success. Full success campaigns, training, broad
+  sweeps and large downloads require explicit user scheduling/authority.
+- Preserve third-party notices and pinned fetchable upstream revisions. Do not
+  invent a license or describe unverified paper conventions as author-code parity.
 
-## Before committing
+## Git and workspace lifecycle
 
-Run relevant CPU tests, formatting, import-boundary and privacy checks. Model changes
-also require real-model smoke checks; algorithm integrations additionally require the
-shared timing harness. Record commands using placeholders, not personal paths.
-Validate important boundaries without relying on untracked files, using an existing
-authorized checkout. Additional validation checkouts require explicit permission.
-Update documentation when behavior or the interface contract changes.
+1. Use an existing authorized checkout. Never create additional clones, worktrees,
+   staging workspaces, recovery copies, bundles or backups without explicit approval.
+   This also applies to clean-install tests. Canonical experiment outputs are not backups.
+2. When the owner explicitly requests collaborator setup, fork/clone as agreed.
+   Use `origin` for the fork and `upstream` for the shared project; initialize only
+   needed submodules. Creating a remote fork or pushing requires authorization.
+3. Branch from current `main`: `feat/<component>-<task>`, `fix/<component>-<issue>`,
+   `refactor/<component>-<task>` or `docs/<task>`. Keep one feature per commit;
+   shared infrastructure is a separate earlier commit.
+4. Commit format: `type(scope): imperative summary`, no trailing period.
+   Types: feat, fix, refactor, test, docs, build, chore. Use the owning component
+   as scope. Nontrivial bodies contain `Why:`, `Changes:`, `Validation:` and
+   `Limitations:`; report checks actually run, never planned checks or private paths.
+5. Upstream modifications require their own submodule branch/commit and an
+   authorized fetchable source before updating the parent gitlink. No personal
+   filesystem remotes or hidden dependencies on another checkout.
+6. Validate, then merge into `main`, preferably fast-forward. Verify the branch
+   tip is reachable from `main` and delete the completed task branch. Never
+   force-delete unmerged work or rewrite/push shared history without permission.
+7. Preserve unrelated user edits. No automatic pre-cleanup backups, Git clean,
+   environment deletion, model/data removal or unrelated remote mutations.
 
-## Implemented scope
+## Validation and documentation
 
-OpenVLA-OFT native baseline; nine token methods including EfficientVLA's token core,
-ST-Merge and FlashVLA's ICS core; VLA-Cache and VLA-InfoEntropy; AWQ; SP-VLA visual
-pruning plus scheduling; and VOTE's trajectory ensemble core. Independent paper-based
-implementations disclose unverified conventions, not published-score reproductions.
-Preserve these qualifications in reports. FlashVLA action reuse remains unresolved;
-EfficientVLA excludes layer pruning and DiT caching; VOTE excludes its other paper
-components. SP-VLA uses one canonical directory and offers scheduling-only as an
-ablation preset, not a second method. CogACT has a native joint-suite baseline
-with causal SDPA, a BF16 VLM and FP32 DiT-B. ADP's released Q/K + observed-EEF
-mechanism and FlashVLA's independent ICS core have explicit CogACT bindings.
-CogACT also supports complete VLA-Cache, SP-VLA pruning plus scheduling, AWQ's
-packed decoder core and VOTE's independent ensemble core. Preserve causal KV
-visibility, native spatial RGB preprocessing and VOTE's matched H1 comparison.
-AWQ calibration uses training data only and artifacts are backend/checkpoint-bound.
-Other OFT methods are not automatically ported. VLA-IAP's CogACT port is deferred
-until its core semantic-feature construction is verifiable. Preserve the single-camera
-input, suite statistics and sampler conventions
-in its README. starVLA retains pinned sources for subsequent implementation; do
-not advertise runtime support until its own model checks have passed. Do not
-fabricate an empty plugin that only registers a name and cannot perform inference.
+- Run relevant CPU tests, lint/format, import boundaries, private-path and repository
+  hygiene checks. For algorithm/model changes also run mechanism/native-parity tests,
+  real kernels, the agreed short LIBERO smoke and shared sequential timing.
+- Test reset/detach, unsupported inputs, optional-dependency isolation and repeated
+  construction. Weight conversion checks must cover reload and checkpoint immutability.
+- Update config, compatibility metadata and the owning README with a feature.
+  Use existing environments/checkouts; request authority for additional ones.
+- Keep `docs/` limited to the development guide and result ledger. Update those or
+  the relevant component README instead of adding per-turn/per-batch reports.
+  Do not delete unresolved limitations merely to shorten documentation.
+- Root README owns user entry points; this file owns workflow rules; the development
+  guide owns technical interfaces. Avoid repeating the same normative content.
+
+Current support is listed in README and validated by the lazy catalog. starVLA
+remains source-only. FlashVLA action reuse, VLA-IAP's CogACT semantic construction
+and a faithful native sampling-acceleration example remain unresolved; do not
+silently promote them to implemented status.

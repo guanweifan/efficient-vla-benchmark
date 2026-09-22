@@ -33,9 +33,12 @@ of redundant pretrained weights, restores it before inference, loads every compo
 strictly, and resolves the tokenizer from the caller-selected export. It does not
 modify upstream files, global model classes, or the supplied export.
 
-See [INSTALL.md](INSTALL.md) for setup and [validation](../../docs/cogact_validation.md)
-for the executed checks, results and limitations. Smoke outcomes must not be reported
-as formal success rates.
+See [INSTALL.md](INSTALL.md) for setup and [results](../../docs/benchmark_results.md)
+for measurements and limits. Native output/reset parity passed exactly on the tested
+export; four-episode smoke is not a formal success rate. The export names training
+revision `01869b7348b41cb315049f32abc7221fc01897db`, but its actual training-source
+location remains unverified. Native parity does not validate the training fork's
+evaluation conventions; a failed guessed URL is not proof that its source is private.
 
 ## Causal visual-token selection
 
@@ -58,9 +61,12 @@ advertised by this capability. Selection/probing policies belong to method
 bindings, not this backend. Closing hooks restores the original instance.
 
 Validated bindings are ADP (including observed-EEF gating) and FlashVLA's ICS core.
-See [token-port validation](../../docs/cogact_token_batch1_validation.md) for core
-mechanism checks, native-parity tests, paired timing and closed-loop smoke evidence.
-Other methods require their own CogACT bindings and fidelity checks.
+Their tests check original positions, protected cognition, causal/padding masks,
+full-retention/reset/detach parity and unchanged diffusion RNG consumption. Paired
+measurements and smoke are in [results](../../docs/benchmark_results.md). VLA-IAP is
+deferred until its defining text/vision semantic-feature construction is verifiable;
+matching dimensions or implementing only edges is insufficient. Additional bindings
+must preserve their own core mechanisms and pass native-boundary checks.
 
 ## Additional model-access capabilities
 

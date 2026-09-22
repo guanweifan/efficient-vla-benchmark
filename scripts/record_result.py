@@ -1,4 +1,4 @@
-"""Export audited portable evidence and render the per-category measurement ledger."""
+"""Keep audited experiment records local and render the public measurement summary."""
 
 import argparse
 import hashlib
@@ -212,7 +212,32 @@ def annotate_supersedes(record, run_ids, records_dir):
     record["supersedes"] = sorted(run_ids)
 
 
+def record_digest(record):
+    """Identify the complete local record without committing or linking its contents."""
+    payload = json.dumps(record, indent=2, sort_keys=True) + "\n"
+    return hashlib.sha256(payload.encode()).hexdigest()
+
+
 def render(records):
+    records = sorted(records, key=lambda record: record["run"]["run_id"])
+    ids = {record["run"]["run_id"]: f"R{index:02d}" for index, record in enumerate(records, 1)}
+    cohorts, cohort_ids = {}, {}
+    for record in records:
+        run = record["run"]
+        meta = run["metadata"]
+        identity = {
+            "backend": meta["backend"]["backend"],
+            "variant": meta["backend"]["model_variant"],
+            "checkpoint": meta["backend"]["checkpoint_sha256"],
+            "source": meta["source"],
+            "hardware": meta["hardware"],
+            "protocol": meta["protocol"],
+            "traces": meta["traces"],
+        }
+        key = json.dumps(identity, sort_keys=True)
+        if key not in cohorts:
+            cohorts[key] = (f"C{len(cohorts) + 1:02d}", run)
+        cohort_ids[run["run_id"]] = cohorts[key][0]
     superseded = {run_id for record in records for run_id in record.get("supersedes", [])}
 
     def display_label(record):
@@ -222,11 +247,13 @@ def render(records):
     lines = [
         "# Algorithm measurement ledger",
         "",
-        "Generated from the versioned JSON evidence in `results/`. This is a development",
-        "measurement ledger, not a final paper comparison or a formal success-rate table.",
+        "Generated from local, ignored JSON records in `outputs/result_records/`.",
+        "Only this summary is tracked now; raw runs and the live record archive stay local.",
+        "This is a development ledger, not a final paper comparison or formal success rate.",
         "Superseded rows preserve earlier, corrected implementations for traceability;",
         "do not use them as results of the current implementation. Their raw records",
-        "are unchanged. Mechanism scope and limits are detailed in the method READMEs.",
+        "are unchanged. Valid earlier cohorts remain separate, not selected by best speed.",
+        "Mechanism scope and limits are detailed in the method READMEs.",
         "",
         "Backend, hardware and protocol are recorded per row below. Policy timing",
         "includes preprocessing, transfer, all method/control overhead and postprocessing,",
@@ -247,7 +274,7 @@ def render(records):
         lines += [
             f"## {section}",
             "",
-            "| Method / configuration | Backend | H | Queries / replacements | "
+            "| Record / configuration | Backend | H | Queries / replacements | "
             "Query mean / p95 ms | ms/control step | Replay speedup | Peak GiB | Smoke |",
             "|---|---|---:|---:|---:|---:|---:|---:|---|",
         ]
@@ -266,7 +293,8 @@ def render(records):
             memory = summary["peak_allocated_bytes"]
             memory_text = f"{memory / 2**30:.2f}" if memory is not None else "—"
             lines.append(
-                f"| [{display_label(record)}](results/{run['run_id']}.json) | "
+                f"| [{ids[run['run_id']]}](#{ids[run['run_id']].lower()}) "
+                f"{display_label(record)} | "
                 f"{meta['backend']['backend']} | "
                 f"{meta['config']['execution_horizon']} | "
                 f"{query['count']} / {summary.get('replacement_steps', 0)} | "
@@ -326,40 +354,61 @@ def render(records):
             )
         lines.append("")
     lines += [
-        "## Traceability",
+        "## Measurement cohorts",
         "",
-        "Raw files remain under `outputs/<run ID>/`; the linked JSON preserves their",
-        "hashes, full metadata, summary, paired baseline and optional smoke records.",
-        "Model/trace/artifact identities, precision, kernel, dependencies, source",
-        "fingerprint, dirty flag and parameters are in those records. A smoke from an",
-        "earlier source revision is explicitly marked, never silently relabeled.",
+        "Each row uses its own paired baseline, never another cohort's denominator.",
+        "F = measured control frames; R = repeats; W = warmup queries.",
         "",
-        "| Method | Preset | Timing commit | Baseline run |",
-        "|---|---|---|---|",
+        "| Cohort | Backend | Hardware | F / R / W | Source fingerprint | Checkpoint |",
+        "|---|---|---|---:|---|---|",
     ]
-    for record in records:
-        commit = record["run"]["metadata"]["source"]["commit"] or "unknown"
-        dirty = " (dirty)" if record["run"]["metadata"]["source"]["dirty"] else ""
-        lines.append(
-            f"| {display_label(record)} | [{Path(record['preset']).stem}](../{record['preset']}) | "
-            f"`{commit[:12]}`{dirty} | `{record['baseline']['run_id']}` |"
-        )
-    lines += [
-        "",
-        "## Timing protocols",
-        "",
-        "| Method | Hardware | Measured frames | Repeats | Warmup queries |",
-        "|---|---|---:|---:|---:|",
-    ]
-    for record in records:
-        run = record["run"]
+    for cohort_id, run in cohorts.values():
         meta = run["metadata"]
         hardware = meta["hardware"].get("gpu", meta["hardware"].get("runtime", "unknown"))
         lines.append(
-            f"| {display_label(record)} | {hardware} | "
-            f"{run['summary']['all_control_steps']['count']} | {meta['protocol']['repeats']} | "
-            f"{meta['protocol']['warmup_queries']} |"
+            f"| {cohort_id} | {meta['backend']['backend']} | {hardware} | "
+            f"{run['summary']['all_control_steps']['count']} / "
+            f"{meta['protocol']['repeats']} / {meta['protocol']['warmup_queries']} | "
+            f"`{meta['source'].get('source_sha256', 'unknown')}` | "
+            f"`{meta['backend']['checkpoint_sha256']}` |"
         )
+    lines += [
+        "",
+        "<details>",
+        "<summary>Run identities, presets and local-record checksums</summary>",
+        "",
+        "Raw runs: `outputs/<run ID>/`; exported records: `outputs/result_records/<run ID>.json`.",
+        "The SHA256 identifies the full canonical JSON, which retains raw-file hashes,",
+        "parameters, baseline, runtime/precision and per-episode smoke outcomes.",
+        "The preset links are current; use the recorded commit for measured source.",
+        "Smoke-source labels: same / different / unknown / not run. Earlier smoke is",
+        "never promoted to a final-source or formal evaluation.",
+        "",
+        "| Record | Run ID | Cohort | Preset | Timing commit | Baseline | "
+        "Smoke source | Record SHA256 |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for record in records:
+        run, meta = record["run"], record["run"]["metadata"]
+        rid = ids[run["run_id"]]
+        baseline_id = ids.get(record["baseline"]["run_id"], record["baseline"]["run_id"])
+        commit = meta["source"]["commit"] or "unknown"
+        dirty = " (dirty)" if meta["source"]["dirty"] else ""
+        smoke = record.get("smoke")
+        same = smoke.get("same_source_fingerprint") if smoke else None
+        smoke_source = (
+            ("same" if same else "different")
+            if same is not None
+            else ("unknown" if smoke else "not run")
+        )
+        lines.append(
+            f'| <a id="{rid.lower()}"></a>{rid} | `{run["run_id"]}` | '
+            f"{cohort_ids[run['run_id']]} | "
+            f"[{Path(record['preset']).stem}](../{record['preset']}) | "
+            f"`{commit}`{dirty} | {baseline_id} | {smoke_source} | "
+            f"`{record_digest(record)}` |"
+        )
+    lines += ["", "</details>"]
     lines += [
         "",
         "## Interpretation boundaries",
@@ -373,7 +422,7 @@ def render(records):
         "- AWQ's FP16-kernel row is mixed precision, not the default BF16 kernel;",
         "  boundary casts are timed. Accuracy equivalence is not established.",
         "- Cache regressions, failed smoke episodes and all precision variants remain",
-        "  visible. Historical runs in other validation reports are separate cohorts.",
+        "  visible. Historical repeats and superseded rows are not new algorithms.",
         "- TEAM-VLA and VLA-IAP are independent paper-based implementations with",
         "  explicit unresolved author-code conventions; consult their method READMEs.",
         "  Their rows are not verified reproductions of the published implementations.",
@@ -383,6 +432,14 @@ def render(records):
         "- VLA-InfoEntropy skips visual QUERY rows while retaining visual KV context.",
         "  It is not context pruning; its query counts do not belong in the retention",
         "  table. Paper-based methods disclose reconstruction choices in their READMEs.",
+        "- CogACT native parity does not verify the unidentified training fork's",
+        "  evaluation conventions. Its original four-episode Long failure is retained.",
+        "- Secondary CogACT native rechecks had observed thermal throttling; do not",
+        "  use them as stable references. The category-example cohort retained seven",
+        "  sparse thermal-flag samples; its late native drift was 0.435%. VOTE's tiny",
+        "  difference is not significant evidence of acceleration or regression.",
+        "- No native sampling accelerator is implemented. Do not relabel fewer DDIM",
+        "  steps as a faithful paper method. Full success campaigns remain unmeasured.",
         "",
     ]
     return "\n".join(lines)
@@ -392,14 +449,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     export = commands.add_parser("export")
-    for name in ("run-dir", "baseline-dir", "records-dir"):
+    for name in ("run-dir", "baseline-dir"):
         export.add_argument(f"--{name}", type=Path, required=True)
+    export.add_argument("--records-dir", type=Path, default=Path("outputs/result_records"))
     export.add_argument("--smoke-dir", type=Path)
     export.add_argument("--supersedes", action="append", default=[], metavar="RUN_ID")
     for name in ("section", "label", "preset"):
         export.add_argument(f"--{name}", required=True)
     table = commands.add_parser("render")
-    table.add_argument("--records-dir", type=Path, required=True)
+    table.add_argument("--records-dir", type=Path, default=Path("outputs/result_records"))
     table.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "export":
@@ -417,7 +475,7 @@ def main():
     else:
         records = [read_json(path) for path in sorted(args.records_dir.glob("*.json"))]
         if not records:
-            raise ValueError("No evidence records")
+            raise ValueError("No evidence records; obtain the local archive before regenerating")
         args.output.write_text(render(records))
 
 

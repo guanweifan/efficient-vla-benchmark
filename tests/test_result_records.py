@@ -113,8 +113,8 @@ def test_superseded_evidence_is_preserved_and_labelled(tmp_path, recorder):
     assert old_path.read_bytes() == original_bytes
     assert new["supersedes"] == ["example-run"]
     table = recorder.render([old, new])
-    assert "[Superseded — Old](results/example-run.json)" in table
-    assert "[Corrected](results/corrected-run.json)" in table
+    assert "Superseded — Old" in table and "`example-run`" in table
+    assert "Corrected" in table and "`corrected-run`" in table
 
 
 @pytest.mark.parametrize("run_id", ["../example-run", "example-run", "not-found"])
@@ -173,3 +173,68 @@ def test_cache_summary_keeps_all_context_and_skips_queued_rows(recorder):
                 }
             ]
         )
+
+
+def test_summary_uses_local_record_digest_without_private_file_links(tmp_path, recorder):
+    import hashlib
+
+    run = tmp_path / "example-run"
+    write_run(run)
+    record = recorder.make_record(run, run, "5.1 Tokens", "Example", "configs/example.yaml")
+    table = recorder.render([record])
+    payload = json.dumps(record, indent=2, sort_keys=True) + "\n"
+    assert hashlib.sha256(payload.encode()).hexdigest() in table
+    assert "(results/" not in table and ".json)" not in table
+    assert "[R01](#r01)" in table and '<a id="r01"></a>R01' in table
+    assert "`example-run`" in table
+    assert "[example](../configs/example.yaml)" in table
+
+
+def test_render_is_deterministic_and_preserves_slower_variants(tmp_path, recorder):
+    import copy
+
+    run = tmp_path / "example-run"
+    write_run(run)
+    first = recorder.make_record(run, run, "6.1 Quantization", "Faster", "configs/a.yaml")
+    second = copy.deepcopy(first)
+    second["run"]["run_id"] = "slow-run"
+    second["label"], second["preset"], second["replay_speedup"] = "Slower", "configs/b.yaml", 0.8
+    assert recorder.render([first, second]) == recorder.render([second, first])
+    table = recorder.render([first, second])
+    assert "Slower" in table and "0.800×" in table
+    assert table.count("\n| C01 |") == 1
+
+
+def test_record_commands_default_to_ignored_outputs(tmp_path):
+    import subprocess
+    import sys
+
+    script = Path(__file__).resolve().parents[1] / "scripts/record_result.py"
+    write_run(tmp_path / "run")
+    subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "export",
+            "--run-dir",
+            "run",
+            "--baseline-dir",
+            "run",
+            "--section",
+            "5.1 Tokens",
+            "--label",
+            "Example",
+            "--preset",
+            "configs/example.yaml",
+        ],
+        cwd=tmp_path,
+        check=True,
+    )
+    assert (tmp_path / "outputs/result_records/run.json").is_file()
+    subprocess.run(
+        [sys.executable, str(script), "render", "--output", "summary.md"],
+        cwd=tmp_path,
+        check=True,
+    )
+    assert "Example" in (tmp_path / "summary.md").read_text()
+    assert not (tmp_path / "docs/results").exists()

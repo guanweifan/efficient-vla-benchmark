@@ -61,6 +61,6 @@ episodes without runtime errors: Spatial, Object and Long succeeded; Goal reache
 the step limit. Preserve that failure rather than retrying until success. This
 four-episode smoke is not a success-rate estimate.
 
-Fresh migration timing is recorded centrally in `docs/migration_validation.md`.
+Timing and historical cohorts are recorded in `docs/benchmark_results.md`.
 Report both per-query latency and total replay time: extra controller queries can
 reduce the overall benefit. These are not closed-loop task-completion times.
