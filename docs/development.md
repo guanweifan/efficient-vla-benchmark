@@ -76,6 +76,9 @@ seven dimensions. Nonfinite/invalid hook outputs fail before environment executi
   not an extra crop or reconstruction from normalized pixels.
 - `model_ops/` is optional tensor infrastructure. It may import Torch/Transformers,
   but never backends or paper policy; discovery/core/harnesses may not import it.
+- `NativeAttentionProbe` reads selected native Llama Q/K rows without replacing
+  attention output. It preserves RoPE and causal/padding visibility; statistics
+  normalize over all current keys. Its transient tensors clear after each call.
 
 Full-retention/no-op adapters must match the appropriate native reference and
 detach cleanly. Eager-versus-fused attention and quantized kernel precision
