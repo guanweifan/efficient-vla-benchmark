@@ -21,12 +21,13 @@ time and derived artifact size are separate from online query latency.
 ## Files and interfaces
 
 - `config.py`: portable validated settings.
-- `implementations/openvla_oft/` contains the following native modules:
-- `calibrate.py`, `search.py`: capture actual image/proprio/language/action-placeholder
+- `implementations/<backend>/target.py` binds decoder layers, attention semantics
+  and offloading; other modules below share the same AWQ algorithm.
+- `calibrate.py`, `search.py`: capture actual native multimodal
   embeddings and perform layerwise scaling, clipping and packing.
 - `artifact.py`: validate/checksum and load all packed layers, including the modified
   normalization parameters. Incomplete, mismatched or corrupt artifacts are rejected.
-- `method.py`: attach one quantized runtime to the common OFT backend.
+- `method.py`: attach one quantized runtime to the owning backend.
 - `runtime.py`: an explicit precision wrapper around the unchanged author kernel;
   preserves packed INT4 weights and converts only the selected floating buffers,
   inputs and outputs. Converted-buffer overflow is rejected during loading.
