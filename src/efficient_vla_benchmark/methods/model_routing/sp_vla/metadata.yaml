@@ -9,3 +9,7 @@ implementations:
     variants: [libero_joint]
     requires: [control_hooks, libero_cartesian_delta_actions, llama_decoder, visual_token_layout]
     factory: efficient_vla_benchmark.methods.model_routing.sp_vla.implementations.openvla_oft.api:build
+  cogact:
+    variants: [libero_joint]
+    requires: [control_hooks, libero_cartesian_delta_actions, causal_visual_token_selection]
+    factory: efficient_vla_benchmark.methods.model_routing.sp_vla.implementations.cogact.api:build

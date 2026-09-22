@@ -55,3 +55,23 @@ planar extrapolation may fail near contact or changes of direction.
 
 The NumPy method is independent of OFT. Future bindings must verify action units,
 XYZ ordering and history semantics, then declare the relevant action capability.
+
+## CogACT binding
+
+The CogACT preset retains both scheduling and pruning with the same equations
+and untuned parameters. It reads one native SigLIP view, shares its patch mask
+across fused DINO/SigLIP features, and keeps original causal LLM positions and
+cognition EOS. Native timm already executes its last block while returning the
+second-last features, so reversible Q/K hooks do not replace the vision encoder.
+All scoring and Canny work remains inside policy timing.
+
+The Z gate uses the last **executed action's** vertical component, not observed
+EEF height or an unexecuted prediction. No additional proprioception input is
+introduced. CogACT predicts sixteen actions but normally executes eight; the
+scheduling gate runs only when that executed prefix ends and emits one fitted
+action at a time. DDIM/CFG and the diffusion head are unchanged. Scheduling alone
+is an explicit ablation, not an additional algorithm or full-method claim.
+
+Use `configs/experiments/cogact/sp_vla.yaml` with native LIBERO inputs; patch scoring reuses the native spatial resize to 224px.
+Cold/low-Z queries retain all 256 patches even when this reduces the measured
+speed benefit. Do not tune that gate using smoke outcomes.
