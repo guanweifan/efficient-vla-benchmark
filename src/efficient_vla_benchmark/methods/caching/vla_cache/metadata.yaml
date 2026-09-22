@@ -10,3 +10,8 @@ implementations:
     requires: [llama_decoder, visual_token_layout, l1_action_head]
     factory: efficient_vla_benchmark.methods.caching.vla_cache.implementations.openvla_oft.api:build
     preflight: efficient_vla_benchmark.methods.caching.vla_cache.implementations.openvla_oft.api:preflight
+  cogact:
+    variants: [libero_joint]
+    requires: [causal_indexed_kv_reuse]
+    factory: efficient_vla_benchmark.methods.caching.vla_cache.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.caching.vla_cache.implementations.cogact.api:preflight

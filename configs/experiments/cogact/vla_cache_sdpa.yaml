@@ -1,0 +1,4 @@
+extends:
+  - vla_cache.yaml
+parameters:
+  attention_backend: sdpa

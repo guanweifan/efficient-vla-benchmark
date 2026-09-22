@@ -1,4 +1,4 @@
-# VLA-Cache on OpenVLA-OFT
+# VLA-Cache
 
 The decoder records selected-row counts from the exact unique-prefix invariant,
 avoiding a redundant device scalar synchronization. Task-protection indices for
@@ -80,3 +80,25 @@ Historical migration timing is recorded in `docs/migration_validation.md`;
 the corrected implementation's retest is in `docs/performance_validation.md`.
 Retain negative results: do not compare only against an artificially slow eager
 baseline or omit the full entropy mechanism to manufacture a speedup.
+
+## CogACT binding
+
+The CogACT preset uses the same complete policy, thresholds and entropy equations
+with one native 256-patch view. RGB comparison follows the native spatial image
+transform and the previous model-query frame. Prompt positions are discovered
+from the native visual boundary through the pre-cognition suffix; the final
+cognition EOS is never skipped. No action placeholders or OFT action slices are
+introduced. Original causal query/key visibility is retained even when the
+computed query set becomes sparse and the full KV set remains in storage.
+
+The indexed adapter suppresses the unused append-cache return of CogACT's single
+cognition-generation step. Its native generation/readout, FP32 DiT, DDIM10/CFG1.5
+and 16-predict/8-execute protocol are unchanged. Full entropy and task-attention
+costs are timed. Eager is the author-pattern preset, while `vla_cache_sdpa.yaml`
+is an explicit output-kernel comparison with the same complete statistics.
+Compare speed against native SDPA, never solely against a slower eager reference.
+A cold eager reference is used only for independent mechanism/parity validation.
+
+`visual_query_tokens_final` counts computed visual queries; `visual_kv_tokens`
+counts retained context. These are not token-removal counts. Empty reuse sets and
+negative gains remain valid outcomes rather than reasons to omit mechanisms.
