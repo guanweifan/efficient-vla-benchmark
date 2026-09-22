@@ -25,6 +25,9 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 |---|---|---:|---:|---:|---:|---:|---:|---|
 | [Native H=8 (token batch 2)](results/batch2-final-benchmark-baseline-001.json) | openvla_oft | 8 | 216 / 0 | 197.31 / 199.10 | 25.03 | 1.000× | 14.98 | Not run |
 | [Native H=8 end recheck (token batch 2)](results/batch2-final-benchmark-baseline_recheck-001.json) | openvla_oft | 8 | 216 / 0 | 198.63 / 200.64 | 25.20 | 0.993× | 14.98 | Not run |
+| [CogACT native DDIM / primary runtime](results/cogact-final-benchmark-baseline-001.json) | cogact | 8 | 321 / 0 | 183.69 / 184.81 | 23.39 | 1.000× | 14.73 | 3/4; errors 0 |
+| [CogACT native DDIM / secondary runtime](results/cogact-secondary-benchmark-baseline-001.json) | cogact | 8 | 321 / 0 | 194.39 / 204.01 | 24.75 | 1.000× | 14.73 | 3/4; errors 0 |
+| [CogACT native DDIM / secondary recheck (thermal throttling)](results/cogact-secondary-benchmark-recheck-001.json) | cogact | 8 | 321 / 0 | 195.57 / 209.94 | 24.90 | 1.000× | 14.73 | 3/4; errors 0 |
 | [Native BF16 / SDPA](results/control-methods-final-benchmark-baseline-001.json) | openvla_oft | 8 | 216 / 0 | 197.86 / 199.86 | 25.10 | 1.000× | 14.98 | 4/4; errors 0 |
 | [Native BF16 / SDPA, matched H=1](results/control-methods-final-benchmark-baseline_horizon1-001.json) | openvla_oft | 1 | 1704 / 0 | 199.83 / 201.42 | 199.83 | 1.000× | 14.98 | Not run |
 | [Native BF16 / SDPA, end recheck](results/control-methods-final-benchmark-baseline_recheck-001.json) | openvla_oft | 8 | 216 / 0 | 198.91 / 201.15 | 25.23 | 0.995× | 14.98 | Not run |
@@ -137,6 +140,9 @@ earlier source revision is explicitly marked, never silently relabeled.
 | Superseded — ST-Merge spatial VLA (paper-based) | [st_merge](../configs/experiments/openvla_oft/st_merge.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
 | VLA-Cache full statistics / eager (token batch 2) | [vla_cache](../configs/experiments/openvla_oft/vla_cache.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
 | VLA-InfoEntropy KV reuse (paper-based) | [vla_infoentropy](../configs/experiments/openvla_oft/vla_infoentropy.yaml) | `01bf64629fd2` | `batch2-final-benchmark-baseline-001` |
+| CogACT native DDIM / primary runtime | [baseline](../configs/experiments/cogact/baseline.yaml) | `a984ef33c463` | `cogact-final-benchmark-baseline-001` |
+| CogACT native DDIM / secondary runtime | [baseline](../configs/experiments/cogact/baseline.yaml) | `a984ef33c463` | `cogact-secondary-benchmark-baseline-001` |
+| CogACT native DDIM / secondary recheck (thermal throttling) | [baseline](../configs/experiments/cogact/baseline.yaml) | `a984ef33c463` | `cogact-secondary-benchmark-recheck-001` |
 | AWQ W4A16, BF16 kernel | [awq](../configs/experiments/openvla_oft/awq.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
 | AWQ W4A16, explicit FP16 kernel | [awq_fp16_kernel](../configs/experiments/openvla_oft/awq_fp16_kernel.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
 | Native BF16 / SDPA | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `be5be7d8e0e1` | `control-methods-final-benchmark-baseline-001` |
@@ -182,6 +188,9 @@ earlier source revision is explicitly marked, never silently relabeled.
 | Superseded — ST-Merge spatial VLA (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | VLA-Cache full statistics / eager (token batch 2) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | VLA-InfoEntropy KV reuse (paper-based) | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
+| CogACT native DDIM / primary runtime | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| CogACT native DDIM / secondary runtime | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
+| CogACT native DDIM / secondary recheck (thermal throttling) | NVIDIA GeForce RTX 3090 | 2523 | 3 | 10 |
 | AWQ W4A16, BF16 kernel | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | AWQ W4A16, explicit FP16 kernel | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
 | Native BF16 / SDPA | NVIDIA GeForce RTX 3090 | 1704 | 3 | 10 |
