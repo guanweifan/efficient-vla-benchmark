@@ -82,6 +82,10 @@ seven dimensions. Nonfinite/invalid hook outputs fail before environment executi
 - `NativeAttentionProbe` reads selected native Llama Q/K rows without replacing
   attention output. It preserves RoPE and causal/padding visibility; statistics
   normalize over all current keys. Its transient tensors clear after each call.
+- CogACT exposes `action_denoiser` under `dit_block_features`. A method may
+  reversibly cache per-block outputs; it must retain native sampling, timestep
+  conditioning, CFG branches and residual paths. Denoiser calls are not policy
+  queries: action-query boundaries must clear any within-sampling feature cache.
 
 Full-retention/no-op adapters must match the appropriate native reference and
 detach cleanly. Eager-versus-fused attention and quantized kernel precision

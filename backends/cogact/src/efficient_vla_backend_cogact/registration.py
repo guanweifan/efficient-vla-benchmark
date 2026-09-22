@@ -17,6 +17,7 @@ def register():
                 "paired_vision_transform",
                 "causal_indexed_kv_reuse",
                 "llama_decoder",
+                "dit_block_features",
             }
         ),
     )

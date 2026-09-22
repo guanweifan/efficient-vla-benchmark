@@ -13,6 +13,7 @@ class CogACTModelAccess:
         if dino != siglip or dino != 256:
             raise ValueError("This CogACT variant requires one aligned 16x16 patch grid")
         self.patches_per_view = dino
+        self.action_denoiser = model.action_model.net
 
     def layout(self, length):
         return TokenLayout(length, patches_per_view=self.patches_per_view)

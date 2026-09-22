@@ -87,3 +87,9 @@ branches must retain identical original patch memberships and protected prefixes
 Sparse output is restored to native patch slots for the unmodified projector;
 the selected method then removes empty slots before LLM layer zero. The dense
 projector and bridge overhead remain part of timing.
+
+`model_access.action_denoiser` exposes the native DiT instance and its blocks.
+Its attention keys are one cognition condition plus sixteen action positions,
+not 256 image patches. CFG calls `forward_with_cfg()`, which directly invokes
+the instance's `forward()`; method wrappers must cover that path and restore
+instance attributes on close. Sampler/CFG/noise ownership remains native.
