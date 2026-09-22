@@ -37,3 +37,22 @@ interpretation decision; runtime metadata and tables label this as ICS core only
 Use `configs/experiments/openvla_oft/flash_vla.yaml` for the same native H=8 replay
 and four-episode smoke. Published full-FlashVLA speedups include action reuse and
 cannot be compared as if that component were implemented here.
+
+## CogACT binding
+
+`implementations/cogact/` uses the same complete-SVD ICS equation on the native
+Llama attention `o_proj` output. One 256-patch view retains 160 patches after
+zero-based layer 1, with unchanged original positions, causal visibility and final
+cognition readout. Native SDPA modules are not replaced. All online SVD, ranking
+and selection overhead remains timed; the diffusion head, DDIM steps, CFG, noise
+generation and action prefix stay at the native baseline settings.
+
+Unlike OFT's bidirectional execution, the CogACT visual prefix cannot attend to
+later language tokens. This is the native model context, not a defect to fix by
+unmasking text or substituting cognition-token attention. ICS remains a visual
+information score; do not relabel it task-attention scoring. The paper's original
+OpenVLA path is also causal. We preserve Eq. 2, not its disputed L2-energy proof.
+
+Use `configs/experiments/cogact/flash_vla.yaml`. No action reuse, low-rank
+approximation or alternate scoring equation is introduced. These results test
+the independent ICS contribution on this checkpoint, not full FlashVLA scores.
