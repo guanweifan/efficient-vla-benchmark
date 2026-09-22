@@ -1,0 +1,12 @@
+schema_version: 1
+name: efficient_vla_diffusion_cache
+category: caching
+description: EfficientVLA independent DiT attention/MLP cache core; no token/layer pruning.
+config: efficient_vla_benchmark.methods.token_reduction.efficient_vla.cache_config:DiffusionCacheConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.token_reduction.efficient_vla.implementations.cogact.api:build
+    validate_experiment: efficient_vla_benchmark.methods.token_reduction.efficient_vla.implementations.cogact.api:validate_experiment

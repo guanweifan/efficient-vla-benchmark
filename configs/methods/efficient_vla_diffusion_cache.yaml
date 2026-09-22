@@ -1,0 +1,4 @@
+method: efficient_vla_diffusion_cache
+parameters:
+  enabled: true
+  cache_interval: 5

@@ -10,7 +10,7 @@ weights, datasets or raw experiment artifacts.
 | Backend / variant | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|
 | OpenVLA-OFT / libero_joint | Nine methods below | VLA-Cache, VLA-InfoEntropy | SP-VLA | VOTE ensemble core | AWQ W4A16 |
-| CogACT / libero_joint | ADP, FlashVLA ICS, SAFE-Pruner, ST-Merge, SpecPrune-VLA | VLA-Cache, VLA-InfoEntropy | SP-VLA | VOTE ensemble core | AWQ W4A16 |
+| CogACT / libero_joint | ADP, FlashVLA ICS, SAFE-Pruner, ST-Merge, SpecPrune-VLA | VLA-Cache, VLA-InfoEntropy, EfficientVLA DiT cache core | SP-VLA | VOTE ensemble core | AWQ W4A16 |
 | starVLA | Source pinned only; runtime not implemented | — | — | — | — |
 
 OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,
@@ -20,7 +20,8 @@ are not additional algorithms.
 
 These are common-checkpoint adaptations, not reproductions of published scores.
 TEAM-VLA, VLA-IAP and ST-Merge retain unverified paper interpretation choices.
-EfficientVLA excludes layer pruning and DiT caching; FlashVLA excludes unresolved
+EfficientVLA exposes token pruning on OFT and a separately named DiT cache core
+on CogACT; neither includes layer pruning or the complete pipeline. FlashVLA excludes unresolved
 action reuse; VOTE implements the independent ensemble, not its trained architecture.
 No action-generation sampler is currently advertised. Read each
 [method README](src/efficient_vla_benchmark/methods/) before using its results.
