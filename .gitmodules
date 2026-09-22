@@ -37,3 +37,6 @@
 [submodule "third_party/methods/safe_pruner"]
 	path = third_party/methods/safe_pruner
 	url = https://github.com/msssl/SAFE-Pruner.git
+[submodule "third_party/runtimes/prismatic_cogact"]
+	path = third_party/runtimes/prismatic_cogact
+	url = https://github.com/arnoldland/openvla.git
