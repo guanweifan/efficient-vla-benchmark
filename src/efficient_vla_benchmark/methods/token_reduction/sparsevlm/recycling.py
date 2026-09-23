@@ -68,7 +68,7 @@ def prune_and_recycle(features, probabilities, positions, config):
     for cluster in range(cluster_count):
         members = recycled[assignment == cluster]
         # Causal-safe anchor: every member is at or before the group's position.
-        anchor = members[positions[members].argmax()]
+        anchor = members.gather(0, positions[members].argmax().reshape(1))[0]
         anchors.append(anchor)
         # Eq. 11 is a SUM, deliberately not the released fixed-budget mean variant.
         replacements.append(features[members].float().sum(0).to(features.dtype))
