@@ -73,7 +73,7 @@ def benchmark(
             "episode_state_reset": True,
             "controller_included": mode == "control",
             "observations": "fixed_reference_trajectory_not_closed_loop",
-            "query_definition": "native_model_call_not_controller_refill",
+            "query_definition": "served_native_call; auxiliary native calls counted separately",
         },
         "hardware": monitor.hardware(),
         "traces": [{"name": path.name, "sha256": digest_file(path)} for path in trace_paths],
@@ -180,6 +180,12 @@ def benchmark(
         "peak_reserved_bytes": peak_reserved,
         "formal_success_rate_measured": False,
         "reference_replay_not_closed_loop": True,
+        "auxiliary_model_calls": sum(
+            row["diagnostics"].get("auxiliary_queries", 0) for row in query_rows
+        ),
+        "total_native_model_calls": len(query_rows) + sum(
+            row["diagnostics"].get("auxiliary_queries", 0) for row in query_rows
+        ),
     }
     if mode == "control":
         result["all_control_steps"] = latency_summary([row["latency_ms"] for row in rows])

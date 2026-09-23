@@ -12,6 +12,7 @@ def register():
         capabilities=frozenset(
             {
                 "llama_decoder",
+                "auxiliary_dense_inference",
                 "visual_token_layout",
                 "l1_action_head",
                 "control_hooks",

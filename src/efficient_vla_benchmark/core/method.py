@@ -40,6 +40,22 @@ class InferenceMethod:
     def after_query(self, actions) -> None:
         pass
 
+    def wants_auxiliary_query(self) -> bool:
+        """Request one non-serving native pass on the same prepared observation."""
+        return False
+
+    def begin_auxiliary_query(self) -> None:
+        """Select the auxiliary mode; never invoke inference from this callback."""
+        pass
+
+    def end_auxiliary_query(self) -> None:
+        """Always restore method mode, including when auxiliary inference fails."""
+        pass
+
+    def auxiliary_diagnostics(self, metrics: dict) -> dict:
+        """Annotate completed work without mutating its measured timings."""
+        return {}
+
     def after_action(self, action, remaining: int) -> bool:
         """Return True to discard the remaining chunk and query on the next step."""
         return False

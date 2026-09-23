@@ -49,7 +49,7 @@ class OpenVLAOFTBackend(MethodHost):
         self.context = None
         self.model_path = model_path
         self._model_manifest = model_manifest(model_path)
-        self.runtime = TorchCUDAMonitor(self.device)
+        self.runtime = TorchCUDAMonitor(self.device, self.drain_auxiliary)
         config = OpenVLAConfig.from_pretrained(model_path, local_files_only=True)
         self.model = (
             OpenVLAForActionPrediction.from_pretrained(
@@ -92,6 +92,7 @@ class OpenVLAOFTBackend(MethodHost):
 
     def reset(self, context):
         self._ensure_open()
+        self.drain_auxiliary()
         torch.manual_seed(context.seed)
         torch.cuda.manual_seed_all(context.seed)
         key = context.suite
@@ -107,13 +108,20 @@ class OpenVLAOFTBackend(MethodHost):
 
     def prepare(self, observation):
         self._ensure_open()
+        self.drain_auxiliary()
         return prepare_observation(self, observation)
 
     @torch.inference_mode()
     def forward(self, prepared):
         self._ensure_open()
-        if self.method is not None:
-            self.method.before_query(prepared)
+        return self.run_native_query(prepared, self._native_forward)
+
+    def make_auxiliary_runner(self):
+        from efficient_vla_benchmark.model_ops.auxiliary import AuxiliaryCUDARunner
+
+        return AuxiliaryCUDARunner(self.device)
+
+    def _native_forward(self, prepared):
         actions, _ = self.model.predict_action(
             **prepared["inputs"],
             unnorm_key=self.unnorm_key,
@@ -124,8 +132,6 @@ class OpenVLAOFTBackend(MethodHost):
             use_film=False,
         )
         actions = process_actions(actions)
-        if self.method is not None:
-            self.method.after_query(actions)
         return actions
 
     def predict_chunk(self, observation):

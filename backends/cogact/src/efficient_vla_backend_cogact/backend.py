@@ -35,12 +35,13 @@ class CogACTBackend(MethodHost):
         self._model_manifest = model_manifest(root, checkpoint)
         self.model = load_native(root, checkpoint, statistics, self.device)
         self.model_access = CogACTModelAccess(self.model)
-        self.runtime = TorchCUDAMonitor(self.device)
+        self.runtime = TorchCUDAMonitor(self.device, self.drain_auxiliary)
         self.context = None
         self.unnorm_key = None
 
     def reset(self, context):
         self._ensure_open()
+        self.drain_auxiliary()
         if context.suite not in self.normalization_keys:
             raise ValueError("Unsupported suite for this checkpoint")
         torch.manual_seed(context.seed)
@@ -53,6 +54,7 @@ class CogACTBackend(MethodHost):
 
     def prepare(self, observation):
         self._ensure_open()
+        self.drain_auxiliary()
         if self.context is None:
             raise RuntimeError("Reset the backend with an episode before prediction")
         return prepare_observation(observation)
@@ -62,8 +64,14 @@ class CogACTBackend(MethodHost):
         self._ensure_open()
         if self.context is None:
             raise RuntimeError("Reset the backend with an episode before prediction")
-        if self.method is not None:
-            self.method.before_query(prepared)
+        return self.run_native_query(prepared, self._native_forward)
+
+    def make_auxiliary_runner(self):
+        from efficient_vla_benchmark.model_ops.auxiliary import AuxiliaryCUDARunner
+
+        return AuxiliaryCUDARunner(self.device)
+
+    def _native_forward(self, prepared):
         actions, _ = self.model.predict_action(
             **prepared,
             unnorm_key=self.unnorm_key,
@@ -73,8 +81,6 @@ class CogACTBackend(MethodHost):
             do_sample=False,
         )
         actions = process_actions(actions)
-        if self.method is not None:
-            self.method.after_query(actions)
         return actions
 
     def predict_chunk(self, observation):

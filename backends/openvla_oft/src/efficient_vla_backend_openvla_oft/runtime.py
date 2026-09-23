@@ -6,10 +6,13 @@ from efficient_vla_benchmark.core.provenance import driver_version
 
 
 class TorchCUDAMonitor:
-    def __init__(self, device):
+    def __init__(self, device, drain_auxiliary=None):
         self.device = device
+        self.drain_auxiliary = drain_auxiliary
 
     def synchronize(self):
+        if self.drain_auxiliary is not None:
+            self.drain_auxiliary()
         torch.cuda.synchronize(self.device)
 
     def reset_peak_memory(self):
