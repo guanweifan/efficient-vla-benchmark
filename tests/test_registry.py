@@ -1,5 +1,6 @@
 import subprocess
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -56,6 +57,21 @@ def test_all_builtin_metadata_is_valid():
     for name, spec in method_catalog().items():
         assert name == spec.name
         assert spec.implementations
+
+
+def test_all_presets_for_installed_backends_pass_public_selection():
+    from efficient_vla_benchmark.core.registry import validate_selection
+
+    installed = backend_entries()
+    root = Path(__file__).resolve().parents[1] / "configs/experiments"
+    checked = 0
+    for path in sorted(root.glob("*/*.yaml")):
+        config = ExperimentConfig.load(path)
+        if config.backend in installed:
+            validate_selection(config)
+            checked += 1
+    if not checked:
+        pytest.skip("No optional backend plugin installed")
 
 
 def test_components_keep_one_paper_owner_and_explicit_identity(tmp_path):
