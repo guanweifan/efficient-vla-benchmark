@@ -44,7 +44,9 @@ evaluation conventions; a failed guessed URL is not proof that its source is pri
 
 `model_access.attach_token_strategy()` exposes before/after-layer selection hooks
 to the selected method. A strategy returns a boolean mask of current rows; only
-visual rows can be removed. Original patch/RoPE positions and all nonvisual tokens,
+visual rows can be removed. A shared `TokenReduction` result may also replace
+selected visual features; merge anchors must preserve causal information order.
+Original patch/RoPE positions and all nonvisual tokens,
 including the final cognition EOS, remain protected. One camera has 256 fused
 DINO/SigLIP patch tokens, not two camera streams.
 
@@ -111,3 +113,12 @@ attention inside DiT. Read method READMEs for reference choices and tested scope
 These are scoped fidelity deferrals, not blanket claims of impossibility. Kernel,
 directory or hook work alone is not a reason to defer; inventing a different core
 score is. The existing OFT bindings and historical measurements remain unchanged.
+
+FastV, DivPrune, DART, SparseVLM v1, DepthCache primary and ASR deletion have
+separate native bindings. FastV uses final cognition attention; DART reads native
+post-RoPE keys; SparseVLM/DepthCache anchor merged features at the latest member.
+DepthCache consumes measured primary-camera depth without adding a model input.
+ASR uses a disclosed cognition-attention gate, not nonexistent DiT patch attention;
+its discarded dense pass retains the native sampler and restores RNG afterwards.
+The common runtime joins auxiliary work for full-cost timing. None of these ports
+changes DDIM steps, CFG, normalization, native action head or executed horizon.

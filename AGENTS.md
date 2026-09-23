@@ -90,5 +90,7 @@ of development and Git rules; upstream submodules retain their own instructions.
 
 Current support is listed in README and validated by the lazy catalog. starVLA
 remains source-only. FlashVLA action reuse, VLA-IAP's CogACT semantic construction
-and a faithful native sampling-acceleration example remain unresolved; do not
-silently promote them to implemented status.
+and a faithful native sampling-acceleration example remain unresolved. SQAP-VLA
+is deferred pending activation-granularity clarification. DepthCache primary and
+ASR deletion are explicitly scoped components, never full-paper reproductions;
+do not silently promote excluded or unverified mechanisms to implemented status.

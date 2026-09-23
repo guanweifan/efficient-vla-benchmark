@@ -52,7 +52,19 @@ Hooks never invoke inference or the environment. Actions at this boundary alread
 use the backend's environment convention. A method requiring a special representation
 declares a capability and backend codec; core assumes neither a gripper index nor
 seven dimensions. Nonfinite/invalid hook outputs fail before environment execution.
-`queried` and query counts mean actual model calls, not replacements or queue refills.
+`queried` and query counts mean served model calls, not replacements or queue refills.
+Discarded auxiliary native calls are reported separately and included in total work.
+
+A method may request one same-observation auxiliary pass through
+`wants_auxiliary_query()`. The backend owns execution; begin/end callbacks only
+select the method's auxiliary mode, and its action output is never served.
+The instance-local worker is serialized before the next native query/reset/detach.
+Its RNG scope restores stochastic-head noise. One policy owns the process; concurrent
+policies sharing global framework RNG in the same process are unsupported.
+The CUDA monitor drains the worker before returning, so common replay timing includes
+ALL refresh cost. Primary-forward latency, auxiliary latency/join wait and auxiliary
+call counts are separate diagnostics. Simulation stepping can overlap refresh, but
+unpaced replay is not proof of real-robot deadline feasibility.
 
 ## Model-access boundaries
 
@@ -63,7 +75,7 @@ seven dimensions. Nonfinite/invalid hook outputs fail before environment executi
 - CogACT's `CausalTokenAdapter` keeps native attention, original RoPE positions,
   causal/padding visibility and final cognition EOS. It supports fresh batch-one
   prefill, not arbitrary past-KV decoding or OFT action-slot reconstruction.
-  Both token adapters accept the shared `model_ops.TokenReduction` result
+  Both token adapters accept the shared `model_ops.token_reduction.TokenReduction` result
   (defined in `model_ops/token_reduction.py`). Merged features replace visual
   rows only. A causal merge must anchor each group at or after its latest member;
   the method owns this grouping constraint, not a relaxed attention mask.
@@ -111,6 +123,9 @@ Create `src/efficient_vla_benchmark/methods/<category>/<paper_id>/`:
   in the same paper directory, with ID `<paper_id>_<scope>` and explicit supported
   backends, category and exclusions. This selects ONE core, not a combination;
   it never duplicates the paper directory or silently upgrades partial coverage.
+  If no complete/default method is supported, owner `metadata.yaml` may declare
+  `components_only: true` with its schema/name/category and no implementations.
+  At least one valid component is required; the owner itself is not selectable.
 - `tests/`: independent mechanism references, reset/detach, unsupported inputs
   and real model/kernel checks. Optional backend tests skip if that plugin is absent.
 
@@ -170,7 +185,12 @@ optional traces and private path configuration. Identical-run resume skips recor
 episodes; changed identities are rejected. Preserve a failed run when fixing it.
 Formal mode (`--formal`, `--tasks`, `--suites`, `--trials`) requires owner scheduling.
 
-Timing defaults to full control replay: four complete schema-2 traces, ten warmup
+Depth-based methods require real aligned metric depth: enable `evaluation.depth`
+or use `evaluate --depth`. Schema-3 traces preserve this modality; no synthetic
+depth is inferred from old RGB-only traces. The native model still receives only
+its original inputs. Depth-aware methods read the retained observation context.
+
+Timing defaults to full control replay: four complete schema-2/3 traces, ten warmup
 queries and three repeats, with fresh episode state. Use one otherwise idle GPU,
 fresh policy/model per method, fixed CPU threads and synchronized measurements.
 It includes preprocessing, transfers, all method/control work and postprocessing;
@@ -221,8 +241,9 @@ backend/variant/method. Rendering keeps obsolete rows visibly marked. Do not
 supersede a valid ablation or slower precision variant. Historical cohorts remain
 separate. Negative results and failed episodes stay visible.
 
-Token diagnostics count actual query rows, including dense refresh, not queued
-actions. `visual_tokens_final` describes retained context, not full FLOPs;
+Token diagnostics count served query rows, including dense served warmup/refresh,
+not queued actions. Auxiliary passes have separate full-context/call/timing evidence.
+`visual_tokens_final` describes retained context, not full FLOPs;
 `visual_query_tokens_final` with `visual_kv_tokens` describes computation reuse
 with retained context. Do not put the latter in a context-pruning table.
 

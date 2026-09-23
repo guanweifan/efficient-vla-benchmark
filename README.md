@@ -9,12 +9,16 @@ weights, datasets or raw experiment artifacts.
 
 | Backend / variant | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|
-| OpenVLA-OFT / libero_joint | Nine methods below | VLA-Cache, VLA-InfoEntropy | SP-VLA | VOTE ensemble core | AWQ W4A16 |
-| CogACT / libero_joint | ADP, FlashVLA ICS, SAFE-Pruner, ST-Merge, SpecPrune-VLA | VLA-Cache, VLA-InfoEntropy, EfficientVLA DiT cache core | SP-VLA | VOTE ensemble core | AWQ W4A16 |
+| OpenVLA-OFT / libero_joint | Fifteen scopes below | VLA-Cache, VLA-InfoEntropy | SP-VLA | VOTE ensemble core | AWQ W4A16 |
+| CogACT / libero_joint | Eleven scopes below | VLA-Cache, VLA-InfoEntropy, EfficientVLA DiT cache core | SP-VLA | VOTE ensemble core | AWQ W4A16 |
 | starVLA | Source pinned only; runtime not implemented | — | — | — | — |
 
 OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,
-EfficientVLA token core, ST-Merge and FlashVLA ICS. SP-VLA includes pruning and
+EfficientVLA token core, ST-Merge and FlashVLA ICS, plus FastV, DivPrune, DART,
+SparseVLM v1, DepthCache primary-view core and ASR deletion instrument.
+CogACT supports the same token scopes except VLA-Pruner, TEAM-VLA, VLA-IAP and
+EfficientVLA token core; its README explains those fidelity deferrals.
+SP-VLA includes pruning and
 scheduling in one method. Kernel precision options and scheduling-only ablations
 are not additional algorithms.
 
@@ -23,12 +27,17 @@ TEAM-VLA, VLA-IAP and ST-Merge retain unverified paper interpretation choices.
 EfficientVLA exposes token pruning on OFT and a separately named DiT cache core
 on CogACT; neither includes layer pruning or the complete pipeline. FlashVLA excludes unresolved
 action reuse; VOTE implements the independent ensemble, not its trained architecture.
+DepthCache requires measured metric depth and excludes unresolved grasp/wrist
+control. ASR includes every auxiliary dense refresh in reported total cost;
+its primary-forward diagnostic is not end-to-end serving latency. SQAP-VLA remains
+deferred: activation quantization granularity is contradictory and no verifiable
+implementation is available. It is not counted as supported.
 No action-generation sampler is currently advertised. Read each
 [method README](src/efficient_vla_benchmark/methods/) before using its results.
 
 CogACT ST-Merge's current preset has 0/4 development-smoke successes (native 3/4),
 without runtime errors. It is a measured negative configuration, not accuracy-
-validated support; the other new CogACT presets each have 3/4. These tiny checks
+validated support. Per-preset outcomes, including newer batches, are in the ledger. These checks
 are not formal success-rate measurements.
 
 ## Install and run
@@ -60,6 +69,8 @@ evb benchmark --config configs/experiments/openvla_oft/specprune_vla.yaml \
 The caller defines the resource variables. Change the experiment YAML to select a
 supported backend/method pair and parameters; AWQ also needs `--artifact-path`.
 LIBERO defaults to four smoke episodes, not a formal success-rate campaign.
+For depth-aware methods, record native baseline traces with `--depth` first;
+their method presets enable depth during evaluation. RGB-only traces are rejected.
 CUDA/EGL device selections must match. Closed-loop evaluation does not require
 the offline training dataset. See the [development guide](docs/development.md)
 for calibration, measurement boundaries and result recording.
