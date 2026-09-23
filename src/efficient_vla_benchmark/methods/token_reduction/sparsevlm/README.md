@@ -27,3 +27,10 @@ The pruning layers, rank scale and rank tolerance are explicitly configured
 benchmark settings, not claimed author-tuned VLA settings. Default rank scale
 0.25, recycling 0.3 and clustering 0.1 are fixed before LIBERO testing.
 All rank, probing and clustering overhead is included in timing.
+
+## CogACT binding
+
+CogACT raters exclude final cognition EOS and use native causal attention.
+Merged visual rows retain latest-member anchors; all language and cognition
+positions survive unchanged. Rank/clustering policy and fixed presets are shared
+with OFT, while each backend retains its native attention and action head.
