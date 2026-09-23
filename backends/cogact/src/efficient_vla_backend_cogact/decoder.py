@@ -9,6 +9,8 @@ from dataclasses import dataclass
 
 import torch
 
+from efficient_vla_benchmark.model_ops.token_reduction import TokenReduction
+
 
 @dataclass(frozen=True)
 class TokenLayout:
@@ -107,7 +109,11 @@ class CausalTokenAdapter:
         self.layer_sequence_lengths = []
         self.strategy.start(self.state)
 
-    def _select(self, hidden, keep):
+    def _select(self, hidden, selection):
+        if isinstance(selection, TokenReduction):
+            keep, replacement = selection.keep, selection.visual_features
+        else:
+            keep, replacement = selection, None
         if keep is None:
             return hidden
         state = self.state
@@ -122,7 +128,18 @@ class CausalTokenAdapter:
         if not bool(keep[~visual].all()) or not bool(keep[visual].any()):
             raise ValueError("Keep all nonvisual tokens and at least one visual token")
         state.positions = state.positions[keep]
-        return hidden[:, keep, :]
+        selected = hidden[:, keep, :]
+        if replacement is not None:
+            visual_ids = state.layout.visual_mask(state.positions).nonzero().flatten()
+            if (
+                replacement.shape != (visual_ids.numel(), hidden.shape[-1])
+                or replacement.device != hidden.device
+                or replacement.dtype != hidden.dtype
+                or not bool(torch.isfinite(replacement).all())
+            ):
+                raise ValueError("Merged features must match retained visual rows and dtype")
+            selected.index_copy_(1, visual_ids, replacement.unsqueeze(0))
+        return selected
 
     def _before(self, index):
         def hook(module, args, kwargs):

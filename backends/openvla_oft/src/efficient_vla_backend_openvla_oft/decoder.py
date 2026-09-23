@@ -11,6 +11,7 @@ import torch
 
 from efficient_vla_benchmark.model_ops.decoder import IndexedKVStore as IndexedKVStore
 from efficient_vla_benchmark.model_ops.decoder import InspectableAttention as InspectableAttention
+from efficient_vla_benchmark.model_ops.token_reduction import TokenReduction as TokenReduction
 
 
 @dataclass(frozen=True)
@@ -62,19 +63,6 @@ class DecoderState:
     # Current layer input/output, before the corresponding strategy callback.
     # A strategy must not retain this full tensor across queries.
     hidden: torch.Tensor | None = None
-
-
-@dataclass(frozen=True)
-class TokenReduction:
-    """Select rows and optionally replace retained visual features for merging.
-
-    keep refers to CURRENT rows. visual_features has shape [retained_visual, D]
-    in their original-position order; nonvisual features cannot be replaced.
-    The surviving positions remain the anchors for RoPE and the native readout.
-    """
-
-    keep: torch.Tensor
-    visual_features: torch.Tensor | None = None
 
 
 class DecoderStrategy:

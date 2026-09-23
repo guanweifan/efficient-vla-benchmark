@@ -63,6 +63,10 @@ seven dimensions. Nonfinite/invalid hook outputs fail before environment executi
 - CogACT's `CausalTokenAdapter` keeps native attention, original RoPE positions,
   causal/padding visibility and final cognition EOS. It supports fresh batch-one
   prefill, not arbitrary past-KV decoding or OFT action-slot reconstruction.
+  Both token adapters accept the shared `model_ops.TokenReduction` result
+  (defined in `model_ops/token_reduction.py`). Merged features replace visual
+  rows only. A causal merge must anchor each group at or after its latest member;
+  the method owns this grouping constraint, not a relaxed attention mask.
 - CogACT's separate `attach_reuse_strategy()` retains indexed visual KV while
   skipping selected query/MLP rows. All nonvisual rows remain active. Sparse queries
   use original causal rows against retained keys; errors invalidate caches and
