@@ -1,0 +1,11 @@
+schema_version: 1
+name: divprune
+category: token_reduction
+description: DivPrune max-min visual diversity selection before LLM prefill.
+config: efficient_vla_benchmark.methods.token_reduction.divprune.config:DivPruneConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout]
+    factory: efficient_vla_benchmark.methods.token_reduction.divprune.implementations.openvla_oft.api:build

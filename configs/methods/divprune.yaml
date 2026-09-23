@@ -1,0 +1,3 @@
+method: divprune
+parameters:
+  keep_ratio: 0.5
