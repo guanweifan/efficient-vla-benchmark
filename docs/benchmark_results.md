@@ -42,8 +42,8 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 | [R37](#r37) Native BF16 / SDPA, end recheck | openvla_oft | 8 | 216 / 0 | 198.91 / 201.15 | 25.23 | 0.995× | 14.98 | Not run |
 | [R43](#r43) Native H=8 (fidelity audit) | openvla_oft | 8 | 216 / 0 | 196.74 / 198.44 | 24.96 | 1.000× | 14.98 | Not run |
 | [R44](#r44) Native H=8 end recheck (fidelity audit) | openvla_oft | 8 | 216 / 0 | 197.84 / 199.24 | 25.10 | 0.994× | 14.98 | Not run |
-| [R57](#r57) Native H=8 (token batch 1) | openvla_oft | 8 | 216 / 0 | 200.57 / 203.81 | 25.44 | 1.000× | 14.98 | Not run |
-| [R58](#r58) Native H=8 end recheck (token batch 1) | openvla_oft | 8 | 216 / 0 | 198.77 / 200.57 | 25.21 | 1.009× | 14.98 | Not run |
+| [R73](#r73) Native H=8 (token batch 1) | openvla_oft | 8 | 216 / 0 | 200.57 / 203.81 | 25.44 | 1.000× | 14.98 | Not run |
+| [R74](#r74) Native H=8 end recheck (token batch 1) | openvla_oft | 8 | 216 / 0 | 198.77 / 200.57 | 25.21 | 1.009× | 14.98 | Not run |
 
 ## 5.1 Token Pruning and Context Compression
 
@@ -68,12 +68,28 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 | [R51](#r51) TEAM-VLA / audited paper-based port | openvla_oft | 8 | 216 / 0 | 139.58 / 148.03 | 17.71 | 1.409× | 14.61 | 1/4; errors 0 |
 | [R53](#r53) VLA-IAP / audited paper-based port | openvla_oft | 8 | 216 / 0 | 193.23 / 200.12 | 24.51 | 1.018× | 14.69 | 3/4; errors 0 |
 | [R55](#r55) VLA-Pruner / control recheck | openvla_oft | 8 | 216 / 0 | 163.52 / 198.05 | 20.75 | 1.203× | 14.68 | 4/4; errors 0 |
-| [R56](#r56) ADP | openvla_oft | 8 | 216 / 0 | 195.37 / 200.98 | 24.80 | 1.026× | 14.68 | 4/4; errors 0 |
-| [R59](#r59) SAFE-Pruner | openvla_oft | 8 | 216 / 0 | 148.28 / 200.16 | 18.82 | 1.352× | 14.68 | 4/4; errors 0 |
-| [R60](#r60) SpecPrune-VLA (token batch 1) | openvla_oft | 8 | 237 / 0 | 147.06 / 163.44 | 20.53 | 1.239× | 14.60 | 3/4; errors 0 |
-| [R61](#r61) TEAM-VLA (paper-based) | openvla_oft | 8 | 216 / 0 | 139.47 / 148.07 | 17.70 | 1.438× | 14.61 | 1/4; errors 0 |
-| [R62](#r62) VLA-IAP (paper-based) | openvla_oft | 8 | 216 / 0 | 196.31 / 204.09 | 24.90 | 1.022× | 14.69 | 3/4; errors 0 |
-| [R63](#r63) VLA-Pruner | openvla_oft | 8 | 216 / 0 | 165.05 / 199.81 | 20.94 | 1.215× | 14.68 | 4/4; errors 0 |
+| [R56](#r56) ASR deletion (all refresh cost) | cogact | 8 | 321 / 0 | 299.19 / 301.75 | 38.10 | 0.618× | 14.74 | 3/4; errors 0 |
+| [R57](#r57) Native baseline (next token batch) | cogact | 8 | 321 / 0 | 184.84 / 186.29 | 23.54 | 1.000× | 14.73 | 3/4; errors 0 |
+| [R58](#r58) Native end recheck (next token batch) | cogact | 8 | 321 / 0 | 184.73 / 185.95 | 23.52 | 1.001× | 14.73 | 3/4; errors 0 |
+| [R59](#r59) DART token reduction | cogact | 8 | 321 / 0 | 133.85 / 135.12 | 17.05 | 1.380× | 14.64 | 4/4; errors 0 |
+| [R60](#r60) DepthCache primary-view core | cogact | 8 | 321 / 0 | 186.87 / 190.49 | 23.80 | 0.989× | 14.73 | 4/4; errors 0 |
+| [R61](#r61) DivPrune | cogact | 8 | 321 / 0 | 139.91 / 140.91 | 17.82 | 1.321× | 14.63 | 4/4; errors 0 |
+| [R62](#r62) FastV released last-query | cogact | 8 | 321 / 0 | 133.04 / 134.15 | 16.95 | 1.389× | 14.64 | 4/4; errors 0 |
+| [R63](#r63) SparseVLM v1 rank + recycling | cogact | 8 | 321 / 0 | 147.35 / 152.05 | 18.77 | 1.254× | 14.64 | 4/4; errors 0 |
+| [R64](#r64) ASR deletion (all refresh cost) | openvla_oft | 8 | 216 / 0 | 366.36 / 385.42 | 46.47 | 0.535× | 14.69 | 4/4; errors 0 |
+| [R65](#r65) Native baseline (next token batch) | openvla_oft | 8 | 216 / 0 | 195.90 / 197.68 | 24.85 | 1.000× | 14.98 | 4/4; errors 0 |
+| [R66](#r66) Native end recheck (next token batch) | openvla_oft | 8 | 216 / 0 | 197.46 / 198.99 | 25.05 | 0.992× | 14.98 | 4/4; errors 0 |
+| [R67](#r67) DART token reduction | openvla_oft | 8 | 216 / 0 | 170.99 / 172.23 | 21.69 | 1.146× | 14.62 | 3/4; errors 0 |
+| [R68](#r68) DepthCache primary-view core | openvla_oft | 8 | 216 / 0 | 200.80 / 204.22 | 25.47 | 0.976× | 14.68 | 4/4; errors 0 |
+| [R69](#r69) DivPrune | openvla_oft | 8 | 216 / 0 | 189.20 / 190.99 | 24.00 | 1.035× | 14.62 | 4/4; errors 0 |
+| [R70](#r70) FastV released last-query | openvla_oft | 8 | 216 / 0 | 168.85 / 170.50 | 21.42 | 1.160× | 14.62 | 4/4; errors 0 |
+| [R71](#r71) SparseVLM v1 rank + recycling | openvla_oft | 8 | 216 / 0 | 183.37 / 187.03 | 23.26 | 1.068× | 14.63 | 4/4; errors 0 |
+| [R72](#r72) ADP | openvla_oft | 8 | 216 / 0 | 195.37 / 200.98 | 24.80 | 1.026× | 14.68 | 4/4; errors 0 |
+| [R75](#r75) SAFE-Pruner | openvla_oft | 8 | 216 / 0 | 148.28 / 200.16 | 18.82 | 1.352× | 14.68 | 4/4; errors 0 |
+| [R76](#r76) SpecPrune-VLA (token batch 1) | openvla_oft | 8 | 237 / 0 | 147.06 / 163.44 | 20.53 | 1.239× | 14.60 | 3/4; errors 0 |
+| [R77](#r77) TEAM-VLA (paper-based) | openvla_oft | 8 | 216 / 0 | 139.47 / 148.07 | 17.70 | 1.438× | 14.61 | 1/4; errors 0 |
+| [R78](#r78) VLA-IAP (paper-based) | openvla_oft | 8 | 216 / 0 | 196.31 / 204.09 | 24.90 | 1.022× | 14.69 | 3/4; errors 0 |
+| [R79](#r79) VLA-Pruner | openvla_oft | 8 | 216 / 0 | 165.05 / 199.81 | 20.94 | 1.215× | 14.68 | 4/4; errors 0 |
 
 ## 5.2 Caching and Computation Reuse
 
@@ -116,48 +132,72 @@ not a success-rate estimate. Formal success rate is **not measured for any row**
 
 ## Observed visual-token retention
 
-Query-weighted measured counts, including warmup/refresh queries; these
+Served-query-weighted counts, including dense served warmup/refresh; these
 are not configured keep ratios or FLOPs. Final counts do not describe
 earlier-layer cost. Per-layer sequence lengths remain in raw diagnostics.
+Discarded auxiliary passes are counted separately below, not as served queries.
 
-| Method | Final mean / min / max | Early mean | Mode counts (true/observed) |
-|---|---:|---:|---|
-| Superseded — EfficientVLA token core (paper-based) | 256.0 / 256 / 256 | — | — |
-| FlashVLA ICS core (paper-based) | 320.0 / 320 / 320 | — | — |
-| SP-VLA pruning + scheduling | 418.9 / 158 / 512 | — | — |
-| Superseded — ST-Merge spatial VLA (paper-based) | 256.0 / 256 / 256 | — | — |
-| SP-VLA pruning + scheduling / CogACT | 219.0 / 108 / 256 | — | — |
-| SAFE-Pruner / CogACT cognition-query port | 73.0 / 64 / 256 | — | keyframe 15/321 |
-| SpecPrune-VLA / CogACT pruning and controller | 32.6 / 30 / 51 | — | — |
-| ST-Merge spatial VLA / CogACT | 128.0 / 128 / 128 | — | — |
-| ADP / CogACT (observed EEF) | 223.7 / 192 / 256 | — | pruned 162/321 |
-| FlashVLA ICS / CogACT (complete SVD) | 160.0 / 160 / 160 | — | — |
-| ADP / control recheck | 458.7 / 384 / 512 | — | pruned 90/216 |
-| EfficientVLA token core / corrected Q-K direction | 256.0 / 256 / 256 | — | — |
-| FlashVLA ICS / automatic complete SVD | 320.0 / 320 / 320 | — | — |
-| FlashVLA ICS / gesvd reference | 320.0 / 320 / 320 | — | — |
-| SAFE-Pruner / control recheck | 170.7 / 128 / 512 | — | keyframe 24/216 |
-| SpecPrune-VLA / control recheck | 68.5 / 60 / 108 | — | — |
-| ST-Merge spatial VLA / key dot product | 256.0 / 256 / 256 | — | — |
-| TEAM-VLA / audited paper-based port | 80.0 / 80 / 80 | 269.1 | — |
-| VLA-IAP / audited paper-based port | 438.0 / 174 / 512 | — | warmup 24/216 |
-| VLA-Pruner / control recheck | 192.0 / 128 / 512 | — | — |
-| ADP | 458.7 / 384 / 512 | — | pruned 90/216 |
-| SAFE-Pruner | 170.7 / 128 / 512 | — | keyframe 24/216 |
-| SpecPrune-VLA (token batch 1) | 68.5 / 60 / 108 | — | — |
-| TEAM-VLA (paper-based) | 80.0 / 80 / 80 | 269.1 | — |
-| VLA-IAP (paper-based) | 438.0 / 174 / 512 | — | warmup 24/216 |
-| VLA-Pruner | 192.0 / 128 / 512 | — | — |
+| Record / method | Backend | Final mean / min / max | Early mean | Mode counts (true/observed) |
+|---|---|---:|---:|---|
+| [R03](#r03) Superseded — EfficientVLA token core (paper-based) | openvla_oft | 256.0 / 256 / 256 | — | — |
+| [R04](#r04) FlashVLA ICS core (paper-based) | openvla_oft | 320.0 / 320 / 320 | — | — |
+| [R05](#r05) SP-VLA pruning + scheduling | openvla_oft | 418.9 / 158 / 512 | — | — |
+| [R07](#r07) Superseded — ST-Merge spatial VLA (paper-based) | openvla_oft | 256.0 / 256 / 256 | — | — |
+| [R15](#r15) SP-VLA pruning + scheduling / CogACT | cogact | 219.0 / 108 / 256 | — | — |
+| [R22](#r22) SAFE-Pruner / CogACT cognition-query port | cogact | 73.0 / 64 / 256 | — | keyframe 15/321 |
+| [R23](#r23) SpecPrune-VLA / CogACT pruning and controller | cogact | 32.6 / 30 / 51 | — | — |
+| [R24](#r24) ST-Merge spatial VLA / CogACT | cogact | 128.0 / 128 / 128 | — | — |
+| [R29](#r29) ADP / CogACT (observed EEF) | cogact | 223.7 / 192 / 256 | — | pruned 162/321 |
+| [R32](#r32) FlashVLA ICS / CogACT (complete SVD) | cogact | 160.0 / 160 / 160 | — | — |
+| [R42](#r42) ADP / control recheck | openvla_oft | 458.7 / 384 / 512 | — | pruned 90/216 |
+| [R45](#r45) EfficientVLA token core / corrected Q-K direction | openvla_oft | 256.0 / 256 / 256 | — | — |
+| [R46](#r46) FlashVLA ICS / automatic complete SVD | openvla_oft | 320.0 / 320 / 320 | — | — |
+| [R47](#r47) FlashVLA ICS / gesvd reference | openvla_oft | 320.0 / 320 / 320 | — | — |
+| [R48](#r48) SAFE-Pruner / control recheck | openvla_oft | 170.7 / 128 / 512 | — | keyframe 24/216 |
+| [R49](#r49) SpecPrune-VLA / control recheck | openvla_oft | 68.5 / 60 / 108 | — | — |
+| [R50](#r50) ST-Merge spatial VLA / key dot product | openvla_oft | 256.0 / 256 / 256 | — | — |
+| [R51](#r51) TEAM-VLA / audited paper-based port | openvla_oft | 80.0 / 80 / 80 | 269.1 | — |
+| [R53](#r53) VLA-IAP / audited paper-based port | openvla_oft | 438.0 / 174 / 512 | — | warmup 24/216 |
+| [R55](#r55) VLA-Pruner / control recheck | openvla_oft | 192.0 / 128 / 512 | — | — |
+| [R56](#r56) ASR deletion (all refresh cost) | cogact | 34.6 / 26 / 256 | — | — |
+| [R59](#r59) DART token reduction | cogact | 132.0 / 132 / 132 | — | — |
+| [R60](#r60) DepthCache primary-view core | cogact | 251.8 / 233 / 256 | — | — |
+| [R61](#r61) DivPrune | cogact | 128.0 / 128 / 128 | — | — |
+| [R62](#r62) FastV released last-query | cogact | 128.0 / 128 / 128 | — | — |
+| [R63](#r63) SparseVLM v1 rank + recycling | cogact | 114.7 / 113 / 118 | — | — |
+| [R64](#r64) ASR deletion (all refresh cost) | openvla_oft | 294.8 / 282 / 512 | — | — |
+| [R67](#r67) DART token reduction | openvla_oft | 260.0 / 260 / 260 | — | — |
+| [R68](#r68) DepthCache primary-view core | openvla_oft | 508.2 / 482 / 512 | — | — |
+| [R69](#r69) DivPrune | openvla_oft | 256.0 / 256 / 256 | — | — |
+| [R70](#r70) FastV released last-query | openvla_oft | 256.0 / 256 / 256 | — | — |
+| [R71](#r71) SparseVLM v1 rank + recycling | openvla_oft | 228.0 / 226 / 230 | — | — |
+| [R72](#r72) ADP | openvla_oft | 458.7 / 384 / 512 | — | pruned 90/216 |
+| [R75](#r75) SAFE-Pruner | openvla_oft | 170.7 / 128 / 512 | — | keyframe 24/216 |
+| [R76](#r76) SpecPrune-VLA (token batch 1) | openvla_oft | 68.5 / 60 / 108 | — | — |
+| [R77](#r77) TEAM-VLA (paper-based) | openvla_oft | 80.0 / 80 / 80 | 269.1 | — |
+| [R78](#r78) VLA-IAP (paper-based) | openvla_oft | 438.0 / 174 / 512 | — | warmup 24/216 |
+| [R79](#r79) VLA-Pruner | openvla_oft | 192.0 / 128 / 512 | — | — |
+
+## Auxiliary dense-refresh work
+
+Main replay rows include ALL auxiliary work. Primary-forward diagnostics exclude
+shared preparation and are not end-to-end serving latency. Refresh timing does
+not establish real-robot deadline feasibility or reduced total computation.
+
+| Record / backend | Served / auxiliary calls | Primary forward mean ms | Refresh mean / max ms | Auxiliary visual tokens |
+|---|---:|---:|---:|---:|
+| R56 / cogact | 321 / 321 | 112.31 | 186.24 / 191.00 | 256.0 |
+| R64 / openvla_oft | 216 / 216 | 162.33 | 179.93 / 201.00 | 512.0 |
 
 ## Computed visual queries and retained KV context
 
 Query-weighted last-layer counts; skipping query/MLP rows does not remove KV context.
 
-| Method | Computed queries: mean / min / max | Retained KV: mean / min / max |
-|---|---:|---:|
-| VLA-Cache full statistics eager / CogACT | 162.4 / 145 / 256 | 256.0 / 256 / 256 |
-| VLA-Cache full statistics SDPA / CogACT | 162.4 / 145 / 256 | 256.0 / 256 / 256 |
-| VLA-InfoEntropy / CogACT full statistics | 162.6 / 141 / 256 | 256.0 / 256 / 256 |
+| Record / method | Backend | Computed queries: mean / min / max | Retained KV: mean / min / max |
+|---|---|---:|---:|
+| [R16](#r16) VLA-Cache full statistics eager / CogACT | cogact | 162.4 / 145 / 256 | 256.0 / 256 / 256 |
+| [R17](#r17) VLA-Cache full statistics SDPA / CogACT | cogact | 162.4 / 145 / 256 | 256.0 / 256 / 256 |
+| [R25](#r25) VLA-InfoEntropy / CogACT full statistics | cogact | 162.6 / 141 / 256 | 256.0 / 256 / 256 |
 
 ## Measurement cohorts
 
@@ -175,7 +215,9 @@ F = measured control frames; R = repeats; W = warmup queries.
 | C07 | cogact | NVIDIA GeForce RTX 3090 | 2523 / 3 / 10 | `dc290916d485bb0f7d3607956ee7075aa0f500d8fad11db0501315d03cd618c8` | `c8aa6908079a1e83fde009bfe5d50bc755aab2e83f160ea4e372f4a8ddc7fc9c` |
 | C08 | openvla_oft | NVIDIA GeForce RTX 3090 | 1704 / 3 / 10 | `86810c762e0810442533cb422acdea45a9557d40415d30d49b88f7135c23c3e7` | `b127ee4bbf88c6e61364da6af2df22efe10363140092c52d54d34f8dbd918fe1` |
 | C09 | openvla_oft | NVIDIA GeForce RTX 3090 | 1704 / 3 / 10 | `1ca39ee30a256e6b873adad4b37f284cb2e2cc93cb0ed1b36ff7136f60677cf8` | `b127ee4bbf88c6e61364da6af2df22efe10363140092c52d54d34f8dbd918fe1` |
-| C10 | openvla_oft | NVIDIA GeForce RTX 3090 | 1704 / 3 / 10 | `f1ac75f63d548db2c37f959f18d83bc5667500cba54122c1979468e88f307ab0` | `b127ee4bbf88c6e61364da6af2df22efe10363140092c52d54d34f8dbd918fe1` |
+| C10 | cogact | NVIDIA GeForce RTX 3090 | 2523 / 3 / 10 | `9ad6a3939f88440d04d3ba9a9b682218de7e5e2c6889f16ddeceb4826f614f57` | `c8aa6908079a1e83fde009bfe5d50bc755aab2e83f160ea4e372f4a8ddc7fc9c` |
+| C11 | openvla_oft | NVIDIA GeForce RTX 3090 | 1704 / 3 / 10 | `9ad6a3939f88440d04d3ba9a9b682218de7e5e2c6889f16ddeceb4826f614f57` | `b127ee4bbf88c6e61364da6af2df22efe10363140092c52d54d34f8dbd918fe1` |
+| C12 | openvla_oft | NVIDIA GeForce RTX 3090 | 1704 / 3 / 10 | `f1ac75f63d548db2c37f959f18d83bc5667500cba54122c1979468e88f307ab0` | `b127ee4bbf88c6e61364da6af2df22efe10363140092c52d54d34f8dbd918fe1` |
 
 <details>
 <summary>Run identities, presets and local-record checksums</summary>
@@ -249,19 +291,46 @@ never promoted to a final-source or formal evaluation.
 | <a id="r53"></a>R53 | `fidelity-final-benchmark-vla_iap-001` | C09 | [vla_iap](../configs/experiments/openvla_oft/vla_iap.yaml) | `b2d91319e440d6c3aeaf1ddc2c04a2c1f10c5362` → `d4eeadf8d3fbd1364d47ab9702280cab8769c0d9` | R43 | different | `666948372c4174d51e555e819f4e1ef23a658088e44d4b7ef2f3522535a14e40` |
 | <a id="r54"></a>R54 | `fidelity-final-benchmark-vla_infoentropy-001` | C09 | [vla_infoentropy](../configs/experiments/openvla_oft/vla_infoentropy.yaml) | `b2d91319e440d6c3aeaf1ddc2c04a2c1f10c5362` → `d4eeadf8d3fbd1364d47ab9702280cab8769c0d9` | R43 | different | `8d7db1528cb12540d7f9bbbe30851bdf49699a4815a1621c938dbfa43fac1536` |
 | <a id="r55"></a>R55 | `fidelity-final-benchmark-vla_pruner-001` | C09 | [vla_pruner](../configs/experiments/openvla_oft/vla_pruner.yaml) | `b2d91319e440d6c3aeaf1ddc2c04a2c1f10c5362` → `d4eeadf8d3fbd1364d47ab9702280cab8769c0d9` | R43 | different | `b219ae2d9a9917df9e242566c12d711efa0e15ff8027e57ec9e5547956d37b08` |
-| <a id="r56"></a>R56 | `token-batch-final-benchmark-adp-001` | C10 | [adp](../configs/experiments/openvla_oft/adp.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R57 | different | `3692e25e645d7b0a7a511f97cbcc5e618124737c2cbc1841d88a8b5560cd166a` |
-| <a id="r57"></a>R57 | `token-batch-final-benchmark-baseline-001` | C10 | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R57 | not run | `64a8c6d3d1239176e992d8baab97bb17e54512746d3ecaf22a069f1cb4c37b40` |
-| <a id="r58"></a>R58 | `token-batch-final-benchmark-baseline_recheck-001` | C10 | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R57 | not run | `94e5197bd45df492e23c8692ca77d74cc67b3d53795bc905a554c081c84264f9` |
-| <a id="r59"></a>R59 | `token-batch-final-benchmark-safe_pruner-001` | C10 | [safe_pruner](../configs/experiments/openvla_oft/safe_pruner.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R57 | different | `6057ae01a3230a08bd6bc39d984771bc016c678321296eab9061ad1e5acc2cd7` |
-| <a id="r60"></a>R60 | `token-batch-final-benchmark-specprune_vla-001` | C10 | [specprune_vla](../configs/experiments/openvla_oft/specprune_vla.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R57 | different | `c98ebecd8039fcd1ffd691677410e4bb02708f0cf5e0473962eab52c80bcbaf2` |
-| <a id="r61"></a>R61 | `token-batch-final-benchmark-team_vla-001` | C10 | [team_vla](../configs/experiments/openvla_oft/team_vla.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R57 | different | `abfd5e1af5ccbbedce776eddc3825ca0bdeec7bbea54338cc4bf1597f36dc7b5` |
-| <a id="r62"></a>R62 | `token-batch-final-benchmark-vla_iap-001` | C10 | [vla_iap](../configs/experiments/openvla_oft/vla_iap.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R57 | different | `293184fa17e39c25574f6d91ec5a7b4118623d07239ca2f1703fe7a43fd1b0df` |
-| <a id="r63"></a>R63 | `token-batch-final-benchmark-vla_pruner-001` | C10 | [vla_pruner](../configs/experiments/openvla_oft/vla_pruner.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R57 | different | `df68768c2b672d1b1bbfefded760cb6f4c42d1d9aa67961fddb5062dce0972ce` |
+| <a id="r56"></a>R56 | `next-batch-final-cog-benchmark-actuation_slack_refresh_deletion-001` | C10 | [actuation_slack_refresh_deletion](../configs/experiments/cogact/actuation_slack_refresh_deletion.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R57 | same | `57810e23b550d6929ac94552dccdd62a82774ecfacfdd2980899bacfedd7d777` |
+| <a id="r57"></a>R57 | `next-batch-final-cog-benchmark-baseline-001` | C10 | [baseline](../configs/experiments/cogact/baseline.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R57 | different | `5b4753b567de37b2a16735517fc2fa522b815da2e07f240cf888bf201be6c1dd` |
+| <a id="r58"></a>R58 | `next-batch-final-cog-benchmark-baseline_recheck-001` | C10 | [baseline](../configs/experiments/cogact/baseline.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R57 | different | `483898df8f78d16355a6ede6ce982ce82cac71820bcfc753014f52860ec33405` |
+| <a id="r59"></a>R59 | `next-batch-final-cog-benchmark-dart-001` | C10 | [dart](../configs/experiments/cogact/dart.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R57 | same | `f23588aa76a2addede77e1daaeedc9fe1e00b4c913978daa1afc3450fc8202cd` |
+| <a id="r60"></a>R60 | `next-batch-final-cog-benchmark-depth_cache_primary-001` | C10 | [depth_cache_primary](../configs/experiments/cogact/depth_cache_primary.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R57 | same | `49b4be997ca1f1222364ac56d4fca8b6ca57dcf05568c6984e1d61644ab3eb6a` |
+| <a id="r61"></a>R61 | `next-batch-final-cog-benchmark-divprune-001` | C10 | [divprune](../configs/experiments/cogact/divprune.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R57 | same | `77f588c93c604d2aa51bd1c428200c545889f560b44bc1e9dd0ce685fc4ae535` |
+| <a id="r62"></a>R62 | `next-batch-final-cog-benchmark-fastv-001` | C10 | [fastv](../configs/experiments/cogact/fastv.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R57 | same | `3c704a2589f1487b6da2bd5f42d7854f4b2eb11731fddf477c33715e76109977` |
+| <a id="r63"></a>R63 | `next-batch-final-cog-benchmark-sparsevlm-001` | C10 | [sparsevlm](../configs/experiments/cogact/sparsevlm.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R57 | same | `75b8133123aef770b4b6afc9c07f7ca07ef0c9075f971aff09aae3bfb9563a1d` |
+| <a id="r64"></a>R64 | `next-batch-final-oft-benchmark-actuation_slack_refresh_deletion-001` | C11 | [actuation_slack_refresh_deletion](../configs/experiments/openvla_oft/actuation_slack_refresh_deletion.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R65 | different | `20b65ec2a335ac2a80775e870249c66f0e34fd0a78a6dbcfc83e12016ef6ebe4` |
+| <a id="r65"></a>R65 | `next-batch-final-oft-benchmark-baseline-001` | C11 | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R65 | different | `b6a9f67a25440b1384780af8667f72bbb6e7d01c44e4a7fccb72abaf4300faae` |
+| <a id="r66"></a>R66 | `next-batch-final-oft-benchmark-baseline_recheck-001` | C11 | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R65 | different | `f86045e57cce601b2b694db52377534a551e937faf88b63196abd75da283def0` |
+| <a id="r67"></a>R67 | `next-batch-final-oft-benchmark-dart-001` | C11 | [dart](../configs/experiments/openvla_oft/dart.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R65 | same | `28caabcee0d080d7c67f18d76dfc9b02c9974445b6edc45f6f2dbc6108028ee3` |
+| <a id="r68"></a>R68 | `next-batch-final-oft-benchmark-depth_cache_primary-001` | C11 | [depth_cache_primary](../configs/experiments/openvla_oft/depth_cache_primary.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R65 | different | `c54b4d4f7407053cb53d8c647ce5dc9ba459fb90f38f5135dea8ffb01efc13fa` |
+| <a id="r69"></a>R69 | `next-batch-final-oft-benchmark-divprune-001` | C11 | [divprune](../configs/experiments/openvla_oft/divprune.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R65 | same | `2715a88fda0a949bb9ce07040ef33b99221eaf6422e8cf31c46b0c1c63b23293` |
+| <a id="r70"></a>R70 | `next-batch-final-oft-benchmark-fastv-001` | C11 | [fastv](../configs/experiments/openvla_oft/fastv.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R65 | different | `afcb0c6eeb1aae862deeb45907d97c5c226fdec4e33d293fa12a55eaf246bdcd` |
+| <a id="r71"></a>R71 | `next-batch-final-oft-benchmark-sparsevlm-001` | C11 | [sparsevlm](../configs/experiments/openvla_oft/sparsevlm.yaml) | `fa01bb7dab94af5a79e616e9c4dd0d7e987d4ff7` | R65 | same | `a3e61db434b93e0305ea03159b2b1b5b4b24ac88816d778527efe42232d3612c` |
+| <a id="r72"></a>R72 | `token-batch-final-benchmark-adp-001` | C12 | [adp](../configs/experiments/openvla_oft/adp.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R73 | different | `3692e25e645d7b0a7a511f97cbcc5e618124737c2cbc1841d88a8b5560cd166a` |
+| <a id="r73"></a>R73 | `token-batch-final-benchmark-baseline-001` | C12 | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R73 | not run | `64a8c6d3d1239176e992d8baab97bb17e54512746d3ecaf22a069f1cb4c37b40` |
+| <a id="r74"></a>R74 | `token-batch-final-benchmark-baseline_recheck-001` | C12 | [baseline](../configs/experiments/openvla_oft/baseline.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R73 | not run | `94e5197bd45df492e23c8692ca77d74cc67b3d53795bc905a554c081c84264f9` |
+| <a id="r75"></a>R75 | `token-batch-final-benchmark-safe_pruner-001` | C12 | [safe_pruner](../configs/experiments/openvla_oft/safe_pruner.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R73 | different | `6057ae01a3230a08bd6bc39d984771bc016c678321296eab9061ad1e5acc2cd7` |
+| <a id="r76"></a>R76 | `token-batch-final-benchmark-specprune_vla-001` | C12 | [specprune_vla](../configs/experiments/openvla_oft/specprune_vla.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R73 | different | `c98ebecd8039fcd1ffd691677410e4bb02708f0cf5e0473962eab52c80bcbaf2` |
+| <a id="r77"></a>R77 | `token-batch-final-benchmark-team_vla-001` | C12 | [team_vla](../configs/experiments/openvla_oft/team_vla.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R73 | different | `abfd5e1af5ccbbedce776eddc3825ca0bdeec7bbea54338cc4bf1597f36dc7b5` |
+| <a id="r78"></a>R78 | `token-batch-final-benchmark-vla_iap-001` | C12 | [vla_iap](../configs/experiments/openvla_oft/vla_iap.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R73 | different | `293184fa17e39c25574f6d91ec5a7b4118623d07239ca2f1703fe7a43fd1b0df` |
+| <a id="r79"></a>R79 | `token-batch-final-benchmark-vla_pruner-001` | C12 | [vla_pruner](../configs/experiments/openvla_oft/vla_pruner.yaml) | `ff880edb449d3840d2a7420e1363d155ac9dfe95` → `7f851f4dbc57f40299d8f0acc3326b41dac20a1d` | R73 | different | `df68768c2b672d1b1bbfefded760cb6f4c42d1d9aa67961fddb5062dce0972ce` |
 
 </details>
 
 ## Interpretation boundaries
 
+- DepthCache rows implement the primary-view progressive merging core only;
+  carrying-dependent scene reinitialization and anticipatory wrist gating are excluded.
+  Measured metric depth is required; RGB-only traces cannot stand in for this input.
+- ASR rows implement the deletion instrument with unconditional dense refresh,
+  not KV reuse. CogACT uses native cognition attention as its disclosed gate.
+  Speedup includes all auxiliary computation, not an assumed actuation overlap.
+- FastV uses the released HF last-query variant; DART is token reduction, not
+  speculative decoding. SparseVLM is original v1 rank-adaptive pruning/recycling,
+  not SparseVLM+ or the released fixed-budget variant.
+- SQAP-VLA is deferred pending clarification of contradictory activation
+  quantization granularity; it has no runnable proxy and is not an implemented method.
 - SP-VLA scheduling-only rows exclude pruning; pruning + scheduling rows
   include both mechanisms in one implementation. Fitted actions change query
   counts; compare full replay cost and evaluate success loss separately.
