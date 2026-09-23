@@ -28,7 +28,7 @@ def pivot_selection(hidden, keys, visual, text, ratio, visual_pivots, text_pivot
         take = min(per_pivot, len(visual_ids) - selected_count)
         if take == 0:
             break
-        similarity = unit @ unit[pivot]
+        similarity = unit @ unit.index_select(0, pivot.reshape(1))[0]
         candidates = torch.argsort(similarity.masked_fill(~available, float("inf")), stable=True)[
             :take
         ]
