@@ -73,7 +73,8 @@ class CogACTBackend(MethodHost):
 
     def _native_forward(self, prepared):
         actions, _ = self.model.predict_action(
-            **prepared,
+            image=prepared["image"],
+            instruction=prepared["instruction"],
             unnorm_key=self.unnorm_key,
             cfg_scale=self.parameters.cfg_scale,
             use_ddim=True,

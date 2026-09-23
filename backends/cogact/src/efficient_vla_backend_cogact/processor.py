@@ -8,7 +8,11 @@ def prepare_observation(observation):
     observation.validate()
     # The common environment adapter has already oriented the RGB image.
     # Native CogACT owns resizing/normalization. This model uses only agentview.
-    return {"image": Image.fromarray(observation.image), "instruction": observation.instruction}
+    return {
+        "image": Image.fromarray(observation.image),
+        "instruction": observation.instruction,
+        "observation": observation,
+    }
 
 
 def process_actions(actions):

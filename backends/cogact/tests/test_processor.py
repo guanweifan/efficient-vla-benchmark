@@ -31,3 +31,4 @@ def test_observation_uses_agentview_without_extra_flip():
     prepared = prepare_observation(obs)
     np.testing.assert_array_equal(np.asarray(prepared["image"]), image)
     assert prepared["instruction"] == obs.instruction
+    assert prepared["observation"] is obs
