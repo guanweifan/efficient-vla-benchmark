@@ -1,0 +1,11 @@
+schema_version: 1
+name: actuation_slack_refresh_deletion
+category: token_reduction
+description: ASR unconditional same-frame dense refresh with a clean previous-chunk deletion gate.
+config: efficient_vla_benchmark.methods.token_reduction.actuation_slack_refresh.config:ASRConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout, auxiliary_dense_inference]
+    factory: efficient_vla_benchmark.methods.token_reduction.actuation_slack_refresh.implementations.openvla_oft.api:build

@@ -1,0 +1,5 @@
+schema_version: 1
+name: actuation_slack_refresh
+category: token_reduction
+components_only: true
+description: Independent clean-gate deletion instrument; KV-reuse instrument not registered.

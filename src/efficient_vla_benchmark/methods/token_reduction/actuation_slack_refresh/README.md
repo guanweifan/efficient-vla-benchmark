@@ -1,0 +1,32 @@
+# Actuation-Slack Refresh: deletion instrument
+
+Implements the independent deletion arm of [Actuation-Slack Refresh](https://arxiv.org/abs/2608.00391),
+not a composition with VLA-Cache or VLA-Pruner. ID:
+`actuation_slack_refresh_deletion`. The KV-reuse instrument is excluded.
+
+The first served chunk is dense. Every served chunk unconditionally schedules
+one dense pass on the **same prepared frame**, whose action output is discarded.
+Only this complete dense pass can update the next chunk's gate; sparse served
+attention is never harvested. Subsequent chunks retain the top-ranked primary-view
+patches under that previous clean gate. OFT wrist tokens are never pruned.
+A dense first chunk also receives a refresh, preserving the unconditional schedule.
+
+The gate is mean action-query attention at explicitly configured layers (default
+zero-based layer 15). The publication's main contribution varies gate families;
+the layer choice is a declared port convention, not verified author code. Ratio
+0.1 follows the paper's 90% skipping instrument. Native masks, original positions
+and action readout remain unchanged. No training or oracle actions are used.
+
+The shared backend worker executes refresh asynchronously on a separate CUDA stream
+while queued actions may execute. It always joins before the next model query,
+reset or detach; failures propagate. Same-frame preparation is shared read-only,
+not repeated, and no proprioception is normalized twice. RNG is restored after
+the discarded pass so a stochastic action head cannot alter later served noise.
+
+**Accounting:** the common monitor joins the worker before stopping the timer.
+Thus the main latency/throughput row includes primary **plus all auxiliary work**.
+Separate primary-forward and refresh diagnostics do not imply a reduction in total
+computation. Primary-forward timing excludes common observation preparation and
+must not be relabeled end-to-end serve latency. A configured 400 ms actuation budget
+is only a nominal check; unpaced simulation/replay does not establish real-robot
+overlap, energy savings, or hardware deadline guarantees.
