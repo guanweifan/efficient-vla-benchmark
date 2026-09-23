@@ -1,0 +1,8 @@
+method: sparsevlm
+parameters:
+  pruning_layers: [2, 6, 15]
+  rank_scale: 0.25
+  recycle_ratio: 0.3
+  cluster_ratio: 0.1
+  neighbors: 3
+  rank_rtol: 0.00001

@@ -1,0 +1,11 @@
+schema_version: 1
+name: sparsevlm
+category: token_reduction
+description: Original SparseVLM text raters, rank-adaptive pruning and token recycling.
+config: efficient_vla_benchmark.methods.token_reduction.sparsevlm.config:SparseVLMConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout]
+    factory: efficient_vla_benchmark.methods.token_reduction.sparsevlm.implementations.openvla_oft.api:build
