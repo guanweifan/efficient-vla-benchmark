@@ -380,8 +380,9 @@ def render(records, commit_map=None):
             "earlier-layer cost. Per-layer sequence lengths remain in raw diagnostics.",
             "Discarded auxiliary passes are counted separately below, not as served queries.",
             "",
-            "| Method | Final mean / min / max | Early mean | Mode counts (true/observed) |",
-            "|---|---:|---:|---|",
+            "| Record / method | Backend | Final mean / min / max | Early mean | "
+            "Mode counts (true/observed) |",
+            "|---|---|---:|---:|---|",
         ]
         for record in token_records:
             diag = record["run"]["token_diagnostics"]
@@ -397,7 +398,9 @@ def render(records, commit_map=None):
                 or "—"
             )
             lines.append(
-                f"| {display_label(record)} | {final['mean']:.1f} / {final['min']} / "
+                f"| [{ids[record['run']['run_id']]}](#{ids[record['run']['run_id']].lower()}) "
+                f"{display_label(record)} | {record['run']['metadata']['backend']['backend']} | "
+                f"{final['mean']:.1f} / {final['min']} / "
                 f"{final['max']} | {early_text} | {modes} |"
             )
         lines.append("")
@@ -434,14 +437,16 @@ def render(records, commit_map=None):
             "",
             "Query-weighted last-layer counts; skipping query/MLP rows does not remove KV context.",
             "",
-            "| Method | Computed queries: mean / min / max | Retained KV: mean / min / max |",
-            "|---|---:|---:|",
+            "| Record / method | Backend | Computed queries: mean / min / max | "
+            "Retained KV: mean / min / max |",
+            "|---|---|---:|---:|",
         ]
         for record in cache_records:
             diag = record["run"]["cache_diagnostics"]
             query, context = diag["computed_visual_queries"], diag["retained_visual_kv"]
             lines.append(
-                f"| {display_label(record)} | "
+                f"| [{ids[record['run']['run_id']]}](#{ids[record['run']['run_id']].lower()}) "
+                f"{display_label(record)} | {record['run']['metadata']['backend']['backend']} | "
                 f"{query['mean']:.1f} / {query['min']} / {query['max']} | "
                 f"{context['mean']:.1f} / {context['min']} / {context['max']} |"
             )

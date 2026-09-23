@@ -273,6 +273,32 @@ def test_tracked_history_map_contains_full_revisions(recorder):
     assert len(mapping) == 81
 
 
+def test_diagnostic_rows_identify_backend_and_measurement_record(tmp_path, recorder):
+    import copy
+
+    run = tmp_path / "example-run"
+    write_run(run)
+    first = recorder.make_record(run, run, "5.1 Tokens", "Shared name", "configs/a.yaml")
+    first["run"]["token_diagnostics"] = {
+        "final_visual_tokens": {"mean": 128.0, "min": 128, "max": 128},
+    }
+    first["run"]["cache_diagnostics"] = {
+        "computed_visual_queries": {"mean": 64.0, "min": 64, "max": 64},
+        "retained_visual_kv": {"mean": 256.0, "min": 256, "max": 256},
+    }
+    second = copy.deepcopy(first)
+    second["run"]["run_id"] = "second-run"
+    second["run"]["metadata"]["backend"]["backend"] = "second_backend"
+    text = recorder.render([first, second])
+    for marker in (
+        "## Observed visual-token retention",
+        "## Computed visual queries and retained KV context",
+    ):
+        table = text.split(marker, 1)[1].split("\n## ", 1)[0]
+        assert "[R01](#r01) Shared name | fixture" in table
+        assert "[R02](#r02) Shared name | second_backend" in table
+
+
 def test_auxiliary_evidence_never_omits_discarded_dense_work(tmp_path, recorder):
     run = tmp_path / "aux-run"
     write_run(run)
