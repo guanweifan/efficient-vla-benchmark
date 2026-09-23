@@ -1,0 +1,11 @@
+schema_version: 1
+name: fastv
+category: token_reduction
+description: FastV released HF last-query attention pruning, transferred to VLA.
+config: efficient_vla_benchmark.methods.token_reduction.fastv.config:FastVConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout]
+    factory: efficient_vla_benchmark.methods.token_reduction.fastv.implementations.openvla_oft.api:build
