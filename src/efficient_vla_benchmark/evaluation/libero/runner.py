@@ -68,7 +68,12 @@ def run_episode(env, policy, context, initial_state, instruction, record_trace=F
     samples, sample_steps = [], []
     queries = 0
     for step in range(MAX_STEPS[context.suite]):
-        obs = make_observation(raw, instruction)
+        depth_range = None
+        if "agentview_depth" in raw:
+            model = env.sim.model
+            extent = model.stat.extent
+            depth_range = (model.vis.map.znear * extent, model.vis.map.zfar * extent)
+        obs = make_observation(raw, instruction, depth_range)
         decision = policy.step(obs)
         if decision.queried:
             queries += 1
@@ -135,6 +140,7 @@ def evaluate(
             "max_steps": MAX_STEPS,
             "environment_seed": 0,
             "record_traces": record_traces,
+            "depth": config.evaluation.get("depth", False),
             "trace_sampling": "all_control_steps",
         },
     }
@@ -182,6 +188,7 @@ def evaluate(
                                 bddl_file_name=str(bddl / task.bddl_file),
                                 camera_heights=256,
                                 camera_widths=256,
+                                camera_depths=config.evaluation.get("depth", False),
                             )
                         result, samples, steps = run_episode(
                             env,

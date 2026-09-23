@@ -45,6 +45,7 @@ def parser():
     evaluate.add_argument("--trials", type=int)
     evaluate.add_argument("--seed", type=int)
     evaluate.add_argument("--record-traces", action=argparse.BooleanOptionalAction, default=None)
+    evaluate.add_argument("--depth", action=argparse.BooleanOptionalAction, default=None)
     evaluate.add_argument("--formal", action="store_true")
     timing.add_argument("--traces", type=Path, nargs="+", required=True)
     timing.add_argument("--output-dir", type=Path, required=True)
@@ -63,6 +64,7 @@ def effective_protocol(config, args):
             "trials": 1,
             "seed": 0,
             "record_traces": False,
+            "depth": False,
             **config.evaluation,
         }
         for key in settings:

@@ -26,6 +26,7 @@ class Observation:
     wrist_image: np.ndarray
     proprio: np.ndarray
     instruction: str
+    depth: np.ndarray | None = None
 
     def validate(self) -> None:
         for image in (self.image, self.wrist_image):
@@ -35,6 +36,15 @@ class Observation:
             raise ValueError("Proprioception must be a finite vector")
         if not self.instruction.strip():
             raise ValueError("A nonempty language instruction is required")
+        if self.depth is not None and (
+            self.depth.shape != self.image.shape[:2]
+            or self.depth.dtype != np.float32
+            or not np.isfinite(self.depth).all()
+            or not (self.depth > 0).all()
+        ):
+            raise ValueError(
+                "Depth must be positive finite float32 meters aligned with primary RGB"
+            )
 
 
 @dataclass

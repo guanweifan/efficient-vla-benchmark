@@ -79,7 +79,7 @@ class ExperimentConfig:
             if not isinstance(value, dict) or any(not isinstance(key, str) for key in value):
                 raise ValueError(f"{field_name} must be a string-keyed mapping")
             validate_portable(value)
-        eval_keys = {"suites", "tasks", "trials", "seed", "record_traces"}
+        eval_keys = {"suites", "tasks", "trials", "seed", "record_traces", "depth"}
         timing_keys = {"repeats", "warmup", "mode"}
         if set(self.evaluation) - eval_keys or set(self.profiling) - timing_keys:
             raise ValueError("Unknown evaluation or profiling setting")
@@ -99,6 +99,8 @@ class ExperimentConfig:
             and type(self.evaluation["record_traces"]) is not bool
         ):
             raise ValueError("record_traces must be boolean")
+        if "depth" in self.evaluation and type(self.evaluation["depth"]) is not bool:
+            raise ValueError("depth must be boolean")
 
     @classmethod
     def load(cls, path: Path) -> "ExperimentConfig":
