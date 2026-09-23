@@ -107,6 +107,40 @@ def cache_evidence(rows):
     return result
 
 
+def auxiliary_evidence(rows):
+    """Count discarded native passes separately, without hiding them in serving counts."""
+    observations = []
+    for row in rows:
+        if not row["queried"]:
+            continue
+        diag = row.get("diagnostics", {})
+        calls = diag.get("auxiliary_queries", 0)
+        if type(calls) is not int or calls not in (0, 1):
+            raise ValueError("Invalid auxiliary call count")
+        if not calls:
+            continue
+        for key in ("primary_forward_ms", "auxiliary_forward_ms", "auxiliary_join_wait_ms"):
+            value = diag.get(key)
+            if type(value) not in (int, float) or not math.isfinite(value) or value < 0:
+                raise ValueError("Invalid auxiliary timing diagnostic")
+        count = diag.get("auxiliary_visual_tokens_final")
+        if type(count) is not int or count <= 0:
+            raise ValueError("Invalid auxiliary visual-token diagnostic")
+        observations.append(diag)
+    if not observations:
+        return None
+    result = {"auxiliary_calls": len(observations)}
+    for key in (
+        "primary_forward_ms",
+        "auxiliary_forward_ms",
+        "auxiliary_join_wait_ms",
+        "auxiliary_visual_tokens_final",
+    ):
+        values = [diag[key] for diag in observations]
+        result[key] = {"mean": sum(values) / len(values), "min": min(values), "max": max(values)}
+    return result
+
+
 def timing_evidence(directory):
     metadata = read_json(directory / "metadata.json")
     summary = read_json(directory / "summary.json")
@@ -133,12 +167,19 @@ def timing_evidence(directory):
         rel_tol=1e-9,
     ):
         raise ValueError("Raw query mean disagrees with summary")
+    auxiliary = auxiliary_evidence(rows)
+    auxiliary_calls = auxiliary["auxiliary_calls"] if auxiliary else 0
+    if summary.get("auxiliary_model_calls", 0) != auxiliary_calls:
+        raise ValueError("Raw auxiliary call count disagrees with summary")
+    if summary.get("total_native_model_calls", len(queries)) != len(queries) + auxiliary_calls:
+        raise ValueError("Raw total native call count disagrees with summary")
     return {
         "run_id": directory.name,
         "metadata": metadata,
         "summary": summary,
         "token_diagnostics": token_evidence(rows),
         "cache_diagnostics": cache_evidence(rows),
+        "auxiliary_diagnostics": auxiliary,
         "files_sha256": {
             name: digest(directory / name)
             for name in ("metadata.json", "summary.json", "timings.jsonl")
@@ -334,9 +375,10 @@ def render(records, commit_map=None):
         lines += [
             "## Observed visual-token retention",
             "",
-            "Query-weighted measured counts, including warmup/refresh queries; these",
+            "Served-query-weighted counts, including dense served warmup/refresh; these",
             "are not configured keep ratios or FLOPs. Final counts do not describe",
             "earlier-layer cost. Per-layer sequence lengths remain in raw diagnostics.",
+            "Discarded auxiliary passes are counted separately below, not as served queries.",
             "",
             "| Method | Final mean / min / max | Early mean | Mode counts (true/observed) |",
             "|---|---:|---:|---|",
@@ -357,6 +399,32 @@ def render(records, commit_map=None):
             lines.append(
                 f"| {display_label(record)} | {final['mean']:.1f} / {final['min']} / "
                 f"{final['max']} | {early_text} | {modes} |"
+            )
+        lines.append("")
+    auxiliary_records = [r for r in records if r["run"].get("auxiliary_diagnostics")]
+    if auxiliary_records:
+        lines += [
+            "## Auxiliary dense-refresh work",
+            "",
+            "Main replay rows include ALL auxiliary work. Primary-forward diagnostics exclude",
+            "shared preparation and are not end-to-end serving latency. Refresh timing does",
+            "not establish real-robot deadline feasibility or reduced total computation.",
+            "",
+            "| Record / backend | Served / auxiliary calls | Primary forward mean ms | "
+            "Refresh mean / max ms | Auxiliary visual tokens |",
+            "|---|---:|---:|---:|---:|",
+        ]
+        for record in auxiliary_records:
+            run = record["run"]
+            diag = run["auxiliary_diagnostics"]
+            refresh = diag["auxiliary_forward_ms"]
+            tokens = diag["auxiliary_visual_tokens_final"]
+            lines.append(
+                f"| {ids[run['run_id']]} / {run['metadata']['backend']['backend']} | "
+                f"{run['summary']['all_queries']['count']} / {diag['auxiliary_calls']} | "
+                f"{diag['primary_forward_ms']['mean']:.2f} | "
+                f"{refresh['mean']:.2f} / {refresh['max']:.2f} | "
+                f"{tokens['mean']:.1f} |"
             )
         lines.append("")
     cache_records = [r for r in records if r["run"].get("cache_diagnostics")]
@@ -442,6 +510,17 @@ def render(records, commit_map=None):
         "",
         "## Interpretation boundaries",
         "",
+        "- DepthCache rows implement the primary-view progressive merging core only;",
+        "  carrying-dependent scene reinitialization and anticipatory wrist gating are excluded.",
+        "  Measured metric depth is required; RGB-only traces cannot stand in for this input.",
+        "- ASR rows implement the deletion instrument with unconditional dense refresh,",
+        "  not KV reuse. CogACT uses native cognition attention as its disclosed gate.",
+        "  Speedup includes all auxiliary computation, not an assumed actuation overlap.",
+        "- FastV uses the released HF last-query variant; DART is token reduction, not",
+        "  speculative decoding. SparseVLM is original v1 rank-adaptive pruning/recycling,",
+        "  not SparseVLM+ or the released fixed-budget variant.",
+        "- SQAP-VLA is deferred pending clarification of contradictory activation",
+        "  quantization granularity; it has no runnable proxy and is not an implemented method.",
         "- SP-VLA scheduling-only rows exclude pruning; pruning + scheduling rows",
         "  include both mechanisms in one implementation. Fitted actions change query",
         "  counts; compare full replay cost and evaluate success loss separately.",

@@ -271,3 +271,55 @@ def test_history_map_rejects_invalid_revisions(tmp_path, recorder, mapping):
 def test_tracked_history_map_contains_full_revisions(recorder):
     mapping = recorder.load_history_map()
     assert len(mapping) == 81
+
+
+def test_auxiliary_evidence_never_omits_discarded_dense_work(tmp_path, recorder):
+    run = tmp_path / "aux-run"
+    write_run(run)
+    diag = {
+        "auxiliary_queries": 1,
+        "primary_forward_ms": 0.8,
+        "auxiliary_forward_ms": 0.9,
+        "auxiliary_join_wait_ms": 0.85,
+        "auxiliary_visual_tokens_final": 256,
+    }
+    rows = [
+        {"queried": True, "latency_ms": 2.0, "diagnostics": diag},
+        {"queried": False, "latency_ms": 1.0, "diagnostics": diag},
+    ]
+    (run / "timings.jsonl").write_text("\n".join(map(json.dumps, rows)))
+    summary = json.loads((run / "summary.json").read_text())
+    with pytest.raises(ValueError, match="auxiliary call count"):
+        recorder.timing_evidence(run)
+    summary.update(auxiliary_model_calls=1, total_native_model_calls=2)
+    (run / "summary.json").write_text(json.dumps(summary))
+    record = recorder.make_record(run, run, "5.1 Tokens", "Aux", "configs/aux.yaml")
+    assert record["run"]["auxiliary_diagnostics"]["auxiliary_calls"] == 1
+    assert record["replay_speedup"] == 1
+    table = recorder.render([record])
+    assert "Auxiliary dense-refresh work" in table
+    assert "ALL auxiliary work" in table and "1 / 1" in table
+    assert recorder.auxiliary_evidence([{"queried": True}]) is None
+
+
+@pytest.mark.parametrize(
+    "key,value",
+    [
+        ("auxiliary_queries", True),
+        ("auxiliary_queries", 2),
+        ("primary_forward_ms", float("nan")),
+        ("auxiliary_forward_ms", -1),
+        ("auxiliary_visual_tokens_final", 0),
+    ],
+)
+def test_auxiliary_rejects_invalid_diagnostics(recorder, key, value):
+    diag = {
+        "auxiliary_queries": 1,
+        "primary_forward_ms": 1.0,
+        "auxiliary_forward_ms": 2.0,
+        "auxiliary_join_wait_ms": 0.0,
+        "auxiliary_visual_tokens_final": 256,
+    }
+    diag[key] = value
+    with pytest.raises(ValueError, match="auxiliary"):
+        recorder.auxiliary_evidence([{"queried": True, "diagnostics": diag}])
