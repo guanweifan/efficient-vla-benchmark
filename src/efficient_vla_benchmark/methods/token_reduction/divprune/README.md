@@ -17,3 +17,10 @@ OFT has one global budget across both cameras. Native nonvisual/action slots and
 RoPE positions are unchanged. This is not VLA-Pruner with one score disabled.
 No training, calibration or attention probes are used. Selection work is timed.
 Full retention installs no hooks; reset and detach preserve native behavior.
+
+## CogACT binding
+
+CogACT applies the same selection to its 256 projected primary-camera patches.
+The shared greedy loop uses device-side gather/scatter rather than scalar host
+indexing; this changes neither selected IDs nor tie rules. Native cognition and
+diffusion sampling are untouched.
