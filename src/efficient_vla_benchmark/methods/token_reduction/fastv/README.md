@@ -20,3 +20,9 @@ Validation covers an independent selection reference, protected tokens,
 invalid configs, real-model no-op parity, actual shortened decoder rows,
 reset determinism and native output after detach. GPU checks use caller-supplied
 model/trace paths; shared LIBERO smoke is not formal accuracy.
+
+## CogACT binding
+
+CogACT uses its native final cognition EOS as the last query, with a 256-patch
+single-camera pool. Causal visibility and original RoPE positions are retained;
+the native diffusion head, sampler and RNG consumption are unchanged.
