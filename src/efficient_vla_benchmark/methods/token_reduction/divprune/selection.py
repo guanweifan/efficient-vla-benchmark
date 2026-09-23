@@ -22,8 +22,8 @@ def max_min_selection(features, count):
     for index in range(count):
         chosen = scores.masked_fill(~available, -float("inf")).argmax()
         selected[index] = chosen
-        available[chosen] = False
-        nearest = torch.minimum(nearest, distance[chosen])
+        available.scatter_(0, chosen.reshape(1), False)
+        nearest = torch.minimum(nearest, distance.index_select(0, chosen.reshape(1))[0])
         scores = nearest
     return selected.sort().values
 
