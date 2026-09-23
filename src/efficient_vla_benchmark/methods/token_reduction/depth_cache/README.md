@@ -34,3 +34,11 @@ it never averages stale features across time. Bipartite rounds handle budgets
 above 50%. A merged row uses its latest original member as the causal-safe anchor.
 A dynamic region immediately restores all its original rows and restarts its
 progressive clock when the depth window becomes static. Reset clears all history.
+
+## CogACT binding
+
+CogACT exposes one primary camera only. Its depth patch grid follows native
+resize without OFT's center crop, and the same shared merging core consumes it.
+Language saliency excludes final cognition EOS. Current-frame feature groups use
+latest-member anchors, keeping native causal attention and diffusion unchanged.
+The object-carrying scene-reset ambiguity remains excluded on both backends.
