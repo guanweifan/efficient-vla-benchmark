@@ -1,0 +1,6 @@
+method: dart
+parameters:
+  pruning_layer: 2
+  keep_ratio: 0.5
+  visual_pivots: 4
+  text_pivots: 4

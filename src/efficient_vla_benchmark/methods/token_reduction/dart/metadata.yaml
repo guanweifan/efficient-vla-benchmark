@@ -1,0 +1,11 @@
+schema_version: 1
+name: dart
+category: token_reduction
+description: DART key-norm visual/text pivots and duplication-aware visual selection.
+config: efficient_vla_benchmark.methods.token_reduction.dart.config:DARTConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout]
+    factory: efficient_vla_benchmark.methods.token_reduction.dart.implementations.openvla_oft.api:build
