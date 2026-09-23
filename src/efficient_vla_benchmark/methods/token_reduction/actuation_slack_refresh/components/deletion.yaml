@@ -9,3 +9,7 @@ implementations:
     variants: [libero_joint]
     requires: [llama_decoder, visual_token_layout, auxiliary_dense_inference]
     factory: efficient_vla_benchmark.methods.token_reduction.actuation_slack_refresh.implementations.openvla_oft.api:build
+  cogact:
+    variants: [libero_joint]
+    requires: [causal_visual_token_selection, auxiliary_dense_inference]
+    factory: efficient_vla_benchmark.methods.token_reduction.actuation_slack_refresh.implementations.cogact.api:build

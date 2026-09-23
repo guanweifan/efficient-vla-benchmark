@@ -30,3 +30,12 @@ computation. Primary-forward timing excludes common observation preparation and
 must not be relabeled end-to-end serve latency. A configured 400 ms actuation budget
 is only a nominal check; unpaced simulation/replay does not establish real-robot
 overlap, energy savings, or hardware deadline guarantees.
+
+## CogACT binding
+
+CogACT uses native final cognition-to-image attention as the disclosed gate
+adaptation. It does not invent action-to-patch attention inside DiT. The core
+claim retained here is gate provenance plus unconditional same-frame dense refresh;
+subsequent served chunks retain 26/256 patches by default. The auxiliary call runs
+the complete native stochastic action head but discards its actions and restores
+RNG, so the next served sample consumes exactly the native noise sequence.
