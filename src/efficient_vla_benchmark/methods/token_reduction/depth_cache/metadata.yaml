@@ -1,0 +1,5 @@
+schema_version: 1
+name: depth_cache
+category: token_reduction
+components_only: true
+description: Full DepthCache is unregistered; see the explicitly scoped primary core.

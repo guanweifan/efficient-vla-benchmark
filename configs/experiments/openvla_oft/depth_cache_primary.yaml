@@ -1,0 +1,5 @@
+extends:
+  - baseline.yaml
+  - ../../methods/depth_cache_primary.yaml
+evaluation:
+  depth: true

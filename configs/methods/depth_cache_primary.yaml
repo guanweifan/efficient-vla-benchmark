@@ -1,0 +1,11 @@
+method: depth_cache_primary
+parameters:
+  warmup_queries: 5
+  depth_clusters: 3
+  merge_window: 5
+  min_merge_ratio: 0.0
+  max_merge_ratio: 0.7
+  edge_threshold_m: 0.03
+  static_threshold_m: 0.01
+  dynamic_fraction: 0.2
+  attention_layer: 31
