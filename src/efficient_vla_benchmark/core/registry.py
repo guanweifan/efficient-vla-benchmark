@@ -103,10 +103,22 @@ def builtin_method_specs(method, category):
     metadata = method.joinpath("metadata.yaml")
     if not method.is_dir() or not metadata.is_file():
         return []
-    primary = parse_method(yaml.safe_load(metadata.read_text()))
-    if primary.category != category or primary.name != method.name:
-        raise ValueError("Method directory and metadata identities disagree")
-    specs = [primary]
+    data = yaml.safe_load(metadata.read_text())
+    if isinstance(data, dict) and data.get("components_only") is True:
+        if (
+            data.get("schema_version") != 1
+            or data.get("name") != method.name
+            or data.get("category") != category
+            or not IDENTIFIER.fullmatch(method.name)
+            or "implementations" in data
+        ):
+            raise ValueError("Invalid non-runnable paper owner metadata")
+        owner, specs = method.name, []
+    else:
+        primary = parse_method(data)
+        if primary.category != category or primary.name != method.name:
+            raise ValueError("Method directory and metadata identities disagree")
+        owner, specs = primary.name, [primary]
     components = method.joinpath("components")
     if components.is_dir():
         for component in sorted(components.iterdir(), key=lambda item: item.name):
@@ -116,9 +128,11 @@ def builtin_method_specs(method, category):
             if not IDENTIFIER.fullmatch(suffix):
                 raise ValueError("Paper component names must use snake_case")
             spec = parse_method(yaml.safe_load(component.read_text()))
-            if spec.name != f"{primary.name}_{suffix}":
+            if spec.name != f"{owner}_{suffix}":
                 raise ValueError("Component identity must include its owning paper and scope")
             specs.append(spec)
+    if not specs:
+        raise ValueError("A components-only paper owner must contain a runnable core")
     return specs
 
 
