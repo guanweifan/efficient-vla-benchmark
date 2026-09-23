@@ -19,3 +19,10 @@ Scores use FP32. OFT language pivots exclude proprioception and action placehold
 Its two views share a global visual budget. Native masks, RoPE and action slots
 are protected; this is a controlled VLM-to-VLA transfer, not author VLA-code parity.
 No attention probabilities, training or calibration are required.
+
+## CogACT binding
+
+CogACT probes the preceding native attention module's post-RoPE keys without
+replacing SDPA. Language pivots exclude the final cognition EOS. The same shared
+rule retains 132/256 visual rows by default; cognition and diffusion RNG remain
+native. Device-side pivot gathering avoids implicit scalar host synchronization.
