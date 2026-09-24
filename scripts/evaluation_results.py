@@ -56,6 +56,19 @@ def plan(matrix, manifest, campaign, shards, baselines_only=False):
     }
 
 
+def progress_summary(value):
+    if "jobs" in value:
+        return {"jobs": len(value["jobs"])}
+    rows = value["configurations"]
+    return {
+        "configurations": len(rows),
+        "completed_configurations": sum(bool(r["complete"]) for r in rows),
+        "episodes": sum(r["episodes"] for r in rows),
+        "errors": sum(r.get("errors", 0) for r in rows),
+        "all_complete": value["all_complete"],
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     subs = parser.add_subparsers(dest="command", required=True)
@@ -119,8 +132,7 @@ def main():
         json.dumps(
             {
                 "output_name": args.output.name,
-                "jobs": len(value.get("jobs", [])),
-                "all_complete": value.get("all_complete"),
+                **progress_summary(value),
             }
         )
     )

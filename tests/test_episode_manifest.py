@@ -123,3 +123,29 @@ def test_current_campaign_matrix_is_executable(manifest):
     assert len(complete["jobs"]) == 43 * 8
     assert len(baseline["jobs"]) == 4 * 8
     assert len({j["id"] for j in complete["jobs"]}) == len(complete["jobs"])
+    assert module.progress_summary(complete) == {"jobs": 344}
+
+
+def test_progress_counts_observed_episodes_not_dispatch_jobs():
+    spec = importlib.util.spec_from_file_location(
+        "evaluation_results", "scripts/evaluation_results.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    summary = module.progress_summary(
+        {
+            "configurations": [
+                {"complete": True, "episodes": 200, "errors": 0},
+                {"complete": False, "episodes": 25, "errors": 1},
+                {"complete": False, "episodes": 0},
+            ],
+            "all_complete": False,
+        }
+    )
+    assert summary == {
+        "configurations": 3,
+        "completed_configurations": 1,
+        "episodes": 225,
+        "errors": 1,
+        "all_complete": False,
+    }
