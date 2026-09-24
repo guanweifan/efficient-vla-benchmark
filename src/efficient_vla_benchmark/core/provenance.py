@@ -63,6 +63,11 @@ def source_metadata() -> dict:
             for path in sorted(package.rglob("*.py"))
         }
     fingerprint = stable_hash(source_files)
+    runtime_files = {
+        name: value
+        for name, value in source_files.items()
+        if name.startswith(("src/", "backends/"))
+    }
 
     submodules = {}
     for line in git("submodule", "status").splitlines():
@@ -106,6 +111,7 @@ def source_metadata() -> dict:
         "commit": git("rev-parse", "HEAD") or None,
         "dirty": bool(git("status", "--porcelain")),
         "source_sha256": fingerprint,
+        "runtime_source_sha256": stable_hash(runtime_files),
         "submodules": submodules,
         "packages": packages,
         "cuda_extension_sha256": extensions,

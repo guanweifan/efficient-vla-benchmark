@@ -3,6 +3,7 @@
 import json
 import os
 import random
+import time
 from dataclasses import asdict
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from efficient_vla_benchmark.core.provenance import source_metadata, stable_hash
 from efficient_vla_benchmark.core.types import EpisodeContext
 from efficient_vla_benchmark.evaluation.traces import save_trace
 
+from .manifest import episode_key, select_shard
 from .observations import make_observation
 
 SUITES = ("libero_spatial", "libero_object", "libero_goal", "libero_10")
@@ -119,18 +121,35 @@ def evaluate(
     seed: int,
     record_traces: bool,
     formal: bool,
+    manifest=None,
+    shard_index=0,
+    num_shards=1,
 ):
-    validate_protocol(suites, task_ids, trials, formal)
+    validate_protocol(suites, task_ids, trials, formal or manifest is not None)
     from libero.libero import benchmark, get_libero_path
     from libero.libero.envs import OffScreenRenderEnv
 
+    selected = (
+        select_shard(manifest, shard_index, num_shards)
+        if manifest
+        else [
+            dict(suite=s, task_id=t, episode_id=e, seed=seed)
+            for s in suites
+            for t in task_ids
+            for e in range(trials)
+        ]
+    )
+    expected = {episode_key(e): e for e in selected}
     output_dir.mkdir(parents=True, exist_ok=True)
     metadata = {
         "schema_version": 1,
-        "kind": "formal" if formal else "development_smoke",
+        "kind": (
+            "development_validation" if manifest else "formal" if formal else "development_smoke"
+        ),
         "config": asdict(config),
         "backend": backend.metadata(),
         "source": source_metadata(),
+        "hardware": backend.runtime.hardware(),
         "protocol": {
             "suites": suites,
             "tasks": task_ids,
@@ -144,20 +163,34 @@ def evaluate(
             "trace_sampling": "all_control_steps",
         },
     }
+    metadata["episode_manifest"] = (
+        {"sha256": manifest["sha256"], "name": manifest["name"], "population": 200}
+        if manifest
+        else None
+    )
+    metadata["shard"] = {"index": shard_index, "count": num_shards, "episodes": selected}
     identity = stable_hash(
         {
             "config": metadata["config"],
             "backend": metadata["backend"],
             "protocol": metadata["protocol"],
-            "source_sha256": metadata["source"]["source_sha256"],
+            "runtime_source_sha256": metadata["source"]["runtime_source_sha256"],
+            "runtime_packages": {
+                name: value
+                for name, value in metadata["source"]["packages"].items()
+                if not name.startswith("efficient-vla-backend-")
+                or name == "efficient-vla-backend-" + config.backend.replace("_", "-")
+            },
+            "cuda_extensions": metadata["source"]["cuda_extension_sha256"],
             "submodules": metadata["source"]["submodules"],
+            "episode_manifest": metadata["episode_manifest"],
         }
     )
     metadata["experiment_id"] = identity
     metadata_path = output_dir / "metadata.json"
     if metadata_path.exists():
         existing = json.loads(metadata_path.read_text())
-        if existing["experiment_id"] != identity:
+        if existing["experiment_id"] != identity or existing.get("shard") != metadata["shard"]:
             raise ValueError(
                 "Output contains a different experiment; choose a new output directory"
             )
@@ -168,19 +201,32 @@ def evaluate(
     results = []
     if results_path.exists():
         results = [json.loads(line) for line in results_path.read_text().splitlines() if line]
-    finished = {(r["suite"], r["task_id"], r["episode_id"]) for r in results}
+    finished = {episode_key(r) for r in results}
+    if len(finished) != len(results) or not finished <= expected.keys():
+        raise ValueError("Existing results contain duplicates or foreign episodes")
+    if any(r["seed"] != expected[episode_key(r)]["seed"] for r in results):
+        raise ValueError("Existing result seed differs from manifest")
     for suite_name in suites:
         suite = benchmark.get_benchmark_dict()[suite_name]()
         for task_id in task_ids:
+            task_episodes = [
+                e for e in selected if e["suite"] == suite_name and e["task_id"] == task_id
+            ]
+            if not task_episodes:
+                continue
             task = suite.get_task(task_id)
+            if manifest and any(e["task_name"] != task.name for e in task_episodes):
+                raise ValueError("Runtime task mapping differs from episode manifest")
             initial_states = suite.get_task_init_states(task_id)
             env = None
             try:
-                for episode_id in range(trials):
+                for entry in task_episodes:
+                    episode_id = entry["episode_id"]
                     key = (suite_name, task_id, episode_id)
                     if key in finished:
                         continue
-                    context = EpisodeContext(suite_name, task_id, episode_id, seed)
+                    context = EpisodeContext(suite_name, task_id, episode_id, entry["seed"])
+                    start = time.monotonic()
                     try:
                         if env is None:
                             bddl = Path(get_libero_path("bddl_files")) / task.problem_folder
@@ -222,8 +268,11 @@ def evaluate(
                         if env is not None:
                             env.close()
                             env = None
+                    result["wall_seconds"] = time.monotonic() - start
                     with results_path.open("a") as stream:
                         stream.write(json.dumps(result, sort_keys=True) + "\n")
+                        stream.flush()
+                        os.fsync(stream.fileno())
                     results.append(result)
                     finished.add(key)
                     print(json.dumps(result), flush=True)
@@ -233,9 +282,13 @@ def evaluate(
     summary = {
         "kind": metadata["kind"],
         "episodes": len(results),
+        "expected_episodes": len(selected),
         "successes": sum(bool(r["success"]) for r in results),
         "errors": sum(r["status"] == "error" for r in results),
         "success_rate": sum(bool(r["success"]) for r in results) / len(results),
+        "validation_completed": bool(manifest)
+        and len(results) == len(selected)
+        and all(r["status"] == "completed" for r in results),
         "formal_campaign_completed": (
             formal
             and len(results) == len(suites) * len(task_ids) * trials
