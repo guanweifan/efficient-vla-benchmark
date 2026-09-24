@@ -18,10 +18,10 @@ def plan(matrix, manifest, campaign, shards, baselines_only=False):
             raise ValueError("Duplicate experiment preset")
         for preset in presets:
             path = f"configs/experiments/{backend}/{preset}.yaml"
-            config = ExperimentConfig.load(path)
+            config = ExperimentConfig.load(Path(path))
             if config.backend != backend:
                 raise ValueError("Preset/backend mismatch")
-            if baselines_only and config.method is not None:
+            if baselines_only and config.method != "none":
                 continue
             for index in range(shards):
                 select_shard(manifest, index, shards)

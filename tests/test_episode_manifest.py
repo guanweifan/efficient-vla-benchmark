@@ -1,7 +1,10 @@
 import copy
+import importlib.util
 import json
+from pathlib import Path
 
 import pytest
+import yaml
 
 from efficient_vla_benchmark.core.provenance import stable_hash
 from efficient_vla_benchmark.evaluation.libero.aggregate import merge_shards
@@ -106,3 +109,17 @@ def test_merge_errors_and_configuration_mismatch(manifest, tmp_path):
     incompatible = write_shard(tmp_path / "wrong", manifest, 1, identity="different")
     with pytest.raises(ValueError, match="differ"):
         merge_shards(manifest, [paths[0], incompatible])
+
+
+def test_current_campaign_matrix_is_executable(manifest):
+    spec = importlib.util.spec_from_file_location(
+        "evaluation_results", "scripts/evaluation_results.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    matrix = yaml.safe_load(Path("configs/evaluation/dev200_campaign.yaml").read_text())
+    complete = module.plan(matrix, manifest, "example", 8)
+    baseline = module.plan(matrix, manifest, "example", 8, True)
+    assert len(complete["jobs"]) == 43 * 8
+    assert len(baseline["jobs"]) == 4 * 8
+    assert len({j["id"] for j in complete["jobs"]}) == len(complete["jobs"])
