@@ -3,6 +3,9 @@
 The caller transfers the OFT site-packages and CogACT overlay into dedicated venvs.
 CogACT reuses read-only common dependencies from the OFT venv; its stock Transformers,
 Prismatic, CogACT and AWQ packages take precedence. Validate both environments afterwards.
+Any version differing from the common runtime must also be transferred into the overlay.
+Compare runtime-source, active package AND CUDA-extension hashes with a reference run;
+a matching package version alone does not establish binary identity.
 """
 
 import argparse
