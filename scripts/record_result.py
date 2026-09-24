@@ -283,7 +283,139 @@ def record_digest(record):
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
-def render(records, commit_map=None):
+def validation_tables(validation, records, timing_selection, ids):
+    """Join audited development outcomes to explicitly chosen historical timing records."""
+    if validation["kind"] != "development_validation" or not validation["all_complete"]:
+        raise ValueError("Publish a Dev-200 table only after every configuration is complete")
+    results = validation["configurations"]
+    by_config = {}
+    for result in results:
+        key = f"{result['backend']['backend']}/{result['preset']}"
+        if key in by_config:
+            raise ValueError("Duplicate development configuration")
+        if (
+            not result["complete"]
+            or result["episodes"] != 200
+            or result["errors"]
+            or result["success_rate"] != result["successes"] / 200
+            or result["manifest_sha256"] != validation["manifest_sha256"]
+        ):
+            raise ValueError("Incomplete or inconsistent development evidence")
+        by_config[key] = result
+    if set(timing_selection) != set(by_config):
+        raise ValueError("Timing selection must explicitly cover every development configuration")
+    by_run = {r["run"]["run_id"]: r for r in records}
+    superseded = {name for r in records for name in r.get("supersedes", [])}
+    suites = ("libero_spatial", "libero_object", "libero_goal", "libero_10")
+    lines = [
+        "## Fixed Dev-200 validation and historical speed",
+        "",
+        "Five fixed initial states per task; forty tasks, fifty episodes per suite.",
+        "Every configuration uses the same episode manifest and policy seeds.",
+        f"Manifest SHA256: `{validation['manifest_sha256']}`.",
+        "This is a **development/tuning subset**, not the formal 2,000-episode success rate.",
+        "The remaining 1,800 episodes were not evaluated by this campaign. No failed",
+        "episode is replaced by a successful retry. Each complete row has zero runtime errors.",
+        "",
+        "Speed columns reuse explicitly selected historical fixed-replay records below,",
+        "matched by checkpoint, method parameters, precision and execution cadence.",
+        "They are **not simultaneous measurements on these 200 trajectories**. Historical",
+        "source/cohort differences remain visible through the timing record links; the",
+        "join does not certify identical implementation revisions. Concurrent evaluation",
+        "wall time is never used as policy latency. Delta is percentage points against",
+        "the same backend's native baseline at matched H; VOTE therefore uses H=1.",
+        "",
+    ]
+    for backend in sorted({r["backend"]["backend"] for r in results}):
+        lines += [
+            f"### {backend}",
+            "",
+            "| Preset / timing record | Section | H | Spatial /50 | Object /50 | Goal /50 | "
+            "Long /50 | Dev-200 | Delta pp | ms/control | Speedup | Peak GiB |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        ]
+        members = sorted(
+            (r for r in results if r["backend"]["backend"] == backend),
+            key=lambda r: (not r["preset"].startswith("baseline"), r["preset"]),
+        )
+        for result in members:
+            key = f"{backend}/{result['preset']}"
+            run_id = timing_selection[key]
+            if run_id in superseded or run_id not in by_run:
+                raise ValueError("Selected timing evidence is missing or superseded")
+            record = by_run[run_id]
+            meta = record["run"]["metadata"]
+            expected_preset = f"configs/experiments/{key}.yaml"
+            if record["preset"] != expected_preset:
+                raise ValueError("Timing preset differs from development configuration")
+            for field in ("backend", "model_variant", "checkpoint_sha256", "method", "precision"):
+                if meta["backend"][field] != result["backend"][field]:
+                    raise ValueError(f"Timing identity differs: {field}")
+            for field in (
+                "backend",
+                "model_variant",
+                "method",
+                "precision",
+                "execution_horizon",
+                "parameters",
+                "backend_parameters",
+            ):
+                default = {} if field.endswith("parameters") else None
+                if meta["config"].get(field, default) != result["config"].get(field, default):
+                    raise ValueError(f"Timing configuration differs: {field}")
+            horizon = result["config"]["execution_horizon"]
+            candidates = [
+                r
+                for r in results
+                if r["backend"]["backend"] == backend
+                and r["config"]["method"] == "none"
+                and r["config"]["execution_horizon"] == horizon
+            ]
+            if len(candidates) != 1:
+                raise ValueError("Exactly one matched-cadence development baseline is required")
+            baseline = candidates[0]
+            if baseline["backend"]["checkpoint_sha256"] != result["backend"]["checkpoint_sha256"]:
+                raise ValueError("Development baseline uses another checkpoint")
+            counts = []
+            for suite in suites:
+                value = result["suites"][suite]
+                if value["episodes"] != 50 or value["errors"]:
+                    raise ValueError("Invalid per-suite development counts")
+                counts.append(str(value["successes"]))
+            summary = record["run"]["summary"]
+            memory = summary["peak_allocated_bytes"]
+            memory_text = f"{memory / 2**30:.2f}" if memory is not None else "—"
+            delta = 100 * (result["success_rate"] - baseline["success_rate"])
+            section = record["section"]
+            lines.append(
+                f"| {result['preset']} [{ids[run_id]}](#{ids[run_id].lower()}) | "
+                f"{section} | {horizon} | "
+                + " | ".join(counts)
+                + f" | {result['successes']}/200 ({100 * result['success_rate']:.1f}%) | "
+                f"{delta:+.1f} | {summary['all_control_steps']['mean_ms']:.2f} | "
+                f"{record['replay_speedup']:.3f}× | {memory_text} |"
+            )
+        lines.append("")
+    lines += [
+        "<details>",
+        "<summary>Development configuration identities</summary>",
+        "",
+        "Raw evidence is retained under each campaign's `runs/<backend>--<preset>--sNNN/`.",
+        "The aggregate retains every episode outcome, source revision, shard and file hash.",
+        "A timing record is an audited historical reference, not a new measurement.",
+        "",
+        "| Configuration | Experiment identity | Runtime source | Shards |",
+        "|---|---|---|---:|",
+    ]
+    for key, result in sorted(by_config.items()):
+        lines.append(
+            f"| {key} | `{result['experiment_id']}` | "
+            f"`{result['source']['runtime_source_sha256']}` | {len(result['shards'])} |"
+        )
+    return lines + ["", "</details>", ""]
+
+
+def render(records, commit_map=None, validation=None, timing_selection=None):
     commit_map = load_history_map() if commit_map is None else commit_map
     records = sorted(records, key=lambda record: record["run"]["run_id"])
     ids = {record["run"]["run_id"]: f"R{index:02d}" for index, record in enumerate(records, 1)}
@@ -335,6 +467,8 @@ def render(records, commit_map=None):
         "not a success-rate estimate. Formal success rate is **not measured for any row**.",
         "",
     ]
+    if validation is not None:
+        lines += validation_tables(validation, records, timing_selection, ids)
     sections = sorted({record["section"] for record in records})
     for section in sections:
         lines += [
@@ -572,6 +706,8 @@ def main():
     table = commands.add_parser("render")
     table.add_argument("--records-dir", type=Path, default=Path("outputs/result_records"))
     table.add_argument("--output", type=Path, required=True)
+    table.add_argument("--development-summary", type=Path)
+    table.add_argument("--timing-selection", type=Path)
     args = parser.parse_args()
     if args.command == "export":
         if Path(args.preset).is_absolute() or ".." in Path(args.preset).parts:
@@ -589,7 +725,11 @@ def main():
         records = [read_json(path) for path in sorted(args.records_dir.glob("*.json"))]
         if not records:
             raise ValueError("No evidence records; obtain the local archive before regenerating")
-        args.output.write_text(render(records))
+        if bool(args.development_summary) != bool(args.timing_selection):
+            raise ValueError("Development summary and explicit timing selection are used together")
+        validation = read_json(args.development_summary) if args.development_summary else None
+        selection = read_json(args.timing_selection) if args.timing_selection else None
+        args.output.write_text(render(records, validation=validation, timing_selection=selection))
 
 
 if __name__ == "__main__":

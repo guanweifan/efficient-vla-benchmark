@@ -223,6 +223,16 @@ remain failures; infrastructure retries preserve the exact episode and attempt
 history. Concurrency wall time is not a policy-speed benchmark. Keep raw evidence
 ignored and add development success columns to the existing result ledger only.
 
+Render the combined ledger with `scripts/record_result.py render`, supplying
+`--development-summary` and `--timing-selection` together. The latter is a local
+JSON map from `backend/preset` to an explicitly audited historical timing run ID;
+choose the current valid implementation cohort, never the fastest repeat. The join
+requires matching checkpoint, precision, method parameters and execution cadence,
+and refuses superseded/incomplete evidence. Timing and closed-loop source revisions
+remain separate: a metadata match does not certify source equivalence. Dev-200
+delta uses the same backend's matched-cadence baseline. Do not overwrite old timing
+records or promote parallel evaluation wall time to a latency measurement.
+
 Depth-based methods require real aligned metric depth: enable `evaluation.depth`
 or use `evaluate --depth`. Schema-3 traces preserve this modality; no synthetic
 depth is inferred from old RGB-only traces. The native model still receives only

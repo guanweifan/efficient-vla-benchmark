@@ -1,3 +1,4 @@
+import copy
 import importlib.util
 import json
 from pathlib import Path
@@ -96,6 +97,104 @@ def test_cache_query_skipping_is_not_reported_as_context_pruning(recorder):
         }
     ]
     assert recorder.token_evidence(rows) is None
+
+
+def development_fixture():
+    suites = ("libero_spatial", "libero_object", "libero_goal", "libero_10")
+    results, records, selection, ids = [], [], {}, {}
+    for preset, successes in (("baseline", 180), ("example", 160)):
+        config = {
+            "backend": "fixture",
+            "model_variant": "joint",
+            "precision": "bf16",
+            "method": "none" if preset == "baseline" else "example",
+            "execution_horizon": 8,
+            "parameters": {},
+            "backend_parameters": {},
+        }
+        backend = {**config, "checkpoint_sha256": "checkpoint"}
+        result = {
+            "backend": backend,
+            "config": config,
+            "preset": preset,
+            "complete": True,
+            "episodes": 200,
+            "errors": 0,
+            "successes": successes,
+            "success_rate": successes / 200,
+            "manifest_sha256": "manifest",
+            "experiment_id": preset,
+            "source": {"runtime_source_sha256": "source"},
+            "shards": [{}] * 8,
+            "suites": {
+                s: {"episodes": 50, "errors": 0, "successes": successes // 4} for s in suites
+            },
+        }
+        records.append(
+            {
+                "run": {
+                    "run_id": preset,
+                    "metadata": {"backend": backend, "config": config},
+                    "summary": {
+                        "peak_allocated_bytes": 2**30,
+                        "all_control_steps": {"mean_ms": 10},
+                    },
+                },
+                "preset": f"configs/experiments/fixture/{preset}.yaml",
+                "section": "5.1",
+                "replay_speedup": 1.0,
+            }
+        )
+        results.append(result)
+        selection[f"fixture/{preset}"] = preset
+        ids[preset] = preset
+    return (
+        {
+            "kind": "development_validation",
+            "all_complete": True,
+            "manifest_sha256": "manifest",
+            "configurations": results,
+        },
+        copy.deepcopy(records),
+        selection,
+        ids,
+    )
+
+
+def test_development_join_is_separate_from_formal_and_historical_timing(recorder):
+    args = development_fixture()
+    text = "\n".join(recorder.validation_tables(*args))
+    assert "160/200 (80.0%)" in text and "-10.0" in text
+    assert "not simultaneous" in text and "development/tuning subset" in text
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "incomplete",
+        "errors",
+        "different_config",
+        "different_checkpoint",
+        "superseded",
+        "missing_timing",
+    ],
+)
+def test_development_join_rejects_incomparable_evidence(recorder, mutation):
+    validation, records, selection, ids = development_fixture()
+    if mutation == "incomplete":
+        validation["all_complete"] = False
+    elif mutation == "errors":
+        validation["configurations"][1]["errors"] = 1
+    elif mutation == "different_config":
+        records[1]["run"]["metadata"]["config"]["parameters"] = {"ratio": 0.5}
+    elif mutation == "different_checkpoint":
+        records[1]["run"]["metadata"]["backend"]["checkpoint_sha256"] = "another"
+    elif mutation == "superseded":
+        records[0]["supersedes"] = ["example"]
+    else:
+        selection.pop("fixture/example")
+    with pytest.raises(ValueError):
+        recorder.validation_tables(validation, records, selection, ids)
 
 
 def test_superseded_evidence_is_preserved_and_labelled(tmp_path, recorder):
