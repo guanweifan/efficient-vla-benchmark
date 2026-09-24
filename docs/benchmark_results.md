@@ -21,6 +21,131 @@ ratios as if query cadence were identical. Peak GiB is runtime allocated tensor
 memory, not loading peak or total process memory. Smoke is successes/episodes,
 not a success-rate estimate. Formal success rate is **not measured for any row**.
 
+## Fixed Dev-200 validation and historical speed
+
+Five fixed initial states per task; forty tasks, fifty episodes per suite.
+Every configuration uses the same episode manifest and policy seeds.
+Manifest SHA256: `9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580`.
+This is a **development/tuning subset**, not the formal 2,000-episode success rate.
+The remaining 1,800 episodes were not evaluated by this campaign. No failed
+episode is replaced by a successful retry. Each complete row has zero runtime errors.
+
+Speed columns reuse explicitly selected historical fixed-replay records below,
+matched by checkpoint, method parameters, precision and execution cadence.
+They are **not simultaneous measurements on these 200 trajectories**. Historical
+source/cohort differences remain visible through the timing record links; the
+join does not certify identical implementation revisions. Concurrent evaluation
+wall time is never used as policy latency. Delta is percentage points against
+the same backend's native baseline at matched H; VOTE therefore uses H=1.
+
+### cogact
+
+| Preset / timing record | Section | H | Spatial /50 | Object /50 | Goal /50 | Long /50 | Dev-200 | Delta pp | ms/control | Speedup | Peak GiB |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| baseline [R57](#r57) | 5.1 Token Pruning and Context Compression | 8 | 47 | 49 | 46 | 41 | 183/200 (91.5%) | +0.0 | 23.54 | 1.000× | 14.73 |
+| baseline_horizon1 [R13](#r13) | 0. Native references | 1 | 47 | 41 | 39 | 34 | 161/200 (80.5%) | +0.0 | 185.82 | 1.000× | 14.73 |
+| actuation_slack_refresh_deletion [R56](#r56) | 5.1 Token Pruning and Context Compression | 8 | 42 | 38 | 35 | 22 | 137/200 (68.5%) | -23.0 | 38.10 | 0.618× | 14.74 |
+| adp [R29](#r29) | 5.1 Token Pruning and Context Compression | 8 | 47 | 48 | 46 | 41 | 182/200 (91.0%) | -0.5 | 21.44 | 1.092× | 14.73 |
+| awq [R10](#r10) | 6.1 Quantization and Low-Precision Inference | 8 | 49 | 48 | 46 | 40 | 183/200 (91.5%) | +0.0 | 19.81 | 1.192× | 5.90 |
+| awq_fp16_kernel [R11](#r11) | 6.1 Quantization and Low-Precision Inference | 8 | 48 | 49 | 47 | 38 | 182/200 (91.0%) | -0.5 | 17.31 | 1.363× | 5.90 |
+| dart [R59](#r59) | 5.1 Token Pruning and Context Compression | 8 | 49 | 48 | 45 | 42 | 184/200 (92.0%) | +0.5 | 17.05 | 1.380× | 14.64 |
+| depth_cache_primary [R60](#r60) | 5.1 Token Pruning and Context Compression | 8 | 47 | 49 | 45 | 39 | 180/200 (90.0%) | -1.5 | 23.80 | 0.989× | 14.73 |
+| divprune [R61](#r61) | 5.1 Token Pruning and Context Compression | 8 | 47 | 47 | 45 | 43 | 182/200 (91.0%) | -0.5 | 17.82 | 1.321× | 14.63 |
+| efficient_vla_diffusion_cache [R21](#r21) | 5.2 Caching and Computation Reuse | 8 | 42 | 49 | 41 | 33 | 165/200 (82.5%) | -9.0 | 21.08 | 1.119× | 14.73 |
+| fastv [R62](#r62) | 5.1 Token Pruning and Context Compression | 8 | 47 | 48 | 45 | 41 | 181/200 (90.5%) | -1.0 | 16.95 | 1.389× | 14.64 |
+| flash_vla [R32](#r32) | 5.1 Token Pruning and Context Compression | 8 | 33 | 32 | 42 | 19 | 126/200 (63.0%) | -28.5 | 20.07 | 1.167× | 14.66 |
+| safe_pruner [R22](#r22) | 5.1 Token Pruning and Context Compression | 8 | 44 | 50 | 44 | 39 | 177/200 (88.5%) | -3.0 | 16.04 | 1.470× | 14.74 |
+| sp_vla [R15](#r15) | 5.3 Layer Skipping, Early Exit, and Model Routing | 8 | 49 | 48 | 45 | 39 | 181/200 (90.5%) | -1.0 | 20.89 | 1.130× | 14.73 |
+| sparsevlm [R63](#r63) | 5.1 Token Pruning and Context Compression | 8 | 46 | 49 | 46 | 44 | 185/200 (92.5%) | +1.0 | 18.77 | 1.254× | 14.64 |
+| specprune_vla [R23](#r23) | 5.1 Token Pruning and Context Compression | 8 | 37 | 29 | 30 | 19 | 115/200 (57.5%) | -34.0 | 18.26 | 1.291× | 14.56 |
+| st_merge [R24](#r24) | 5.1 Token Pruning and Context Compression | 8 | 9 | 14 | 7 | 4 | 34/200 (17.0%) | -74.5 | 16.59 | 1.421× | 14.63 |
+| vla_cache [R16](#r16) | 5.2 Caching and Computation Reuse | 8 | 48 | 48 | 45 | 37 | 178/200 (89.0%) | -2.5 | 20.20 | 1.169× | 14.75 |
+| vla_infoentropy [R25](#r25) | 5.2 Caching and Computation Reuse | 8 | 48 | 47 | 46 | 34 | 175/200 (87.5%) | -4.0 | 21.68 | 1.088× | 14.75 |
+| vote_ensemble [R18](#r18) | 5.5 Action Chunking and Replanning | 1 | 46 | 46 | 45 | 43 | 180/200 (90.0%) | +9.5 | 186.53 | 0.996× | 14.73 |
+
+### openvla_oft
+
+| Preset / timing record | Section | H | Spatial /50 | Object /50 | Goal /50 | Long /50 | Dev-200 | Delta pp | ms/control | Speedup | Peak GiB |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| baseline [R65](#r65) | 5.1 Token Pruning and Context Compression | 8 | 49 | 50 | 49 | 50 | 198/200 (99.0%) | +0.0 | 24.85 | 1.000× | 14.98 |
+| baseline_horizon1 [R36](#r36) | 0. Native references | 1 | 49 | 40 | 38 | 31 | 158/200 (79.0%) | +0.0 | 199.83 | 1.000× | 14.98 |
+| actuation_slack_refresh_deletion [R64](#r64) | 5.1 Token Pruning and Context Compression | 8 | 50 | 50 | 49 | 46 | 195/200 (97.5%) | -1.5 | 46.47 | 0.535× | 14.69 |
+| adp [R42](#r42) | 5.1 Token Pruning and Context Compression | 8 | 49 | 50 | 50 | 48 | 197/200 (98.5%) | -0.5 | 24.58 | 1.015× | 14.68 |
+| awq [R33](#r33) | 6.1 Quantization and Low-Precision Inference | 8 | 49 | 50 | 50 | 49 | 198/200 (99.0%) | +0.0 | 26.00 | 0.965× | 6.12 |
+| awq_fp16_kernel [R34](#r34) | 6.1 Quantization and Low-Precision Inference | 8 | 49 | 49 | 49 | 48 | 195/200 (97.5%) | -1.5 | 21.61 | 1.162× | 6.12 |
+| dart [R67](#r67) | 5.1 Token Pruning and Context Compression | 8 | 46 | 50 | 48 | 40 | 184/200 (92.0%) | -7.0 | 21.69 | 1.146× | 14.62 |
+| depth_cache_primary [R68](#r68) | 5.1 Token Pruning and Context Compression | 8 | 50 | 48 | 49 | 49 | 196/200 (98.0%) | -1.0 | 25.47 | 0.976× | 14.68 |
+| divprune [R69](#r69) | 5.1 Token Pruning and Context Compression | 8 | 49 | 50 | 48 | 47 | 194/200 (97.0%) | -2.0 | 24.00 | 1.035× | 14.62 |
+| efficient_vla [R45](#r45) | 5.1 Token Pruning and Context Compression | 8 | 50 | 50 | 48 | 48 | 196/200 (98.0%) | -1.0 | 21.59 | 1.156× | 14.63 |
+| fastv [R70](#r70) | 5.1 Token Pruning and Context Compression | 8 | 49 | 49 | 50 | 50 | 198/200 (99.0%) | +0.0 | 21.42 | 1.160× | 14.62 |
+| flash_vla [R46](#r46) | 5.1 Token Pruning and Context Compression | 8 | 48 | 47 | 45 | 50 | 190/200 (95.0%) | -4.0 | 26.48 | 0.943× | 14.64 |
+| safe_pruner [R48](#r48) | 5.1 Token Pruning and Context Compression | 8 | 49 | 50 | 48 | 48 | 195/200 (97.5%) | -1.5 | 18.62 | 1.340× | 14.68 |
+| sp_vla [R05](#r05) | 5.3 Layer Skipping, Early Exit, and Model Routing | 8 | 50 | 49 | 48 | 48 | 195/200 (97.5%) | -1.5 | 22.41 | 1.117× | 14.68 |
+| sparsevlm [R71](#r71) | 5.1 Token Pruning and Context Compression | 8 | 49 | 49 | 48 | 47 | 193/200 (96.5%) | -2.5 | 23.26 | 1.068× | 14.63 |
+| specprune_vla [R49](#r49) | 5.1 Token Pruning and Context Compression | 8 | 36 | 45 | 44 | 33 | 158/200 (79.0%) | -20.0 | 20.42 | 1.222× | 14.60 |
+| st_merge [R50](#r50) | 5.1 Token Pruning and Context Compression | 8 | 35 | 41 | 20 | 27 | 123/200 (61.5%) | -37.5 | 21.74 | 1.148× | 14.62 |
+| team_vla [R51](#r51) | 5.1 Token Pruning and Context Compression | 8 | 30 | 49 | 7 | 11 | 97/200 (48.5%) | -50.5 | 17.71 | 1.409× | 14.61 |
+| vla_cache [R52](#r52) | 5.2 Caching and Computation Reuse | 8 | 50 | 48 | 47 | 48 | 193/200 (96.5%) | -2.5 | 26.16 | 0.954× | 15.03 |
+| vla_iap [R53](#r53) | 5.1 Token Pruning and Context Compression | 8 | 50 | 50 | 43 | 46 | 189/200 (94.5%) | -4.5 | 24.51 | 1.018× | 14.69 |
+| vla_infoentropy [R54](#r54) | 5.2 Caching and Computation Reuse | 8 | 48 | 50 | 49 | 48 | 195/200 (97.5%) | -1.5 | 27.08 | 0.922× | 15.03 |
+| vla_pruner [R55](#r55) | 5.1 Token Pruning and Context Compression | 8 | 49 | 50 | 49 | 47 | 195/200 (97.5%) | -1.5 | 20.75 | 1.203× | 14.68 |
+| vote_ensemble [R41](#r41) | 5.5 Action Chunking and Replanning | 1 | 48 | 50 | 46 | 44 | 188/200 (94.0%) | +15.0 | 199.62 | 1.001× | 14.98 |
+
+<details>
+<summary>Development configuration identities</summary>
+
+Raw evidence is retained under each campaign's `runs/<backend>--<preset>--sNNN/`.
+The aggregate retains every episode outcome, source revision, shard and file hash.
+A timing record is an audited historical reference, not a new measurement.
+
+| Configuration | Experiment identity | Runtime source | Shards |
+|---|---|---|---:|
+| cogact/actuation_slack_refresh_deletion | `b53ec6957ea787d2670b39019271cea2a415f75fce5b3213e5132d201e1c4c50` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/adp | `42449ae56acdde4b772b59d1e06aae9fd967c8b2218fc23decbb18768ba3af66` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/awq | `a223cf526c859a8a6071ba21da16d2be890c981c5048f52ab863fda22eace8dc` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/awq_fp16_kernel | `be03b017c6a40862b3ebc5afa78a0ce2cf31111d49e8763c1fe5d0650391c117` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/baseline | `a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/baseline_horizon1 | `14ac367a1ff2fcdccd71c123235a5879d950eca0ebed49cf9c4aaf76769d6989` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/dart | `703d93d8a87981631d66e7a6466a8793d795eecd9b2805b7525f54bf65efa389` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/depth_cache_primary | `8f0ed815f5f86fb2088cb19f63a81b6e9c0637fab2ddf178cd6f1bcf9fa202d6` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/divprune | `0450741919be84698dcad7bdb2ac98811edad1574c09cabcf4871983a05ff1ae` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/efficient_vla_diffusion_cache | `2e99d4df59fd76c5961cbf0ce7b5e263c64eb81b2b7f72f60da5893bac5920e3` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/fastv | `27489ccc7f64a43601970748ec169d8a89d2c6547eaa078682debf490749bc32` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/flash_vla | `a3241c13b054520b72fe7d7a8afe665de8ccc3521dd177151f134b84c24b33ba` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/safe_pruner | `bdc7820db41f431415a887ed411fead64ed546d22e056708ae5ef56344353f26` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/sp_vla | `27d4793d914e2be7c1eb929c254b8661581eaefb1a68530fc1c0746d0cd764d9` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/sparsevlm | `19e55b9daed5d94fe5e3c51402cfe296a0a1cb52a519fa5e24cc0025772342e2` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/specprune_vla | `200e2a5546ff87e327bf91696fb9a35b9f0a400baf9f744101f68e74fa752304` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/st_merge | `2a63e1b14d73cbda0afa52b35c299e770af5a3dfa14025eedb31eca4c39edb65` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/vla_cache | `f9612931a47706abef36d9251e82bcf9c0ceeb249fce9e68412d8214f5a29fcb` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/vla_infoentropy | `3e7f5140c644c221a9a02a45731cf1e949650a3564053c9d662f85e37b11cabb` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| cogact/vote_ensemble | `f6b608bfced978188d89978e816e2ba29cbd6e9d12a4dc5656cb146d2d4a955f` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/actuation_slack_refresh_deletion | `2e2b75988b34636d5fa39e24e573aa4a159c179d48954e47203a23897921b39c` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/adp | `83f9aeebdff8a240e92f929ab699eaabc470de89ecc663c04837580dce3f412a` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/awq | `5d64703c2acfcfe4a33ed22f76215b16457c1d61cc0be948e134f97124f509cf` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/awq_fp16_kernel | `566ed69c9ce2db872ba40344f9123dac0ba1db2f05ef3c240c7f156406fe6d66` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/baseline | `83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/baseline_horizon1 | `d1432ffd8638abf10c9ab9ecc527a43f7e12f650a6c7b7bd4e66d09134d065c5` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/dart | `959698fd55bb54c37ba68a4b14bc589d41d41e4cab340d7023a14ce24af65841` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/depth_cache_primary | `23ee03e39b8e019f7c9674baabb00b045f8f303a25ea442dd81e7a27516cb331` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/divprune | `4482ae63177ce1099a9ba5360b83ab01317cb8d5519527dbd8aecd75cb083aea` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/efficient_vla | `fa758c551bfb39b4f8a0a122e5dd9b278d42ceb1728352c67697012322438fb3` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/fastv | `66828e8ed4865b10d7301a447b0fa90beb10e83827a02f0aac1c8551701e69d1` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/flash_vla | `d8ddc05d8a8948df0fe5d2418b2a39e1c0f438f1e183ed4d010b0d5b2c66caad` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/safe_pruner | `21e11d22bc36089d4007bafe5b33d9b790947dbef1e904ab92e73336bf26ffec` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/sp_vla | `c321f89069f8c73c936a1388ee57c00bab318a500a5f81d0ec5b9074a94a23a8` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/sparsevlm | `071e8857510d6e9ed29997e514942f2950f8af42284c5bba9ff50ba0b2c7f6ef` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/specprune_vla | `db98812e4d43c083caa9734b047770a7de7e2af0f2446e06e730cf3e3be7cb34` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/st_merge | `03eda8c029c9b6266595a28fb15e9b26b06271c75879bd824270d01f09393698` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/team_vla | `01da23f467ef2f675afa00620cd10be36f2366225c2ab2bc1d4a69d012ea1d43` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/vla_cache | `05bde38fdbf83dfb4f0928768c7d460b51ef106a49e29eeb6aaf7783da1da17d` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/vla_iap | `0a6a2c9c71aefa83b1f9ce71ac8d7813d3bb4ed9c4494769d977fdf123756ae0` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/vla_infoentropy | `fc132144e01cbf7c6a681a8b9f59e0010c7cb55a4742809365070e9632b55733` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/vla_pruner | `bdc953860094a1e5dc0a255f8c0bc53142570fbd610242920303d1b1a1216310` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+| openvla_oft/vote_ensemble | `fe1c47c9ecd7373e5744dfcb53a13ba295d4b6543240f380be2724ba3453f792` | `5b5740bec7bf22ac88b188de1afe1aca0373d62566c28df4a9498e4fdfcb340e` | 8 |
+
+</details>
+
 ## 0. Native references
 
 | Record / configuration | Backend | H | Queries / replacements | Query mean / p95 ms | ms/control step | Replay speedup | Peak GiB | Smoke |
