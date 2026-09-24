@@ -6,6 +6,7 @@ Prismatic, CogACT and AWQ packages take precedence. Validate both environments a
 """
 
 import argparse
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -15,6 +16,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--source-root", required=True)
+    parser.add_argument("--library-dir", type=Path)
     args = parser.parse_args()
     root = args.root.resolve()
     if sys.version_info[:2] != (3, 10):
@@ -57,6 +59,16 @@ def main():
             check=True,
         )
         subprocess.run([str(python), "-m", "pip", "check"], check=True)
+        if args.library_dir:
+            library = args.library_dir.resolve(strict=True)
+            wrapper = python.with_name("python-evb")
+            wrapper.write_text(
+                "#!/bin/sh\n"
+                f"export LD_LIBRARY_PATH={shlex.quote(str(library))}"
+                "${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}\n"
+                f'exec {shlex.quote(str(python))} "$@"\n'
+            )
+            wrapper.chmod(0o755)
 
 
 if __name__ == "__main__":
