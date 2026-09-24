@@ -72,6 +72,14 @@ def main():
                 f'exec {shlex.quote(str(python))} "$@"\n'
             )
             wrapper.chmod(0o755)
+        launcher = python.with_name("python-gpu")
+        interpreter = python.with_name("python-evb") if args.library_dir else python
+        launcher.write_text(
+            "#!/bin/sh\n"
+            f"exec {shlex.quote(str(interpreter))} "
+            f'{shlex.quote(str(root / "scripts/gpu_worker.py"))} "$@"\n'
+        )
+        launcher.chmod(0o755)
 
 
 if __name__ == "__main__":

@@ -216,6 +216,16 @@ interrupted running jobs before resuming. Worker runtime relocation is explicit 
 `scripts/prepare_worker_runtime.py`; validate package origins and matched real-model
 episodes before admitting another host. Machine-local paths are runtime inputs only.
 
+Prepared worker environments expose `bin/python-gpu` for the evaluation CLI. The
+launcher resolves the assigned GPU to a UUID, then queries `EGL_NV_device_cuda`;
+never assume EGL enumeration equals the GPU index shown by `nvidia-smi`. It keeps
+one CUDA-visible device and defers the EGL override until the pinned robosuite
+binding has imported, avoiding its incorrect cross-namespace index assertion.
+Its import-scoped log redirection restores the logging factory immediately and
+keeps legacy simulator logs under the run's `_private/`, not a shared global file.
+No model/simulator equations or installed packages are patched. Verify rendered
+RGB/depth and real-policy parity when changing launch/bootstrap behavior.
+
 `scripts/evaluation_results.py merge` rejects duplicate, foreign or incompatible
 episodes and reports missing episodes/errors. A comparable Dev-200 success rate
 requires all 200 records and zero runtime errors. Normal unsuccessful episodes
