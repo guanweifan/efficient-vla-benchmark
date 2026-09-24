@@ -1,0 +1,47 @@
+# One fixed current preset per supported scope, plus matched H1 baselines and
+# both explicitly reported AWQ kernel precisions. No scheduling-only ablations.
+openvla_oft:
+  - baseline
+  - baseline_horizon1
+  - vote_ensemble
+  - actuation_slack_refresh_deletion
+  - awq
+  - awq_fp16_kernel
+  - adp
+  - dart
+  - depth_cache_primary
+  - divprune
+  - efficient_vla
+  - fastv
+  - flash_vla
+  - safe_pruner
+  - sp_vla
+  - sparsevlm
+  - specprune_vla
+  - st_merge
+  - team_vla
+  - vla_cache
+  - vla_infoentropy
+  - vla_iap
+  - vla_pruner
+cogact:
+  - baseline
+  - baseline_horizon1
+  - vote_ensemble
+  - actuation_slack_refresh_deletion
+  - awq
+  - awq_fp16_kernel
+  - adp
+  - dart
+  - depth_cache_primary
+  - divprune
+  - efficient_vla_diffusion_cache
+  - fastv
+  - flash_vla
+  - safe_pruner
+  - sp_vla
+  - sparsevlm
+  - specprune_vla
+  - st_merge
+  - vla_cache
+  - vla_infoentropy

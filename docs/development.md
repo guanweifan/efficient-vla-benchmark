@@ -185,6 +185,44 @@ optional traces and private path configuration. Identical-run resume skips recor
 episodes; changed identities are rejected. Preserve a failed run when fixing it.
 Formal mode (`--formal`, `--tasks`, `--suites`, `--trials`) requires owner scheduling.
 
+### Fixed development validation
+
+`evaluation-manifest` freezes `libero_dev200_v1`: five seeded samples without
+replacement from initial-state indices 0–49 for each of forty tasks. Task order,
+BDDL/init-state digests and policy seeds are explicit. It is a tuning subset of
+the full 2,000-episode protocol, not an independent final test. Retain the remaining
+1,800 episodes as untuned evidence and disclose overlap in later full-set reports.
+
+```bash
+evb evaluation-manifest --libero-root "$LIBERO_ROOT" --output "$MANIFEST"
+evb evaluate --config "$PRESET" --model-path "$MODEL_DIR" \
+  --libero-root "$LIBERO_ROOT" --episode-manifest "$MANIFEST" \
+  --shard-index 0 --num-shards 8 --output-dir "$RUN_DIR" --no-record-traces
+```
+
+The manifest owns episode selection; `--formal`, task/trial/seed overrides cannot
+be combined with it. Shards retain original initial-state IDs and policy seeds;
+every algorithm uses the same manifest. Runtime-source, active backend dependency,
+extension, checkpoint and effective-config identities protect resume/aggregation.
+Full source revisions and hardware remain recorded separately for every shard.
+No framework, algorithm or backend branch belongs in sampling or aggregation.
+
+`configs/evaluation/dev200_campaign.yaml` defines current main presets and matched
+cadence baselines. `scripts/evaluation_results.py plan` generates portable jobs;
+`scripts/run_evaluation_campaign.py` consumes caller-owned private SSH/resource
+inventories and dynamically assigns jobs to idle GPUs. It never installs assets,
+kills processes or writes Git. One coordinator owns its state directory; inspect
+interrupted running jobs before resuming. Worker runtime relocation is explicit via
+`scripts/prepare_worker_runtime.py`; validate package origins and matched real-model
+episodes before admitting another host. Machine-local paths are runtime inputs only.
+
+`scripts/evaluation_results.py merge` rejects duplicate, foreign or incompatible
+episodes and reports missing episodes/errors. A comparable Dev-200 success rate
+requires all 200 records and zero runtime errors. Normal unsuccessful episodes
+remain failures; infrastructure retries preserve the exact episode and attempt
+history. Concurrency wall time is not a policy-speed benchmark. Keep raw evidence
+ignored and add development success columns to the existing result ledger only.
+
 Depth-based methods require real aligned metric depth: enable `evaluation.depth`
 or use `evaluate --depth`. Schema-3 traces preserve this modality; no synthetic
 depth is inferred from old RGB-only traces. The native model still receives only
