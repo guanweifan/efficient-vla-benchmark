@@ -25,6 +25,11 @@ def hygiene():
         "logs/run.log",
         "_private/settings.yaml",
         "models/config.json",
+        ".runtime/evaluation/launch.py",
+        "scripts/run_evaluation_campaign.py",
+        "scripts/prepare_worker_runtime.py",
+        "scripts/gpu_worker.py",
+        "tests/test_gpu_worker_launcher.py",
     ],
 )
 def test_generated_and_private_files_cannot_enter_tracked_tree(hygiene, name):

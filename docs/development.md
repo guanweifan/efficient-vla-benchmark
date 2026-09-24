@@ -209,15 +209,13 @@ No framework, algorithm or backend branch belongs in sampling or aggregation.
 
 `configs/evaluation/dev200_campaign.yaml` defines current main presets and matched
 cadence baselines. `scripts/evaluation_results.py plan` generates portable jobs;
-`scripts/run_evaluation_campaign.py` consumes caller-owned private SSH/resource
-inventories and dynamically assigns jobs to idle GPUs. It never installs assets,
-kills processes or writes Git. One coordinator owns its state directory; inspect
-interrupted running jobs before resuming. Worker runtime relocation is explicit via
-`scripts/prepare_worker_runtime.py`; validate package origins and matched real-model
-episodes before admitting another host. Machine-local paths are runtime inputs only.
+deployment, scheduling and environment bootstrap are private operational tools,
+kept outside Git with caller-owned resource inventories. Validate package origins,
+CUDA-extension identities and matched real-model episodes before admitting another
+host. One coordinator owns campaign state; inspect interrupted jobs before resuming.
+Machine-local paths are runtime inputs only, never committed deployment settings.
 
-Prepared worker environments expose `bin/python-gpu` for the evaluation CLI. The
-launcher resolves the assigned GPU to a UUID, then queries `EGL_NV_device_cuda`;
+The local launcher must resolve the assigned GPU to a UUID and map its EGL device;
 never assume EGL enumeration equals the GPU index shown by `nvidia-smi`. It keeps
 one CUDA-visible device and defers the EGL override until the pinned robosuite
 binding has imported, avoiding its incorrect cross-namespace index assertion.

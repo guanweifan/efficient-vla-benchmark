@@ -1,6 +1,11 @@
 # Local runtimes and generated outputs
 .venv*/
 .runtime/
+# Private campaign operations retained locally, never part of the public harness
+/scripts/run_evaluation_campaign.py
+/scripts/prepare_worker_runtime.py
+/scripts/gpu_worker.py
+/tests/test_gpu_worker_launcher.py
 outputs/
 artifacts/
 _private/

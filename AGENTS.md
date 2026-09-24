@@ -32,6 +32,9 @@ of development and Git rules; upstream submodules retain their own instructions.
 
 - Pass every external resource location through CLI arguments. Never commit private
   filesystem paths, host/network identities, credentials or environment dumps.
+- Keep machine-specific launchers, deployment/scheduling scripts and ad-hoc smoke
+  drivers in ignored local runtime storage, not Git. Commit reusable harnesses,
+  portable result tools and generic tests; never force-add private operational files.
 - Original checkpoints/datasets are read-only. Derived calibration artifacts stay
   separate. No global site-package edits or global model-class monkey patches.
 - Keep weights, datasets, traces, logs, environments, binaries and exported result

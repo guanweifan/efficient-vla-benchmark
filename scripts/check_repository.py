@@ -51,12 +51,22 @@ SECRET_PATTERNS = (
     re.compile(r"\bhf_[A-Za-z0-9]{30,}\b"),
 )
 
+# Retired operational files may remain locally for an active campaign, but a
+# force-add must not silently reintroduce them into the distributable project.
+LOCAL_ONLY_FILES = {
+    "scripts/run_evaluation_campaign.py",
+    "scripts/prepare_worker_runtime.py",
+    "scripts/gpu_worker.py",
+    "tests/test_gpu_worker_launcher.py",
+}
+
 
 def file_issues(relative, content):
     path = Path(relative)
     issues = []
     if (
-        any(part in FORBIDDEN_DIRS or part.startswith(".venv") for part in path.parts)
+        relative in LOCAL_ONLY_FILES
+        or any(part in FORBIDDEN_DIRS or part.startswith(".venv") for part in path.parts)
         or relative.startswith("docs/results/")
         or (path.name.startswith(".env") and path.name != ".env.example")
         or path.suffix in FORBIDDEN_SUFFIXES
