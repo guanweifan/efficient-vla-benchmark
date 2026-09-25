@@ -138,6 +138,15 @@ def make_workload(manifest, trace_paths, baseline):
         "length_rule": "native_reference_until_success_or_official_limit",
         "traces": traces,
     }
+    if manifest["name"] == "libero_timing4_v1":
+        result.update(
+            schema_version=2,
+            protocol_id="libero_replay4x128_v1",
+            length_rule="first_min_128_native_control_steps",
+        )
+        for row in traces:
+            row["source_steps"] = row["steps"]
+            row["steps"] = min(128, row["steps"])
     result["sha256"] = stable_hash(result)
     return validate_workload(result)
 

@@ -209,8 +209,8 @@ Full source revisions and hardware remain recorded separately for every shard.
 No framework, algorithm or backend branch belongs in sampling or aggregation.
 
 `evb derive-manifest --development-manifest "$MANIFEST" --purpose timing --output
-"$TIMING_MANIFEST"` freezes one episode per task (the lowest selected Dev initial-
-state ID), before examining outcomes. `--purpose final` instead freezes all fifty
+"$TIMING_MANIFEST"` freezes FOUR episodes: task 0 in each suite, using its lowest
+selected Dev initial-state ID before examining outcomes. `--purpose final` freezes all fifty
 states per task. Derivation never runs a policy. Timing-reference rollouts may
 record real depth with `--depth --record-traces`; failed tasks remain in the workload.
 A final-manifest rollout additionally requires `--authorize-final` after owner

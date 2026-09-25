@@ -58,6 +58,12 @@ def test_fixed_workload_rejects_wrong_ids_files_or_backend(tmp_path):
         for t in range(10)
     }
     manifest = derive_manifest(make_manifest(resources), "timing")
+    compact_manifest = copy.deepcopy(manifest)
+    # The legacy bank remains readable for transition audits, but new capture
+    # defaults to four episodes and never requires forty native rollouts.
+    manifest["name"] = "libero_timing40_v1"
+    manifest["episodes"] = make_manifest(resources)["episodes"][::5]
+    manifest["sha256"] = stable_hash({k: v for k, v in manifest.items() if k != "sha256"})
     obs = Observation(
         np.zeros((2, 2, 3), dtype=np.uint8),
         np.zeros((2, 2, 3), dtype=np.uint8),
@@ -135,6 +141,9 @@ def test_fixed_workload_rejects_wrong_ids_files_or_backend(tmp_path):
     save_trace(selected, context, [obs] * 160, list(range(160)))
     compact = compact_workload(make_workload(manifest, paths, baseline))
     compact_paths = [p for p in paths if p.name in {r["name"] for r in compact["traces"]}]
+    direct = make_workload(compact_manifest, compact_paths, baseline)
+    assert direct["schema_version"] == 2
+    assert direct["traces"] == compact["traces"]
     assert len(compact_paths) == 4
     assert sum(r["steps"] for r in compact["traces"]) == 134
     result = benchmark(

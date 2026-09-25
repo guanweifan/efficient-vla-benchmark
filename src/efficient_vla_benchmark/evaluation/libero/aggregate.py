@@ -109,7 +109,7 @@ def merge_shards(manifest, run_dirs):
         rows = [r for k, r in records.items() if k[0] == suite]
         successes = sum(r["success"] for r in rows)
         errors = sum(r["status"] == "error" for r in rows)
-        expected_suite = 10 * manifest["samples_per_task"]
+        expected_suite = sum(e["suite"] == suite for e in manifest["episodes"])
         complete = len(rows) == expected_suite and errors == 0
         suites[suite] = {
             "episodes": len(rows),

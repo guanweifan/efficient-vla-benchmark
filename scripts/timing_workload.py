@@ -22,7 +22,7 @@ def build(manifest, run_dirs):
     for trace in workload["traces"]:
         context = trace["context"]
         key = (context["suite"], context["task_id"], context["episode_id"])
-        if trace["steps"] != outcomes[key]["steps"]:
+        if trace.get("source_steps", trace["steps"]) != outcomes[key]["steps"]:
             raise ValueError("Timing trace was truncated relative to its reference rollout")
     workload["reference_evidence"] = {
         "experiment_id": aggregate["experiment_id"],
@@ -51,7 +51,7 @@ def main():
         if not args.manifest or not args.run_dirs:
             parser.error("Supply --reference-workload or both --manifest and --run-dirs")
         reference = build(load_manifest(args.manifest), args.run_dirs)
-    value = compact_workload(reference)
+    value = compact_workload(reference) if reference["schema_version"] == 1 else reference
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
     print(json.dumps({"tasks": len(value["traces"]), "sha256": value["sha256"]}))

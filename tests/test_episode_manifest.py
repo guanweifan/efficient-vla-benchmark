@@ -112,7 +112,7 @@ def test_merge_errors_and_configuration_mismatch(manifest, tmp_path):
         merge_shards(manifest, [paths[0], incompatible])
 
 
-@pytest.mark.parametrize("purpose,count", [("timing", 40), ("final", 2000)])
+@pytest.mark.parametrize("purpose,count", [("timing", 4), ("final", 2000)])
 def test_derived_manifests_and_aggregate_keep_protocols_distinct(
     manifest, tmp_path, purpose, count
 ):
@@ -120,9 +120,10 @@ def test_derived_manifests_and_aggregate_keep_protocols_distinct(
     assert len(derived["episodes"]) == count
     assert derived["development_manifest_sha256"] == manifest["sha256"]
     assert derived == derive_manifest(manifest, purpose)
-    assert len([e for i in range(8) for e in select_shard(derived, i, 8)]) == count
+    shards = min(8, count)
+    assert len([e for i in range(shards) for e in select_shard(derived, i, shards)]) == count
     if purpose == "timing":
-        assert derived["episodes"] == manifest["episodes"][::5]
+        assert derived["episodes"] == [e for e in manifest["episodes"][::5] if e["task_id"] == 0]
     else:
         assert {episode_key(e) for e in manifest["episodes"]} <= {
             episode_key(e) for e in derived["episodes"]

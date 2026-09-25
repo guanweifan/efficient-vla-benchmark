@@ -11,6 +11,7 @@ SUITES = ("libero_spatial", "libero_object", "libero_goal", "libero_10")
 PROTOCOLS = {
     "libero_dev200_v1": ("development_validation", 5),
     "libero_timing40_v1": ("timing_reference", 1),
+    "libero_timing4_v1": ("timing_reference", 1),
     "libero_final2000_v1": ("final_evaluation", 50),
 }
 
@@ -68,11 +69,12 @@ def validate_manifest(data):
     ) != (50, samples, 0):
         raise ValueError("Invalid fixed episode protocol")
     episodes = data["episodes"]
-    population = 40 * samples
+    task_ids = range(1) if data["name"] == "libero_timing4_v1" else range(10)
+    population = 4 * len(task_ids) * samples
     if len(episodes) != population or len({episode_key(e) for e in episodes}) != population:
         raise ValueError(f"Manifest requires exactly {population} distinct episodes")
     counts = Counter((e["suite"], e["task_id"]) for e in episodes)
-    if counts != Counter({(s, t): samples for s in SUITES for t in range(10)}):
+    if counts != Counter({(s, t): samples for s in SUITES for t in task_ids}):
         raise ValueError("Manifest requires its fixed episode count per task")
     for e in episodes:
         if (
@@ -95,7 +97,8 @@ def validate_manifest(data):
         development = make_manifest(data["resources"], data["sample_seed"], data["policy_seed"])
         if data.get("development_manifest_sha256") != development["sha256"]:
             raise ValueError("Derived manifest does not match its fixed development source")
-        if samples == 1 and episodes != development["episodes"][::5]:
+        expected = [e for e in development["episodes"][::5] if e["task_id"] in task_ids]
+        if samples == 1 and episodes != expected:
             raise ValueError("Timing requires the lowest selected initial-state ID per task")
     return data
 
@@ -107,10 +110,10 @@ def derive_manifest(development, purpose):
         raise ValueError("Derivation requires Dev-200 and timing/final purpose")
     data = {k: v for k, v in development.items() if k != "sha256"}
     data["development_manifest_sha256"] = development["sha256"]
-    data["name"] = "libero_timing40_v1" if purpose == "timing" else "libero_final2000_v1"
+    data["name"] = "libero_timing4_v1" if purpose == "timing" else "libero_final2000_v1"
     data["kind"], data["samples_per_task"] = PROTOCOLS[data["name"]]
     data["episodes"] = (
-        development["episodes"][::5]
+        [e for e in development["episodes"][::5] if e["task_id"] == 0]
         if purpose == "timing"
         else [
             dict(row, episode_id=index)
