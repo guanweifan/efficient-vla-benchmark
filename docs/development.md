@@ -182,7 +182,8 @@ LIBERO smoke uses task 0 / initial state 0 / seed 0 in each suite, ten settling 
 then limits of 220/280/300/520 control steps for Spatial/Object/Goal/Long. CUDA/EGL
 selection must agree. Outputs retain metadata, episodes (including errors), summary,
 optional traces and private path configuration. Identical-run resume skips recorded
-episodes; changed identities are rejected. Preserve a failed run when fixing it.
+episodes; changed identities are rejected. Preserve a failed run during diagnosis;
+after resolution apply the dependency-aware retirement policy below.
 Formal mode (`--formal`, `--tasks`, `--suites`, `--trials`) requires owner scheduling.
 
 ### Fixed development validation
@@ -207,8 +208,9 @@ extension, checkpoint and effective-config identities protect resume/aggregation
 Full source revisions and hardware remain recorded separately for every shard.
 No framework, algorithm or backend branch belongs in sampling or aggregation.
 
-`configs/evaluation/dev200_campaign.yaml` defines current main presets and matched
-cadence baselines. `scripts/evaluation_results.py plan` generates portable jobs;
+`configs/evaluation/dev200_campaign.yaml` defines the original development campaign,
+including both AWQ kernel variants; it is NOT the final report selection manifest.
+`scripts/evaluation_results.py plan` generates portable jobs;
 deployment, scheduling and environment bootstrap are private operational tools,
 kept outside Git with caller-owned resource inventories. Validate package origins,
 CUDA-extension identities and matched real-model episodes before admitting another
@@ -237,7 +239,8 @@ JSON map from `backend/preset` to an explicitly audited historical timing run ID
 choose the current valid implementation cohort, never the fastest repeat. The join
 accepts repeated pairs of `--development-summary` / `--timing-selection` in round
 order, preserving the original table alongside later bounded diagnostic rounds.
-Always retain failed candidates. A changed parameter configuration needs its own
+Retain unsuccessful candidates while they support selection or diagnosis; retire
+unneeded ones under the policy below. A changed parameter configuration needs its own
 paired timing measurement; never attach its parent's speed to the new preset.
 The join
 requires matching checkpoint, precision, method parameters and execution cadence,
@@ -251,7 +254,7 @@ or use `evaluate --depth`. Schema-3 traces preserve this modality; no synthetic
 depth is inferred from old RGB-only traces. The native model still receives only
 its original inputs. Depth-aware methods read the retained observation context.
 
-Timing defaults to full control replay: four complete schema-2/3 traces, ten warmup
+Existing development timing uses full control replay: four complete schema-2/3 traces, ten warmup
 queries and three repeats, with fresh episode state. Use one otherwise idle GPU,
 fresh policy/model per method, fixed CPU threads and synchronized measurements.
 It includes preprocessing, transfers, all method/control work and postprocessing;
@@ -266,12 +269,81 @@ attention/precision and driver/kernel identities accompany every result. Dirty
 measurements keep their real status. Replay is not closed-loop completion time;
 four smoke episodes never establish formal accuracy.
 
+### Selection and final-measurement workflow
+
+1. Establish fidelity: identify the paper's core, compare executable reference or
+   explicit equations, test active behavior and native/reset boundaries, and label
+   independent cores and unverified conventions. Run the common smoke; runtime
+   completion alone is neither correctness nor accuracy validation.
+2. Evaluate the existing candidate on the fixed Dev-200 manifest. Reuse compatible,
+   complete evidence; do not rerun merely because documentation changed. All four
+   suites share one parameter configuration. Calibration still uses training data.
+3. Investigate only warranted cases: unexplained accuracy loss, poor full-cost
+   latency, almost-inactive mechanisms or unresolved fidelity. Select informative
+   changes to the implicated parameters; no fixed candidate quota or exhaustive
+   sweep. A mechanism change is a new implementation audit, not just tuning.
+4. Selection target: `Dev_SR >= matched_baseline_Dev_SR - 3 percentage points`.
+   On the current H8 references this is at least 192/200 for OFT and 177/200 for
+   CogACT. These counts follow the observed baseline, not a universal constant.
+   Prefer faster full-cost candidates meeting the target; differences within
+   timing variability are ties, with higher success and then the simpler/reference-
+   closer setting preferred. This is a development decision, not a significance test.
+5. If no tested active candidate meets the target, or none accelerates, do not
+   exclude a faithfully implemented mechanism for its outcome. Stop when further
+   useful tuning is not justified; nominate a representative, preferably reference-
+   close or accuracy-recovered, active configuration with a recorded reason. An
+   unresolved core cannot be certified simply because a favorable preset was found.
+   Record every attempted measurement during this process; keep only useful evidence
+   after decisions settle. An intentional schedule/precision change stays explicit.
+6. Freeze ONE primary configuration per backend/method scope, its selection evidence,
+   calibration identity if applicable, checkpoint, runtime and evaluation protocol.
+   Valuable auxiliary configurations may remain separately, without automatically
+   scheduling extra full campaigns. No separate best preset for each suite.
+7. Following owner scheduling, run all 2,000 fixed episodes once for each frozen
+   primary and matched baseline. Never tune using those outcomes, replace failures
+   or choose the best repeat. Extract the untuned 1,800-episode subset from THAT SAME
+   run for internal overlap-aware analysis; retain the original Dev-200 selection
+   evidence separately. Do not assemble a final result from old Dev runs plus 1,800
+   new episodes. Infrastructure resume is allowed with exact identities; a real
+   implementation bug invalidating a final run needs an explicit owner decision.
+8. Publish one primary row joining its Dev selection reason, actual final success,
+   separately measured full-cost speed/memory, scope and evidence IDs. Low success
+   and slowdowns remain reportable. A dash means not measured, never zero or baseline.
+
+The formal timing target is a fixed **40-task replay workload**, one deterministic
+native-baseline trace per task drawn by ID from the existing Dev manifest, never
+selected by favorable success or speed. Freeze IDs, content hashes and length rules
+before comparing methods; record each backend's own traces, shared by its methods.
+Depth-aware methods and their paired native reference need the same real depth-bearing
+traces. Keep the same CPU/GPU/runtime conditions and existing full-cost boundary,
+with warmup reset, repeated timing and native pre/post checks for drift/throttling.
+Compute mean ms/control within each task, macro-average the 40 task means, then
+divide the native macro-mean by the method macro-mean for speedup. Do not average
+task speedup ratios or weight tasks by their rollout lengths. Retain repeat-level
+variation; an approximately 1x historical result is not proof of acceleration.
+
+VOTE uses a separately labeled H1 protocol and H1 native reference, not the H8
+ranking. AWQ precision/memory and offline calibration costs remain explicit. ASR's
+auxiliary refresh stays in total compute timing; real-robot overlap/serve latency
+is a different, currently unmeasured claim.
+
+**Implementation status (2026-09-25):** Dev-200 sampling/sharding/merging and full
+replay exist. The common 40-task timing manifest/macro-aggregation, final-report
+selection whitelist and integrated final-2,000/held-out-1,800 summary still need
+implementation/validation. Existing four-trace records are development evidence,
+not completed measurements under this target protocol. Do not start final campaigns
+or present the future report format as already populated.
+
 ## Record results
 
 Keep canonical JSON records in ignored `outputs/result_records/`, raw runs under
-their run IDs, and only the generated summary in the current Git tree. Obtain the
-complete local record collection from the owner
-before regenerating the complete table. An empty record directory is an error.
+their run IDs, and only the summary in the current Git tree. The current renderer
+still enumerates every local record: it is a historical development ledger, NOT
+the primary-report whitelist. Obtain the retained dependency-complete collection
+before regeneration; an empty directory is an error. The dated audit between
+`benchmark-review:start/end` comment markers is hand-maintained and preserved by
+the renderer, separately from generated measurements. Refresh its decisions when
+evidence changes; regeneration alone does not revalidate them.
 
 ```bash
 python scripts/record_result.py export \
@@ -288,7 +360,8 @@ The default records directory is `outputs/result_records/`; `--records-dir` may
 select another ignored local directory. Export verifies counts, sums and compatible
 checkpoint/source/runtime/hardware/traces/protocol. Omit `--smoke-dir` if unavailable.
 Each summary row retains a run ID, paired reference and record digest. Records are
-immutable: do not replace earlier evidence or manually edit generated metrics.
+immutable while retained: do not rewrite earlier evidence or manually edit generated
+metrics. Immutability does not require indefinite retention of retired experiments.
 
 The pre-publication history cleanup removed retired documents and exported JSON.
 [scripts/history_commit_map.json](../scripts/history_commit_map.json) maps all original
@@ -298,9 +371,20 @@ Original source fingerprints and dirty flags remain authoritative; a mapped clea
 checkout cannot reconstruct uncommitted changes from a dirty measurement.
 
 Use `--supersedes OLD_RUN_ID` only for a corrected implementation of the same
-backend/variant/method. Rendering keeps obsolete rows visibly marked. Do not
-supersede a valid ablation or slower precision variant. Historical cohorts remain
-separate. Negative results and failed episodes stay visible.
+backend/variant/method. The legacy renderer marks those rows while retained; the
+final primary view must omit retired/invalid rows. Do not supersede a valid
+ablation or slower precision variant. A lower score is not an invalid measurement.
+
+Keep primary, useful auxiliary and still-open candidate evidence distinct. Before
+deleting anything, resolve dependencies from selection decisions, paired baselines,
+native drift rechecks, timing-quality checks, calibration, source identities and
+campaign manifests. The absence of a record from a main table is NOT proof it is
+unused. Retained campaigns keep every episode, including failures and warnings.
+Invalid timings and superseded buggy runs cannot be selected as current results.
+After their causes and replacements are recorded, genuinely unnecessary logs,
+traces, duplicates and retired records may be removed; no extra archive or backup.
+Keep only compact run IDs/reasons where history is needed, not redundant full tables.
+Never break hashes or references by editing retained raw records to simulate cleanup.
 
 Token diagnostics count served query rows, including dense served warmup/refresh,
 not queued actions. Auxiliary passes have separate full-context/call/timing evidence.

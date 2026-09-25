@@ -1,5 +1,5 @@
-# One fixed current preset per supported scope, plus matched H1 baselines and
-# both explicitly reported AWQ kernel precisions. No scheduling-only ablations.
+# Original development campaign, NOT a final report selection or launch queue.
+# Includes matched H1 baselines and both AWQ kernel variants; no scheduling-only ablations.
 openvla_oft:
   - baseline
   - baseline_horizon1

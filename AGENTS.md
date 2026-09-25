@@ -41,8 +41,9 @@ of development and Git rules; upstream submodules retain their own instructions.
   JSON outside Git. Canonical result records live in ignored `outputs/result_records/`;
   raw runs stay under their output IDs. Do not recreate `docs/results/`.
 - Commit the generated `docs/benchmark_results.md`, including negative outcomes,
-  actual measurement revisions and paired baselines. Preserve raw evidence locally;
-  an older smoke source must never be relabeled as the final timing source.
+  actual measurement revisions and paired baselines. Retain evidence needed by
+  selected results and their selection/validity checks, not every experiment forever.
+  An older smoke source must never be relabeled as the final timing source.
 - Use the common harness and actual native speed reference. Include preprocessing,
   transfers, selection/cache/control work and postprocessing. Report precision,
   cadence, hardware, protocol and full versus partial mechanism scope.
@@ -51,6 +52,30 @@ of development and Git rules; upstream submodules retain their own instructions.
   sweeps and large downloads require explicit user scheduling/authority.
 - Preserve third-party notices and pinned fetchable upstream revisions. Do not
   invent a license or describe unverified paper conventions as author-code parity.
+
+## Selection and reporting contract
+
+- One primary configuration per backend/method scope, shared across four suites.
+  Use the fixed Dev-200 subset for selection, not the final 2,000 outcomes. Tune
+  selectively when evidence warrants it; no mandatory number of candidate presets.
+- Target at most 3 percentage points of Dev-200 success loss against the matched
+  native baseline, then prefer reliably faster full-cost execution among tested
+  eligible configurations. This is a selection goal, NOT an admission/reporting filter.
+  Never disable the core or substitute a baseline no-op to obtain eligibility.
+- A tested, core-faithful port may report low success, no speedup or a slowdown.
+  Check implementation, scope and reasonable parameter choices first. Say what
+  the tested configuration shows; do not infer that the published method fails.
+  Unresolved core definitions remain provisional, not certified negative findings.
+- Freeze configuration/checkpoint/runtime/protocol identities before the owner's
+  scheduled final 2,000-episode run. Run it once; do not retune or select the best
+  final repeat. Infrastructure resume must preserve episode identity and failures.
+- Keep one clean primary result row, with Dev selection evidence, final success
+  and separately measured speed. Valuable auxiliary configurations are explicitly
+  secondary, never additional default report rows. Missing measurements stay missing.
+- Retire genuinely obsolete results after checking baseline, calibration, selection,
+  validity and provenance dependencies. Remove unnecessary raw artifacts rather than
+  creating archives/backups; keep compact retirement reasons and the evidence still
+  needed to support live results. Never erase failures from a retained campaign.
 
 ## Git and workspace lifecycle
 
