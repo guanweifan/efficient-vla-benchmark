@@ -1,7 +1,120 @@
 # Algorithm measurement ledger
 
+<!-- benchmark-review:start -->
+## Integration audit — 2026-09-25
+
+This hand-reviewed snapshot is NOT the final report or a frozen launch queue.
+Audit basis: source `0cc594e209bfdfd3696460a19f3da88466c176a7`, all method/backend
+READMEs, configuration definitions, retained Dev aggregates and timing records.
+Paper-convention warnings below come from the pinned implementation audits, not
+a claim of a new exhaustive author-source search. No GPU runs or parameter changes
+were made for this review. Follow the [selection workflow](development.md#selection-and-final-measurement-workflow).
+
+There are **37 backend/method scopes** (20 OFT, 17 CogACT), not counting native
+references or AWQ precision variants as additional algorithms. The original 43
+configurations and 29 diagnostic configurations represent 61 unique configurations,
+14,400 evaluated episodes including repeats, and zero recorded Python exceptions.
+One CogACT ST-Merge layer6 shard has a simulator instability warning; retain it.
+No formal 2,000-episode result or new 40-task timing result exists yet.
+
+Cells below are **Dev success % / paired development speedup** for a candidate,
+NOT final measurements. Named suffixes identify nondefault presets. Otherwise use
+the existing method preset. OFT H8 native is 99.0%; CogACT H8 native is 91.5%.
+The 3-percentage-point selection targets are therefore 96.0% and 88.5%, respectively.
+Thirty scopes have a numerically eligible tested candidate, including provisional
+ports/variants; this does NOT certify thirty faithful or final-report-ready results.
+Historical cohorts differ and cannot support a precise cross-method ranking.
+
+| Section / measured scope | OpenVLA-OFT candidate: Dev / speed | CogACT candidate: Dev / speed | Decision before final measurements |
+|---|---|---|---|
+| 5.1 ADP | 98.5 / 1.015x | 91.0 / 1.092x | Keep parameters; inspect gate activity and refresh speed evidence. Cog historical timing is dirty-source, not a clean final measurement. |
+| 5.1 DART | `dart_layer4`: 98.5 / 1.135x | 92.0 / 1.380x | OFT layer4 is supported by the budget/layer diagnostic; keep Cog default. |
+| 5.1 DepthCache primary core | 98.0 / 0.976x | 90.0 / 0.989x | Inspect protected fractions, depth units and restoration triggers before tuning: barely any context reduction on current replay. Excluded wrist/grasp rules stay excluded. |
+| 5.1 DivPrune | 97.0 / 1.035x | 91.0 / 1.321x | Keep parameters; OFT's small historical gain needs broader timing, not automatic tuning. |
+| 5.1 EfficientVLA token core | 98.0 / 1.156x | Deferred | Keep OFT parameters; Cog's native visual-to-text causal conflict remains unresolved. |
+| 5.1 FastV | 99.0 / 1.160x | 90.5 / 1.389x | Keep parameters; no current evidence warrants more tuning. |
+| 5.1 FlashVLA ICS core | 95.0 / 0.943x | `flash_vla_keep192`: 77.0 / 1.098x | Selectively investigate retention on both backends. Keep complete SVD and exclude action reuse; do not attribute the residual loss to a proven implementation bug. |
+| 5.1 SAFE-Pruner | 97.5 / 1.340x | 88.5 / 1.470x | Keep parameters; Cog sits exactly on the target boundary, not evidence for further aggressive pruning. Cognition-query adaptation stays explicit. |
+| 5.1 SparseVLM v1 | 96.5 / 1.068x | 92.5 / 1.254x | Keep parameters and rank-adaptive/recycling scope, not v1.5 fixed-budget claims. |
+| 5.1 SpecPrune-VLA | `specprune_vla_score_first`: 96.5 / 1.254x | `specprune_vla_static128`: 87.0 / 1.175x | OFT is an explicit schedule variant, NOT an author-default bug fix. Preserve reference-default evidence. Cog needs conservative deletion-budget diagnosis without changing its core query convention silently. |
+| 5.1 ST-Merge | `st_merge_keep192`: 98.5 / 1.023x | `st_merge_keep192`: 81.0 / 1.180x | Provisional paper reconstruction on both backends; resolve grouping/fusion conventions before certifying a faithful negative or freezing Cog tuning. |
+| 5.1 TEAM-VLA | `team_vla_merge160`: 83.5 / 1.288x | Deferred | Resolve softmax/fusion/density conventions first. Larger merge budget helped; more early context did not. Do not launch a blind combined sweep. |
+| 5.1 VLA-IAP | 94.5 / 1.018x | Deferred | Semantic feature alignment/threshold calibration remain unverified. Do not use favorable tuning to certify that core. |
+| 5.1 VLA-Pruner | 97.5 / 1.203x | Deferred | Keep OFT parameters. Cog lacks independently verifiable action-decoder-to-patch attention for the dual criterion. |
+| 5.1 ASR deletion instrument | 97.5 / 0.535x | `actuation_slack_refresh_keep25`: 89.0 / 0.537x | Honest full-compute slowdown candidate. Cog keep50 gives 91.0 / 0.520x as a useful accuracy-focused auxiliary; no unmeasured real-robot overlap claim. |
+| 5.2 VLA-Cache | 96.5 / 0.954x | 89.0 / 1.169x | Keep parameters provisionally; audit OFT full-entropy/eager overhead and activity before calling slow speed a remaining bug. Native SDPA remains denominator. |
+| 5.2 VLA-InfoEntropy | 97.5 / 0.922x | 87.5 / 1.088x | OFT needs cost/activity evidence, not removal of entropy mechanisms. Cog merits a conservative static-reuse-budget candidate; preserve entropy/quota equations. |
+| 5.2 EfficientVLA DiT cache core | Not applicable | `efficient_vla_cache3`: 88.5 / 1.086x | N=3 and N=2 tied on success; N=3 was faster. Keep native ten DDIM calls; N is feature refresh interval, not sampler steps. |
+| 5.3 SP-VLA pruning + scheduling | 97.5 / 1.117x | 90.5 / 1.130x | Keep full-method parameters; scheduling-only ablation is not a second algorithm. |
+| 5.5 VOTE ensemble core, H1 | 94.0 / 1.001x | 90.0 / 0.996x | Separate H1 comparison: native success 79.0% / 80.5%. Not an H8 model-latency accelerator or full trained VOTE. |
+| 6.1 AWQ W4A16 | `awq_fp16_kernel`: 97.5 / 1.162x | `awq_fp16_kernel`: 91.0 / 1.363x | FP16-kernel candidates for the primary row, with casts/accumulation explicit. BF16 is a useful precision/memory control, not an additional method. |
+
+### What actually needs work
+
+- **No tested candidate meets the success target:** OFT FlashVLA ICS, TEAM-VLA,
+  VLA-IAP; CogACT FlashVLA ICS, ST-Merge, SpecPrune-VLA, VLA-InfoEntropy. Low success
+  is not a deletion criterion. TEAM/IAP/ST require a fidelity decision before
+  allocating more success-tuning runs. OFT ST remains provisional despite 98.5%.
+- **Parameters already explain recoverable regressions:** OFT DART layer4 and
+  ST keep192; CogACT ASR keep25/50 and EfficientVLA N=3. SpecPrune OFT score_first
+  is separately a deliberate schedule change. Do not promote it to the unchanged
+  author configuration or give every method additional candidates by default.
+- **Activity/cost evidence:** DepthCache retains 508.17/512 OFT tokens and
+  251.82/256 Cog tokens on the historical replay (about 0.75% / 1.63% context
+  reduction). This warrants inspecting protection/restoration before blaming
+  merging overhead alone. OFT ADP prunes on 90/216 recorded queries (41.7%);
+  full-query gates explain why nominal retention is not average savings. OFT
+  Cache/InfoEntropy's raw last-layer counters show 172.03 / 173.81 reused tokens
+  per query despite their slowdowns: these are NOT inactive caches. The old
+  exports omit the newer query-versus-KV summary; carry those distinctions into
+  the next timing report, without rewriting historical records.
+- **Common infrastructure:** implement/validate the fixed 40-task timing workload,
+  task-macro aggregation and quality gate; one-primary selection/retirement manifest;
+  full-2,000 plus same-run held-out-1,800 join. All primary candidates and matched
+  baselines need the new timing and scheduled final success run. Reuse valid Dev-200
+  evidence unless parameters, relevant implementation or protocol actually change.
+- **Source quality:** current Dev campaigns share runtime hash `5b5740bec7bf...`;
+  older timing records lack a separate runtime-only fingerprint and have different
+  full-source identities; Cog ADP is marked dirty. A metadata-compatible join does
+  not prove identical runtime, nor does a different full-source hash alone prove
+  changed algorithm math. Fresh final timing resolves this gap without relabeling
+  old sources. All 216 referenced raw timing files checked for the latest-candidate
+  joins and paired baselines exist and match their retained SHA256 hashes.
+- **No new algorithm bug was established by this inventory.** Existing mechanism
+  tests and past audits provide evidence, not a blanket proof of author parity.
+  A later verified implementation fix requires affected-pair revalidation; do not
+  rerun unaffected methods or call parameter changes implementation corrections.
+
+### Retention audit — no deletion performed
+
+There are 116 local timing records. The two campaign maps directly select 72;
+paired-reference and supersession links expand that set to 83. Of the other 33,
+five diagnostic native rechecks are explicitly required by timing-quality records.
+Other rechecks and useful precision/kernel/ablation controls also need dependency
+review. **Unselected does not mean disposable.** Keep selected evidence, necessary
+negative/reference candidates, calibration, manifests and quality checks.
+
+Retirement candidates, after dependency resolution: invalid thermal/no-model timing
+attempt payloads; redundant deployment logs; superseded buggy
+`batch2-final-benchmark-efficient_vla-001` and
+`batch2-final-benchmark-st_merge-001` artifacts after retaining their correction
+reason/IDs. Valid but unneeded tuning candidates may be retired once selection and
+diagnosis close; do not delete the simulator warning or failure outcomes from a
+retained campaign. No result deletion, final-config activation or experiment launch
+is implied by this snapshot.
+
+Evidence: `outputs/dev200-v1/final.json` (SHA256
+`1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf`),
+`outputs/dev200-diagnostic-v1/final.json` (SHA256
+`937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d`),
+their explicit `timing-selection.json` maps and the diagnostic `timing-quality.json`.
+The following generated sections retain detailed provenance; they are not the
+final one-configuration-per-method report.
+<!-- benchmark-review:end -->
+
 Generated from local, ignored JSON records in `outputs/result_records/`.
-Only this summary is tracked now; raw runs and the live record archive stay local.
+Only this summary is tracked; retained raw evidence stays local under the
+development guide's selection and retirement policy, not a permanent archive.
 This is a development ledger, not a final paper comparison or formal success rate.
 Superseded rows preserve earlier, corrected implementations for traceability;
 do not use them as results of the current implementation. Their raw records

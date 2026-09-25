@@ -90,9 +90,12 @@ for calibration, measurement boundaries and result recording.
 
 Read [AGENTS.md](AGENTS.md) for the single development/Git contract.
 [Development](docs/development.md) covers interfaces and extension workflows.
-[Benchmark results](docs/benchmark_results.md) retains measured regressions,
-failed smoke episodes, configuration variants and provenance. Raw records remain
-local under `outputs/result_records/`, outside the current tracked tree.
+[Benchmark results](docs/benchmark_results.md) opens with the dated integration
+audit, followed by historical development measurements, not a final comparison.
+The [selection workflow](docs/development.md#selection-and-final-measurement-workflow)
+targets one primary configuration per backend/method; poor faithful results remain
+reportable. Useful raw evidence stays local under `outputs/result_records/`, outside Git;
+unneeded results are retired after dependency checks, not archived indefinitely.
 Do not equate replay speed, mechanism tests or four-episode smoke with formal
 accuracy or closed-loop task completion time.
 
