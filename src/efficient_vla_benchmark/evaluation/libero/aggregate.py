@@ -5,7 +5,51 @@ from pathlib import Path
 
 from efficient_vla_benchmark.core.provenance import digest_file, stable_hash
 
-from .manifest import SUITES, episode_key, select_shard, validate_manifest
+from .manifest import SUITES, derive_manifest, episode_key, select_shard, validate_manifest
+
+
+def final_partition(result, development_manifest):
+    """Extract full and untuned success from ONE complete final run, never splice runs."""
+    final = derive_manifest(development_manifest, "final")
+    if (
+        result.get("kind") != "final_evaluation"
+        or result.get("manifest_sha256") != final["sha256"]
+        or not result.get("complete")
+        or result.get("episodes") != 2000
+        or result.get("errors") != 0
+    ):
+        raise ValueError("Final partition requires one complete, error-free final-2000 run")
+    rows = result["episode_results"]
+    expected = {episode_key(e): e for e in final["episodes"]}
+    if len(rows) != 2000 or {episode_key(r) for r in rows} != set(expected):
+        raise ValueError("Final partition has duplicate, missing or foreign episodes")
+    if any(
+        r["seed"] != expected[episode_key(r)]["seed"]
+        or r["status"] != "completed"
+        or type(r["success"]) is not bool
+        for r in rows
+    ):
+        raise ValueError("Invalid final outcome or seed")
+    development = {episode_key(e) for e in development_manifest["episodes"]}
+
+    def count(members):
+        successes = sum(r["success"] for r in members)
+        return {
+            "episodes": len(members),
+            "successes": successes,
+            "success_rate": successes / len(members),
+        }
+
+    full = count(rows)
+    if result["successes"] != full["successes"] or result["success_rate"] != full["success_rate"]:
+        raise ValueError("Final summary disagrees with its episode outcomes")
+    return {
+        "experiment_id": result["experiment_id"],
+        "full_2000": full,
+        "untuned_1800": count([r for r in rows if episode_key(r) not in development]),
+        "overlapping_200_in_final_run": count([r for r in rows if episode_key(r) in development]),
+        "selection_dev200_is_separate": True,
+    }
 
 
 def merge_shards(manifest, run_dirs):

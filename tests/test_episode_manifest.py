@@ -143,8 +143,14 @@ def test_timing_ids_cannot_be_cherry_picked_after_rehash(manifest):
         validate_manifest(derived)
 
 
-def test_final_manifest_needs_explicit_scheduling_before_model_loading(manifest, tmp_path):
+def test_final_manifest_needs_explicit_scheduling_before_model_loading(
+    manifest, tmp_path, monkeypatch
+):
     from efficient_vla_benchmark.cli.commands import main
+
+    monkeypatch.setattr(
+        "efficient_vla_benchmark.cli.commands.validate_selection", lambda config: None
+    )
 
     path = tmp_path / "final.json"
     path.write_text(json.dumps(derive_manifest(manifest, "final")))
