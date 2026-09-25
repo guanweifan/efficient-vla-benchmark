@@ -184,6 +184,15 @@ def timing_evidence(directory):
     ):
         raise ValueError("Raw query mean disagrees with summary")
     auxiliary = auxiliary_evidence(rows)
+    if "workload" in metadata:
+        from efficient_vla_benchmark.profiling.workload import task_macro_summary, validate_workload
+
+        workload = validate_workload(metadata["workload"])
+        if metadata["protocol"].get("workload_sha256") != workload["sha256"]:
+            raise ValueError("Workload identity differs from timing protocol")
+        actual = task_macro_summary(rows, workload["traces"], metadata["protocol"]["repeats"])
+        if summary.get("task_macro") != actual:
+            raise ValueError("Task-macro summary disagrees with raw timing rows")
     auxiliary_calls = auxiliary["auxiliary_calls"] if auxiliary else 0
     if summary.get("auxiliary_model_calls", 0) != auxiliary_calls:
         raise ValueError("Raw auxiliary call count disagrees with summary")
@@ -241,6 +250,10 @@ def make_record(run_dir, baseline_dir, section, label, preset, smoke_dir=None):
         "comparison_differences": differences,
         "formal_success_rate": None,
     }
+    if "task_macro" in run["summary"]:
+        record["task_macro_speedup"] = (
+            baseline["summary"]["task_macro"]["mean_ms"] / run["summary"]["task_macro"]["mean_ms"]
+        )
     if smoke_dir is not None:
         meta = read_json(smoke_dir / "metadata.json")
         if meta["kind"] != "development_smoke":

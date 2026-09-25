@@ -10,6 +10,7 @@ import numpy as np
 from efficient_vla_benchmark.control.chunk import ChunkPolicy
 from efficient_vla_benchmark.core.provenance import digest_file, source_metadata
 from efficient_vla_benchmark.evaluation.traces import load_trace
+from efficient_vla_benchmark.profiling.workload import task_macro_summary, verify_trace_files
 
 
 def latency_summary(values: list[float]) -> dict:
@@ -33,6 +34,7 @@ def benchmark(
     repeats: int = 3,
     warmup: int = 10,
     mode: str = "control",
+    workload=None,
 ):
     if (
         type(repeats) is not int
@@ -43,16 +45,17 @@ def benchmark(
     ):
         raise ValueError("Invalid timing protocol")
     monitor = backend.runtime
+    if workload is not None:
+        if mode != "control":
+            raise ValueError("Fixed task timing requires full control replay")
+        verify_trace_files(workload, trace_paths, backend.metadata())
     if not trace_paths:
         raise ValueError("At least one real observation trace is required")
     if (output_dir / "timings.jsonl").exists() or (output_dir / "metadata.json").exists():
         raise ValueError("Timing output already exists; choose a new output directory")
     if mode != "control" and backend.metadata().get("requires_control_history"):
         raise ValueError("This method requires control replay to preserve its complete mechanism")
-    traces = [
-        (path.name, *load_trace(path, require_control_steps=mode == "control"))
-        for path in trace_paths
-    ]
+    traces = [(path.name, path) for path in trace_paths]
     output_dir.mkdir(parents=True, exist_ok=True)
     metadata = {
         "schema_version": 3,
@@ -78,10 +81,16 @@ def benchmark(
         "hardware": monitor.hardware(),
         "traces": [{"name": path.name, "sha256": digest_file(path)} for path in trace_paths],
     }
+    if workload is not None:
+        metadata["workload"] = workload
+        metadata["protocol"]["workload_sha256"] = workload["sha256"]
+        metadata["protocol"]["aggregation"] = "task_macro_mean_of_control_latency"
     (output_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True))
 
     # Warm kernels separately; their method history is discarded before measurement.
-    _, first_context, first_samples, _ = traces[0]
+    first_context, first_samples, _ = load_trace(
+        traces[0][1], require_control_steps=mode == "control"
+    )
     policy = ChunkPolicy(backend, config.execution_horizon)
     policy.reset(first_context)
     if mode == "control":
@@ -96,13 +105,17 @@ def benchmark(
         for index in range(warmup):
             backend.predict_chunk(first_samples[index % len(first_samples)])
     monitor.synchronize()
+    del first_samples
 
     rows = []
     peak_allocated = None
     peak_reserved = None
     with (output_dir / "timings.jsonl").open("x") as stream:
         for repeat in range(repeats):
-            for name, context, samples, steps in traces:
+            for name, path in traces:
+                # Decode one trace at a time OUTSIDE timing; forty RGB-D episodes
+                # must not all coexist in host memory for every GPU worker.
+                context, samples, steps = load_trace(path, require_control_steps=mode == "control")
                 policy.reset(context)
                 prepared = (
                     [backend.prepare(sample) for sample in samples] if mode == "prepared" else None
@@ -162,6 +175,7 @@ def benchmark(
                     json.dumps({"repeat": repeat, "trace": name, "queries": query_index}),
                     flush=True,
                 )
+                del samples, steps
     query_rows = [row for row in rows if row["queried"]]
     all_latencies = [row["latency_ms"] for row in query_rows]
     steady = [row["latency_ms"] for row in query_rows if not row["cache_cold"]]
@@ -183,9 +197,8 @@ def benchmark(
         "auxiliary_model_calls": sum(
             row["diagnostics"].get("auxiliary_queries", 0) for row in query_rows
         ),
-        "total_native_model_calls": len(query_rows) + sum(
-            row["diagnostics"].get("auxiliary_queries", 0) for row in query_rows
-        ),
+        "total_native_model_calls": len(query_rows)
+        + sum(row["diagnostics"].get("auxiliary_queries", 0) for row in query_rows),
     }
     if mode == "control":
         result["all_control_steps"] = latency_summary([row["latency_ms"] for row in rows])
@@ -200,6 +213,8 @@ def benchmark(
             if replacement_rows
             else None
         )
+        if workload is not None:
+            result["task_macro"] = task_macro_summary(rows, workload["traces"], repeats)
     (output_dir / "summary.json").write_text(json.dumps(result, indent=2, sort_keys=True))
     print(json.dumps(result, indent=2), flush=True)
     return result

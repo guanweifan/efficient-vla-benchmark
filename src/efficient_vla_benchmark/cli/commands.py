@@ -67,6 +67,7 @@ def parser():
     evaluate.add_argument("--shard-index", type=int, default=0)
     evaluate.add_argument("--num-shards", type=int, default=1)
     timing.add_argument("--traces", type=Path, nargs="+", required=True)
+    timing.add_argument("--workload-manifest", type=Path)
     timing.add_argument("--output-dir", type=Path, required=True)
     timing.add_argument("--repeats", type=int)
     timing.add_argument("--warmup", type=int)
@@ -278,6 +279,11 @@ def main(argv=None):
         elif args.command == "benchmark":
             from efficient_vla_benchmark.profiling.benchmark import benchmark
 
-            benchmark(backend, config, args.traces, args.output_dir, **config.profiling)
+            workload = (
+                json.loads(args.workload_manifest.read_text()) if args.workload_manifest else None
+            )
+            benchmark(
+                backend, config, args.traces, args.output_dir, workload=workload, **config.profiling
+            )
     finally:
         backend.close()
