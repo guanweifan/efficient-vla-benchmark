@@ -1,4 +1,4 @@
 profiling:
   mode: control
-  repeats: 3
+  repeats: 1
   warmup: 10

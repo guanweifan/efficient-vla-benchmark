@@ -92,7 +92,7 @@ def effective_protocol(config, args):
                 settings[key] = getattr(args, key)
         return replace(config, evaluation=settings)
     if args.command == "benchmark":
-        settings = {"repeats": 3, "warmup": 10, "mode": "control", **config.profiling}
+        settings = {"repeats": 1, "warmup": 10, "mode": "control", **config.profiling}
         for key in settings:
             if getattr(args, key) is not None:
                 settings[key] = getattr(args, key)

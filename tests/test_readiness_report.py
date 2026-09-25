@@ -117,6 +117,21 @@ def test_negative_outcome_is_ready_but_final_is_unmeasured(reporter):
     assert "0.800×" in reporter.render(report)
 
 
+def test_compact_diagnostic_does_not_become_final_candidate(reporter):
+    selection, summaries, records, quality, manifest = fixture()
+    selection["timing_protocol"] = "libero_replay4x128_v1"
+    selection["configurations"][0]["status"] = "pending_core"
+    record = records["method"]
+    record["run"]["metadata"]["protocol"]["protocol_id"] = selection["timing_protocol"]
+    record["run"]["summary"]["control_workload"] = {"mean_ms": 12.5}
+    del record["run"]["summary"]["task_macro"]
+    record["workload_speedup"] = record.pop("task_macro_speedup")
+    report = reporter.build(selection, summaries, records, quality, manifest)
+    assert not report["primary"] and not report["final_launch_candidates"]
+    assert report["pending_core"][0]["timing"]["repeat_std_ms"] is None
+    assert "0.800×" in reporter.render(report)
+
+
 @pytest.mark.parametrize(
     "case",
     [

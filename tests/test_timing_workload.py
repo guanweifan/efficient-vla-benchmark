@@ -15,6 +15,7 @@ from efficient_vla_benchmark.evaluation.libero.manifest import (
 from efficient_vla_benchmark.evaluation.traces import save_trace
 from efficient_vla_benchmark.profiling.benchmark import benchmark
 from efficient_vla_benchmark.profiling.workload import (
+    compact_workload,
     make_workload,
     task_macro_summary,
     validate_workload,
@@ -126,6 +127,40 @@ def test_fixed_workload_rejects_wrong_ids_files_or_backend(tmp_path):
     assert result["task_macro"]["tasks"] == 40
     assert result["all_control_steps"]["count"] == 160
     assert len(result["task_macro"]["repeat_mean_ms"]) == 2
+    selected = next(p for p in paths if p.name.startswith("libero_spatial-0-"))
+    entry = next(
+        e for e in manifest["episodes"] if e["suite"] == "libero_spatial" and e["task_id"] == 0
+    )
+    context = EpisodeContext(entry["suite"], 0, entry["episode_id"], entry["seed"])
+    save_trace(selected, context, [obs] * 160, list(range(160)))
+    compact = compact_workload(make_workload(manifest, paths, baseline))
+    compact_paths = [p for p in paths if p.name in {r["name"] for r in compact["traces"]}]
+    assert len(compact_paths) == 4
+    assert sum(r["steps"] for r in compact["traces"]) == 134
+    result = benchmark(
+        Backend(),
+        ExperimentConfig("fixture"),
+        compact_paths,
+        tmp_path / "compact",
+        workload=compact,
+    )
+    assert result["all_control_steps"]["count"] == 134
+    assert result["control_workload"]["mean_ms"] == result["all_control_steps"]["mean_ms"]
+    assert "task_macro" not in result
+    with pytest.raises(ValueError, match="one pass"):
+        benchmark(
+            Backend(),
+            ExperimentConfig("fixture"),
+            compact_paths,
+            tmp_path / "invalid",
+            workload=compact,
+            repeats=3,
+        )
+    changed = copy.deepcopy(compact)
+    changed["traces"][0]["steps"] += 1
+    changed["sha256"] = stable_hash({k: v for k, v in changed.items() if k != "sha256"})
+    with pytest.raises(ValueError, match="prefix"):
+        validate_workload(changed)
     paths[0].write_bytes(b"corrupted fixture")
     with pytest.raises(ValueError, match="content"):
         verify_trace_files(workload, paths, baseline)

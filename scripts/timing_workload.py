@@ -7,7 +7,7 @@ from pathlib import Path
 from efficient_vla_benchmark.core.provenance import stable_hash
 from efficient_vla_benchmark.evaluation.libero.aggregate import merge_shards
 from efficient_vla_benchmark.evaluation.libero.manifest import load_manifest
-from efficient_vla_benchmark.profiling.workload import make_workload
+from efficient_vla_benchmark.profiling.workload import compact_workload, make_workload
 
 
 def build(manifest, run_dirs):
@@ -36,13 +36,22 @@ def build(manifest, run_dirs):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--run-dirs", type=Path, nargs="+", required=True)
+    parser.add_argument("--manifest", type=Path)
+    parser.add_argument("--run-dirs", type=Path, nargs="+")
+    parser.add_argument("--reference-workload", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.output.exists():
         raise ValueError("Refusing to overwrite a frozen timing workload")
-    value = build(load_manifest(args.manifest), args.run_dirs)
+    if args.reference_workload:
+        if args.manifest or args.run_dirs:
+            parser.error("Use a reference workload OR native reference shards")
+        reference = json.loads(args.reference_workload.read_text())
+    else:
+        if not args.manifest or not args.run_dirs:
+            parser.error("Supply --reference-workload or both --manifest and --run-dirs")
+        reference = build(load_manifest(args.manifest), args.run_dirs)
+    value = compact_workload(reference)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
     print(json.dumps({"tasks": len(value["traces"]), "sha256": value["sha256"]}))

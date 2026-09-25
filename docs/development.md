@@ -263,15 +263,17 @@ or use `evaluate --depth`. Schema-3 traces preserve this modality; no synthetic
 depth is inferred from old RGB-only traces. The native model still receives only
 its original inputs. Depth-aware methods read the retained observation context.
 
-Existing development timing uses full control replay: four complete schema-2/3 traces, ten warmup
-queries and three repeats, with fresh episode state. Use one otherwise idle GPU,
+The standard timing protocol is `libero_replay4x128_v1`: four schema-3 native traces,
+one per suite, each restricted to its first min(128, native length) controls. Select
+the lowest task ID and its frozen reference episode by ID, never by outcome. Use
+ten warmup queries and ONE measured pass, with fresh episode state. Use one otherwise idle GPU,
 fresh policy/model per method, fixed CPU threads and synchronized measurements.
 It includes preprocessing, transfers, all method/control work and postprocessing;
 it excludes loading, disk I/O and simulation. Warmup history is reset before timing.
 Query/prepared modes are diagnostics; prepared excludes input preparation/transfer.
 Neither can replace full replay for history-dependent methods.
 
-Record query/first/steady latency, percentiles, repeats, total/control latency,
+Record query/first/steady latency, percentiles, total/control latency,
 queries/replacements and allocated/reserved memory. Compare matched cadence for
 aggregation, including VOTE H1. Checkpoint/source/trace hashes, dependencies,
 attention/precision and driver/kernel identities accompany every result. Dirty
@@ -319,33 +321,43 @@ four smoke episodes never establish formal accuracy.
    separately measured full-cost speed/memory, scope and evidence IDs. Low success
    and slowdowns remain reportable. A dash means not measured, never zero or baseline.
 
-The formal timing target is a fixed **40-task replay workload**, one deterministic
-native-baseline trace per task drawn by ID from the existing Dev manifest, never
-selected by favorable success or speed. Freeze IDs, content hashes and length rules
-before comparing methods; record each backend's own traces, shared by its methods.
-Depth-aware methods and their paired native reference need the same real depth-bearing
-traces. Keep the same CPU/GPU/runtime conditions and existing full-cost boundary,
-with warmup reset, repeated timing and native pre/post checks for drift/throttling.
-Compute mean ms/control within each task, macro-average the 40 task means, then
-divide the native macro-mean by the method macro-mean for speedup. Do not average
-task speedup ratios or weight tasks by their rollout lengths. Retain repeat-level
-variation; an approximately 1x historical result is not proof of acceleration.
+The timing target is the lightweight **four-prefix replay**, at most 512 controls.
+The existing native reference bank supplies RGB/depth; no new simulator campaign
+is necessary. All methods on a backend share the same frozen input/content hashes.
+Average ALL measured control-step latencies, including queue-consumption steps;
+divide the matched native mean by the method mean. This is representative-input
+policy compute, not task-macro performance or closed-loop completion time. Do not
+report repeat standard deviation from one pass, or mix historical protocols in the
+primary table. H1 and H8 require separate matched references.
+
+Use fresh model processes and fixed CPU threads. A small batch on the same GPU may
+share native pre/post references. Accept at most 3% native latency drift and no
+observed thermal slowdown during the measurement window; loading/warmup are outside
+that window. Inspect telemetry per run: a method's thermal failure excludes that
+run, not its healthy neighbors, provided BOTH native references are valid. An
+unstable reference invalidates the associated speedup until targeted remeasurement.
+No power/clock/fan changes. Repeat only for an explained anomaly, never select the
+fastest repeat. A >10% speedup difference from compatible old evidence triggers
+diagnosis, not adjustment to match the old number. Prefer reaggregating the exact
+same prefixes; cross-GPU absolute latencies are not directly comparable.
 
 VOTE uses a separately labeled H1 protocol and H1 native reference, not the H8
 ranking. AWQ precision/memory and offline calibration costs remain explicit. ASR's
 auxiliary refresh stays in total compute timing; real-robot overlap/serve latency
 is a different, currently unmeasured claim.
 
-**Implementation status (2026-09-25):** Dev-200 sampling/sharding/merging, derived
-40-task/final manifests, hashed timing workloads, task-macro aggregation, explicit
-primary-report joins and same-run final-2,000/untuned-1,800 partitioning are implemented
-and tested. Native timing references and the additional Dev candidates have completed;
-quality-controlled timing and primary selection are being populated. Existing
-four-trace records remain development evidence, not completed measurements under
-the new timing protocol. No final campaign has been launched.
+**Implementation status (2026-09-25):** The lightweight protocol replaces the old
+full-trajectory repeated timing. Dev-200 evidence is reused only for the same policy,
+checkpoint and audited implementation. Native reference capture is complete; all
+integrated configurations are being remeasured under the new protocol. Unresolved
+cores may retain clearly labeled diagnostics but are not final-run candidates.
+No final 2,000-episode campaign has been launched.
 
-Create each fixed workload with `scripts/timing_workload.py` from the complete
-native timing-reference shards. Pass it to `benchmark --workload-manifest`; missing,
+Create each compact workload with `scripts/timing_workload.py --reference-workload
+"$REFERENCE_WORKLOAD" --output "$WORKLOAD"`, or supply complete native reference
+shards using `--manifest` and `--run-dirs`. Both routes produce the SAME compact
+protocol; the full reference format remains readable for historical audits only.
+Pass it to `benchmark --workload-manifest "$WORKLOAD" --repeats 1 --warmup 10`; missing,
 changed or extra traces are rejected. `scripts/readiness_report.py` consumes an
 explicit selection, retained Dev summaries, timing records and accepted native
 pre/post quality groups. It refuses missing evidence, unknown runtime changes,

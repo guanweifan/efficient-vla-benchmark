@@ -102,7 +102,7 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         seen.add(key)
         if not all(selected.get(k) for k in ("reason", "scope", "section")):
             raise ValueError("Every selection needs a reason, core scope and section")
-        if selected["status"] == "pending_core":
+        if selected["status"] == "pending_core" and not selected.get("timing_record"):
             pending.append(
                 {
                     "backend": config["backend"],
@@ -113,7 +113,7 @@ def build(selection, summaries, records, quality, development_manifest, final_re
                 }
             )
             continue
-        if selected["status"] != "primary":
+        if selected["status"] not in {"primary", "pending_core"}:
             raise ValueError("Unknown readiness status")
         summary = summaries[selected["development_summary_sha256"]]
         devs = [
@@ -149,7 +149,11 @@ def build(selection, summaries, records, quality, development_manifest, final_re
             timing["protocol"].get("workload_sha256")
             != selection["timing_workloads"][config["backend"]]
         ):
-            raise ValueError("Selected record does not use the frozen forty-task workload")
+            raise ValueError("Selected record does not use the frozen timing workload")
+        if selection.get("timing_protocol") and (
+            timing["protocol"].get("protocol_id") != selection["timing_protocol"]
+        ):
+            raise ValueError("Selected record uses a different timing protocol")
         cohort = quality_by_run.get(record["run"]["run_id"])
         if cohort is None or record["baseline"]["run_id"] != cohort["baseline_pre"]:
             raise ValueError("Missing matched pre/post timing quality evidence")
@@ -193,7 +197,8 @@ def build(selection, summaries, records, quality, development_manifest, final_re
                 ):
                     raise ValueError("Final runtime differs from the frozen final selection")
                 final = final_partition(measured, development_manifest)
-        latency = record["run"]["summary"]["task_macro"]
+        compact = "control_workload" in record["run"]["summary"]
+        latency = record["run"]["summary"]["control_workload" if compact else "task_macro"]
         delta = 100 * (dev["success_rate"] - ref["success_rate"])
         row = {
             "backend": config["backend"],
@@ -213,14 +218,18 @@ def build(selection, summaries, records, quality, development_manifest, final_re
             "timing": {
                 "record": selected["timing_record"],
                 "mean_ms": latency["mean_ms"],
-                "speedup": record["task_macro_speedup"],
-                "repeat_std_ms": latency["repeat_std_ms"],
+                "speedup": record["workload_speedup" if compact else "task_macro_speedup"],
+                "repeat_std_ms": latency.get("repeat_std_ms"),
                 "peak_allocated_bytes": record["run"]["summary"]["peak_allocated_bytes"],
                 "record_sha256": stable_hash(record),
                 "quality_group": cohort["group"],
             },
             "final": final,
         }
+        if selected["status"] == "pending_core":
+            row["config"] = selected["config"]
+            pending.append(row)
+            continue
         rows.append(row)
         launch.append(
             {
@@ -241,6 +250,7 @@ def build(selection, summaries, records, quality, development_manifest, final_re
     return {
         "schema_version": 1,
         "kind": "primary_readiness",
+        "timing_protocol": selection.get("timing_protocol", "legacy_task_macro"),
         "selection_sha256": stable_hash(selection),
         "development_manifest_sha256": manifest,
         "primary": rows,
@@ -255,8 +265,9 @@ def render(report):
         "# Benchmark results",
         "",
         "One selected configuration per backend/method scope. Dev-200 is tuning evidence,",
-        "not final accuracy. Timing uses the frozen 40-task full-cost replay, task-macro",
-        "aggregation and three repeats; native pre/post checks must pass. Final success",
+        "not final accuracy. Timing uses frozen four-suite prefixes (at most 128 controls",
+        "each), ten warmup queries, one pass and the mean over all measured controls.",
+        "Native pre/post checks must pass. Final success",
         "is unmeasured until the owner schedules the frozen 2,000-episode campaign.",
         "Low success and slowdowns remain reportable. VOTE H1 is separate from H8.",
         "Each speedup uses its own same-GPU native pair; the displayed native row is",
@@ -269,7 +280,7 @@ def render(report):
         lines += [
             f"## {backend}",
             "",
-            "| Section | Preset | H | Dev SR (n/200) | Δ pp | ms/control ± repeat SD | "
+            "| Section | Preset | H | Dev SR (n/200) | Δ pp | ms/control | "
             "Speedup | Peak GiB | Final SR (n/2000) | Selection / scope |",
             "|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
         ]
@@ -289,7 +300,7 @@ def render(report):
             lines.append(
                 f"| {r['section']} | `{r['preset']}` | {r['horizon']} | "
                 f"{d['successes'] / 2:.1f}% ({d['successes']}) | {d['delta_pp']:+.1f} | "
-                f"{t['mean_ms']:.3f} ± {t['repeat_std_ms']:.3f} | {t['speedup']:.3f}× | "
+                f"{t['mean_ms']:.3f} | {t['speedup']:.3f}× | "
                 f"{memory} | {final} | "
                 f"{r['reason']} {r['scope']} |"
             )
@@ -297,11 +308,20 @@ def render(report):
     lines += [
         "## Not certified for final evaluation",
         "",
-        "| Backend / method | Reason |",
-        "|---|---|",
+        "Diagnostic measurements below do NOT certify the unresolved core or authorize final runs.",
+        "",
+        "| Backend / method | Dev SR (n/200) | ms/control | Speedup | Reason |",
+        "|---|---:|---:|---:|---|",
     ]
     for r in report["pending_core"]:
-        lines.append(f"| {r['backend']} / `{r['method']}` | {r['reason']} |")
+        d, t = r.get("development"), r.get("timing")
+        success = f"{d['successes'] / 2:.1f}% ({d['successes']})" if d else "—"
+        latency = f"{t['mean_ms']:.3f}" if t else "—"
+        speedup = f"{t['speedup']:.3f}×" if t else "—"
+        lines.append(
+            f"| {r['backend']} / `{r['method']}` | {success} | {latency} | "
+            f"{speedup} | {r['reason']} |"
+        )
     lines += [
         "",
         "## Evidence index",
@@ -312,7 +332,7 @@ def render(report):
         "| Backend / preset | Dev experiment | Timing record | Record digest |",
         "|---|---|---|---|",
     ]
-    for r in report["primary"]:
+    for r in report["primary"] + [p for p in report["pending_core"] if p.get("timing")]:
         lines.append(
             f"| {r['backend']} / `{r['preset']}` | `{r['development']['experiment_id']}` | "
             f"`{r['timing']['record']}` | `{r['timing']['record_sha256']}` |"
@@ -336,7 +356,7 @@ def main():
     records = {
         r["timing_record"]: json.loads((a.records_dir / (r["timing_record"] + ".json")).read_text())
         for r in selection["configurations"]
-        if r["status"] == "primary"
+        if r.get("timing_record")
     }
     finals = [r for f in a.final_summary for r in json.loads(f.read_text())["configurations"]]
     report = build(

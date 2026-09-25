@@ -10,7 +10,7 @@ import numpy as np
 from efficient_vla_benchmark.control.chunk import ChunkPolicy
 from efficient_vla_benchmark.core.provenance import digest_file, source_metadata
 from efficient_vla_benchmark.evaluation.traces import load_trace
-from efficient_vla_benchmark.profiling.workload import task_macro_summary, verify_trace_files
+from efficient_vla_benchmark.profiling.workload import verify_trace_files, workload_summary
 
 
 def latency_summary(values: list[float]) -> dict:
@@ -31,7 +31,7 @@ def benchmark(
     config,
     trace_paths: list[Path],
     output_dir: Path,
-    repeats: int = 3,
+    repeats: int = 1,
     warmup: int = 10,
     mode: str = "control",
     workload=None,
@@ -49,6 +49,8 @@ def benchmark(
         if mode != "control":
             raise ValueError("Fixed task timing requires full control replay")
         verify_trace_files(workload, trace_paths, backend.metadata())
+        if workload["schema_version"] == 2 and (repeats != 1 or warmup != 10):
+            raise ValueError("Compact timing requires one pass and ten warmup queries")
     if not trace_paths:
         raise ValueError("At least one real observation trace is required")
     if (output_dir / "timings.jsonl").exists() or (output_dir / "metadata.json").exists():
@@ -84,7 +86,13 @@ def benchmark(
     if workload is not None:
         metadata["workload"] = workload
         metadata["protocol"]["workload_sha256"] = workload["sha256"]
-        metadata["protocol"]["aggregation"] = "task_macro_mean_of_control_latency"
+        metadata["protocol"]["aggregation"] = (
+            "fixed_control_mean"
+            if workload["schema_version"] == 2
+            else "task_macro_mean_of_control_latency"
+        )
+        if workload["schema_version"] == 2:
+            metadata["protocol"]["protocol_id"] = workload["protocol_id"]
     (output_dir / "metadata.json").write_text(json.dumps(metadata, indent=2, sort_keys=True))
 
     # Warm kernels separately; their method history is discarded before measurement.
@@ -108,6 +116,10 @@ def benchmark(
     del first_samples
 
     rows = []
+    window_path = output_dir / "_private" / "timing_window.json"
+    window_path.parent.mkdir(exist_ok=True)
+    window = {"start": time.time(), "end": None}
+    window_path.write_text(json.dumps(window))
     peak_allocated = None
     peak_reserved = None
     with (output_dir / "timings.jsonl").open("x") as stream:
@@ -116,6 +128,11 @@ def benchmark(
                 # Decode one trace at a time OUTSIDE timing; forty RGB-D episodes
                 # must not all coexist in host memory for every GPU worker.
                 context, samples, steps = load_trace(path, require_control_steps=mode == "control")
+                if workload is not None and workload["schema_version"] == 2:
+                    entry = next(r for r in workload["traces"] if r["name"] == name)
+                    if len(steps) != entry["source_steps"]:
+                        raise ValueError("Reference trace length differs from compact workload")
+                    samples, steps = samples[: entry["steps"]], steps[: entry["steps"]]
                 policy.reset(context)
                 prepared = (
                     [backend.prepare(sample) for sample in samples] if mode == "prepared" else None
@@ -176,6 +193,8 @@ def benchmark(
                     flush=True,
                 )
                 del samples, steps
+    window["end"] = time.time()
+    window_path.write_text(json.dumps(window))
     query_rows = [row for row in rows if row["queried"]]
     all_latencies = [row["latency_ms"] for row in query_rows]
     steady = [row["latency_ms"] for row in query_rows if not row["cache_cold"]]
@@ -214,7 +233,8 @@ def benchmark(
             else None
         )
         if workload is not None:
-            result["task_macro"] = task_macro_summary(rows, workload["traces"], repeats)
+            key, value = workload_summary(rows, workload, repeats)
+            result[key] = value
     (output_dir / "summary.json").write_text(json.dumps(result, indent=2, sort_keys=True))
     print(json.dumps(result, indent=2), flush=True)
     return result
