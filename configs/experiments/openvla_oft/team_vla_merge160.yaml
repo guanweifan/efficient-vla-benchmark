@@ -1,0 +1,4 @@
+# Dev-200 diagnostic variant; does not replace team_vla defaults.
+extends: team_vla.yaml
+parameters:
+  merge_tokens: 160
