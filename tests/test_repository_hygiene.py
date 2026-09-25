@@ -23,6 +23,8 @@ def hygiene():
         ".venv/lib/module.py",
         "weights/model.safetensors",
         "logs/run.log",
+        "MUJOCO_LOG.TXT",
+        "logs/MUJOCO_LOG.TXT",
         "_private/settings.yaml",
         "models/config.json",
         ".runtime/evaluation/launch.py",

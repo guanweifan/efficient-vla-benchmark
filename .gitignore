@@ -38,6 +38,7 @@ htmlcov/
 *.parquet
 *.mp4
 *.log
+MUJOCO_LOG.TXT
 
 # Credentials and local editor/OS files
 .env

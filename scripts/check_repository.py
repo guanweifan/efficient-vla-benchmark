@@ -66,6 +66,7 @@ def file_issues(relative, content):
     issues = []
     if (
         relative in LOCAL_ONLY_FILES
+        or path.name == "MUJOCO_LOG.TXT"
         or any(part in FORBIDDEN_DIRS or part.startswith(".venv") for part in path.parts)
         or relative.startswith("docs/results/")
         or (path.name.startswith(".env") and path.name != ".env.example")
