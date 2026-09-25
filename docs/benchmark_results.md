@@ -1,5 +1,11 @@
 # Algorithm measurement ledger
 
+> **Readiness selection is in progress.** The snapshot and four-trace timing tables
+> below are historical development evidence, not the selected final-report table.
+> An additional 800 Dev episodes have completed and accepted 40-task timing groups
+> are being collected. Do not use the historical configuration list as a final
+> launch queue. No 2,000-episode campaign has been launched.
+
 <!-- benchmark-review:start -->
 ## Integration audit — 2026-09-25
 
