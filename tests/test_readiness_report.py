@@ -21,6 +21,9 @@ def fixture():
     config = asdict(ExperimentConfig.load(Path("configs/experiments/openvla_oft/fastv.yaml")))
     native = asdict(ExperimentConfig.load(Path("configs/experiments/openvla_oft/baseline.yaml")))
     backend = {"checkpoint_sha256": "checkpoint", "method_details": {}}
+    episodes = [
+        {"suite": "suite", "task_id": i // 5, "episode_id": i % 5, "seed": 0} for i in range(200)
+    ]
 
     def dev(cfg, exp, successes):
         return {
@@ -35,7 +38,9 @@ def fixture():
             "manifest_sha256": "manifest",
             "kind": "development_validation",
             "source": {"runtime_source_sha256": "old"},
-            "episode_results": [],
+            "episode_results": [
+                dict(e, status="completed", success=i < successes) for i, e in enumerate(episodes)
+            ],
         }
 
     summaries = {
@@ -62,6 +67,7 @@ def fixture():
     chosen = {
         "config": "configs/experiments/openvla_oft/fastv.yaml",
         "status": "primary",
+        "section": "5.1",
         "scope": "core",
         "reason": "Faithful active negative result, not excluded for its outcome.",
         "development_summary_sha256": "summary",
@@ -91,7 +97,13 @@ def fixture():
             }
         ]
     }
-    return selection, summaries, {"method": record}, quality, {"sha256": "manifest"}
+    return (
+        selection,
+        summaries,
+        {"method": record},
+        quality,
+        {"sha256": "manifest", "episodes": episodes},
+    )
 
 
 def test_negative_outcome_is_ready_but_final_is_unmeasured(reporter):
@@ -107,7 +119,19 @@ def test_negative_outcome_is_ready_but_final_is_unmeasured(reporter):
 
 @pytest.mark.parametrize(
     "case",
-    ["duplicate", "unmeasured_config", "checkpoint", "incomplete", "source", "thermal", "cadence"],
+    [
+        "duplicate",
+        "unmeasured_config",
+        "checkpoint",
+        "incomplete",
+        "source",
+        "thermal",
+        "cadence",
+        "outcomes",
+        "dependencies",
+        "coverage",
+        "section",
+    ],
 )
 def test_invalid_primary_join_is_rejected(reporter, case):
     selection, summaries, records, quality, manifest = copy.deepcopy(fixture())
@@ -129,6 +153,14 @@ def test_invalid_primary_join_is_rejected(reporter, case):
         records["method"]["baseline"]["metadata"]["config"] = dict(
             execution_horizon=1, method="none"
         )
+    if case == "outcomes":
+        summaries["summary"]["configurations"][0]["episode_results"][0]["success"] = False
+    if case == "dependencies":
+        records["method"]["run"]["metadata"]["source"]["packages"] = {"torch": "different"}
+    if case == "coverage":
+        selection["coverage_summary_sha256"] = "summary"
+    if case == "section":
+        del selection["configurations"][0]["section"]
     with pytest.raises(ValueError):
         reporter.build(selection, summaries, records, quality, manifest)
 

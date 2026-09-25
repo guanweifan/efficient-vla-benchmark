@@ -241,7 +241,8 @@ remain failures; infrastructure retries preserve the exact episode and attempt
 history. Concurrency wall time is not a policy-speed benchmark. Keep raw evidence
 ignored and add development success columns to the existing result ledger only.
 
-Render the combined ledger with `scripts/record_result.py render`, supplying
+For historical diagnostics only, render a separate ignored ledger with
+`scripts/record_result.py render`, supplying
 `--development-summary` and `--timing-selection` together. The latter is a local
 JSON map from `backend/preset` to an explicitly audited historical timing run ID;
 choose the current valid implementation cohort, never the fastest repeat. The join
@@ -349,7 +350,9 @@ changed or extra traces are rejected. `scripts/readiness_report.py` consumes an
 explicit selection, retained Dev summaries, timing records and accepted native
 pre/post quality groups. It refuses missing evidence, unknown runtime changes,
 configuration/checkpoint/cadence mismatches and multiple primary presets for one
-scope. Its launch list is descriptive only; it never launches final evaluations.
+scope. It rechecks the actual 200 outcomes and seeds, backend metadata, active
+dependency/extension identities and coverage of the frozen reviewed campaign.
+Its launch list is descriptive only; it never launches final evaluations.
 `final_partition()` accepts only one complete final-2000 aggregate and derives the
 untuned 1800 from those same episode outcomes, not an older Dev run.
 
@@ -364,10 +367,15 @@ and method/artifact metadata. It is not a general permission to ignore code iden
 ## Record results
 
 Keep canonical JSON records in ignored `outputs/result_records/`, raw runs under
-their run IDs, and only the summary in the current Git tree. The current renderer
-still enumerates every local record: it is a historical development ledger, NOT
-the primary-report whitelist. Obtain the retained dependency-complete collection
-before regeneration; an empty directory is an error. The dated audit between
+their run IDs, and only the summary in the current Git tree. The primary table is
+rendered by `scripts/readiness_report.py` from
+`configs/evaluation/primary_selection.yaml`, grouped by backend and labeled by
+survey section. Keep the actual Dev count/rate, selection reason, scope and exact
+timing record; a matched native pair belongs to each speedup, not to the whole table.
+`record_result.py render` enumerates historical records and cannot overwrite the
+primary table once its selection manifest exists. Obtain the retained dependency-
+complete collection before regeneration; an empty directory is an error.
+For historical diagnostics, the dated audit between
 `benchmark-review:start/end` comment markers is hand-maintained and preserved by
 the renderer, separately from generated measurements. Refresh its decisions when
 evidence changes; regeneration alone does not revalidate them.
@@ -380,8 +388,15 @@ python scripts/record_result.py export \
   --label 'SP-VLA pruning + scheduling' \
   --preset configs/experiments/cogact/sp_vla.yaml
 
-python scripts/record_result.py render --output docs/benchmark_results.md
+python scripts/readiness_report.py --selection configs/evaluation/primary_selection.yaml \
+  --development-summary "$DEV_SUMMARY" --development-manifest "$DEV_MANIFEST" \
+  --records-dir "$RECORDS_DIR" --timing-quality "$TIMING_QUALITY" \
+  --output docs/benchmark_results.md --evidence-output "$READINESS_JSON"
 ```
+
+Repeat `--development-summary` for every referenced selection/coverage summary.
+Historical or diagnostic rendering must use a separate ignored output, not the
+primary table. Neither rendering command executes a policy or schedules a campaign.
 
 The default records directory is `outputs/result_records/`; `--records-dir` may
 select another ignored local directory. Export verifies counts, sums and compatible

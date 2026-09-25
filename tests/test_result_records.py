@@ -15,6 +15,23 @@ def recorder():
     return module
 
 
+def test_legacy_renderer_cannot_overwrite_primary_selection(tmp_path, recorder, monkeypatch):
+    import sys
+
+    root = tmp_path / "project"
+    selection = root / "configs/evaluation/primary_selection.yaml"
+    selection.parent.mkdir(parents=True)
+    selection.write_text("schema_version: 1\n")
+    output = root / "docs/benchmark_results.md"
+    output.parent.mkdir(parents=True)
+    output.write_text("selected report\n")
+    monkeypatch.setattr(recorder, "__file__", str(root / "scripts/record_result.py"))
+    monkeypatch.setattr(sys, "argv", ["record_result.py", "render", "--output", str(output)])
+    with pytest.raises(ValueError, match="selection-driven"):
+        recorder.main()
+    assert output.read_text() == "selected report\n"
+
+
 def write_run(path):
     path.mkdir()
     meta = {

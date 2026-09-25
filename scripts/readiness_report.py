@@ -10,7 +10,7 @@ import yaml
 from efficient_vla_benchmark.core.config import ExperimentConfig
 from efficient_vla_benchmark.core.provenance import digest_file, stable_hash
 from efficient_vla_benchmark.evaluation.libero.aggregate import final_partition
-from efficient_vla_benchmark.evaluation.libero.manifest import load_manifest
+from efficient_vla_benchmark.evaluation.libero.manifest import episode_key, load_manifest
 
 POLICY_KEYS = (
     "backend",
@@ -33,10 +33,45 @@ def check_development(result, manifest):
         or not result.get("complete")
         or result.get("episodes") != 200
         or result.get("errors") != 0
-        or result.get("manifest_sha256") != manifest
+        or result.get("manifest_sha256") != manifest["sha256"]
         or result.get("success_rate") != result.get("successes", -1) / 200
     ):
         raise ValueError("Primary selection requires complete matching Dev-200 evidence")
+    expected = {episode_key(e): e for e in manifest["episodes"]}
+    rows = result["episode_results"]
+    if (
+        len(rows) != 200
+        or {episode_key(r) for r in rows} != set(expected)
+        or any(
+            r["seed"] != expected[episode_key(r)]["seed"]
+            or r["status"] != "completed"
+            or type(r["success"]) is not bool
+            for r in rows
+        )
+        or sum(r["success"] for r in rows) != result["successes"]
+    ):
+        raise ValueError("Development summary disagrees with its manifest or outcomes")
+
+
+def scope_key(config):
+    return (
+        config["backend"],
+        config["method"],
+        config["execution_horizon"] if config["method"] == "none" else None,
+    )
+
+
+def environment_identity(source, backend):
+    return {
+        "packages": {
+            name: value
+            for name, value in source.get("packages", {}).items()
+            if not name.startswith("efficient-vla-backend-")
+            or name == "efficient-vla-backend-" + backend.replace("_", "-")
+        },
+        "extensions": source.get("cuda_extension_sha256", {}),
+        "submodules": source.get("submodules", {}),
+    }
 
 
 def build(selection, summaries, records, quality, development_manifest, final_results=None):
@@ -61,22 +96,19 @@ def build(selection, summaries, records, quality, development_manifest, final_re
     seen, rows, pending, launch = set(), [], [], []
     for selected in selection["configurations"]:
         config = asdict(ExperimentConfig.load(Path(selected["config"])))
-        key = (
-            config["backend"],
-            config["method"],
-            config["execution_horizon"] if config["method"] == "none" else None,
-        )
+        key = scope_key(config)
         if key in seen:
             raise ValueError("Multiple primary configurations for one backend/method scope")
         seen.add(key)
-        if not selected.get("reason") or not selected.get("scope"):
-            raise ValueError("Every selection needs a reason and core scope")
+        if not all(selected.get(k) for k in ("reason", "scope", "section")):
+            raise ValueError("Every selection needs a reason, core scope and section")
         if selected["status"] == "pending_core":
             pending.append(
                 {
                     "backend": config["backend"],
                     "method": config["method"],
                     "config": selected["config"],
+                    "section": selected["section"],
                     "reason": selected["reason"],
                 }
             )
@@ -93,7 +125,7 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         if len(devs) != 1:
             raise ValueError("Development selection is missing or ambiguous")
         dev = devs[0]
-        check_development(dev, manifest)
+        check_development(dev, development_manifest)
         record = records[selected["timing_record"]]
         timing = record["run"]["metadata"]
         baseline = record["baseline"]["metadata"]
@@ -101,8 +133,12 @@ def build(selection, summaries, records, quality, development_manifest, final_re
             raise ValueError("Preset differs from measured timing configuration")
         if timing["backend"]["checkpoint_sha256"] != dev["backend"]["checkpoint_sha256"]:
             raise ValueError("Timing and development checkpoints differ")
-        if timing["backend"].get("method_details") != dev["backend"].get("method_details"):
-            raise ValueError("Timing and development method/artifact metadata differ")
+        if timing["backend"] != dev["backend"]:
+            raise ValueError("Timing and development backend/method metadata differ")
+        if environment_identity(timing["source"], config["backend"]) != environment_identity(
+            dev["source"], config["backend"]
+        ):
+            raise ValueError("Timing and development runtime dependencies differ")
         source_pair = (
             dev["source"]["runtime_source_sha256"],
             timing["source"]["runtime_source_sha256"],
@@ -132,7 +168,7 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         if not refs:
             raise ValueError("Missing development baseline")
         ref = refs[0]
-        check_development(ref, manifest)
+        check_development(ref, development_manifest)
         if (
             ref["config"]["execution_horizon"] != config["execution_horizon"]
             or ref["backend"]["checkpoint_sha256"] != dev["backend"]["checkpoint_sha256"]
@@ -162,6 +198,7 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         row = {
             "backend": config["backend"],
             "method": config["method"],
+            "section": selected["section"],
             "preset": Path(selected["config"]).stem,
             "horizon": config["execution_horizon"],
             "scope": selected["scope"],
@@ -194,6 +231,13 @@ def build(selection, summaries, records, quality, development_manifest, final_re
                 "owner_authorization_required": True,
             }
         )
+    coverage = selection.get("coverage_summary_sha256")
+    if coverage is not None:
+        expected = {scope_key(r["config"]) for r in summaries[coverage]["configurations"]}
+        if seen != expected:
+            raise ValueError(
+                "Selection omits or adds scopes relative to its frozen review coverage"
+            )
     return {
         "schema_version": 1,
         "kind": "primary_readiness",
@@ -215,6 +259,8 @@ def render(report):
         "aggregation and three repeats; native pre/post checks must pass. Final success",
         "is unmeasured until the owner schedules the frozen 2,000-episode campaign.",
         "Low success and slowdowns remain reportable. VOTE H1 is separate from H8.",
+        "Each speedup uses its own same-GPU native pair; the displayed native row is",
+        "not a universal denominator. Absolute latency across GPU pairs is descriptive.",
         "",
         f"Selection digest: `{report['selection_sha256']}`.",
         "",
@@ -223,22 +269,26 @@ def render(report):
         lines += [
             f"## {backend}",
             "",
-            "| Preset | H | Dev /200 | Δ pp | ms/control ± repeat SD | Speedup | Peak GiB | "
-            "Final /2000 | Selection / scope |",
-            "|---|---:|---:|---:|---:|---:|---:|---:|---|",
+            "| Section | Preset | H | Dev SR (n/200) | Δ pp | ms/control ± repeat SD | "
+            "Speedup | Peak GiB | Final SR (n/2000) | Selection / scope |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
         ]
         for r in report["primary"]:
             if r["backend"] != backend:
                 continue
             d, t = r["development"], r["timing"]
-            final = str(r["final"]["full_2000"]["successes"]) if r["final"] else "—"
+            final = "—"
+            if r["final"]:
+                f = r["final"]["full_2000"]
+                final = f"{100 * f['success_rate']:.2f}% ({f['successes']})"
             memory = (
                 f"{t['peak_allocated_bytes'] / 2**30:.2f}"
                 if t["peak_allocated_bytes"] is not None
                 else "—"
             )
             lines.append(
-                f"| `{r['preset']}` | {r['horizon']} | {d['successes']} | {d['delta_pp']:+.1f} | "
+                f"| {r['section']} | `{r['preset']}` | {r['horizon']} | "
+                f"{d['successes'] / 2:.1f}% ({d['successes']}) | {d['delta_pp']:+.1f} | "
                 f"{t['mean_ms']:.3f} ± {t['repeat_std_ms']:.3f} | {t['speedup']:.3f}× | "
                 f"{memory} | {final} | "
                 f"{r['reason']} {r['scope']} |"

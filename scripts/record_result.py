@@ -826,9 +826,20 @@ def main():
             raise ValueError("Refusing to replace a different published evidence record")
         destination.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
     else:
+        primary_output = Path(__file__).resolve().parents[1] / "docs/benchmark_results.md"
+        if (
+            args.output.resolve() == primary_output
+            and (primary_output.parents[1] / "configs/evaluation/primary_selection.yaml").exists()
+        ):
+            raise ValueError(
+                "Primary results are selection-driven; use scripts/readiness_report.py. "
+                "Historical rendering requires a different output path."
+            )
         records = [read_json(path) for path in sorted(args.records_dir.glob("*.json"))]
         if not records:
-            raise ValueError("No evidence records; obtain the local archive before regenerating")
+            raise ValueError(
+                "No evidence records; obtain the retained evidence before regenerating"
+            )
         if len(args.development_summary) != len(args.timing_selection):
             raise ValueError("Each development summary requires its explicit timing selection")
         rounds = [
