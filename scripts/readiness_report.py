@@ -208,6 +208,9 @@ def build(selection, summaries, records, quality, development_manifest, final_re
             "horizon": config["execution_horizon"],
             "scope": selected["scope"],
             "reason": selected["reason"],
+            "hardware": timing.get("hardware", {}),
+            "timing_commit": timing["source"].get("commit"),
+            "development_commit": dev["source"].get("commit"),
             "development": {
                 "successes": dev["successes"],
                 "episodes": 200,
@@ -285,6 +288,8 @@ def build(selection, summaries, records, quality, development_manifest, final_re
 
 
 def render(report):
+    measured = report["primary"] + report.get("auxiliary", []) + report["pending_core"]
+    devices = sorted({r["hardware"]["gpu"] for r in measured if r.get("hardware", {}).get("gpu")})
     timing_description = (
         "Timing uses frozen four-suite prefixes (at most 128 controls each), ten warmup "
         "queries, one pass and the mean over all measured controls."
@@ -301,6 +306,7 @@ def render(report):
         "Low success and slowdowns remain reportable. VOTE H1 is separate from H8.",
         "Each speedup uses its own same-GPU native pair; the displayed native row is",
         "not a universal denominator. Absolute latency across GPU pairs is descriptive.",
+        "Measured GPU models: " + (", ".join(devices) or "see retained source metadata") + ".",
         "",
         f"Selection digest: `{report['selection_sha256']}`.",
         "",
@@ -375,8 +381,9 @@ def render(report):
         "Raw measurements and resource locations are ignored local evidence, not public files.",
         "Use the selection manifest and generated readiness JSON to resolve exact records.",
         "",
-        "| Backend / preset | Dev experiment | Timing record | Record digest |",
-        "|---|---|---|---|",
+        "| Backend / preset | Dev experiment | Timing record | "
+        "Dev / timing commit | Record digest |",
+        "|---|---|---|---|---|",
     ]
     for r in (
         report["primary"]
@@ -385,7 +392,8 @@ def render(report):
     ):
         lines.append(
             f"| {r['backend']} / `{r['preset']}` | `{r['development']['experiment_id']}` | "
-            f"`{r['timing']['record']}` | `{r['timing']['record_sha256']}` |"
+            f"`{r['timing']['record']}` | `{r.get('development_commit') or 'unknown'}` / "
+            f"`{r.get('timing_commit') or 'unknown'}` | `{r['timing']['record_sha256']}` |"
         )
     return "\n".join(lines) + "\n"
 
