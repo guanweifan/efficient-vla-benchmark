@@ -1,0 +1,4 @@
+# Dev-200 diagnostic variant; does not replace specprune_vla defaults.
+extends: specprune_vla.yaml
+parameters:
+  importance_layers: [9,14,19,24]
