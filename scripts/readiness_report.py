@@ -384,6 +384,8 @@ def render(report):
         "",
         "Raw measurements and resource locations are ignored local evidence, not public files.",
         "Use the selection manifest and generated readiness JSON to resolve exact records.",
+        "Recorded revisions predating history cleanup can be resolved through the",
+        "[history map](../scripts/history_commit_map.json); recorded source IDs are not rewritten.",
         "",
         "| Backend / preset | Dev experiment | Timing record | "
         "Dev / timing commit | Record digest |",

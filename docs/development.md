@@ -336,6 +336,10 @@ observed thermal slowdown during measured replay intervals; loading, warmup and
 trace-file decoding are outside those intervals. Inspect telemetry per run: a method's thermal failure excludes that
 run, not its healthy neighbors, provided BOTH native references are valid. An
 unstable reference invalidates the associated speedup until targeted remeasurement.
+If only the post-reference is thermally rejected, remeasure that reference on the
+same GPU with unchanged source/config/protocol, retaining the healthy pre-reference
+and methods. Keep the rejected check and replacement reason in the audit; accept
+the first valid replacement satisfying the drift bound, never the fastest repeat.
 No power/clock/fan changes. Repeat only for an explained anomaly, never select the
 fastest repeat. A >10% speedup difference from compatible old evidence triggers
 diagnosis, not adjustment to match the old number. Prefer reaggregating the exact
@@ -349,9 +353,18 @@ is a different, currently unmeasured claim.
 **Implementation status (2026-09-25):** The lightweight protocol replaces the old
 full-trajectory repeated timing. Dev-200 evidence is reused only for the same policy,
 checkpoint and audited implementation. Native reference capture is complete; all
-integrated configurations are being remeasured under the new protocol. Unresolved
-cores may retain clearly labeled diagnostics but are not final-run candidates.
+37 integrated backend/method scopes now have compact timing and matched Dev-200
+evidence. There are 33 primary method selections and four unresolved-core diagnostic
+entries, plus four cadence-matched native references and three useful auxiliaries.
+Unresolved cores and auxiliaries are not default final-run candidates.
 No final 2,000-episode campaign has been launched.
+
+The completed protocol transition compared 37 compatible old/new configurations:
+four used identical reaggregated prefixes, the others had explicitly different
+reference episodes/lengths. No speedup change exceeded the 10% diagnostic trigger;
+three new configurations had no compatible retained old timing. The ignored
+comparison/retirement audits retain these distinctions after obsolete timings are
+removed. Native input provenance, Dev outcomes and calibration remain available.
 
 Create each compact workload with `scripts/timing_workload.py --reference-workload
 "$REFERENCE_WORKLOAD" --output "$WORKLOAD"`, or supply complete native reference
@@ -365,6 +378,9 @@ configuration/checkpoint/cadence mismatches and multiple primary presets for one
 scope. It rechecks the actual 200 outcomes and seeds, backend metadata, active
 dependency/extension identities and coverage of the frozen reviewed campaign.
 Its launch list is descriptive only; it never launches final evaluations.
+Useful precision/accuracy alternatives belong in `auxiliary_configurations` and
+undergo the same evidence checks, but never enter the default final launch list.
+They must differ from the primary and belong to an already certified method scope.
 `final_partition()` accepts only one complete final-2000 aggregate and derives the
 untuned 1800 from those same episode outcomes, not an older Dev run.
 
@@ -378,6 +394,9 @@ and method/artifact metadata. It is not a general permission to ignore code iden
 The compact-timing revision `e6a9117` was checked against the same baseline: no
 backend/core/control/model-ops/method Python sources changed. The new runtime
 identity is `b30a41d426f30c6f8e7731d6ab35fe56ea52ac691f601faf83c2daff72e9c099`.
+The subsequent native-four capture and measured-interval boundary changes through
+`2a49223` likewise leave all policy sources unchanged; their runtime identity is
+`fb5c9a52ab1f503f3ad5b8aca8a23b63f8fd395c73adbb95a624f6156b8bb63b`.
 
 ## Record results
 
@@ -390,10 +409,9 @@ timing record; a matched native pair belongs to each speedup, not to the whole t
 `record_result.py render` enumerates historical records and cannot overwrite the
 primary table once its selection manifest exists. Obtain the retained dependency-
 complete collection before regeneration; an empty directory is an error.
-For historical diagnostics, the dated audit between
-`benchmark-review:start/end` comment markers is hand-maintained and preserved by
-the renderer, separately from generated measurements. Refresh its decisions when
-evidence changes; regeneration alone does not revalidate them.
+The primary ledger replaces historical candidate tables. Component READMEs retain
+mechanism limitations; ignored comparison and retirement audits retain replacement
+reasons without leaving obsolete results available for accidental selection.
 
 ```bash
 python scripts/record_result.py export \
