@@ -53,6 +53,35 @@ def test_evidence_export_and_render_without_private_locations(tmp_path, recorder
     assert "5.3 Routing" in table and "1.000×" in table and "Not run" in table
 
 
+def test_dated_review_survives_regeneration_without_becoming_evidence(tmp_path, recorder):
+    run = tmp_path / "example-run"
+    write_run(run)
+    record = recorder.make_record(run, run, "5.3 Routing", "Example", "configs/example.yaml")
+    block = f"{recorder.REVIEW_START}\n## Dated audit\n\nPending final test.\n{recorder.REVIEW_END}"
+    original = f"# Old title\n\n{block}\n\nStale generated table\n"
+    review = recorder.review_block(original)
+    assert review == block
+    rendered = recorder.render([record], review=review)
+    assert rendered.count(block) == 1
+    assert "Stale generated table" not in rendered
+    assert "Formal success rate is **not measured for any row**" in rendered
+    assert recorder.review_block(rendered) == block
+    assert recorder.review_block(recorder.render([record])) is None
+
+
+@pytest.mark.parametrize("case", ["missing_start", "missing_end", "duplicate", "reversed"])
+def test_malformed_review_refuses_silent_overwrite(recorder, case):
+    start, end = recorder.REVIEW_START, recorder.REVIEW_END
+    text = {
+        "missing_start": end,
+        "missing_end": start,
+        "duplicate": start + end + start + end,
+        "reversed": end + start,
+    }[case]
+    with pytest.raises(ValueError, match="review"):
+        recorder.review_block(text)
+
+
 def test_rejects_inconsistent_raw_data(tmp_path, recorder):
     run = tmp_path / "example-run"
     write_run(run)

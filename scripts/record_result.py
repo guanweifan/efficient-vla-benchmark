@@ -12,6 +12,22 @@ def read_json(path):
     return json.loads(path.read_text())
 
 
+REVIEW_START = "<!-- benchmark-review:start -->"
+REVIEW_END = "<!-- benchmark-review:end -->"
+
+
+def review_block(text):
+    """Preserve the dated human audit, never treating it as generated measurements."""
+    if REVIEW_START not in text and REVIEW_END not in text:
+        return None
+    if text.count(REVIEW_START) != 1 or text.count(REVIEW_END) != 1:
+        raise ValueError("Expected one complete benchmark review block")
+    start, end = text.index(REVIEW_START), text.index(REVIEW_END)
+    if end < start:
+        raise ValueError("Reversed benchmark review markers")
+    return text[start : end + len(REVIEW_END)]
+
+
 def load_history_map(path=None):
     """Resolve historical IDs without changing immutable measurement evidence."""
     path = path or Path(__file__).with_name("history_commit_map.json")
@@ -439,7 +455,14 @@ def validation_tables(
     return lines + ["", "</details>", ""]
 
 
-def render(records, commit_map=None, validation=None, timing_selection=None, development_rounds=()):
+def render(
+    records,
+    commit_map=None,
+    validation=None,
+    timing_selection=None,
+    development_rounds=(),
+    review=None,
+):
     commit_map = load_history_map() if commit_map is None else commit_map
     records = sorted(records, key=lambda record: record["run"]["run_id"])
     ids = {record["run"]["run_id"]: f"R{index:02d}" for index, record in enumerate(records, 1)}
@@ -469,8 +492,10 @@ def render(records, commit_map=None, validation=None, timing_selection=None, dev
     lines = [
         "# Algorithm measurement ledger",
         "",
+        *([review, ""] if review is not None else []),
         "Generated from local, ignored JSON records in `outputs/result_records/`.",
-        "Only this summary is tracked now; raw runs and the live record archive stay local.",
+        "Only this summary is tracked; retained raw evidence stays local under the",
+        "development guide's selection and retirement policy, not a permanent archive.",
         "This is a development ledger, not a final paper comparison or formal success rate.",
         "Superseded rows preserve earlier, corrected implementations for traceability;",
         "do not use them as results of the current implementation. Their raw records",
@@ -805,7 +830,8 @@ def main():
                 zip(args.development_summary, args.timing_selection)
             )
         ]
-        args.output.write_text(render(records, development_rounds=rounds))
+        review = review_block(args.output.read_text()) if args.output.exists() else None
+        args.output.write_text(render(records, development_rounds=rounds, review=review))
 
 
 if __name__ == "__main__":
