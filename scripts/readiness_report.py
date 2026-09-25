@@ -247,6 +247,29 @@ def build(selection, summaries, records, quality, development_manifest, final_re
             raise ValueError(
                 "Selection omits or adds scopes relative to its frozen review coverage"
             )
+    auxiliary, auxiliary_seen = [], set()
+    primary_identities = {
+        stable_hash(policy_identity(asdict(ExperimentConfig.load(Path(r["config"])))))
+        for r in selection["configurations"]
+    }
+    primary_scopes = {(r["backend"], r["method"]) for r in rows}
+    for selected in selection.get("auxiliary_configurations", []):
+        config = asdict(ExperimentConfig.load(Path(selected["config"])))
+        identity = stable_hash(policy_identity(config))
+        if (
+            selected.get("status") != "auxiliary"
+            or (config["backend"], config["method"]) not in primary_scopes
+            or identity in primary_identities | auxiliary_seen
+        ):
+            raise ValueError(
+                "Auxiliary must be a distinct alternative to a certified primary scope"
+            )
+        auxiliary_seen.add(identity)
+        scoped = dict(selection, configurations=[dict(selected, status="primary")])
+        scoped.pop("auxiliary_configurations", None)
+        scoped.pop("coverage_summary_sha256", None)
+        checked = build(scoped, summaries, records, quality, development_manifest)
+        auxiliary.extend(checked["primary"])
     return {
         "schema_version": 1,
         "kind": "primary_readiness",
@@ -255,18 +278,24 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         "development_manifest_sha256": manifest,
         "primary": rows,
         "pending_core": pending,
+        "auxiliary": auxiliary,
         "final_launch_candidates": launch,
         "final_launched_by_this_command": False,
     }
 
 
 def render(report):
+    timing_description = (
+        "Timing uses frozen four-suite prefixes (at most 128 controls each), ten warmup "
+        "queries, one pass and the mean over all measured controls."
+        if report.get("timing_protocol") == "libero_replay4x128_v1"
+        else "Historical timing uses the protocol and aggregation recorded in each source."
+    )
     lines = [
         "# Benchmark results",
         "",
         "One selected configuration per backend/method scope. Dev-200 is tuning evidence,",
-        "not final accuracy. Timing uses frozen four-suite prefixes (at most 128 controls",
-        "each), ten warmup queries, one pass and the mean over all measured controls.",
+        "not final accuracy. " + timing_description,
         "Native pre/post checks must pass. Final success",
         "is unmeasured until the owner schedules the frozen 2,000-episode campaign.",
         "Low success and slowdowns remain reportable. VOTE H1 is separate from H8.",
@@ -305,6 +334,23 @@ def render(report):
                 f"{r['reason']} {r['scope']} |"
             )
         lines += [""]
+    if report.get("auxiliary"):
+        lines += [
+            "## Useful auxiliary configurations",
+            "",
+            "Secondary evidence only; these do not enter the default final-evaluation queue.",
+            "",
+            "| Backend / preset | Dev SR (n/200) | ms/control | Speedup | Reason / scope |",
+            "|---|---:|---:|---:|---|",
+        ]
+        for r in report["auxiliary"]:
+            d, t = r["development"], r["timing"]
+            lines.append(
+                f"| {r['backend']} / `{r['preset']}` | {d['successes'] / 2:.1f}% "
+                f"({d['successes']}) | {t['mean_ms']:.3f} | {t['speedup']:.3f}× | "
+                f"{r['reason']} {r['scope']} |"
+            )
+        lines.append("")
     lines += [
         "## Not certified for final evaluation",
         "",
@@ -332,7 +378,11 @@ def render(report):
         "| Backend / preset | Dev experiment | Timing record | Record digest |",
         "|---|---|---|---|",
     ]
-    for r in report["primary"] + [p for p in report["pending_core"] if p.get("timing")]:
+    for r in (
+        report["primary"]
+        + report.get("auxiliary", [])
+        + [p for p in report["pending_core"] if p.get("timing")]
+    ):
         lines.append(
             f"| {r['backend']} / `{r['preset']}` | `{r['development']['experiment_id']}` | "
             f"`{r['timing']['record']}` | `{r['timing']['record_sha256']}` |"
@@ -355,7 +405,7 @@ def main():
     summaries = {digest_file(f): json.loads(f.read_text()) for f in a.development_summary}
     records = {
         r["timing_record"]: json.loads((a.records_dir / (r["timing_record"] + ".json")).read_text())
-        for r in selection["configurations"]
+        for r in selection["configurations"] + selection.get("auxiliary_configurations", [])
         if r.get("timing_record")
     }
     finals = [r for f in a.final_summary for r in json.loads(f.read_text())["configurations"]]

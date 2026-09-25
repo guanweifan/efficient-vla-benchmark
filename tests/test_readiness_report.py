@@ -186,3 +186,50 @@ def test_unresolved_core_does_not_silently_enter_final_queue(reporter):
     result = reporter.build(*values)
     assert len(result["pending_core"]) == 1
     assert result["primary"] == result["final_launch_candidates"] == []
+
+
+def test_auxiliary_is_validated_without_entering_final_queue(reporter, monkeypatch):
+    selection, summaries, records, quality, manifest = fixture()
+    primary = selection["configurations"][0]
+    alternative = copy.deepcopy(summaries["summary"]["configurations"][0])
+    alternative["config"]["parameters"] = {"auxiliary_fixture": True}
+    alternative["experiment_id"] = "auxiliary"
+    summaries["summary"]["configurations"].append(alternative)
+    records["auxiliary"] = copy.deepcopy(records["method"])
+    records["auxiliary"]["run"]["run_id"] = "auxiliary"
+    records["auxiliary"]["run"]["metadata"]["config"] = alternative["config"]
+    quality["groups"][0]["jobs"].append("auxiliary")
+    selection["auxiliary_configurations"] = [
+        dict(
+            primary,
+            config="auxiliary.yaml",
+            status="auxiliary",
+            development_experiment_id="auxiliary",
+            timing_record="auxiliary",
+        )
+    ]
+    original = reporter.ExperimentConfig.load
+    monkeypatch.setattr(
+        reporter.ExperimentConfig,
+        "load",
+        lambda path: ExperimentConfig(**alternative["config"])
+        if path.name == "auxiliary.yaml"
+        else original(path),
+    )
+    result = reporter.build(selection, summaries, records, quality, manifest)
+    assert len(result["primary"]) == len(result["auxiliary"]) == 1
+    assert len(result["final_launch_candidates"]) == 1
+    assert result["final_launch_candidates"][0]["timing_record"] == "method"
+    assert "Useful auxiliary configurations" in reporter.render(result)
+    selection["auxiliary_configurations"] *= 2
+    with pytest.raises(ValueError, match="distinct alternative"):
+        reporter.build(selection, summaries, records, quality, manifest)
+
+
+def test_primary_cannot_be_duplicated_as_auxiliary(reporter):
+    selection, summaries, records, quality, manifest = fixture()
+    selection["auxiliary_configurations"] = [
+        dict(selection["configurations"][0], status="auxiliary")
+    ]
+    with pytest.raises(ValueError, match="distinct alternative"):
+        reporter.build(selection, summaries, records, quality, manifest)
