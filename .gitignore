@@ -1,5 +1,5 @@
 # Local runtimes and generated outputs
-.venv*/
+.venv*
 .runtime/
 # Private campaign operations retained locally, never part of the public harness
 /scripts/run_evaluation_campaign.py
