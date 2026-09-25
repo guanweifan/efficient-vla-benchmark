@@ -271,7 +271,7 @@ fresh policy/model per method, fixed CPU threads and synchronized measurements.
 It includes preprocessing, transfers, all method/control work and postprocessing;
 it excludes loading, disk I/O and simulation. Warmup history is reset before timing.
 Query/prepared modes are diagnostics; prepared excludes input preparation/transfer.
-Neither can replace full replay for history-dependent methods.
+Neither can replace stateful control replay for history-dependent methods.
 
 Record query/first/steady latency, percentiles, total/control latency,
 queries/replacements and allocated/reserved memory. Compare matched cadence for
@@ -375,6 +375,9 @@ Changed runtime hashes concern evaluation/profiling/CLI infrastructure; algorith
 native backend and controller logic did not change. Cross-version Dev reuse requires
 this explicit scoped audit plus identical effective policy configuration, checkpoint
 and method/artifact metadata. It is not a general permission to ignore code identity.
+The compact-timing revision `e6a9117` was checked against the same baseline: no
+backend/core/control/model-ops/method Python sources changed. The new runtime
+identity is `b30a41d426f30c6f8e7731d6ab35fe56ea52ac691f601faf83c2daff72e9c099`.
 
 ## Record results
 

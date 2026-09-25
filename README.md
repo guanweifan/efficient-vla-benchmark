@@ -60,14 +60,20 @@ evb evaluate --config configs/experiments/openvla_oft/baseline.yaml \
   --model-path "$MODEL_DIR" --libero-root third_party/benchmarks/libero \
   --output-dir "$SMOKE_DIR" --record-traces
 
+python scripts/timing_workload.py --reference-workload "$REFERENCE_WORKLOAD" \
+  --output "$WORKLOAD"
+
 evb benchmark --config configs/experiments/openvla_oft/specprune_vla.yaml \
   --model-path "$MODEL_DIR" \
   --traces "$SPATIAL_TRACE" "$OBJECT_TRACE" "$GOAL_TRACE" "$LONG_TRACE" \
-  --output-dir "$TIMING_DIR"
+  --workload-manifest "$WORKLOAD" --repeats 1 --warmup 10 --output-dir "$TIMING_DIR"
 ```
 
 The caller defines the resource variables. Change the experiment YAML to select a
 supported backend/method pair and parameters; AWQ also needs `--artifact-path`.
+Timing uses the four trace files selected by the frozen workload, not arbitrary
+smoke observations: at most 128 continuous controls per suite, one measured pass.
+Matched native references use the same inputs, GPU and execution cadence.
 LIBERO defaults to four smoke episodes, not a formal success-rate campaign.
 For depth-aware methods, record native baseline traces with `--depth` first;
 their method presets enable depth during evaluation. RGB-only traces are rejected.
@@ -90,8 +96,8 @@ for calibration, measurement boundaries and result recording.
 
 Read [AGENTS.md](AGENTS.md) for the single development/Git contract.
 [Development](docs/development.md) covers interfaces and extension workflows.
-[Benchmark results](docs/benchmark_results.md) opens with the dated integration
-audit, followed by historical development measurements, not a final comparison.
+[Benchmark results](docs/benchmark_results.md) joins selected Dev-200 outcomes with
+separately measured compact-replay latency; final 2,000-episode success remains unmeasured.
 The [selection workflow](docs/development.md#selection-and-final-measurement-workflow)
 targets one primary configuration per backend/method; poor faithful results remain
 reportable. Useful raw evidence stays local under `outputs/result_records/`, outside Git;
