@@ -78,3 +78,10 @@ These results diagnose this disclosed port, not all author conventions.
 Budget relief also reduces acceleration: paired keep192 replay measured 1.023x
 on OFT and 1.180x on CogACT, versus 1.151x and 1.425x for their default presets.
 Near-native OFT success therefore does not imply a substantial speed benefit.
+## Final-readiness boundary (2026-09-25)
+
+Both bindings remain pending core clarification: Eq. 4's fusion direction and
+the text's one-to-many matching do not uniquely determine the current surviving-
+anchor/collision construction. Improved Dev success does not resolve that issue.
+Keep the disclosed port and useful diagnostics, but do not schedule a final
+benchmark row claiming a verified core or attribute its losses to the paper.

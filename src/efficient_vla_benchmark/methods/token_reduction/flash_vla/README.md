@@ -72,3 +72,10 @@ Readiness candidates `openvla_oft/flash_vla_keep192` and
 `cogact/flash_vla_keep224` test more conservative retention without changing the
 scoring equation, SVD solver, pruning layer or declared ICS-only scope. They are
 not selected defaults; their Dev-200 and full-cost timing must precede selection.
+## Readiness diagnostic (2026-09-25)
+
+On the frozen Dev-200 subset, OFT keep192 scored 196/200 and CogACT keep224
+scored 176/200, with no runtime errors. Native H8 references scored 198/200
+and 183/200. CogACT remains 3.5 percentage points below native; do not call
+this target-compliant or treat the 3-point selection target as an admission
+filter. These are ICS-only parameter comparisons, not evidence for action reuse.

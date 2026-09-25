@@ -39,3 +39,10 @@ matching embedding widths or copying OFT's unverified mean-embedding assumption
 does not establish that construction for CogACT. The existing OFT implementation
 remains explicitly provisional; it is not evidence that a faithful CogACT binding
 has been verified. Keep CogACT unregistered until this core rule is grounded.
+## Final-readiness boundary (2026-09-25)
+
+The OFT port remains pending core clarification: the unidentified semantic
+encoder/alignment/centering construction controls both adaptive selection modes.
+Matching feature widths and passing equation tests do not establish semantic
+alignment. Retain the disclosed port diagnostics, but do not use its success
+loss as evidence that the published core fails or enter it as a confirmed primary.

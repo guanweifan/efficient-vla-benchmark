@@ -51,3 +51,10 @@ and 167/200 with merge160, against native 198/200. Increasing middle-layer
 anchors helped substantially; increasing early context alone did not. Do not
 combine the two variants without a separately scheduled experiment. The remaining
 accuracy gap and paper interpretation uncertainties remain explicit.
+## Final-readiness boundary (2026-09-25)
+
+The OFT port remains pending core clarification. Eq. 5–9's soft-weight direction
+and cardinality-versus-received-mass normalization affect the merged feature,
+not just an incidental hyperparameter. Increasing the anchor count cannot settle
+that interpretation. Retain the port diagnostics without certifying a faithful
+negative result or scheduling it as a confirmed primary method.

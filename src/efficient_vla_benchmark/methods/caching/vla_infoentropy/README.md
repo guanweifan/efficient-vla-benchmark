@@ -58,3 +58,10 @@ Readiness candidate `cogact/vla_infoentropy_static100` changes only the maximum
 static reuse candidate count from 150 to 100. Complete histogram, text entropy,
 quota transition, task protection and layer schedule remain present. This is a
 selective accuracy-sensitivity test, not an already validated replacement default.
+## Readiness diagnostic (2026-09-25)
+
+CogACT static100 scored 174/200 on the frozen Dev subset, versus 175/200 for
+the original preset and native 183/200. Reducing the static candidate budget
+therefore did not recover accuracy in this test. No retuning conclusion may be
+inferred from its newer timestamp; retain the original candidate unless paired
+full-cost timing supplies a separate selection reason.

@@ -110,3 +110,9 @@ Readiness candidate `cogact/specprune_vla_static96` reduces the static DELETION
 cap from 128 to 96 per view. It preserves the pinned importance/pruning schedule,
 dynamic pruning and action controller; 96 does not denote the final retained count.
 It requires its own Dev-200 and timing evidence before selection.
+## Readiness diagnostic (2026-09-25)
+
+CogACT static96 scored 182/200 on the frozen Dev subset, versus 174/200 for
+static128 and native 183/200. These limits cap STATIC DELETIONS, not retained
+tokens. All scoring, moving-object protection and query-level pruning rules
+remain unchanged. Timing must be measured for this exact preset before selection.
