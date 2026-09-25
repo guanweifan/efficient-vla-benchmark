@@ -335,12 +335,31 @@ ranking. AWQ precision/memory and offline calibration costs remain explicit. ASR
 auxiliary refresh stays in total compute timing; real-robot overlap/serve latency
 is a different, currently unmeasured claim.
 
-**Implementation status (2026-09-25):** Dev-200 sampling/sharding/merging and full
-replay exist. The common 40-task timing manifest/macro-aggregation, final-report
-selection whitelist and integrated final-2,000/held-out-1,800 summary still need
-implementation/validation. Existing four-trace records are development evidence,
-not completed measurements under this target protocol. Do not start final campaigns
-or present the future report format as already populated.
+**Implementation status (2026-09-25):** Dev-200 sampling/sharding/merging, derived
+40-task/final manifests, hashed timing workloads, task-macro aggregation, explicit
+primary-report joins and same-run final-2,000/untuned-1,800 partitioning are implemented
+and tested. Native timing references and the additional Dev candidates have completed;
+quality-controlled timing and primary selection are being populated. Existing
+four-trace records remain development evidence, not completed measurements under
+the new timing protocol. No final campaign has been launched.
+
+Create each fixed workload with `scripts/timing_workload.py` from the complete
+native timing-reference shards. Pass it to `benchmark --workload-manifest`; missing,
+changed or extra traces are rejected. `scripts/readiness_report.py` consumes an
+explicit selection, retained Dev summaries, timing records and accepted native
+pre/post quality groups. It refuses missing evidence, unknown runtime changes,
+configuration/checkpoint/cadence mismatches and multiple primary presets for one
+scope. Its launch list is descriptive only; it never launches final evaluations.
+`final_partition()` accepts only one complete final-2000 aggregate and derives the
+untuned 1800 from those same episode outcomes, not an older Dev run.
+
+The readiness source audit reconstructed runtime identities at `0cc594e`, `1d954ec`,
+`557dac8` and `83cd166`. Their 307 backend/core/control/model-ops/method source files
+are identical (SHA256 `c118623603d159cb90bbc445e91d2e7cc33672cfc07856f4afd552348b402ef4`).
+Changed runtime hashes concern evaluation/profiling/CLI infrastructure; algorithm,
+native backend and controller logic did not change. Cross-version Dev reuse requires
+this explicit scoped audit plus identical effective policy configuration, checkpoint
+and method/artifact metadata. It is not a general permission to ignore code identity.
 
 ## Record results
 
