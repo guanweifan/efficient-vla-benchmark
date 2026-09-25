@@ -1,4 +1,5 @@
 import copy
+import json
 from types import SimpleNamespace
 
 import numpy as np
@@ -156,6 +157,11 @@ def test_fixed_workload_rejects_wrong_ids_files_or_backend(tmp_path):
     assert result["all_control_steps"]["count"] == 134
     assert result["control_workload"]["mean_ms"] == result["all_control_steps"]["mean_ms"]
     assert "task_macro" not in result
+    window = json.loads((tmp_path / "compact/_private/timing_window.json").read_text())
+    assert len(window["intervals"]) == 4
+    assert all(
+        window["start"] <= w["start"] <= w["end"] <= window["end"] for w in window["intervals"]
+    )
     with pytest.raises(ValueError, match="one pass"):
         benchmark(
             Backend(),

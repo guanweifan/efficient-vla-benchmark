@@ -332,8 +332,8 @@ primary table. H1 and H8 require separate matched references.
 
 Use fresh model processes and fixed CPU threads. A small batch on the same GPU may
 share native pre/post references. Accept at most 3% native latency drift and no
-observed thermal slowdown during the measurement window; loading/warmup are outside
-that window. Inspect telemetry per run: a method's thermal failure excludes that
+observed thermal slowdown during measured replay intervals; loading, warmup and
+trace-file decoding are outside those intervals. Inspect telemetry per run: a method's thermal failure excludes that
 run, not its healthy neighbors, provided BOTH native references are valid. An
 unstable reference invalidates the associated speedup until targeted remeasurement.
 No power/clock/fan changes. Repeat only for an explained anomaly, never select the

@@ -118,7 +118,7 @@ def benchmark(
     rows = []
     window_path = output_dir / "_private" / "timing_window.json"
     window_path.parent.mkdir(exist_ok=True)
-    window = {"start": time.time(), "end": None}
+    window = {"start": time.time(), "end": None, "intervals": []}
     window_path.write_text(json.dumps(window))
     peak_allocated = None
     peak_reserved = None
@@ -140,6 +140,7 @@ def benchmark(
                 monitor.synchronize()
                 monitor.reset_peak_memory()
                 query_index = 0
+                interval_start = time.time()
                 for index, sample in enumerate(samples):
                     monitor.synchronize()
                     start = time.perf_counter_ns()
@@ -181,6 +182,7 @@ def benchmark(
                     query_index += int(queried)
                     stream.write(json.dumps(row, sort_keys=True) + "\n")
                     rows.append(row)
+                window["intervals"].append({"start": interval_start, "end": time.time()})
                 stream.flush()
                 memory = monitor.peak_memory()
                 if memory["allocated_bytes"] is not None:
