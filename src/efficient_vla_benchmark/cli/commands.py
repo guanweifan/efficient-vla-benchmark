@@ -28,6 +28,12 @@ def parser():
     manifest.add_argument("--output", type=Path, required=True)
     manifest.add_argument("--sample-seed", type=int, default=20260924)
     manifest.add_argument("--policy-seed", type=int, default=0)
+    derive = commands.add_parser(
+        "derive-manifest", help="Freeze timing40/final2000 from Dev-200; no rollout"
+    )
+    derive.add_argument("--development-manifest", type=Path, required=True)
+    derive.add_argument("--purpose", choices=("timing", "final"), required=True)
+    derive.add_argument("--output", type=Path, required=True)
     validate = commands.add_parser("validate-config", help="Validate without loading a model")
     validate.add_argument("--config", type=Path, required=True)
     check = commands.add_parser("check-model", help="Load the real model read-only")
@@ -52,6 +58,11 @@ def parser():
     evaluate.add_argument("--record-traces", action=argparse.BooleanOptionalAction, default=None)
     evaluate.add_argument("--depth", action=argparse.BooleanOptionalAction, default=None)
     evaluate.add_argument("--formal", action="store_true")
+    evaluate.add_argument(
+        "--authorize-final",
+        action="store_true",
+        help="Explicitly schedule an owner-approved final-manifest rollout",
+    )
     evaluate.add_argument("--episode-manifest", type=Path)
     evaluate.add_argument("--shard-index", type=int, default=0)
     evaluate.add_argument("--num-shards", type=int, default=1)
@@ -112,6 +123,23 @@ def protect_resources(args):
 
 def main(argv=None):
     args = parser().parse_args(argv)
+    if args.command == "derive-manifest":
+        from efficient_vla_benchmark.evaluation.libero.manifest import (
+            derive_manifest,
+            load_manifest,
+        )
+
+        if args.output.exists():
+            raise ValueError("Refusing to overwrite an existing episode manifest")
+        data = derive_manifest(load_manifest(args.development_manifest), args.purpose)
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
+        print(
+            json.dumps(
+                {"kind": data["kind"], "episodes": len(data["episodes"]), "sha256": data["sha256"]}
+            )
+        )
+        return
     if args.command == "evaluation-manifest":
         from efficient_vla_benchmark.evaluation.libero import configure_libero
         from efficient_vla_benchmark.evaluation.libero.manifest import (
@@ -179,6 +207,10 @@ def main(argv=None):
                     "Manifest owns episode selection; do not override it or use --formal"
                 )
             manifest = load_manifest(args.episode_manifest)
+            if manifest["kind"] == "final_evaluation" and not args.authorize_final:
+                raise ValueError("Final evaluation requires explicit --authorize-final scheduling")
+            if manifest["kind"] != "final_evaluation" and args.authorize_final:
+                raise ValueError("--authorize-final requires a final evaluation manifest")
             select_shard(manifest, args.shard_index, args.num_shards)
             verify_resources(manifest, args.libero_root)
             config = replace(
@@ -187,13 +219,15 @@ def main(argv=None):
                     **config.evaluation,
                     "suites": list(SUITES),
                     "tasks": list(range(10)),
-                    "trials": 5,
+                    "trials": manifest["samples_per_task"],
                     "seed": manifest["policy_seed"],
                     "record_traces": bool(args.record_traces),
                 },
             )
         elif args.shard_index != 0 or args.num_shards != 1:
             raise ValueError("Sharding requires an explicit episode manifest")
+        elif args.authorize_final:
+            raise ValueError("--authorize-final requires a final evaluation manifest")
         protocol = config.evaluation
         validate_protocol(
             protocol["suites"],

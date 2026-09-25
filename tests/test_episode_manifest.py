@@ -10,6 +10,7 @@ from efficient_vla_benchmark.core.provenance import stable_hash
 from efficient_vla_benchmark.evaluation.libero.aggregate import merge_shards
 from efficient_vla_benchmark.evaluation.libero.manifest import (
     SUITES,
+    derive_manifest,
     episode_key,
     load_manifest,
     make_manifest,
@@ -70,7 +71,7 @@ def write_shard(root, manifest, index, *, error=False, identity="same"):
     root.mkdir()
     episodes = select_shard(manifest, index, 4)
     meta = {
-        "kind": "development_validation",
+        "kind": manifest["kind"],
         "experiment_id": identity,
         "episode_manifest": {"sha256": manifest["sha256"]},
         "config": {},
@@ -109,6 +110,60 @@ def test_merge_errors_and_configuration_mismatch(manifest, tmp_path):
     incompatible = write_shard(tmp_path / "wrong", manifest, 1, identity="different")
     with pytest.raises(ValueError, match="differ"):
         merge_shards(manifest, [paths[0], incompatible])
+
+
+@pytest.mark.parametrize("purpose,count", [("timing", 40), ("final", 2000)])
+def test_derived_manifests_and_aggregate_keep_protocols_distinct(
+    manifest, tmp_path, purpose, count
+):
+    derived = derive_manifest(manifest, purpose)
+    assert len(derived["episodes"]) == count
+    assert derived["development_manifest_sha256"] == manifest["sha256"]
+    assert derived == derive_manifest(manifest, purpose)
+    assert len([e for i in range(8) for e in select_shard(derived, i, 8)]) == count
+    if purpose == "timing":
+        assert derived["episodes"] == manifest["episodes"][::5]
+    else:
+        assert {episode_key(e) for e in manifest["episodes"]} <= {
+            episode_key(e) for e in derived["episodes"]
+        }
+    paths = [write_shard(tmp_path / str(i), derived, i) for i in range(4)]
+    result = merge_shards(derived, paths)
+    assert result["complete"] and result["episodes"] == count
+    assert result["formal_success_rate"] == (1.0 if purpose == "final" else None)
+    assert result["suites"][SUITES[0]]["expected"] == count // 4
+
+
+def test_timing_ids_cannot_be_cherry_picked_after_rehash(manifest):
+    derived = derive_manifest(manifest, "timing")
+    derived["episodes"] = copy.deepcopy(derived["episodes"])
+    derived["episodes"][0] = manifest["episodes"][1]
+    derived["sha256"] = stable_hash({k: v for k, v in derived.items() if k != "sha256"})
+    with pytest.raises(ValueError, match="lowest"):
+        validate_manifest(derived)
+
+
+def test_final_manifest_needs_explicit_scheduling_before_model_loading(manifest, tmp_path):
+    from efficient_vla_benchmark.cli.commands import main
+
+    path = tmp_path / "final.json"
+    path.write_text(json.dumps(derive_manifest(manifest, "final")))
+    with pytest.raises(ValueError, match="authorize-final"):
+        main(
+            [
+                "evaluate",
+                "--config",
+                "configs/experiments/openvla_oft/baseline.yaml",
+                "--model-path",
+                str(tmp_path / "model"),
+                "--libero-root",
+                str(tmp_path / "libero"),
+                "--output-dir",
+                str(tmp_path / "run"),
+                "--episode-manifest",
+                str(path),
+            ]
+        )
 
 
 def test_current_campaign_matrix_is_executable(manifest):

@@ -121,7 +121,7 @@ def main():
                     }
                 )
         value = {
-            "kind": "development_validation",
+            "kind": manifest["kind"],
             "manifest_sha256": manifest["sha256"],
             "configurations": results,
             "all_complete": all(r["complete"] for r in results),

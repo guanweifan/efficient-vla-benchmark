@@ -143,9 +143,7 @@ def evaluate(
     output_dir.mkdir(parents=True, exist_ok=True)
     metadata = {
         "schema_version": 1,
-        "kind": (
-            "development_validation" if manifest else "formal" if formal else "development_smoke"
-        ),
+        "kind": (manifest["kind"] if manifest else "formal" if formal else "development_smoke"),
         "config": asdict(config),
         "backend": backend.metadata(),
         "source": source_metadata(),
@@ -164,7 +162,11 @@ def evaluate(
         },
     }
     metadata["episode_manifest"] = (
-        {"sha256": manifest["sha256"], "name": manifest["name"], "population": 200}
+        {
+            "sha256": manifest["sha256"],
+            "name": manifest["name"],
+            "population": len(manifest["episodes"]),
+        }
         if manifest
         else None
     )
@@ -290,8 +292,9 @@ def evaluate(
         and len(results) == len(selected)
         and all(r["status"] == "completed" for r in results),
         "formal_campaign_completed": (
-            formal
-            and len(results) == len(suites) * len(task_ids) * trials
+            (formal or bool(manifest and manifest["kind"] == "final_evaluation"))
+            and len(results) == len(selected)
+            and num_shards == 1
             and all(r["status"] == "completed" for r in results)
         ),
     }

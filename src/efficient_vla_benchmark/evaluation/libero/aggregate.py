@@ -15,8 +15,8 @@ def merge_shards(manifest, run_dirs):
     reference = None
     for directory in sorted(map(Path, run_dirs)):
         metadata = json.loads((directory / "metadata.json").read_text())
-        if metadata["kind"] != "development_validation":
-            raise ValueError("Only development-validation shards may be merged")
+        if metadata["kind"] != manifest["kind"]:
+            raise ValueError("Shard kind differs from its episode manifest")
         if metadata["episode_manifest"]["sha256"] != manifest["sha256"]:
             raise ValueError("Shards use different episode manifests")
         comparable = {
@@ -65,33 +65,37 @@ def merge_shards(manifest, run_dirs):
         rows = [r for k, r in records.items() if k[0] == suite]
         successes = sum(r["success"] for r in rows)
         errors = sum(r["status"] == "error" for r in rows)
-        complete = len(rows) == 50 and errors == 0
+        expected_suite = 10 * manifest["samples_per_task"]
+        complete = len(rows) == expected_suite and errors == 0
         suites[suite] = {
             "episodes": len(rows),
-            "expected": 50,
+            "expected": expected_suite,
             "successes": successes,
             "errors": errors,
-            "success_rate": successes / 50 if complete else None,
+            "success_rate": successes / expected_suite if complete else None,
         }
     successes = sum(r["success"] for r in records.values())
     errors = sum(r["status"] == "error" for r in records.values())
-    complete = len(records) == 200 and errors == 0
+    population = len(expected)
+    complete = len(records) == population and errors == 0
     return {
         "schema_version": 1,
-        "kind": "development_validation",
+        "kind": manifest["kind"],
         "manifest_sha256": manifest["sha256"],
         "experiment_id": reference["experiment_id"],
         "config": reference["config"],
         "backend": reference["backend"],
         "source": reference["source"],
-        "expected_episodes": 200,
+        "expected_episodes": population,
         "episodes": len(records),
         "successes": successes,
         "errors": errors,
         "complete": complete,
-        "success_rate": successes / 200 if complete else None,
-        "successes_over_planned": successes / 200,
-        "formal_success_rate": None,
+        "success_rate": successes / population if complete else None,
+        "successes_over_planned": successes / population,
+        "formal_success_rate": successes / population
+        if complete and manifest["kind"] == "final_evaluation"
+        else None,
         "missing": [expected[k] for k in expected if k not in records],
         "suites": suites,
         "episode_results": [records[k] for k in sorted(records)],

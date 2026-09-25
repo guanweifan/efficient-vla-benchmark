@@ -208,6 +208,14 @@ extension, checkpoint and effective-config identities protect resume/aggregation
 Full source revisions and hardware remain recorded separately for every shard.
 No framework, algorithm or backend branch belongs in sampling or aggregation.
 
+`evb derive-manifest --development-manifest "$MANIFEST" --purpose timing --output
+"$TIMING_MANIFEST"` freezes one episode per task (the lowest selected Dev initial-
+state ID), before examining outcomes. `--purpose final` instead freezes all fifty
+states per task. Derivation never runs a policy. Timing-reference rollouts may
+record real depth with `--depth --record-traces`; failed tasks remain in the workload.
+A final-manifest rollout additionally requires `--authorize-final` after owner
+scheduling. The common shard/merge path keeps timing, Dev and final kinds distinct.
+
 `configs/evaluation/dev200_campaign.yaml` defines the original development campaign,
 including both AWQ kernel variants; it is NOT the final report selection manifest.
 `scripts/evaluation_results.py plan` generates portable jobs;
