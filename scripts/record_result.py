@@ -351,6 +351,8 @@ def validation_tables(
             if run_id in superseded or run_id not in by_run:
                 raise ValueError("Selected timing evidence is missing or superseded")
             record = by_run[run_id]
+            if not record.get("measurement_quality", {}).get("accepted", True):
+                raise ValueError("Selected timing evidence failed its measurement quality gate")
             meta = record["run"]["metadata"]
             expected_preset = f"configs/experiments/{key}.yaml"
             if record["preset"] != expected_preset:
@@ -593,6 +595,46 @@ def render(records, commit_map=None, validation=None, timing_selection=None, dev
                 f"{query['mean']:.1f} / {query['min']} / {query['max']} | "
                 f"{context['mean']:.1f} / {context['min']} / {context['max']} |"
             )
+        lines.append("")
+    quality = {}
+    for record in records:
+        value = record.get("measurement_quality")
+        if value is not None:
+            cohort = value["cohort"]
+            if cohort in quality and quality[cohort] != value:
+                raise ValueError("Inconsistent measurement quality within one cohort")
+            quality[cohort] = value
+    if quality:
+        lines += [
+            "## Timing quality controls",
+            "",
+            "Independent idle GPUs and fixed CPU affinity; no simulator runs on the timing host.",
+            "Native rechecks diagnose drift, not alternative denominators selected by speed.",
+            "Acceptance requires no observed thermal flags and absolute native drift at most 3%.",
+            "",
+            "| Cohort | Reference / recheck | Native drift | Thermal flags / samples | Accepted |",
+            "|---|---|---:|---:|---|",
+        ]
+        for cohort, value in sorted(quality.items()):
+            reference, recheck = ids[value["reference"]], ids[value["recheck"]]
+            lines.append(
+                f"| {cohort} | [{reference}](#{reference.lower()}) / "
+                f"[{recheck}](#{recheck.lower()}) | {value['native_drift_percent']:+.2f}% | "
+                f"{value['thermal_flag_samples']} / {value['telemetry_samples']} | "
+                f"{'Yes' if value['accepted'] else 'No'} |"
+            )
+        excluded = sorted(
+            {name for value in quality.values() for name in value.get("excluded_cohorts", [])}
+        )
+        if excluded:
+            lines += [
+                "",
+                "Initial thermal-affected cohorts excluded from current speed joins: "
+                + ", ".join(f"`{name}`" for name in excluded)
+                + ".",
+                "Their raw logs and incomplete attempts remain archived; no rollout outcome",
+                "was retried for this reason.",
+            ]
         lines.append("")
     lines += [
         "## Measurement cohorts",

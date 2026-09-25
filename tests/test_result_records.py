@@ -217,6 +217,7 @@ def test_multiple_development_rounds_keep_controls_and_negative_outcomes(tmp_pat
         "different_checkpoint",
         "superseded",
         "missing_timing",
+        "failed_quality_gate",
     ],
 )
 def test_development_join_rejects_incomparable_evidence(recorder, mutation):
@@ -231,6 +232,8 @@ def test_development_join_rejects_incomparable_evidence(recorder, mutation):
         records[1]["run"]["metadata"]["backend"]["checkpoint_sha256"] = "another"
     elif mutation == "superseded":
         records[0]["supersedes"] = ["example"]
+    elif mutation == "failed_quality_gate":
+        records[1]["measurement_quality"] = {"accepted": False}
     else:
         selection.pop("fixture/example")
     with pytest.raises(ValueError):
@@ -254,6 +257,26 @@ def test_superseded_evidence_is_preserved_and_labelled(tmp_path, recorder):
     table = recorder.render([old, new])
     assert "Superseded — Old" in table and "`example-run`" in table
     assert "Corrected" in table and "`corrected-run`" in table
+
+
+def test_quality_controls_keep_recheck_separate_and_disclose_exclusions(tmp_path, recorder):
+    run = tmp_path / "quality-run"
+    write_run(run)
+    record = recorder.make_record(run, run, "5.1", "Example", "configs/example.yaml")
+    record["measurement_quality"] = {
+        "cohort": "fixture",
+        "reference": "quality-run",
+        "recheck": "quality-run",
+        "native_drift_percent": 1.0,
+        "thermal_flag_samples": 0,
+        "telemetry_samples": 20,
+        "accepted": True,
+        "excluded_cohorts": ["thermal-excluded"],
+    }
+    table = recorder.render([record])
+    assert "Timing quality controls" in table and "+1.00%" in table
+    assert "thermal-excluded" in table and "0 / 20" in table
+    assert record["replay_speedup"] == 1.0
 
 
 @pytest.mark.parametrize("run_id", ["../example-run", "example-run", "not-found"])
