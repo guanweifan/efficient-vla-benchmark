@@ -1,13 +1,5 @@
 # Actuation-Slack Refresh: deletion instrument
 
-## Bounded development diagnostics
-
-CogACT Dev-200 presets `actuation_slack_refresh_keep25` and
-`actuation_slack_refresh_keep50` raise the primary-view retention ratio from 0.1
-to 0.25 or 0.5. Dense first chunks, unconditional same-frame dense refresh,
-gate provenance and RNG restoration are unchanged. Timing must include refresh;
-a better success rate cannot justify omitting this cost.
-
 Implements the independent deletion arm of [Actuation-Slack Refresh](https://arxiv.org/abs/2608.00391),
 not a composition with VLA-Cache or VLA-Pruner. ID:
 `actuation_slack_refresh_deletion`. The KV-reuse instrument is excluded.
@@ -47,3 +39,11 @@ claim retained here is gate provenance plus unconditional same-frame dense refre
 subsequent served chunks retain 26/256 patches by default. The auxiliary call runs
 the complete native stochastic action head but discards its actions and restores
 RNG, so the next served sample consumes exactly the native noise sequence.
+
+## Bounded development diagnostics
+
+CogACT Dev-200 presets `actuation_slack_refresh_keep25` and
+`actuation_slack_refresh_keep50` raise the primary-view retention ratio from 0.1
+to 0.25 or 0.5. Dense first chunks, unconditional same-frame dense refresh,
+gate provenance and RNG restoration are unchanged. Timing must include refresh;
+a better success rate cannot justify omitting this cost.

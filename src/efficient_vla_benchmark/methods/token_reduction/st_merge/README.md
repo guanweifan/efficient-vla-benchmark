@@ -1,13 +1,5 @@
 # ST-Merge: spatial VLA path
 
-## Bounded development diagnostics
-
-The bounded Dev-200 diagnostic presets `st_merge_keep192` and `st_merge_layer6`
-change only the target budget (128 to 192 per view) or merge layer (1 to 6),
-respectively, on both backends. Matching, mass weighting and paired DINO/SigLIP
-membership are unchanged. These test compression strength and early-feature
-sensitivity; neither resolves the paper's unverified grouping conventions.
-
 Paper-based port of [ST-Merge](https://arxiv.org/html/2606.29350v1), section III-E's
 single-frame multi-view VLA deployment, not its video-Qwen path. The linked author
 repository returned 404 during integration. No claim of verified source parity.
@@ -66,3 +58,11 @@ independent matching/mass checks and shared DINO/SigLIP membership checks passed
 the observed regression is retained, not tuned away. These checks do not prove
 that every author convention is recovered or that the published method fails.
 See the central ledger for its paired speed/memory measurements and run identity.
+
+## Bounded development diagnostics
+
+The bounded Dev-200 diagnostic presets `st_merge_keep192` and `st_merge_layer6`
+change only the target budget (128 to 192 per view) or merge layer (1 to 6),
+respectively, on both backends. Matching, mass weighting and paired DINO/SigLIP
+membership are unchanged. These test compression strength and early-feature
+sensitivity; neither resolves the paper's unverified grouping conventions.

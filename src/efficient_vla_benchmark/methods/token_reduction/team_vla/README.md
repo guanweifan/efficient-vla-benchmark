@@ -1,12 +1,5 @@
 # TEAM-VLA
 
-## Bounded development diagnostics
-
-The Dev-200 diagnostics isolate early sampling (`team_vla_context50`: 0.25 to
-0.5 context ratio) from middle-layer compression (`team_vla_merge160`: 80 to
-160 anchors). All expansion, scoring and weighted-merge equations stay fixed.
-These are parameter comparisons, not alternate interpretations chosen by success.
-
 Independent, training-free implementation of [TEAM-VLA](https://arxiv.org/abs/2512.09927v1), Sections IV-B/C. The [project repository](https://github.com/Jasper-aaa/TEAM-VLA) did not contain algorithm source at audit time. This is a paper-based port, **not verified reproduction of the authors' implementation or published scores**.
 
 ## Mechanism
@@ -45,3 +38,10 @@ representation and receive only one compressed condition. Treating cognition as
 the missing action-token set or projecting DiT features back would introduce an
 unverified guidance rule. We do not label the early stage alone as full TEAM-VLA.
 This is a fidelity deferral, not proof that a new CogACT variant cannot be designed.
+
+## Bounded development diagnostics
+
+The Dev-200 diagnostics isolate early sampling (`team_vla_context50`: 0.25 to
+0.5 context ratio) from middle-layer compression (`team_vla_merge160`: 80 to
+160 anchors). All expansion, scoring and weighted-merge equations stay fixed.
+These are parameter comparisons, not alternate interpretations chosen by success.

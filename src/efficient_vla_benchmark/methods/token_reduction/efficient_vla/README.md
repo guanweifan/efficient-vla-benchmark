@@ -1,12 +1,5 @@
 # EfficientVLA independent cores
 
-## Bounded development diagnostics
-
-CogACT Dev-200 presets `efficient_vla_cache2` and `efficient_vla_cache3`
-change the per-query refresh interval from 5 to 2 or 3 denoiser calls. They
-retain separate attention/MLP caches, live residuals and conditioning, CFG
-branches, native DDIM steps and native action RNG. No token pruning is combined.
-
 Independent paper-based implementation of [section 3.3](https://arxiv.org/html/2506.10100v1).
 The OFT ID `efficient_vla` implements token pruning only. The separately selected
 CogACT ID `efficient_vla_diffusion_cache` implements section 3.4 only. Neither is
@@ -77,3 +70,10 @@ this published rule. The paper reports CogACT, so this is an unresolved
 paper/native-implementation discrepancy, not evidence that the authors' method
 cannot work. Keep this scope unregistered until a verifiable attention convention
 resolves it; the cache-core result cannot stand in for token pruning.
+
+## Bounded development diagnostics
+
+CogACT Dev-200 presets `efficient_vla_cache2` and `efficient_vla_cache3`
+change the per-query refresh interval from 5 to 2 or 3 denoiser calls. They
+retain separate attention/MLP caches, live residuals and conditioning, CFG
+branches, native DDIM steps and native action RNG. No token pruning is combined.

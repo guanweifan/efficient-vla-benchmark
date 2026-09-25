@@ -1,11 +1,5 @@
 # FlashVLA (2025): ICS token-pruning core
 
-## Bounded development diagnostics
-
-CogACT Dev-200 presets `flash_vla_keep192` and `flash_vla_layer4` vary only
-retention (160 to 192) or pruning layer (1 to 4). Complete FP32 SVD and its L1
-score remain unchanged. Action reuse remains excluded, including in all tables.
-
 This is **Think Twice, Act Once**, [arXiv:2505.21200v1](https://arxiv.org/html/2505.21200v1),
 not the later streaming-action-decoding work with the same name.
 Independent paper-based section 3.2 implementation; NOT full FlashVLA reproduction.
@@ -62,3 +56,9 @@ OpenVLA path is also causal. We preserve Eq. 2, not its disputed L2-energy proof
 Use `configs/experiments/cogact/flash_vla.yaml`. No action reuse, low-rank
 approximation or alternate scoring equation is introduced. These results test
 the independent ICS contribution on this checkpoint, not full FlashVLA scores.
+
+## Bounded development diagnostics
+
+CogACT Dev-200 presets `flash_vla_keep192` and `flash_vla_layer4` vary only
+retention (160 to 192) or pruning layer (1 to 4). Complete FP32 SVD and its L1
+score remain unchanged. Action reuse remains excluded, including in all tables.

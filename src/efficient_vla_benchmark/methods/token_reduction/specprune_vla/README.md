@@ -1,15 +1,5 @@
 # SpecPrune-VLA
 
-## Bounded development diagnostics
-
-Dev-200 compares two explicit variants on each backend. `specprune_vla_static128`
-caps low-change deletion at 128 patches per view in both controller modes,
-without disabling global/local selection, dynamic pruning or control. The
-`specprune_vla_score_first` schedule adds an importance update at layer 9 before
-the first layer-10 pruning; other layers are unchanged. This is an intentional
-schedule ablation, NOT a correction to the pinned author's executable defaults.
-The latter initialize scores to zero and first update at layer 14.
-
 Reference: [paper](https://arxiv.org/abs/2509.05614),
 [author code](https://github.com/alexwhz-sjtu/SpecPrune-VLA/tree/8091adc4b574ce9008d49a1dc9a210f4eec314c1).
 The fixed reference is available under `third_party/methods/specprune_vla`.
@@ -98,3 +88,13 @@ pruning schedule. Raw-frame lookback uses native RGB preprocessing without an OF
 crop. Original causal visibility, positions, final cognition and DDIM remain intact.
 Reset clears frames, confidence, global saliency and controller state. Probe costs
 and any extra model queries are included in control-replay timing.
+
+## Bounded development diagnostics
+
+Dev-200 compares two explicit variants on each backend. `specprune_vla_static128`
+caps low-change deletion at 128 patches per view in both controller modes,
+without disabling global/local selection, dynamic pruning or control. The
+`specprune_vla_score_first` schedule adds an importance update at layer 9 before
+the first layer-10 pruning; other layers are unchanged. This is an intentional
+schedule ablation, NOT a correction to the pinned author's executable defaults.
+The latter initialize scores to zero and first update at layer 14.
