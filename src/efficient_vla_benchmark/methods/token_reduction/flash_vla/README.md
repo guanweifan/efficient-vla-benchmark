@@ -62,3 +62,8 @@ the independent ICS contribution on this checkpoint, not full FlashVLA scores.
 CogACT Dev-200 presets `flash_vla_keep192` and `flash_vla_layer4` vary only
 retention (160 to 192) or pruning layer (1 to 4). Complete FP32 SVD and its L1
 score remain unchanged. Action reuse remains excluded, including in all tables.
+
+Fixed CogACT Dev-200 scored 126/200 by default, 154/200 with keep192 and
+113/200 with layer4, versus native 183/200. Budget relief helped, whereas this
+later pruning layer did not. The residual 14.5-point gap at keep192 is retained;
+complete SVD checks do not establish that all lost accuracy is intrinsic to ICS.

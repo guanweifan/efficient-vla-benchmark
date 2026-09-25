@@ -66,3 +66,11 @@ change only the target budget (128 to 192 per view) or merge layer (1 to 6),
 respectively, on both backends. Matching, mass weighting and paired DINO/SigLIP
 membership are unchanged. These test compression strength and early-feature
 sensitivity; neither resolves the paper's unverified grouping conventions.
+
+On the fixed Dev-200 subset, the current-round OFT default, keep192 and layer6
+presets scored 124, 197 and 174 successes; CogACT scored 34, 162 and 56 out of
+200. Native references scored 198 and 183. Budget relief is the stronger tested
+intervention, but CogACT still loses 10.5 percentage points at keep192. One
+CogACT layer6 shard logged a simulator instability warning; its outcomes remain
+included without assigning the buffered warning to an unverified episode.
+These results diagnose this disclosed port, not all author conventions.

@@ -47,3 +47,8 @@ CogACT Dev-200 presets `actuation_slack_refresh_keep25` and
 to 0.25 or 0.5. Dense first chunks, unconditional same-frame dense refresh,
 gate provenance and RNG restoration are unchanged. Timing must include refresh;
 a better success rate cannot justify omitting this cost.
+
+Fixed CogACT Dev-200 scored 137/200 at retention 0.1, 178/200 at 0.25 and
+182/200 at 0.5, versus native 183/200. This isolates strong retention sensitivity
+while keeping the refresh mechanism. A near-native success rate does not remove
+the extra dense-pass cost or establish real-robot serve-latency acceleration.

@@ -77,3 +77,8 @@ CogACT Dev-200 presets `efficient_vla_cache2` and `efficient_vla_cache3`
 change the per-query refresh interval from 5 to 2 or 3 denoiser calls. They
 retain separate attention/MLP caches, live residuals and conditioning, CFG
 branches, native DDIM steps and native action RNG. No token pruning is combined.
+
+Fixed CogACT Dev-200 scored 165/200 at N=5 and 177/200 at both N=2 and N=3,
+versus native 183/200. More frequent refresh recovers accuracy without changing
+the ten native denoising calls. Equal aggregate counts do not mean identical
+episode outcomes; compare paired timing before choosing between N=2 and N=3.

@@ -45,3 +45,9 @@ The Dev-200 diagnostics isolate early sampling (`team_vla_context50`: 0.25 to
 0.5 context ratio) from middle-layer compression (`team_vla_merge160`: 80 to
 160 anchors). All expansion, scoring and weighted-merge equations stay fixed.
 These are parameter comparisons, not alternate interpretations chosen by success.
+
+The fixed Dev-200 comparison scored 97/200 by default, 82/200 with context50,
+and 167/200 with merge160, against native 198/200. Increasing middle-layer
+anchors helped substantially; increasing early context alone did not. Do not
+combine the two variants without a separately scheduled experiment. The remaining
+accuracy gap and paper interpretation uncertainties remain explicit.
