@@ -1,5 +1,12 @@
 # DART
 
+## Bounded development diagnostics
+
+OFT Dev-200 presets `dart_keep75` and `dart_layer4` change retention (0.5 to
+0.75) or pruning layer (2 to 4) separately. Post-RoPE key pivots, normalized
+feature distances and sequential exclusion remain unchanged. Budgets retain
+the reference's extra visual pivots rather than silently forcing an exact ratio.
+
 [Duplication-Aware Reduction of Tokens](https://arxiv.org/abs/2502.11494), not the
 similarly named speculative-decoding method. Reviewed author revision
 [`0c888673198b0f2784053a5686f95a519ceef209`](https://github.com/ZichenWen1/DART/tree/0c888673198b0f2784053a5686f95a519ceef209).

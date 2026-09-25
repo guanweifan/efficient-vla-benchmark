@@ -1,0 +1,4 @@
+# Dev-200 diagnostic variant; does not replace dart defaults.
+extends: dart.yaml
+parameters:
+  keep_ratio: 0.75
