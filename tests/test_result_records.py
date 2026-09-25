@@ -168,6 +168,17 @@ def test_development_join_is_separate_from_formal_and_historical_timing(recorder
     assert "not simultaneous" in text and "development/tuning subset" in text
 
 
+def test_simulator_warnings_are_not_hidden_by_zero_python_errors(recorder):
+    validation, records, selection, ids = development_fixture()
+    validation["simulator_warning_shards"] = ["fixture--example--s000"]
+    text = "\n".join(recorder.validation_tables(validation, records, selection, ids))
+    assert "numerical-instability warnings" in text and "fixture--example--s000" in text
+    assert "160/200 (80.0%)" in text
+    validation["simulator_warning_shards"] = ["../private/run"]
+    with pytest.raises(ValueError, match="portable shard IDs"):
+        recorder.validation_tables(validation, records, selection, ids)
+
+
 def test_multiple_development_rounds_keep_controls_and_negative_outcomes(tmp_path, recorder):
     validation, records, selection, ids = development_fixture()
     first = recorder.validation_tables(validation, records, selection, ids)

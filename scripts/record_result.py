@@ -322,7 +322,7 @@ def validation_tables(
         f"Manifest SHA256: `{validation['manifest_sha256']}`.",
         "This is a **development/tuning subset**, not the formal 2,000-episode success rate.",
         "The remaining 1,800 episodes were not evaluated by this campaign. No failed",
-        "episode is replaced by a successful retry. Each complete row has zero runtime errors.",
+        "episode is replaced by a successful retry. Complete rows have no recorded Python errors.",
         "",
         "Speed columns reuse explicitly selected historical fixed-replay records below,",
         "matched by checkpoint, method parameters, precision and execution cadence.",
@@ -333,6 +333,21 @@ def validation_tables(
         "the same backend's native baseline at matched H; VOTE therefore uses H=1.",
         "",
     ]
+    warning_shards = validation.get("simulator_warning_shards", [])
+    if warning_shards:
+        if not isinstance(warning_shards, list) or any(
+            not isinstance(name, str) or not name or not all(c.isalnum() or c in "-_" for c in name)
+            for name in warning_shards
+        ):
+            raise ValueError("Simulator warning references must be portable shard IDs")
+        lines += [
+            "Simulator numerical-instability warnings were logged in: "
+            + ", ".join(f"`{name}`" for name in sorted(warning_shards))
+            + ".",
+            "These are distinct from Python exceptions. Original episode outcomes are retained;",
+            "buffered simulator logs support shard-level, not exact episode-level attribution.",
+            "",
+        ]
     for backend in sorted({r["backend"]["backend"] for r in results}):
         lines += [
             f"### {backend}",
