@@ -1,0 +1,33 @@
+# Bounded, preregistered diagnostic comparisons on the unchanged development manifest.
+# Original presets and matched native baselines remain explicit controls.
+openvla_oft:
+  - baseline
+  - st_merge
+  - st_merge_keep192
+  - st_merge_layer6
+  - team_vla
+  - team_vla_context50
+  - team_vla_merge160
+  - specprune_vla
+  - specprune_vla_static128
+  - specprune_vla_score_first
+  - dart
+  - dart_keep75
+  - dart_layer4
+cogact:
+  - baseline
+  - st_merge
+  - st_merge_keep192
+  - st_merge_layer6
+  - specprune_vla
+  - specprune_vla_static128
+  - specprune_vla_score_first
+  - flash_vla
+  - flash_vla_keep192
+  - flash_vla_layer4
+  - actuation_slack_refresh_deletion
+  - actuation_slack_refresh_keep25
+  - actuation_slack_refresh_keep50
+  - efficient_vla_diffusion_cache
+  - efficient_vla_cache2
+  - efficient_vla_cache3
