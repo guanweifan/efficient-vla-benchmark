@@ -235,6 +235,11 @@ Render the combined ledger with `scripts/record_result.py render`, supplying
 `--development-summary` and `--timing-selection` together. The latter is a local
 JSON map from `backend/preset` to an explicitly audited historical timing run ID;
 choose the current valid implementation cohort, never the fastest repeat. The join
+accepts repeated pairs of `--development-summary` / `--timing-selection` in round
+order, preserving the original table alongside later bounded diagnostic rounds.
+Always retain failed candidates. A changed parameter configuration needs its own
+paired timing measurement; never attach its parent's speed to the new preset.
+The join
 requires matching checkpoint, precision, method parameters and execution cadence,
 and refuses superseded/incomplete evidence. Timing and closed-loop source revisions
 remain separate: a metadata match does not certify source equivalence. Dev-200

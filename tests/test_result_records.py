@@ -168,6 +168,46 @@ def test_development_join_is_separate_from_formal_and_historical_timing(recorder
     assert "not simultaneous" in text and "development/tuning subset" in text
 
 
+def test_multiple_development_rounds_keep_controls_and_negative_outcomes(tmp_path, recorder):
+    validation, records, selection, ids = development_fixture()
+    first = recorder.validation_tables(validation, records, selection, ids)
+    later = copy.deepcopy(validation)
+    candidate = later["configurations"][1]
+    candidate["successes"] = 120
+    candidate["success_rate"] = 0.6
+    for suite in candidate["suites"].values():
+        suite["successes"] = 30
+    second = recorder.validation_tables(later, records, selection, ids, title="Diagnostic round")
+    assert "160/200 (80.0%)" in "\n".join(first)
+    assert "120/200 (60.0%)" in "\n".join(second)
+    assert second[0] == "## Diagnostic round"
+    assert validation["configurations"][1]["successes"] == 160
+
+    run = tmp_path / "round-fixture"
+    write_run(run)
+    record = recorder.make_record(run, run, "5.1", "Fixture", "configs/example.yaml")
+    observed = []
+    original = recorder.validation_tables
+
+    def capture(value, records, selection, ids, **kwargs):
+        observed.append((value, selection, kwargs["title"]))
+        return [kwargs["title"], ""]
+
+    recorder.validation_tables = capture
+    try:
+        text = recorder.render(
+            [record],
+            development_rounds=[
+                ("Original round", validation, selection),
+                ("Diagnostic round", later, selection),
+            ],
+        )
+    finally:
+        recorder.validation_tables = original
+    assert [entry[2] for entry in observed] == ["Original round", "Diagnostic round"]
+    assert text.index("Original round") < text.index("Diagnostic round")
+
+
 @pytest.mark.parametrize(
     "mutation",
     [

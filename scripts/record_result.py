@@ -283,7 +283,14 @@ def record_digest(record):
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
-def validation_tables(validation, records, timing_selection, ids):
+def validation_tables(
+    validation,
+    records,
+    timing_selection,
+    ids,
+    *,
+    title="Fixed Dev-200 validation and historical speed",
+):
     """Join audited development outcomes to explicitly chosen historical timing records."""
     if validation["kind"] != "development_validation" or not validation["all_complete"]:
         raise ValueError("Publish a Dev-200 table only after every configuration is complete")
@@ -308,7 +315,7 @@ def validation_tables(validation, records, timing_selection, ids):
     superseded = {name for r in records for name in r.get("supersedes", [])}
     suites = ("libero_spatial", "libero_object", "libero_goal", "libero_10")
     lines = [
-        "## Fixed Dev-200 validation and historical speed",
+        f"## {title}",
         "",
         "Five fixed initial states per task; forty tasks, fifty episodes per suite.",
         "Every configuration uses the same episode manifest and policy seeds.",
@@ -415,7 +422,7 @@ def validation_tables(validation, records, timing_selection, ids):
     return lines + ["", "</details>", ""]
 
 
-def render(records, commit_map=None, validation=None, timing_selection=None):
+def render(records, commit_map=None, validation=None, timing_selection=None, development_rounds=()):
     commit_map = load_history_map() if commit_map is None else commit_map
     records = sorted(records, key=lambda record: record["run"]["run_id"])
     ids = {record["run"]["run_id"]: f"R{index:02d}" for index, record in enumerate(records, 1)}
@@ -469,6 +476,8 @@ def render(records, commit_map=None, validation=None, timing_selection=None):
     ]
     if validation is not None:
         lines += validation_tables(validation, records, timing_selection, ids)
+    for title, round_validation, round_selection in development_rounds:
+        lines += validation_tables(round_validation, records, round_selection, ids, title=title)
     sections = sorted({record["section"] for record in records})
     for section in sections:
         lines += [
@@ -706,8 +715,8 @@ def main():
     table = commands.add_parser("render")
     table.add_argument("--records-dir", type=Path, default=Path("outputs/result_records"))
     table.add_argument("--output", type=Path, required=True)
-    table.add_argument("--development-summary", type=Path)
-    table.add_argument("--timing-selection", type=Path)
+    table.add_argument("--development-summary", type=Path, action="append", default=[])
+    table.add_argument("--timing-selection", type=Path, action="append", default=[])
     args = parser.parse_args()
     if args.command == "export":
         if Path(args.preset).is_absolute() or ".." in Path(args.preset).parts:
@@ -725,11 +734,21 @@ def main():
         records = [read_json(path) for path in sorted(args.records_dir.glob("*.json"))]
         if not records:
             raise ValueError("No evidence records; obtain the local archive before regenerating")
-        if bool(args.development_summary) != bool(args.timing_selection):
-            raise ValueError("Development summary and explicit timing selection are used together")
-        validation = read_json(args.development_summary) if args.development_summary else None
-        selection = read_json(args.timing_selection) if args.timing_selection else None
-        args.output.write_text(render(records, validation=validation, timing_selection=selection))
+        if len(args.development_summary) != len(args.timing_selection):
+            raise ValueError("Each development summary requires its explicit timing selection")
+        rounds = [
+            (
+                "Fixed Dev-200 validation and historical speed"
+                if index == 0
+                else f"Dev-200 diagnostic round {index}: validation and paired fixed-replay speed",
+                read_json(summary),
+                read_json(selection),
+            )
+            for index, (summary, selection) in enumerate(
+                zip(args.development_summary, args.timing_selection)
+            )
+        ]
+        args.output.write_text(render(records, development_rounds=rounds))
 
 
 if __name__ == "__main__":
