@@ -74,3 +74,7 @@ intervention, but CogACT still loses 10.5 percentage points at keep192. One
 CogACT layer6 shard logged a simulator instability warning; its outcomes remain
 included without assigning the buffered warning to an unverified episode.
 These results diagnose this disclosed port, not all author conventions.
+
+Budget relief also reduces acceleration: paired keep192 replay measured 1.023x
+on OFT and 1.180x on CogACT, versus 1.151x and 1.425x for their default presets.
+Near-native OFT success therefore does not imply a substantial speed benefit.

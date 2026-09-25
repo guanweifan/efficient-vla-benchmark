@@ -102,6 +102,6 @@ The latter initialize scores to zero and first update at layer 14.
 Fixed Dev-200 outcomes (default / static128 / score_first) were 157 / 182 / 193
 out of 200 on OFT and 115 / 174 / 166 on CogACT, versus native 198 and 183.
 This supports budget and scheduling sensitivity, not an implementation-error
-claim: score_first intentionally differs from the pinned default. CogACT's best
-of these two variants is static128; do not generalize one backend's schedule
+claim: score_first intentionally differs from the pinned default. CogACT's higher-
+success variant is static128; do not generalize one backend's schedule
 choice to the other. Preserve both presets and their independently timed costs.
