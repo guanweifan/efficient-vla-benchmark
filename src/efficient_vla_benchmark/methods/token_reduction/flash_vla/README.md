@@ -67,3 +67,8 @@ Fixed CogACT Dev-200 scored 126/200 by default, 154/200 with keep192 and
 113/200 with layer4, versus native 183/200. Budget relief helped, whereas this
 later pruning layer did not. The residual 14.5-point gap at keep192 is retained;
 complete SVD checks do not establish that all lost accuracy is intrinsic to ICS.
+
+Readiness candidates `openvla_oft/flash_vla_keep192` and
+`cogact/flash_vla_keep224` test more conservative retention without changing the
+scoring equation, SVD solver, pruning layer or declared ICS-only scope. They are
+not selected defaults; their Dev-200 and full-cost timing must precede selection.

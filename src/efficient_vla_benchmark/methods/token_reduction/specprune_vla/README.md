@@ -105,3 +105,8 @@ This supports budget and scheduling sensitivity, not an implementation-error
 claim: score_first intentionally differs from the pinned default. CogACT's higher-
 success variant is static128; do not generalize one backend's schedule
 choice to the other. Preserve both presets and their independently timed costs.
+
+Readiness candidate `cogact/specprune_vla_static96` reduces the static DELETION
+cap from 128 to 96 per view. It preserves the pinned importance/pruning schedule,
+dynamic pruning and action controller; 96 does not denote the final retained count.
+It requires its own Dev-200 and timing evidence before selection.

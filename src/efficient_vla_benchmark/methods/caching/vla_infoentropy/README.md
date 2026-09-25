@@ -53,3 +53,8 @@ are unchanged. Eager probabilities are shared with the statistics; their precisi
 and overhead are reported rather than claimed identical to native SDPA.
 Cold/reset/disabled/detach checks, full-key versus sparse-query tests and executed
 step quota tests accompany this independent paper-based port.
+
+Readiness candidate `cogact/vla_infoentropy_static100` changes only the maximum
+static reuse candidate count from 150 to 100. Complete histogram, text entropy,
+quota transition, task protection and layer schedule remain present. This is a
+selective accuracy-sensitivity test, not an already validated replacement default.

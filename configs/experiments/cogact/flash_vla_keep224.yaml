@@ -1,0 +1,4 @@
+# Readiness candidate: 224/256 retained; complete SVD and original pruning layer.
+extends: flash_vla.yaml
+parameters:
+  tokens_per_view: 224
