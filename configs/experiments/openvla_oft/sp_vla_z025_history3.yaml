@@ -1,0 +1,5 @@
+extends:
+- ./sp_vla.yaml
+parameters:
+  z_prune_threshold: 0.25
+  min_model_actions: 3
