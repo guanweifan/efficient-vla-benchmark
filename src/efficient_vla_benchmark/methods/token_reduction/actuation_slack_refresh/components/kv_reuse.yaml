@@ -1,0 +1,15 @@
+schema_version: 1
+name: actuation_slack_refresh_kv_reuse
+category: caching
+description: ASR unconditional same-frame dense refresh of both gate and indexed KV base.
+config: efficient_vla_benchmark.methods.token_reduction.actuation_slack_refresh.config:ASRConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout, auxiliary_dense_inference]
+    factory: efficient_vla_benchmark.methods.token_reduction.actuation_slack_refresh.implementations.openvla_oft.api:build_reuse
+  cogact:
+    variants: [libero_joint]
+    requires: [causal_indexed_kv_reuse, auxiliary_dense_inference]
+    factory: efficient_vla_benchmark.methods.token_reduction.actuation_slack_refresh.implementations.cogact.api:build_reuse

@@ -1,8 +1,9 @@
-# Actuation-Slack Refresh: deletion instrument
+# Actuation-Slack Refresh: independent deletion and KV-reuse instruments
 
-Implements the independent deletion arm of [Actuation-Slack Refresh](https://arxiv.org/abs/2608.00391),
-not a composition with VLA-Cache or VLA-Pruner. ID:
-`actuation_slack_refresh_deletion`. The KV-reuse instrument is excluded.
+Implements the independently selectable deletion and KV-reuse instruments of
+[Actuation-Slack Refresh](https://arxiv.org/abs/2608.00391), not a composition with
+VLA-Cache or VLA-Pruner. IDs: `actuation_slack_refresh_deletion` and
+`actuation_slack_refresh_kv_reuse`. Each run selects exactly one instrument.
 
 The first served chunk is dense. Every served chunk unconditionally schedules
 one dense pass on the **same prepared frame**, whose action output is discarded.
@@ -39,6 +40,26 @@ claim retained here is gate provenance plus unconditional same-frame dense refre
 subsequent served chunks retain 26/256 patches by default. The auxiliary call runs
 the complete native stochastic action head but discards its actions and restores
 RNG, so the next served sample consumes exactly the native noise sequence.
+
+## KV-reuse instrument
+
+The reuse component implements equations 1-2 with the same pure-attention clean
+gate as deletion. All visual keys remain visible with their native causal or
+bidirectional constraints. Selected primary-view queries and MLP rows execute;
+skipped rows use one-chunk-old per-layer KV from the complete dense refresh.
+The first served chunk is dense. Wrist/nonvisual rows are always computed.
+
+The dense KV base is immutable during serving: active-row splices are temporary,
+never recursively published. Every auxiliary pass replaces all layer KV and the
+gate, even after a dense first chunk. Gate probing, cache storage/splicing and the
+complete discarded action head are included in the common timing boundary.
+This component does not implement the VLA-Cache static/entropy gate or claim its
+composition results. Configuration layer choices and CogACT cognition-attention
+adaptation have the same explicit limitations as the deletion instrument.
+
+Tests check immutable clean KV, missing-base rejection and real-checkpoint
+cold/no-op/reset/detach/RNG behavior. Measurements must additionally pass the common
+smoke, Dev-200 and full-cost replay before this scope enters the primary ledger.
 
 ## Bounded development diagnostics
 

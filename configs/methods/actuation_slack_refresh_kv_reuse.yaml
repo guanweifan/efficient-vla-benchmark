@@ -1,0 +1,5 @@
+method: actuation_slack_refresh_kv_reuse
+parameters:
+  keep_ratio: 0.1
+  gate_layers: [15]
+  actuation_window_ms: 400.0
