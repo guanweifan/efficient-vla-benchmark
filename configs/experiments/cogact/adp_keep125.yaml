@@ -1,0 +1,4 @@
+extends:
+- ./adp.yaml
+parameters:
+  keep_ratio: 0.125

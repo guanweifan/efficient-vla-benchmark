@@ -33,7 +33,8 @@ unmodified; `dynamic: false` is an explicitly static-pruning ablation.
 - Preserve the joint checkpoint's original RoPE positions, bilateral mask and
   one-token-offset action readout. The author's sequence rebuild compacts positions;
   our explicit native-position policy avoids modifying protected model semantics.
-- Keep the published 0.75 retention and 0.4/0.6 view weights across all suites.
+- The reference preset uses 0.75 retention and 0.4/0.6 view weights across all suites.
+  Dev-selected presets vary retention, not the scorer, view allocation or motion-gate rule.
   Preserve per-view quota clipping; actual retained counts, not nominal ratios,
   are recorded. Clamp tiny total budgets to one token per view to avoid the
   reference allocator's otherwise nonterminating correction loop.
@@ -51,7 +52,8 @@ parity and active pruning. Timing and four-episode smoke are recorded centrally 
 
 `implementations/cogact/` reuses the same released Q/K scorer and observed-EEF
 motion controller; it never imports the OFT decoder. One 256-patch camera uses
-weight [1.0] and the unchanged 0.75 retention rule (192 when pruning is active).
+weight [1.0]; the reference preset retains 0.75 (192 when pruning is active).
+The selected retention ratio is recorded in the primary-selection manifest.
 Language-Q includes the native nonvisual INPUT embeddings, including BOS,
 prompt/separator and cognition EOS, following the reference's non-action-token
 selection. This is not contextualized cognition/action attention. Native causal
