@@ -1,0 +1,13 @@
+schema_version: 1
+name: action_cache
+category: caching
+description: Frozen successful-trajectory action retrieval and native DDIM refinement.
+config: efficient_vla_benchmark.methods.caching.action_cache.config:ActionCacheConfig
+requires_artifact: true
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.caching.action_cache.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.caching.action_cache.implementations.cogact.api:preflight
+    validate_experiment: efficient_vla_benchmark.methods.caching.action_cache.implementations.cogact.api:validate_experiment

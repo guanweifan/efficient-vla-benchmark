@@ -1,0 +1,8 @@
+method: action_cache
+parameters:
+  enabled: true
+  hit_threshold: 0.90
+  refinement_steps: 2
+  key_dim: 500
+  projection_density: 0.01
+  projection_seed: 42
