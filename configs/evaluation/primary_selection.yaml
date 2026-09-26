@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+coverage_summary_sha256: 6bc97b0fbc2091a71d1174523bbd83a075550d1a2c8cc751e418c95451baf95f
 source_compatibility:
 - development_runtime: 0dd68a00d775d3a36a95e949eb2e0fe708456ae4c6fd03fde045ccd5695cc8f2
   timing_runtime: b30a41d426f30c6f8e7731d6ab35fe56ea52ac691f601faf83c2daff72e9c099
@@ -21,8 +21,238 @@ source_compatibility:
 timing_workloads:
   openvla_oft: 01f8a93fc0bd522be3ef1d2dbee981ad1bb53ed9c1bf76b404808060bdedbefe
   cogact: 6c0e509fe062fdc393d7edbf668d29450250b99e9b163a5bad5597796e7420bc
-final_runtime_source_sha256: fb5c9a52ab1f503f3ad5b8aca8a23b63f8fd395c73adbb95a624f6156b8bb63b
+final_runtime_source_sha256: 168f6e3a995a6aa0a9dc473471ba1e7006299c4da6480897d0dbbdca6e019894
 configurations:
+- config: configs/experiments/cogact/baseline.yaml
+  status: primary
+  section: Reference
+  reason: Native H8 reference.
+  scope: Native model.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-41-4-cogact-1--native-pre
+- config: configs/experiments/cogact/baseline_horizon1.yaml
+  status: primary
+  section: Reference
+  reason: Separate matched-cadence reference for VOTE.
+  scope: Native H1 control.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: 14ac367a1ff2fcdccd71c123235a5879d950eca0ebed49cf9c4aaf76769d6989
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 14ac367a1ff2fcdccd71c123235a5879d950eca0ebed49cf9c4aaf76769d6989
+  timing_record: compact-42-1-cogact-vote--native-pre
+- config: configs/experiments/cogact/actuation_slack_refresh_keep25.yaml
+  status: primary
+  section: '5.1'
+  reason: 178/200 meets the 3-pp target; keep25 costs less than eligible keep50 in matched compact replay.
+  scope: Deletion core with full auxiliary refresh cost.
+  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
+  development_experiment_id: 1745acc6a866125188a9997d38d3a193bf3f2238f71a72e8522ed6a2933d2115
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-41-4-cogact-1--actuation_slack_refresh_keep25
+- config: configs/experiments/cogact/adp.yaml
+  status: primary
+  section: '5.1'
+  reason: Existing candidate meets Dev loss target.
+  scope: Adaptive pruning.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: 42449ae56acdde4b772b59d1e06aae9fd967c8b2218fc23decbb18768ba3af66
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-43-0-cogact-token-retry--adp
+- config: configs/experiments/cogact/dart.yaml
+  status: primary
+  section: '5.1'
+  reason: Existing candidate meets Dev loss target.
+  scope: Pivot-based token selection.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: 703d93d8a87981631d66e7a6466a8793d795eecd9b2805b7525f54bf65efa389
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-43-0-cogact-1--dart
+- config: configs/experiments/cogact/depth_cache_primary.yaml
+  status: primary
+  section: '5.1'
+  reason: Meets Dev target; protected tokens limit observed compression.
+  scope: Primary-view depth merging only; unknown wrist/carrying rules excluded.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: 8f0ed815f5f86fb2088cb19f63a81b6e9c0637fab2ddf178cd6f1bcf9fa202d6
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-41-4-cogact-1--depth_cache_primary
+- config: configs/experiments/cogact/divprune.yaml
+  status: primary
+  section: '5.1'
+  reason: Existing candidate meets Dev loss target.
+  scope: Diversity-based token selection.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: 0450741919be84698dcad7bdb2ac98811edad1574c09cabcf4871983a05ff1ae
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-43-0-cogact-1--divprune
+- config: configs/experiments/cogact/fastv.yaml
+  status: primary
+  section: '5.1'
+  reason: Existing candidate meets Dev loss target.
+  scope: Attention-based visual token pruning.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: 27489ccc7f64a43601970748ec169d8a89d2c6547eaa078682debf490749bc32
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-43-0-cogact-1--fastv
+- config: configs/experiments/cogact/flash_vla_keep224.yaml
+  status: primary
+  section: '5.1'
+  reason: 176/200 versus 154/200 at keep192; one episode below Dev target.
+  scope: Active ICS core only; unconfirmed action reuse excluded.
+  development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
+  development_experiment_id: 6e80dea7bbd83095f95c6bd8dd8a0c5b1584398e9ae1259930ba1c8915e4cdac
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-43-0-cogact-token-retry--flash_vla_keep224
+- config: configs/experiments/cogact/safe_pruner.yaml
+  status: primary
+  section: '5.1'
+  reason: Existing candidate meets Dev loss target.
+  scope: Task-aware token pruning.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: bdc7820db41f431415a887ed411fead64ed546d22e056708ae5ef56344353f26
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-43-0-cogact-token-retry--safe_pruner
+- config: configs/experiments/cogact/sparsevlm.yaml
+  status: primary
+  section: '5.1'
+  reason: Existing candidate meets Dev loss target.
+  scope: Task-related selection and token recycling.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: 19e55b9daed5d94fe5e3c51402cfe296a0a1cb52a519fa5e24cc0025772342e2
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-43-0-cogact-1--sparsevlm
+- config: configs/experiments/cogact/specprune_vla_static96.yaml
+  status: primary
+  section: '5.1'
+  reason: 182/200 versus 174/200 at static128; cap denotes deletions.
+  scope: Static/dynamic pruning with bounded static deletion.
+  development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
+  development_experiment_id: f11bd3ab2edf722f6cafdee4b9a5ded3164b79889d30a90afebf71887d62dc96
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-43-2-cogact-inputs-retry--specprune_vla_static96
+- config: configs/experiments/cogact/st_merge_keep192.yaml
+  status: pending_core
+  section: '5.1'
+  reason: Source/target direction and one-to-many merge rule remain unresolved.
+  scope: Uncertified spatial-temporal merging.
+  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
+  development_experiment_id: 2715131409b114d95dc8dc1349d3ea4da8b4baa5ab6f0e78127aff0d3dc431eb
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-43-2-cogact-3--st_merge_keep192
+- config: configs/experiments/cogact/action_cache.yaml
+  status: primary
+  section: '5.2'
+  reason: Threshold 0.90 from independent prefill; two native tail steps; frozen bank.
+  scope: DDIM refinement adaptation; 1412 pairs from 77/80 independent successful episodes.
+  development_summary_sha256: b4142c75a7e05218bfba9e3ae3e19edc72693c1c3ef58647c56305eb93477ed8
+  development_experiment_id: 4b3d636daaf8c5a63af7431e8272b01f48762c2bb6a0d52b81a0ffc211f184b4
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: cache-v2-45-6-cogact--action_cache
+- config: configs/experiments/cogact/c3ache_conditioned_residual_prefix6.yaml
+  status: primary
+  section: '5.2'
+  reason: Six live blocks selected after shorter-prefix residuals caused severe Dev loss.
+  scope: Cross-chunk residual core; two cached steps, refresh interval two; not full Fast-WAM.
+  development_summary_sha256: ba718ed1e3d21f4b87e36ccf569f4c63c188d60dec7e6cd6f02f7e5d3f1ce421
+  development_experiment_id: c692772b868aa42a4d774070b8028db7bf93ab031712cb7cb5d7b65d9cd03d6e
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: cache-v2-45-6-cogact--c3ache_conditioned_residual_prefix6
+- config: configs/experiments/cogact/dp_cache.yaml
+  status: primary
+  section: '5.2'
+  reason: Middle-window output reuse meets the Dev loss target.
+  scope: Native denoiser output reuse only; no VAE/compiler pipeline.
+  development_summary_sha256: 0151c5d817556bcd8f7f08cd0f55b1a40f4c58d0733fe96987033f0fb3328b3d
+  development_experiment_id: 6458d39a74fadb3f25082501ae8d88486a7a1520c726bf6c23a4f9e9f328e5fb
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: cache-v1-45-6-cogact--dp_cache
+- config: configs/experiments/cogact/efficient_vla_cache3.yaml
+  status: primary
+  section: '5.2'
+  reason: 177/200 after bounded cache-interval tuning.
+  scope: Within-sampling DiT feature cache; native sampler unchanged.
+  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
+  development_experiment_id: e265084237e3a715d4af23bf9fd4aa704cc121ee7b3e70d5addd79efc2792590
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-42-0-cogact-quant--efficient_vla_cache3
+- config: configs/experiments/cogact/temporal_redundancy_visual_update75.yaml
+  status: primary
+  section: '5.2'
+  reason: Update75 selected after update50 scored 168/200; retain measured full-cost overhead.
+  scope: Visual attention core; trained action branch excluded.
+  development_summary_sha256: 2f05e428a06da31cbce59353e5c2386005074786ec46812c27b16ac635843e85
+  development_experiment_id: fd8de3e4c0776b169a8a488af5f09a840a22c597869235a171387ed9ab2adca5
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: cache-v3-45-6-cogact--temporal_redundancy_visual_update75
+- config: configs/experiments/cogact/vla_cache.yaml
+  status: primary
+  section: '5.2'
+  reason: Existing candidate meets Dev loss target.
+  scope: Query-row reuse with retained visual KV.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: f9612931a47706abef36d9251e82bcf9c0ceeb249fce9e68412d8214f5a29fcb
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-43-2-cogact-inputs-retry--vla_cache
+- config: configs/experiments/cogact/vla_infoentropy.yaml
+  status: primary
+  section: '5.2'
+  reason: 175/200; tested static100 yielded 174/200, so retain original active setting.
+  scope: Entropy-guided query-row reuse; below Dev loss target.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: 3e7f5140c644c221a9a02a45731cf1e949650a3564053c9d662f85e37b11cabb
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-43-2-cogact-inputs-retry--vla_infoentropy
+- config: configs/experiments/cogact/sp_vla.yaml
+  status: primary
+  section: '5.3'
+  reason: Existing candidate meets Dev loss target.
+  scope: Pruning plus executed-action scheduling.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: 27d4793d914e2be7c1eb929c254b8661581eaefb1a68530fc1c0746d0cd764d9
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-43-0-cogact-token-retry--sp_vla
+- config: configs/experiments/cogact/vote_ensemble.yaml
+  status: primary
+  section: '5.5'
+  reason: H1 comparison only; no claim of H8 acceleration.
+  scope: Action ensemble at matched H1 cadence.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: f6b608bfced978188d89978e816e2ba29cbd6e9d12a4dc5656cb146d2d4a955f
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 14ac367a1ff2fcdccd71c123235a5879d950eca0ebed49cf9c4aaf76769d6989
+  timing_record: compact-42-1-cogact-vote--vote_ensemble
+- config: configs/experiments/cogact/awq_fp16_kernel.yaml
+  status: primary
+  section: '6.1'
+  reason: Selected FP16-kernel W4A16; BF16 retained as a labeled precision auxiliary.
+  scope: Explicit FP16 cast boundary; training-only calibration.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: be03b017c6a40862b3ebc5afa78a0ce2cf31111d49e8763c1fe5d0650391c117
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: compact-42-0-cogact-quant--awq_fp16_kernel
 - config: configs/experiments/openvla_oft/baseline.yaml
   status: primary
   section: Reference
@@ -63,16 +293,6 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-6-openvla_oft-2--adp
-- config: configs/experiments/openvla_oft/awq_fp16_kernel.yaml
-  status: primary
-  section: '6.1'
-  reason: Measured FP16-kernel W4A16 candidate; compare retained BF16 auxiliary.
-  scope: Explicit FP16 cast boundary; training-only calibration.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 566ed69c9ce2db872ba40344f9123dac0ba1db2f05ef3c240c7f156406fe6d66
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-124-7-openvla_oft-quant--awq_fp16_kernel
 - config: configs/experiments/openvla_oft/dart_layer4.yaml
   status: primary
   section: '5.1'
@@ -143,16 +363,6 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-6-openvla_oft-2--safe_pruner
-- config: configs/experiments/openvla_oft/sp_vla.yaml
-  status: primary
-  section: '5.3'
-  reason: Existing candidate meets Dev loss target.
-  scope: Pruning plus executed-action scheduling.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: c321f89069f8c73c936a1388ee57c00bab318a500a5f81d0ec5b9074a94a23a8
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-6-openvla_oft-2--sp_vla
 - config: configs/experiments/openvla_oft/sparsevlm.yaml
   status: primary
   section: '5.1'
@@ -193,16 +403,6 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-7-openvla_oft-3--team_vla_merge160
-- config: configs/experiments/openvla_oft/vla_cache.yaml
-  status: primary
-  section: '5.2'
-  reason: Existing candidate meets Dev loss target; retain any measured overhead honestly.
-  scope: Query-row reuse with retained visual KV.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 05bde38fdbf83dfb4f0928768c7d460b51ef106a49e29eeb6aaf7783da1da17d
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-7-openvla_oft-1--vla_cache
 - config: configs/experiments/openvla_oft/vla_iap.yaml
   status: pending_core
   section: '5.1'
@@ -213,16 +413,6 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-7-openvla_oft-3--vla_iap
-- config: configs/experiments/openvla_oft/vla_infoentropy.yaml
-  status: primary
-  section: '5.2'
-  reason: Existing candidate meets Dev loss target; retain full reuse overhead.
-  scope: Entropy-guided query-row reuse with retained KV.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: fc132144e01cbf7c6a681a8b9f59e0010c7cb55a4742809365070e9632b55733
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-7-openvla_oft-1--vla_infoentropy
 - config: configs/experiments/openvla_oft/vla_pruner.yaml
   status: primary
   section: '5.1'
@@ -233,6 +423,46 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-7-openvla_oft-1--vla_pruner
+- config: configs/experiments/openvla_oft/temporal_redundancy_visual.yaml
+  status: primary
+  section: '5.2'
+  reason: Retain active half-row reuse; report measured full-cost slowdown.
+  scope: Visual attention core; trained action branch excluded.
+  development_summary_sha256: 0151c5d817556bcd8f7f08cd0f55b1a40f4c58d0733fe96987033f0fb3328b3d
+  development_experiment_id: a0480729b2ee658d04b2ce8dc01bd888cadca71e070a130a2cb0143cf2efd768
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  timing_record: cache-v1-45-7-oft-recheck--temporal_redundancy_visual
+- config: configs/experiments/openvla_oft/vla_cache.yaml
+  status: primary
+  section: '5.2'
+  reason: Existing candidate meets Dev loss target; retain any measured overhead honestly.
+  scope: Query-row reuse with retained visual KV.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: 05bde38fdbf83dfb4f0928768c7d460b51ef106a49e29eeb6aaf7783da1da17d
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  timing_record: compact-45-7-openvla_oft-1--vla_cache
+- config: configs/experiments/openvla_oft/vla_infoentropy.yaml
+  status: primary
+  section: '5.2'
+  reason: Existing candidate meets Dev loss target; retain full reuse overhead.
+  scope: Entropy-guided query-row reuse with retained KV.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: fc132144e01cbf7c6a681a8b9f59e0010c7cb55a4742809365070e9632b55733
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  timing_record: compact-45-7-openvla_oft-1--vla_infoentropy
+- config: configs/experiments/openvla_oft/sp_vla.yaml
+  status: primary
+  section: '5.3'
+  reason: Existing candidate meets Dev loss target.
+  scope: Pruning plus executed-action scheduling.
+  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  development_experiment_id: c321f89069f8c73c936a1388ee57c00bab318a500a5f81d0ec5b9074a94a23a8
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  timing_record: compact-45-6-openvla_oft-2--sp_vla
 - config: configs/experiments/openvla_oft/vote_ensemble.yaml
   status: primary
   section: '5.5'
@@ -243,196 +473,16 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: d1432ffd8638abf10c9ab9ecc527a43f7e12f650a6c7b7bd4e66d09134d065c5
   timing_record: compact-45-5-openvla_oft-1--vote_ensemble
-- config: configs/experiments/cogact/baseline.yaml
-  status: primary
-  section: Reference
-  reason: Native H8 reference.
-  scope: Native model.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-41-4-cogact-1--native-pre
-- config: configs/experiments/cogact/baseline_horizon1.yaml
-  status: primary
-  section: Reference
-  reason: Separate matched-cadence reference for VOTE.
-  scope: Native H1 control.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 14ac367a1ff2fcdccd71c123235a5879d950eca0ebed49cf9c4aaf76769d6989
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 14ac367a1ff2fcdccd71c123235a5879d950eca0ebed49cf9c4aaf76769d6989
-  timing_record: compact-42-1-cogact-vote--native-pre
-- config: configs/experiments/cogact/actuation_slack_refresh_keep25.yaml
-  status: primary
-  section: '5.1'
-  reason: 178/200 meets the 3-pp target; keep25 costs less than eligible keep50 in matched compact replay.
-  scope: Deletion core with full auxiliary refresh cost.
-  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
-  development_experiment_id: 1745acc6a866125188a9997d38d3a193bf3f2238f71a72e8522ed6a2933d2115
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-41-4-cogact-1--actuation_slack_refresh_keep25
-- config: configs/experiments/cogact/adp.yaml
-  status: primary
-  section: '5.1'
-  reason: Existing candidate meets Dev loss target.
-  scope: Adaptive pruning.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 42449ae56acdde4b772b59d1e06aae9fd967c8b2218fc23decbb18768ba3af66
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-token-retry--adp
-- config: configs/experiments/cogact/awq_fp16_kernel.yaml
+- config: configs/experiments/openvla_oft/awq_fp16_kernel.yaml
   status: primary
   section: '6.1'
-  reason: Selected FP16-kernel W4A16; BF16 retained as a labeled precision auxiliary.
+  reason: Measured FP16-kernel W4A16 candidate; compare retained BF16 auxiliary.
   scope: Explicit FP16 cast boundary; training-only calibration.
   development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: be03b017c6a40862b3ebc5afa78a0ce2cf31111d49e8763c1fe5d0650391c117
+  development_experiment_id: 566ed69c9ce2db872ba40344f9123dac0ba1db2f05ef3c240c7f156406fe6d66
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-42-0-cogact-quant--awq_fp16_kernel
-- config: configs/experiments/cogact/dart.yaml
-  status: primary
-  section: '5.1'
-  reason: Existing candidate meets Dev loss target.
-  scope: Pivot-based token selection.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 703d93d8a87981631d66e7a6466a8793d795eecd9b2805b7525f54bf65efa389
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-1--dart
-- config: configs/experiments/cogact/depth_cache_primary.yaml
-  status: primary
-  section: '5.1'
-  reason: Meets Dev target; protected tokens limit observed compression.
-  scope: Primary-view depth merging only; unknown wrist/carrying rules excluded.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 8f0ed815f5f86fb2088cb19f63a81b6e9c0637fab2ddf178cd6f1bcf9fa202d6
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-41-4-cogact-1--depth_cache_primary
-- config: configs/experiments/cogact/divprune.yaml
-  status: primary
-  section: '5.1'
-  reason: Existing candidate meets Dev loss target.
-  scope: Diversity-based token selection.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 0450741919be84698dcad7bdb2ac98811edad1574c09cabcf4871983a05ff1ae
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-1--divprune
-- config: configs/experiments/cogact/efficient_vla_cache3.yaml
-  status: primary
-  section: '5.2'
-  reason: 177/200 after bounded cache-interval tuning.
-  scope: Within-sampling DiT feature cache; native sampler unchanged.
-  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
-  development_experiment_id: e265084237e3a715d4af23bf9fd4aa704cc121ee7b3e70d5addd79efc2792590
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-42-0-cogact-quant--efficient_vla_cache3
-- config: configs/experiments/cogact/fastv.yaml
-  status: primary
-  section: '5.1'
-  reason: Existing candidate meets Dev loss target.
-  scope: Attention-based visual token pruning.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 27489ccc7f64a43601970748ec169d8a89d2c6547eaa078682debf490749bc32
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-1--fastv
-- config: configs/experiments/cogact/flash_vla_keep224.yaml
-  status: primary
-  section: '5.1'
-  reason: 176/200 versus 154/200 at keep192; one episode below Dev target.
-  scope: Active ICS core only; unconfirmed action reuse excluded.
-  development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
-  development_experiment_id: 6e80dea7bbd83095f95c6bd8dd8a0c5b1584398e9ae1259930ba1c8915e4cdac
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-token-retry--flash_vla_keep224
-- config: configs/experiments/cogact/safe_pruner.yaml
-  status: primary
-  section: '5.1'
-  reason: Existing candidate meets Dev loss target.
-  scope: Task-aware token pruning.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: bdc7820db41f431415a887ed411fead64ed546d22e056708ae5ef56344353f26
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-token-retry--safe_pruner
-- config: configs/experiments/cogact/sp_vla.yaml
-  status: primary
-  section: '5.3'
-  reason: Existing candidate meets Dev loss target.
-  scope: Pruning plus executed-action scheduling.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 27d4793d914e2be7c1eb929c254b8661581eaefb1a68530fc1c0746d0cd764d9
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-token-retry--sp_vla
-- config: configs/experiments/cogact/sparsevlm.yaml
-  status: primary
-  section: '5.1'
-  reason: Existing candidate meets Dev loss target.
-  scope: Task-related selection and token recycling.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 19e55b9daed5d94fe5e3c51402cfe296a0a1cb52a519fa5e24cc0025772342e2
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-1--sparsevlm
-- config: configs/experiments/cogact/specprune_vla_static96.yaml
-  status: primary
-  section: '5.1'
-  reason: 182/200 versus 174/200 at static128; cap denotes deletions.
-  scope: Static/dynamic pruning with bounded static deletion.
-  development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
-  development_experiment_id: f11bd3ab2edf722f6cafdee4b9a5ded3164b79889d30a90afebf71887d62dc96
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-2-cogact-inputs-retry--specprune_vla_static96
-- config: configs/experiments/cogact/st_merge_keep192.yaml
-  status: pending_core
-  section: '5.1'
-  reason: Source/target direction and one-to-many merge rule remain unresolved.
-  scope: Uncertified spatial-temporal merging.
-  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
-  development_experiment_id: 2715131409b114d95dc8dc1349d3ea4da8b4baa5ab6f0e78127aff0d3dc431eb
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-2-cogact-3--st_merge_keep192
-- config: configs/experiments/cogact/vla_cache.yaml
-  status: primary
-  section: '5.2'
-  reason: Existing candidate meets Dev loss target.
-  scope: Query-row reuse with retained visual KV.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: f9612931a47706abef36d9251e82bcf9c0ceeb249fce9e68412d8214f5a29fcb
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-2-cogact-inputs-retry--vla_cache
-- config: configs/experiments/cogact/vla_infoentropy.yaml
-  status: primary
-  section: '5.2'
-  reason: 175/200; tested static100 yielded 174/200, so retain original active setting.
-  scope: Entropy-guided query-row reuse; below Dev loss target.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 3e7f5140c644c221a9a02a45731cf1e949650a3564053c9d662f85e37b11cabb
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-2-cogact-inputs-retry--vla_infoentropy
-- config: configs/experiments/cogact/vote_ensemble.yaml
-  status: primary
-  section: '5.5'
-  reason: H1 comparison only; no claim of H8 acceleration.
-  scope: Action ensemble at matched H1 cadence.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: f6b608bfced978188d89978e816e2ba29cbd6e9d12a4dc5656cb146d2d4a955f
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 14ac367a1ff2fcdccd71c123235a5879d950eca0ebed49cf9c4aaf76769d6989
-  timing_record: compact-42-1-cogact-vote--vote_ensemble
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  timing_record: compact-124-7-openvla_oft-quant--awq_fp16_kernel
 timing_protocol: libero_replay4x128_v1
 auxiliary_configurations:
 - config: configs/experiments/openvla_oft/awq.yaml
