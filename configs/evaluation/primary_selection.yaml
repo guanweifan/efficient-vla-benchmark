@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: 152542b9db826ce00de7208134a7d46a47ca60e12d2e5695061f167e98773f57
+coverage_summary_sha256: 227d4ef079b56379f7ef1267c28c030dba41af0e35784ace6b43c38e734a86ac
 source_compatibility:
 - development_runtime: 0dd68a00d775d3a36a95e949eb2e0fe708456ae4c6fd03fde045ccd5695cc8f2
   timing_runtime: b30a41d426f30c6f8e7731d6ab35fe56ea52ac691f601faf83c2daff72e9c099
@@ -18,10 +18,20 @@ source_compatibility:
   timing_runtime: fb5c9a52ab1f503f3ad5b8aca8a23b63f8fd395c73adbb95a624f6156b8bb63b
   reason: Audited unchanged backend/core/control/model-ops/method Python sources; only timing, evaluation
     and CLI infrastructure changed.
+- development_runtime: 0807236f106c5df802d673db420827a093a0174bd8825d1540950e185b9b48ca
+  timing_runtime: 4400f201bd0fd54bb6ab32ced3a3702e6224dbe563058683152c3da6bc20979e
+  reason: Audited isolated additions and unchanged ASR/control/harness; EcoVLA kernel arithmetic and launch
+    grids are unchanged. Only token count stops specializing the Triton JIT; real GPU static/dynamic bitwise
+    parity and cache invariance pass. Original source hashes are retained.
+- development_runtime: 34d140e68841cf665edec7c22f1d1f04265ea7f57ea611d3d121ec817f2c6979
+  timing_runtime: 4400f201bd0fd54bb6ab32ced3a3702e6224dbe563058683152c3da6bc20979e
+  reason: Audited isolated additions and unchanged ASR/control/harness; EcoVLA kernel arithmetic and launch
+    grids are unchanged. Only token count stops specializing the Triton JIT; real GPU static/dynamic bitwise
+    parity and cache invariance pass. Original source hashes are retained.
 timing_workloads:
   openvla_oft: 01f8a93fc0bd522be3ef1d2dbee981ad1bb53ed9c1bf76b404808060bdedbefe
   cogact: 6c0e509fe062fdc393d7edbf668d29450250b99e9b163a5bad5597796e7420bc
-final_runtime_source_sha256: e9198686f47d476cecb94eb04a7b06387177dcf906ca3ff48b3352d867eeb238
+final_runtime_source_sha256: 4400f201bd0fd54bb6ab32ced3a3702e6224dbe563058683152c3da6bc20979e
 configurations:
 - config: configs/experiments/cogact/baseline.yaml
   status: primary
@@ -33,6 +43,35 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-41-4-cogact-1--native-pre
+- config: configs/experiments/cogact/efficient_vla_layer_prune04.yaml
+  status: primary
+  section: '3.3'
+  reason: 'layer_prune04 gives 186/200, fastest valid timing among tested configurations meeting >= 177/200.
+    Measured below-target boundary: layer_prune08=114/200, layer_prune06=156/200, layer_prune05=165/200.'
+  scope: EfficientVLA calibrated static non-contiguous layer core, not dynamic routing or the full pipeline.
+  development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+  development_experiment_id: 2c4f114dbefc70fd9001735c927d158cfb17bd28fee9d21786a3676ebed679fd
+  timing_record: routing-layers-v1-124-7-cogact--layer_prune04
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: 'layer_prune04 gives 186/200, fastest valid timing among tested configurations meeting >=
+      177/200. Measured below-target boundary: layer_prune08=114/200, layer_prune06=156/200, layer_prune05=165/200.'
+    evidence:
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 2c4f114dbefc70fd9001735c927d158cfb17bd28fee9d21786a3676ebed679fd
+      timing_record: routing-layers-v1-124-7-cogact--layer_prune04
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 14fa13ce15c3ba8deeb378ee76ff27c7b61100a716605dcd9fa48380dad9cc06
+      timing_record: routing-layers-v1-124-7-cogact--layer_prune08
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 61c70f1395f8bc137afd553316d2c06e83ac05c23f19612c0c2b8ee197eaadbd
+      timing_record: routing-layers-v2-124-6-cogact--layer_prune06
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: ffc87b7975d78aff0ed47b5e2a5db588c9cdd0486959b4ee34f3a9b3b1aeae37
+      timing_record: routing-layers-v5-45-7-cogact--layer_prune05
 - config: configs/experiments/cogact/actuation_slack_refresh_keep25.yaml
   status: primary
   section: '5.1'
@@ -355,6 +394,40 @@ configurations:
     - development_summary_sha256: b8f812820f0861f01a4e71aca1d42dd22fed21244e47893c112cd685df3717de
       development_experiment_id: aaef488dea4f8cd987e8b3454bd44fb33b3e0146d716c9002bc91614132c6846
       timing_record: search-r22-41-7-cogact--action_cache_threshold80_refine1
+- config: configs/experiments/cogact/actuation_slack_refresh_kv_keep50.yaml
+  status: primary
+  section: '5.2'
+  reason: 'asr_kv_keep50 gives 179/200, fastest valid timing among tested configurations meeting >= 177/200.
+    Measured below-target boundary: asr_kv_keep10=37/200, asr_kv_keep25=126/200, asr_kv_keep375=176/200.
+    Retain the full-cost slowdown; auxiliary work is not free actuation overlap.'
+  scope: ASR immutable dense-base KV reuse with unconditional same-frame full auxiliary refresh; no composition.
+  development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
+  development_experiment_id: a335934e5a3e5f57336b356f9da9fd8d227ab7e9155a6fc2b2f13d17f5a74f10
+  timing_record: routing-asr-v2-45-6-cogact--asr_kv_keep50
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: 'asr_kv_keep50 gives 179/200, fastest valid timing among tested configurations meeting >=
+      177/200. Measured below-target boundary: asr_kv_keep10=37/200, asr_kv_keep25=126/200, asr_kv_keep375=176/200.
+      Retain the full-cost slowdown; auxiliary work is not free actuation overlap.'
+    evidence:
+    - development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
+      development_experiment_id: 57da3791d5307c82afdfd89f4c7e56298ac6ac3479d6665b501af5f6265d2d2d
+      timing_record: routing-asr-v1-45-6-cogact--asr_kv_keep10
+    - development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
+      development_experiment_id: 900c11369ae11573baeace6bdd1bce21f0ab5e45f0d813973a874ccfe50ca5f9
+      timing_record: routing-asr-v1-45-6-cogact--asr_kv_keep25
+    - development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
+      development_experiment_id: a335934e5a3e5f57336b356f9da9fd8d227ab7e9155a6fc2b2f13d17f5a74f10
+      timing_record: routing-asr-v2-45-6-cogact--asr_kv_keep50
+    - development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
+      development_experiment_id: d7f8334685db3ef7bd545fe9d4d90707228f66521e3521e65b2819eb4c0476d1
+      timing_record: routing-asr-v2-45-6-cogact--asr_kv_keep75
+    - development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
+      development_experiment_id: c7f748e2fd8bcb21637d94ecb2adc6db91feaa222b9785a86d50d1b117d855b8
+      timing_record: routing-asr-v4-45-6-cogact--asr_kv_keep375
 - config: configs/experiments/cogact/c3ache_conditioned_residual_prefix6.yaml
   status: primary
   section: '5.2'
@@ -529,6 +602,35 @@ configurations:
       timing_record: search-r24-recheck-125-6-cogact--vla_infoentropy_sdpa150
     - development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
       development_experiment_id: 9566b1fc8ecf0c99e00660d307fb2102619007b878aa103c81b470833a9abc89
+- config: configs/experiments/cogact/eco_vla_keep60.yaml
+  status: primary
+  section: '5.3'
+  reason: 'eco_keep60 gives 184/200, fastest valid timing among tested configurations meeting >= 177/200.
+    Measured below-target boundary: eco_keep50=167/200, eco_keep55=175/200.'
+  scope: EcoVLA dynamic FFN-channel and whole-head core; declared trigger/grouping conventions and frozen
+    training prior.
+  development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+  development_experiment_id: 9b3df9db8fb40e0e1a2088fc5ec34728f4cef5d25c363dff38c9bc22ecf8a308
+  timing_record: routing-eco-dyn1-45-7-cogact--eco_keep60
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: 'eco_keep60 gives 184/200, fastest valid timing among tested configurations meeting >= 177/200.
+      Measured below-target boundary: eco_keep50=167/200, eco_keep55=175/200.'
+    evidence:
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 444d698ca2bcd988924ea6862d44781a717df0d53b35354657738762c28b71d7
+      timing_record: routing-eco-dyn1-45-7-cogact--eco_keep75
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 9b3df9db8fb40e0e1a2088fc5ec34728f4cef5d25c363dff38c9bc22ecf8a308
+      timing_record: routing-eco-dyn1-45-7-cogact--eco_keep60
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 1db31a573b823afd9fe8efe111d047eb8f11f44b66b114c95be5c10fd27f7763
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 7d8b6b13ed6f748d1a289a7a02590b820e54d4c4321f4a483d38543575ede5da
+      timing_record: routing-eco-dyn4-45-6-cogact--eco_keep55
 - config: configs/experiments/cogact/sp_vla_z025_min_actions3.yaml
   status: primary
   section: '5.3'
@@ -622,6 +724,38 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-124-7-openvla_oft-quant--native-pre
+- config: configs/experiments/openvla_oft/efficient_vla_layer_prune03.yaml
+  status: primary
+  section: '3.3'
+  reason: 'layer_prune03 gives 193/200, fastest valid timing among tested configurations meeting >= 192/200.
+    Measured below-target boundary: layer_prune04=181/200, layer_prune08=135/200.'
+  scope: EfficientVLA calibrated static non-contiguous layer core, not dynamic routing or the full pipeline.
+  development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+  development_experiment_id: 4d5841c74fa9f501a353b8e29e29afb085d26b3b1af36d17906060b696e5c792
+  timing_record: routing-layers-v3-45-5-openvla_oft--layer_prune03
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: 'layer_prune03 gives 193/200, fastest valid timing among tested configurations meeting >=
+      192/200. Measured below-target boundary: layer_prune04=181/200, layer_prune08=135/200.'
+    evidence:
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 446f6a2e6cb5b8f0d4b3a4dbc513bc98326f6d9d17d80301ab67f8e140e2fb34
+      timing_record: routing-layers-v1-124-6-openvla_oft--layer_prune04
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 879f239560c6cf711bf4508a603228c9aa7b69b2f930ba385376feba2cec74f4
+      timing_record: routing-layers-v1-124-6-openvla_oft--layer_prune08
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 37c9c9621fd1d0615eb0dc627416bb36a726be28545805ce36c5341919c62e7f
+      timing_record: routing-layers-v2-124-6-openvla_oft--layer_prune02
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 4b3dda1549179b09e03909ff9caa9ee6ad95a2a3fca85a21d5f9a2ea4bac259c
+      timing_record: routing-layers-v2-124-6-openvla_oft--layer_prune01
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 4d5841c74fa9f501a353b8e29e29afb085d26b3b1af36d17906060b696e5c792
+      timing_record: routing-layers-v3-45-5-openvla_oft--layer_prune03
 - config: configs/experiments/openvla_oft/actuation_slack_refresh_deletion.yaml
   status: primary
   section: '5.1'
@@ -970,6 +1104,40 @@ configurations:
     - development_summary_sha256: 3f06ec25d8c0d17b9470d2f6be32bcb933d930297846984ea44ffa3a5751318b
       development_experiment_id: 8a9decc7d2ed1ea85b59c406f0204ee830a0002da28555513cb0185c9d06f569
       timing_record: search-r10-124-6-openvla_oft--vla_pruner_keep0625
+- config: configs/experiments/openvla_oft/actuation_slack_refresh_kv_keep175.yaml
+  status: primary
+  section: '5.2'
+  reason: 'asr_kv_keep175 gives 194/200, fastest valid timing among tested configurations meeting >= 192/200.
+    Measured below-target boundary: asr_kv_keep10=185/200, asr_kv_keep05=168/200. Retain the full-cost
+    slowdown; auxiliary work is not free actuation overlap.'
+  scope: ASR immutable dense-base KV reuse with unconditional same-frame full auxiliary refresh; no composition.
+  development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
+  development_experiment_id: 05a0210e3be30b69e8bfdf6a755eb172425012bd4ed16f6ede86b35f62e27ddf
+  timing_record: routing-asr-v3-45-5-openvla_oft--asr_kv_keep175
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: 'asr_kv_keep175 gives 194/200, fastest valid timing among tested configurations meeting >=
+      192/200. Measured below-target boundary: asr_kv_keep10=185/200, asr_kv_keep05=168/200. Retain the
+      full-cost slowdown; auxiliary work is not free actuation overlap.'
+    evidence:
+    - development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
+      development_experiment_id: cadc18d17a3b64e5031df76164027b687b0a72b171a61b85572e216982e88bb2
+      timing_record: routing-asr-v1-45-5-openvla_oft--asr_kv_keep10
+    - development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
+      development_experiment_id: 71783a57c5ee78dd659a67644abe1ff3e14f6dd44fcdb7221fa059851c14d0b5
+      timing_record: routing-asr-v1-45-5-openvla_oft--asr_kv_keep05
+    - development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
+      development_experiment_id: 408ecaa841e30fa860b8e7168352ae8fab8877f2ee0114aa015507fd54bd2629
+      timing_record: routing-asr-v2-45-5-openvla_oft--asr_kv_keep25
+    - development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
+      development_experiment_id: ed783caedce6d188252c7e7486d374a2ae2714ec594454cb06a742c532992d3e
+      timing_record: routing-asr-v2-45-5-openvla_oft--asr_kv_keep50
+    - development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
+      development_experiment_id: 05a0210e3be30b69e8bfdf6a755eb172425012bd4ed16f6ede86b35f62e27ddf
+      timing_record: routing-asr-v3-45-5-openvla_oft--asr_kv_keep175
 - config: configs/experiments/openvla_oft/temporal_redundancy_visual.yaml
   status: primary
   section: '5.2'
@@ -1052,6 +1220,39 @@ configurations:
     - development_summary_sha256: 7b1fed0defbff39987fe1c1cfaee540ac1c442b7c5782b4a94d3500582537dc8
       development_experiment_id: f7246f5cd6687d505114d743907a738470b99b7ec46abffbc4df44249e1d3e04
       timing_record: search-recovery-125-6-openvla_oft-0--vla_infoentropy_budget256_quotas20_30
+- config: configs/experiments/openvla_oft/eco_vla_keep625.yaml
+  status: primary
+  section: '5.3'
+  reason: 'eco_keep625 gives 193/200, fastest valid timing among tested configurations meeting >= 192/200.
+    Measured below-target boundary: eco_keep60=186/200, eco_keep50=190/200.'
+  scope: EcoVLA dynamic FFN-channel and whole-head core; declared trigger/grouping conventions and frozen
+    training prior.
+  development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+  development_experiment_id: 420ed8a10ec07dafaa45251f29e974609a77d157b8a62e3fd5c2212a0924d73a
+  timing_record: routing-eco-dyn3-45-5-openvla_oft--eco_keep625
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: 'eco_keep625 gives 193/200, fastest valid timing among tested configurations meeting >= 192/200.
+      Measured below-target boundary: eco_keep60=186/200, eco_keep50=190/200.'
+    evidence:
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 0e5966233f84ad1eeec6f41af09b6b177ef151846f5e4b2b502a2db1552924dc
+      timing_record: routing-eco-dyn1-45-5-openvla_oft--eco_keep75
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 7d346cfaaac123d79612e9366530678ef8ac9bdfc67b7c63b644cb713d30c4c2
+      timing_record: routing-eco-dyn1-45-5-openvla_oft--eco_keep60
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 8cbc99e9a12b7a27d50005d5771c812a1ce267c3740118449214c917800a4ff0
+      timing_record: routing-eco-dyn1-45-5-openvla_oft--eco_keep50
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: db6399b21b50511d619ef3a91fba235fe847a959815df495b9129f921788c4d8
+      timing_record: routing-eco-dyn1-45-5-openvla_oft--eco_keep6875
+    - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
+      development_experiment_id: 420ed8a10ec07dafaa45251f29e974609a77d157b8a62e3fd5c2212a0924d73a
+      timing_record: routing-eco-dyn3-45-5-openvla_oft--eco_keep625
 - config: configs/experiments/openvla_oft/sp_vla_z025_min_actions3.yaml
   status: primary
   section: '5.3'

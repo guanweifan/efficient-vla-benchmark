@@ -1,0 +1,3 @@
+extends: ./actuation_slack_refresh_kv_reuse.yaml
+parameters:
+  keep_ratio: 0.175
