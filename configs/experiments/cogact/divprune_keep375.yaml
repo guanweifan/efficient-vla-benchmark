@@ -1,0 +1,4 @@
+extends:
+- ./divprune.yaml
+parameters:
+  keep_ratio: 0.375
