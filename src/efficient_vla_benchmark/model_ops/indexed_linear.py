@@ -2,6 +2,8 @@
 
 Weights stay dense in storage. Only selected rows/columns are loaded and multiplied;
 this is structured execution, not dense GEMM followed by an output mask.
+Token count is a non-specializing runtime argument: a new prompt length must not
+trigger compilation after the common warmup. Feature widths and tiles stay fixed.
 """
 
 import torch
@@ -9,14 +11,14 @@ import triton
 import triton.language as tl
 
 
-@triton.jit
+@triton.jit(do_not_specialize=["M"])
 def _linear(
     X,
     W,
     ROWS,
     COLS,
     Y,
-    M: tl.constexpr,
+    M,
     N: tl.constexpr,
     K: tl.constexpr,
     W0: tl.constexpr,
@@ -40,14 +42,14 @@ def _linear(
     tl.store(Y + m[:, None] * N + n[None, :], acc, (m[:, None] < M) & (n[None, :] < N))
 
 
-@triton.jit
+@triton.jit(do_not_specialize=["M"])
 def _gate_up(
     X,
     G,
     U,
     ROWS,
     Y,
-    M: tl.constexpr,
+    M,
     N: tl.constexpr,
     K: tl.constexpr,
     G0: tl.constexpr,
