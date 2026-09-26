@@ -1,0 +1,19 @@
+schema_version: 1
+name: eco_vla
+category: model_routing
+description: Environment-triggered dynamic channel/head pruning with temporal statistics and interleaved sparse execution.
+config: efficient_vla_benchmark.methods.model_routing.eco_vla.config:EcoVLAConfig
+requires_artifact: true
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder]
+    factory: efficient_vla_benchmark.methods.model_routing.eco_vla.implementations.openvla_oft.api:build
+    preflight: efficient_vla_benchmark.methods.model_routing.eco_vla.implementations.openvla_oft.api:preflight
+    calibrate: efficient_vla_benchmark.methods.model_routing.eco_vla.implementations.openvla_oft.api:calibrate
+  cogact:
+    variants: [libero_joint]
+    requires: [llama_decoder]
+    factory: efficient_vla_benchmark.methods.model_routing.eco_vla.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.model_routing.eco_vla.implementations.cogact.api:preflight
+    calibrate: efficient_vla_benchmark.methods.model_routing.eco_vla.implementations.cogact.api:calibrate

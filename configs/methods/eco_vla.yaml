@@ -1,0 +1,9 @@
+method: eco_vla
+parameters:
+  keep_ratio: 0.75
+  temporal_inertia: 0.7
+  history_momentum: 0.9
+  trigger_quantile: 0.05
+  history_window: 16
+  calibration_samples: 32
+  calibration_seed: 0
