@@ -1,0 +1,6 @@
+method: dp_cache
+parameters:
+  enabled: true
+  start_step: 2
+  end_step: 7
+  cache_interval: 2

@@ -1,0 +1,12 @@
+schema_version: 1
+name: dp_cache
+category: caching
+description: DP-Cache stable-window denoiser output broadcasting; no pipeline fusion.
+config: efficient_vla_benchmark.methods.caching.dp_cache.config:DPCacheConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.caching.dp_cache.implementations.cogact.api:build
+    validate_experiment: efficient_vla_benchmark.methods.caching.dp_cache.implementations.cogact.api:validate_experiment
