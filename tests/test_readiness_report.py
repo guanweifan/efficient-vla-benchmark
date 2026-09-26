@@ -307,3 +307,34 @@ def test_faster_eligible_candidate_cannot_be_ignored(reporter):
     )
     with pytest.raises(ValueError, match="faster eligible"):
         reporter.build(selection, summaries, records, quality, manifest)
+
+
+@pytest.mark.parametrize("case", ["workload", "reference", "source", "dependencies"])
+def test_search_alternatives_need_matched_timing_provenance(reporter, case):
+    selection, summaries, records, quality, manifest = fixture()
+    alternative = copy.deepcopy(summaries["summary"]["configurations"][0])
+    alternative["experiment_id"] = "alternative"
+    alternative["config"]["parameters"] = {"keep_ratio": 0.25}
+    summaries["summary"]["configurations"].append(alternative)
+    timing = copy.deepcopy(records["method"])
+    timing["run"]["run_id"] = "alternative"
+    timing["run"]["metadata"]["config"] = alternative["config"]
+    records["alternative"] = timing
+    quality["groups"][0]["jobs"].append("alternative")
+    selection["configurations"][0]["search"]["evidence"].append(
+        {
+            "development_summary_sha256": "summary",
+            "development_experiment_id": "alternative",
+            "timing_record": "alternative",
+        }
+    )
+    if case == "workload":
+        timing["run"]["metadata"]["protocol"]["workload_sha256"] = "other"
+    if case == "reference":
+        timing["baseline"]["run_id"] = "unmatched"
+    if case == "source":
+        timing["run"]["metadata"]["source"]["runtime_source_sha256"] = "unaudited"
+    if case == "dependencies":
+        timing["run"]["metadata"]["source"]["packages"] = {"torch": "other"}
+    with pytest.raises(ValueError, match="Search"):
+        reporter.build(selection, summaries, records, quality, manifest)

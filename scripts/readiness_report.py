@@ -74,7 +74,9 @@ def environment_identity(source, backend):
     }
 
 
-def check_search(selected, config, dev, reference, summaries, records, valid_runs, manifest):
+def check_search(
+    selected, config, dev, reference, summaries, records, valid_runs, manifest, selection
+):
     """Require evidence of search closure, independently of accuracy eligibility."""
     if config["method"] == "none":
         return {"complete": True, "stop": "native_reference", "reason": "Fixed native reference"}
@@ -124,6 +126,37 @@ def check_search(selected, config, dev, reference, summaries, records, valid_run
                 raise ValueError("Search candidate Dev/timing configurations differ")
             if measured["backend"]["checkpoint_sha256"] != dev["backend"]["checkpoint_sha256"]:
                 raise ValueError("Search candidate timing checkpoint differs")
+            cohort = valid_runs[timing["run"]["run_id"]]
+            baseline = timing["baseline"]["metadata"]["config"]
+            if (
+                timing["baseline"]["run_id"] != cohort["baseline_pre"]
+                or baseline["method"] != "none"
+                or baseline["execution_horizon"] != config["execution_horizon"]
+                or measured["protocol"].get("workload_sha256")
+                != selection["timing_workloads"][config["backend"]]
+                or (
+                    selection.get("timing_protocol")
+                    and measured["protocol"].get("protocol_id") != selection["timing_protocol"]
+                )
+            ):
+                raise ValueError("Search timing changes the workload, protocol or native reference")
+            if candidate:
+                pair = (
+                    candidate["source"]["runtime_source_sha256"],
+                    measured["source"]["runtime_source_sha256"],
+                )
+                audited = {
+                    (r["development_runtime"], r["timing_runtime"])
+                    for r in selection["source_compatibility"]
+                    if r.get("reason")
+                }
+                if (
+                    measured["backend"] != candidate["backend"]
+                    or environment_identity(measured["source"], config["backend"])
+                    != environment_identity(candidate["source"], config["backend"])
+                    or (pair[0] != pair[1] and pair not in audited)
+                ):
+                    raise ValueError("Search Dev/timing implementation or dependencies differ")
         if candidate is None and timing is None:
             raise ValueError("Search evidence must resolve a measurement, not a free-text claim")
         if scope_key(candidate_config) != scope_key(config) or any(
@@ -339,7 +372,15 @@ def build(selection, summaries, records, quality, development_manifest, final_re
             pending.append(row)
             continue
         row["search"] = check_search(
-            selected, config, dev, ref, summaries, records, quality_by_run, development_manifest
+            selected,
+            config,
+            dev,
+            ref,
+            summaries,
+            records,
+            quality_by_run,
+            development_manifest,
+            selection,
         )
         if final is not None and not row["search"]["complete"]:
             raise ValueError("Final results cannot certify an unfinished parameter search")
@@ -455,7 +496,8 @@ def render(report):
                 f"{d['successes'] / 2:.1f}% ({d['successes']}) | {d['delta_pp']:+.1f} | "
                 f"{t['mean_ms']:.3f} | {t['speedup']:.3f}× | "
                 f"{memory} | {final} | "
-                f"{r['reason']} {r['scope']} |"
+                f"{r['reason']} {r['scope']} "
+                f"Search: {r['search']['stop']}. |"
             )
         lines += [""]
     if report.get("auxiliary"):
