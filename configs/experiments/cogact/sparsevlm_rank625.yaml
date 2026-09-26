@@ -1,0 +1,4 @@
+extends:
+- ./sparsevlm.yaml
+parameters:
+  rank_scale: 0.625
