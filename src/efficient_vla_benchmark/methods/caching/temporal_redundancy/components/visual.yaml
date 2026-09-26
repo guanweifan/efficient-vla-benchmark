@@ -1,0 +1,15 @@
+schema_version: 1
+name: temporal_redundancy_visual
+category: caching
+description: Odd-even visual attention reuse; no trained two-step action generator.
+config: efficient_vla_benchmark.methods.caching.temporal_redundancy.config:TemporalReuseConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [visual_token_layout]
+    factory: efficient_vla_benchmark.methods.caching.temporal_redundancy.implementations.openvla_oft.api:build
+  cogact:
+    variants: [libero_joint]
+    requires: [paired_vision_transform]
+    factory: efficient_vla_benchmark.methods.caching.temporal_redundancy.implementations.cogact.api:build

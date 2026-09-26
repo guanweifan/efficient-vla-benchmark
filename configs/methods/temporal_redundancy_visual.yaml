@@ -1,0 +1,4 @@
+method: temporal_redundancy_visual
+parameters:
+  enabled: true
+  update_ratio: 0.5
