@@ -72,9 +72,10 @@ and timing results are recorded centrally in `docs/benchmark_results.md`.
 The OFT BF16-kernel measurements reduced peak allocated runtime memory substantially,
 but did not improve query latency. Packed weight size does not guarantee speedup
 at OFT's multimodal sequence length. Do not replace the real result with a
-fake-quantization or synthetic GEMV claim. Formal task success rates and broad
-calibration-quality comparisons have not been measured. These four episodes are
-functional checks, not a success-rate estimate.
+fake-quantization or synthetic GEMV claim. The ledger now includes complete Dev-200
+selection evidence for both kernel precisions. Final 2,000-episode success and
+broad calibration-quality comparisons remain unmeasured; smoke alone is not an
+accuracy estimate.
 
 ## Explicit kernel precision
 
@@ -99,9 +100,10 @@ native model to FP16 without AWQ. It is not a replacement for the common BF16
 reference. Report these conditions separately, never hide a precision switch
 inside an AWQ-versus-native speedup.
 
-Both kernel precisions and their native references are retained in
-`docs/benchmark_results.md`. OFT's BF16 kernel remained slower in its recorded cohort;
-CogACT's BF16 kernel was faster. Neither finding establishes formal task accuracy.
+The selected FP16-kernel preset and useful BF16-kernel auxiliary are retained for
+each backend in `docs/benchmark_results.md`, with the common native BF16 reference.
+OFT's BF16 kernel remained slower in its recorded cohort; CogACT's was faster.
+Dev-200 selection does not establish final task accuracy.
 
 ## CogACT binding
 
@@ -114,6 +116,6 @@ artifacts are rejected, never re-labelled or loaded into CogACT.
 
 Use the corresponding `configs/experiments/cogact/awq.yaml` with the same CLI
 resource arguments above. Build the pinned AWQ extension inside the CogACT runtime;
-compiled OFT binaries are not ABI-compatible substitutes. BF16 is the primary
-preset; the explicitly named FP16-kernel preset includes boundary casts and is
-reported separately. Neither option performs gradient updates.
+compiled OFT binaries are not ABI-compatible substitutes. The generic `awq.yaml`
+preset uses BF16; the frozen report selection uses the explicitly named FP16-kernel
+preset with all boundary casts timed. Neither option performs gradient updates.
