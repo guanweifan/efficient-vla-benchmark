@@ -9,8 +9,8 @@ weights, datasets or raw experiment artifacts.
 
 | Backend / variant | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|
-| OpenVLA-OFT / libero_joint | Fifteen scopes below | VLA-Cache, VLA-InfoEntropy | SP-VLA | VOTE ensemble core | AWQ W4A16 |
-| CogACT / libero_joint | Eleven scopes below | VLA-Cache, VLA-InfoEntropy, EfficientVLA DiT cache core | SP-VLA | VOTE ensemble core | AWQ W4A16 |
+| OpenVLA-OFT / libero_joint | Fifteen scopes below | VLA-Cache, VLA-InfoEntropy, Temporal Redundancy visual core | SP-VLA | VOTE ensemble core | AWQ W4A16 |
+| CogACT / libero_joint | Eleven scopes below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache | SP-VLA | VOTE ensemble core | AWQ W4A16 |
 | starVLA | Source pinned only; runtime not implemented | — | — | — | — |
 
 OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,
@@ -32,7 +32,12 @@ control. ASR includes every auxiliary dense refresh in reported total cost;
 its primary-forward diagnostic is not end-to-end serving latency. SQAP-VLA remains
 deferred: activation quantization granularity is contradictory and no verifiable
 implementation is available. It is not counted as supported.
-No action-generation sampler is currently advertised. Read each
+The new caches have distinct scopes: DP-Cache reuses native denoiser outputs;
+C³ache retains a live conditioning prefix and reuses cross-chunk suffix residuals;
+Temporal Redundancy reuses visual attention rows, excluding its trained action branch.
+ActionCache retrieves independently collected, frozen intermediate actions and
+refines them with the native DDIM tail; it is not a reproduction of flow-model scores.
+No trained few-step sampler is advertised. Read each
 [method README](src/efficient_vla_benchmark/methods/) before using its results.
 
 CogACT ST-Merge's current preset has 0/4 development-smoke successes (native 3/4),
@@ -70,7 +75,9 @@ evb benchmark --config configs/experiments/openvla_oft/specprune_vla.yaml \
 ```
 
 The caller defines the resource variables. Change the experiment YAML to select a
-supported backend/method pair and parameters; AWQ also needs `--artifact-path`.
+supported backend/method pair and parameters; AWQ and ActionCache also need
+`--artifact-path`. ActionCache requires its independently collected frozen bank;
+see its [population instructions](src/efficient_vla_benchmark/methods/caching/action_cache/README.md).
 Timing uses the four trace files selected by the frozen workload, not arbitrary
 smoke observations: at most 128 continuous controls per suite, one measured pass.
 Matched native references use the same inputs, GPU and execution cadence.

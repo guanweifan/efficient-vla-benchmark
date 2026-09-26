@@ -102,6 +102,11 @@ unpaced replay is not proof of real-robot deadline feasibility.
   reversibly cache per-block outputs; it must retain native sampling, timestep
   conditioning, CFG branches and residual paths. Denoiser calls are not policy
   queries: action-query boundaries must clear any within-sampling feature cache.
+- `ForwardPatches` wraps named callable attributes on individual module/sampler
+  instances and restores whether the attribute originally existed. It never patches
+  a model class. Methods own cache policy, shape guards and lifecycle; shared code
+  owns only reversible binding. Visual attention reuse preserves native grid/MLPs,
+  while denoiser output and cross-chunk residual caches are separate methods.
 
 Full-retention/no-op adapters must match the appropriate native reference and
 detach cleanly. Eager-versus-fused attention and quantized kernel precision
@@ -178,6 +183,16 @@ indices are not LIBERO task IDs (calibration task ID is -1). Backend preprocessi
 remains native. Algorithm search/packing belongs to the method; no evaluation-sample
 fitting, gradient training or silent data download is implied.
 
+ActionCache uses an additional, separately authorized native population: two fresh
+seeded placements per task, distinct from ALL fifty standard evaluation states.
+The method-specific collector calls the same H8 episode runner; it does not create
+another success protocol. Commit pairs only after trajectory success, retain every
+collection outcome, then freeze and checksum the bank before Dev/timing.
+The freezing command rechecks saved states and complete pair accounting. Failed
+population episodes are not replaced. Evaluation never updates this bank. Report
+population cost separately from steady-state lookup/refinement; an 80-episode bank
+is not free training data or part of the final 2,000-episode success measurement.
+
 LIBERO smoke uses task 0 / initial state 0 / seed 0 in each suite, ten settling steps,
 then limits of 220/280/300/520 control steps for Spatial/Object/Goal/Long. CUDA/EGL
 selection must agree. Outputs retain metadata, episodes (including errors), summary,
@@ -224,6 +239,12 @@ kept outside Git with caller-owned resource inventories. Validate package origin
 CUDA-extension identities and matched real-model episodes before admitting another
 host. One coordinator owns campaign state; inspect interrupted jobs before resuming.
 Machine-local paths are runtime inputs only, never committed deployment settings.
+
+Freeze each worker checkout's source for the entire queued campaign. Adding an
+unrelated method still changes the global runtime identity of later shards.
+Do not synchronize new code into a running worker or rewrite recorded identities.
+If this happens, repeat the affected shards under one frozen source; retain the
+replacement reason and compare outcomes before retiring the invalid mixed cohort.
 
 The local launcher must resolve the assigned GPU to a UUID and map its EGL device;
 never assume EGL enumeration equals the GPU index shown by `nvidia-smi`. It keeps
@@ -398,6 +419,12 @@ The subsequent native-four capture and measured-interval boundary changes throug
 `2a49223` likewise leave all policy sources unchanged; their runtime identity is
 `fb5c9a52ab1f503f3ad5b8aca8a23b63f8fd395c73adbb95a624f6156b8bb63b`.
 
+The caching batch through `d3c46d3` only adds isolated method files and
+`ForwardPatches`; all existing native/backend/control/harness Python files are
+unchanged from `b293e89`. Existing native Dev evidence therefore remains the
+reference. New method Dev/timing pairs retain their actual runtime identities;
+no measurement revision or dirty-source flag is relabeled as a later clean commit.
+
 ## Record results
 
 Keep canonical JSON records in ignored `outputs/result_records/`, raw runs under
@@ -412,6 +439,12 @@ complete collection before regeneration; an empty directory is an error.
 The primary ledger replaces historical candidate tables. Component READMEs retain
 mechanism limitations; ignored comparison and retirement audits retain replacement
 reasons without leaving obsolete results available for accidental selection.
+
+A later batch may use a compact `review_scope_coverage` manifest containing only
+the effective configurations of all reviewed scopes. Its digest pins coverage;
+it contains no imputed outcomes. Supply it alongside the actual complete Dev
+summaries when regenerating the primary ledger. Every measured row still requires
+its own strictly validated 200 episode records and matched timing evidence.
 
 ```bash
 python scripts/record_result.py export \
