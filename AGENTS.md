@@ -62,6 +62,14 @@ of development and Git rules; upstream submodules retain their own instructions.
   native baseline, then prefer reliably faster full-cost execution among tested
   eligible configurations. This is a selection goal, NOT an admission/reporting filter.
   Never disable the core or substitute a baseline no-op to obtain eligibility.
+- Meeting the accuracy target is NOT search completion. Inspect every admitted
+  scope for speedward headroom; test meaningful stronger configurations and record
+  a measured accuracy boundary, latency plateau or concrete mechanism limit.
+  Measurement-complete but search-incomplete rows cannot enter the final queue.
+  Keep the current timing and Dev protocols unchanged; no best-of-repeat selection.
+- Primary comparisons use native H8. CogACT VOTE is a disclosed two-vote overlapping-
+  chunk adaptation; OFT VOTE is unsupported without overlapping native predictions.
+  Historical H1 evidence must never be relabeled as an H8 result.
 - A tested, core-faithful port may report low success, no speedup or a slowdown.
   Check implementation, scope and reasonable parameter choices first. Say what
   the tested configuration shows; do not infer that the published method fails.

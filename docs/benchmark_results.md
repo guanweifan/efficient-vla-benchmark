@@ -4,7 +4,9 @@ One selected configuration per backend/method scope. Dev-200 is tuning evidence,
 not final accuracy. Timing uses frozen four-suite prefixes (at most 128 controls each), ten warmup queries, one pass and the mean over all measured controls.
 Native pre/post checks must pass. Final success
 is unmeasured until the owner schedules the frozen 2,000-episode campaign.
-Low success and slowdowns remain reportable. VOTE H1 is separate from H8.
+Low success and slowdowns remain reportable. All primary comparisons use H8.
+Complete measurements do not certify parameter-search completion; unfinished
+searches are excluded from the final launch list even when Dev meets the target.
 Selection targets at most 3 percentage points of Dev loss versus the matched
 native; this is not an outcome filter. Δ pp uses that same-cadence reference.
 Speedup >1 means faster and <1 means slower. Near-1 differences from one pass
@@ -13,14 +15,13 @@ Each speedup uses its own same-GPU native pair; the displayed native row is
 not a universal denominator. Absolute latency across GPU pairs is descriptive.
 Measured GPU models: NVIDIA GeForce RTX 3090.
 
-Selection digest: `e74967d20e3508c994919551567f4d8751eb607cf024540782ac4435c124c3e7`.
+Selection digest: `31183e6370350827709d4cf351e35a72730bad6dceb22e5fa857af7afddcc8b8`.
 
 ## cogact
 
 | Section | Preset | H | Dev SR (n/200) | Δ pp | ms/control | Speedup | Peak GiB | Final SR (n/2000) | Selection / scope |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
 | Reference | `baseline` | 8 | 91.5% (183) | +0.0 | 23.399 | 1.000× | 14.73 | — | Native H8 reference. Native model. |
-| Reference | `baseline_horizon1` | 1 | 80.5% (161) | +0.0 | 181.413 | 1.000× | 14.73 | — | Separate matched-cadence reference for VOTE. Native H1 control. |
 | 5.1 | `actuation_slack_refresh_keep25` | 8 | 89.0% (178) | -2.5 | 41.122 | 0.569× | 14.74 | — | 178/200 meets the 3-pp target; keep25 costs less than eligible keep50 in matched compact replay. Deletion core with full auxiliary refresh cost. |
 | 5.1 | `adp` | 8 | 91.0% (182) | -0.5 | 21.351 | 1.081× | 14.73 | — | Existing candidate meets Dev loss target. Adaptive pruning. |
 | 5.1 | `dart` | 8 | 92.0% (184) | +0.5 | 16.466 | 1.404× | 14.64 | — | Existing candidate meets Dev loss target. Pivot-based token selection. |
@@ -39,7 +40,6 @@ Selection digest: `e74967d20e3508c994919551567f4d8751eb607cf024540782ac4435c124c
 | 5.2 | `vla_cache` | 8 | 89.0% (178) | -2.5 | 19.925 | 1.162× | 14.75 | — | Existing candidate meets Dev loss target. Query-row reuse with retained visual KV. |
 | 5.2 | `vla_infoentropy` | 8 | 87.5% (175) | -4.0 | 20.307 | 1.140× | 14.75 | — | 175/200; tested static100 yielded 174/200, so retain original active setting. Entropy-guided query-row reuse; below Dev loss target. |
 | 5.3 | `sp_vla` | 8 | 90.5% (181) | -1.0 | 19.096 | 1.208× | 14.73 | — | Existing candidate meets Dev loss target. Pruning plus executed-action scheduling. |
-| 5.5 | `vote_ensemble` | 1 | 90.0% (180) | +9.5 | 183.055 | 0.991× | 14.73 | — | H1 comparison only; no claim of H8 acceleration. Action ensemble at matched H1 cadence. |
 | 6.1 | `awq_fp16_kernel` | 8 | 91.0% (182) | -0.5 | 17.005 | 1.356× | 5.90 | — | Selected FP16-kernel W4A16; BF16 retained as a labeled precision auxiliary. Explicit FP16 cast boundary; training-only calibration. |
 
 ## openvla_oft
@@ -47,7 +47,6 @@ Selection digest: `e74967d20e3508c994919551567f4d8751eb607cf024540782ac4435c124c
 | Section | Preset | H | Dev SR (n/200) | Δ pp | ms/control | Speedup | Peak GiB | Final SR (n/2000) | Selection / scope |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
 | Reference | `baseline` | 8 | 99.0% (198) | +0.0 | 24.793 | 1.000× | 14.98 | — | Native H8 reference. Native model. |
-| Reference | `baseline_horizon1` | 1 | 79.0% (158) | +0.0 | 193.915 | 1.000× | 14.98 | — | Separate matched-cadence reference for VOTE. Native H1 control. |
 | 5.1 | `actuation_slack_refresh_deletion` | 8 | 97.5% (195) | -1.5 | 44.000 | 0.563× | 14.69 | — | Retain active configuration; full auxiliary cost is included. Deletion core; not real-robot overlap. |
 | 5.1 | `adp` | 8 | 98.5% (197) | -0.5 | 24.037 | 1.022× | 14.68 | — | Existing candidate meets Dev loss target. Adaptive pruning. |
 | 5.1 | `dart_layer4` | 8 | 98.5% (197) | -0.5 | 21.511 | 1.141× | 14.63 | — | 197/200 versus 184/200 at the original layer. Pivot-based token selection, later pruning layer. |
@@ -64,7 +63,6 @@ Selection digest: `e74967d20e3508c994919551567f4d8751eb607cf024540782ac4435c124c
 | 5.2 | `vla_cache` | 8 | 96.5% (193) | -2.5 | 25.887 | 0.950× | 15.03 | — | Existing candidate meets Dev loss target; retain any measured overhead honestly. Query-row reuse with retained visual KV. |
 | 5.2 | `vla_infoentropy` | 8 | 97.5% (195) | -1.5 | 26.595 | 0.925× | 15.03 | — | Existing candidate meets Dev loss target; retain full reuse overhead. Entropy-guided query-row reuse with retained KV. |
 | 5.3 | `sp_vla` | 8 | 97.5% (195) | -1.5 | 21.830 | 1.125× | 14.68 | — | Existing candidate meets Dev loss target. Pruning plus executed-action scheduling. |
-| 5.5 | `vote_ensemble` | 1 | 94.0% (188) | +15.0 | 193.268 | 1.003× | 14.98 | — | H1 comparison only; no claim of H8 acceleration. Action ensemble at matched H1 cadence. |
 | 6.1 | `awq_fp16_kernel` | 8 | 97.5% (195) | -1.5 | 21.359 | 1.161× | 6.12 | — | Measured FP16-kernel W4A16 candidate; compare retained BF16 auxiliary. Explicit FP16 cast boundary; training-only calibration. |
 
 ## Useful auxiliary configurations
@@ -98,7 +96,6 @@ Recorded revisions predating history cleanup can be resolved through the
 | Backend / preset | Dev experiment | Timing record | Dev / timing commit | Record digest |
 |---|---|---|---|---|
 | cogact / `baseline` | `a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358` | `compact-41-4-cogact-1--native-pre` | `e86cbe2edc52d3bc69122a66dc727a8aa1109d93` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `c3be4cb17862b40f8519c7c2a4a52805b268f4e547991a93fae666ee733fb862` |
-| cogact / `baseline_horizon1` | `14ac367a1ff2fcdccd71c123235a5879d950eca0ebed49cf9c4aaf76769d6989` | `compact-42-1-cogact-vote--native-pre` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `465838d6af15428eace0f168b48392ce6886137b` | `6e9d1fe241129cbc0969850046199b2c554ca2e2eae157033471971f1ca59c2a` |
 | cogact / `actuation_slack_refresh_keep25` | `1745acc6a866125188a9997d38d3a193bf3f2238f71a72e8522ed6a2933d2115` | `compact-41-4-cogact-1--actuation_slack_refresh_keep25` | `1dc47be1a1e7d1cd8623a50e329d3a72e5daa8ef` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `ba45d59001f53064891ce78afc87457c6fcfb42d74aae8f49bd7b9ed91127717` |
 | cogact / `adp` | `42449ae56acdde4b772b59d1e06aae9fd967c8b2218fc23decbb18768ba3af66` | `compact-43-0-cogact-token-retry--adp` | `e86cbe2edc52d3bc69122a66dc727a8aa1109d93` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `cb242ba60b5490a89b285e5839708c75c9b176a1bc1c40d22159649e6aa5f744` |
 | cogact / `dart` | `703d93d8a87981631d66e7a6466a8793d795eecd9b2805b7525f54bf65efa389` | `compact-43-0-cogact-1--dart` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `4d19aee96c571e6f7d440537615e53cc842fbd6edda5f86777b48bf2e4ccc81b` |
@@ -117,10 +114,8 @@ Recorded revisions predating history cleanup can be resolved through the
 | cogact / `vla_cache` | `f9612931a47706abef36d9251e82bcf9c0ceeb249fce9e68412d8214f5a29fcb` | `compact-43-2-cogact-inputs-retry--vla_cache` | `3d6c5ab11dd9880b13536285a7ea478fe6ee7303` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `f38f970dfc5297f06b904976332fc957ce4fc1fd798761e196d602f54de2ab8b` |
 | cogact / `vla_infoentropy` | `3e7f5140c644c221a9a02a45731cf1e949650a3564053c9d662f85e37b11cabb` | `compact-43-2-cogact-inputs-retry--vla_infoentropy` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `3330159196088131057ec15ea17cdc1667f6f9668632ed2266ff747cae62d186` |
 | cogact / `sp_vla` | `27d4793d914e2be7c1eb929c254b8661581eaefb1a68530fc1c0746d0cd764d9` | `compact-43-0-cogact-token-retry--sp_vla` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `e99743927fcec363c2c3d93fe4529ebf5caed70086bf11c3842164c097267b8c` |
-| cogact / `vote_ensemble` | `f6b608bfced978188d89978e816e2ba29cbd6e9d12a4dc5656cb146d2d4a955f` | `compact-42-1-cogact-vote--vote_ensemble` | `e86cbe2edc52d3bc69122a66dc727a8aa1109d93` / `465838d6af15428eace0f168b48392ce6886137b` | `ee994f9f3a6df18804bbd064d90c901ac235c8080981a03ceb3f710c2861c8d8` |
 | cogact / `awq_fp16_kernel` | `be03b017c6a40862b3ebc5afa78a0ce2cf31111d49e8763c1fe5d0650391c117` | `compact-42-0-cogact-quant--awq_fp16_kernel` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `465838d6af15428eace0f168b48392ce6886137b` | `cb173d2eb42c17ac8ae3398af5f884071e082d7e3ed7db8ac15db2f40bfa4a61` |
 | openvla_oft / `baseline` | `83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e` | `compact-124-7-openvla_oft-quant--native-pre` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `77575dfbcb36ed385377a886f994a3d21e6cb2eb1de5d620f896aea2f9f493cd` |
-| openvla_oft / `baseline_horizon1` | `d1432ffd8638abf10c9ab9ecc527a43f7e12f650a6c7b7bd4e66d09134d065c5` | `compact-45-5-openvla_oft-1--native-pre` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `f13153dbc895b7e21b961d0f40c63764b47995a49bb35a6d2e314453ca22a0b9` |
 | openvla_oft / `actuation_slack_refresh_deletion` | `2e2b75988b34636d5fa39e24e573aa4a159c179d48954e47203a23897921b39c` | `compact-45-5-openvla_oft-recheck--actuation_slack_refresh_deletion` | `f63c95a6f22a8fd2c1fcdc9fed2441ecb376379d` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `515f46e72adb7e0bd549ce44c0e3716db4d7b3573c3fdf3ad56c826d9df12c2d` |
 | openvla_oft / `adp` | `83f9aeebdff8a240e92f929ab699eaabc470de89ecc663c04837580dce3f412a` | `compact-45-6-openvla_oft-2--adp` | `e86cbe2edc52d3bc69122a66dc727a8aa1109d93` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `6f76f82646ba660a22f3e3d9071fd906f2d2dcf3c6e4c9513037391e9fff795b` |
 | openvla_oft / `dart_layer4` | `03a1390651f10da98428fda879b3bb34131f032a02463218beb1c31648b493b9` | `compact-45-6-openvla_oft-1--dart_layer4` | `1dc47be1a1e7d1cd8623a50e329d3a72e5daa8ef` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `aa6d0b7a820d6271646a6534dd6119bcf5fa7ee1924b3b299881dcaee26a05e0` |
@@ -137,7 +132,6 @@ Recorded revisions predating history cleanup can be resolved through the
 | openvla_oft / `vla_cache` | `05bde38fdbf83dfb4f0928768c7d460b51ef106a49e29eeb6aaf7783da1da17d` | `compact-45-7-openvla_oft-1--vla_cache` | `e86cbe2edc52d3bc69122a66dc727a8aa1109d93` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `34fe4a649f26a7631e6e0622091082808d643c0555b03cc201844e3fe12bf750` |
 | openvla_oft / `vla_infoentropy` | `fc132144e01cbf7c6a681a8b9f59e0010c7cb55a4742809365070e9632b55733` | `compact-45-7-openvla_oft-1--vla_infoentropy` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `4a6499beeec7a1677b998c573e499ae9891d141426efad983fbf81feeafa1bb1` |
 | openvla_oft / `sp_vla` | `c321f89069f8c73c936a1388ee57c00bab318a500a5f81d0ec5b9074a94a23a8` | `compact-45-6-openvla_oft-2--sp_vla` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `70ef6b76fdff34a2ca60ad5c3029782aecf46b4d4cc1b7aaf7ec3ecebc60756e` |
-| openvla_oft / `vote_ensemble` | `fe1c47c9ecd7373e5744dfcb53a13ba295d4b6543240f380be2724ba3453f792` | `compact-45-5-openvla_oft-1--vote_ensemble` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `dc2d217e9d3c5c559f6c6f92497b263463408b4db92a28cdf51a57b624e96434` |
 | openvla_oft / `awq_fp16_kernel` | `566ed69c9ce2db872ba40344f9123dac0ba1db2f05ef3c240c7f156406fe6d66` | `compact-124-7-openvla_oft-quant--awq_fp16_kernel` | `e86cbe2edc52d3bc69122a66dc727a8aa1109d93` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `b1a7536157e29af90a22cc43bb47a37850b6d3ea9e3d8b499df6089f0311cab1` |
 | openvla_oft / `awq` | `5d64703c2acfcfe4a33ed22f76215b16457c1d61cc0be948e134f97124f509cf` | `compact-124-7-openvla_oft-quant--awq` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `8720ab41aa47c710bc8c10a98479089045df80598caa44b3cf79b9645c6b8a8d` |
 | cogact / `awq` | `a223cf526c859a8a6071ba21da16d2be890c981c5048f52ab863fda22eace8dc` | `compact-42-0-cogact-quant--awq` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `465838d6af15428eace0f168b48392ce6886137b` | `2b53ecaeb6d71307c5630e29c56920594ad7c3f6663d15eb0660d780aebc8f2f` |

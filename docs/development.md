@@ -296,7 +296,7 @@ Neither can replace stateful control replay for history-dependent methods.
 
 Record query/first/steady latency, percentiles, total/control latency,
 queries/replacements and allocated/reserved memory. Compare matched cadence for
-aggregation, including VOTE H1. Checkpoint/source/trace hashes, dependencies,
+aggregation at the fixed H8 comparison cadence. Checkpoint/source/trace hashes, dependencies,
 attention/precision and driver/kernel identities accompany every result. Dirty
 measurements keep their real status. Replay is not closed-loop completion time;
 four smoke episodes never establish formal accuracy.
@@ -310,10 +310,13 @@ four smoke episodes never establish formal accuracy.
 2. Evaluate the existing candidate on the fixed Dev-200 manifest. Reuse compatible,
    complete evidence; do not rerun merely because documentation changed. All four
    suites share one parameter configuration. Calibration still uses training data.
-3. Investigate only warranted cases: unexplained accuracy loss, poor full-cost
-   latency, almost-inactive mechanisms or unresolved fidelity. Select informative
-   changes to the implicated parameters; no fixed candidate quota or exhaustive
-   sweep. A mechanism change is a new implementation audit, not just tuning.
+3. Audit speedward headroom for every admitted backend/method scope, including
+   candidates already meeting the accuracy target. Select meaningful stronger
+   settings of the main compute parameter, then refine measured accuracy boundaries
+   or inspect overhead plateaus. Investigate secondary parameters when justified;
+   no mandatory candidate count or exhaustive Cartesian sweep. Mechanism changes
+   require a fresh fidelity audit. Meeting the accuracy target alone never closes
+   search. Freeze one effective configuration across all suites.
 4. Selection target: `Dev_SR >= matched_baseline_Dev_SR - 3 percentage points`.
    On the current H8 references this is at least 192/200 for OFT and 177/200 for
    CogACT. These counts follow the observed baseline, not a universal constant.
@@ -327,7 +330,13 @@ four smoke episodes never establish formal accuracy.
    unresolved core cannot be certified simply because a favorable preset was found.
    Record every attempted measurement during this process; keep only useful evidence
    after decisions settle. An intentional schedule/precision change stays explicit.
-6. Freeze ONE primary configuration per backend/method scope, its selection evidence,
+6. Record search closure with referenced candidate evidence: an accuracy boundary,
+   latency plateau, concrete mechanism limit, or a reasonably explored no-feasible
+   outcome. Lack of time/budget is unfinished, not a boundary. The report validates
+   these references separately from measurement completeness and withholds unfinished
+   rows from the final queue. Explain any selection over a faster eligible candidate
+   under the existing timing-variability tie rule; never pick a favorable repeat.
+   Freeze ONE primary configuration per backend/method scope, its selection evidence,
    calibration identity if applicable, checkpoint, runtime and evaluation protocol.
    Valuable auxiliary configurations may remain separately, without automatically
    scheduling extra full campaigns. No separate best preset for each suite.
@@ -349,7 +358,7 @@ Average ALL measured control-step latencies, including queue-consumption steps;
 divide the matched native mean by the method mean. This is representative-input
 policy compute, not task-macro performance or closed-loop completion time. Do not
 report repeat standard deviation from one pass, or mix historical protocols in the
-primary table. H1 and H8 require separate matched references.
+primary table. The current primary comparison is H8; old H1 evidence is not eligible.
 
 Use fresh model processes and fixed CPU threads. A small batch on the same GPU may
 share native pre/post references. Accept at most 3% native latency drift and no
@@ -366,12 +375,16 @@ fastest repeat. A >10% speedup difference from compatible old evidence triggers
 diagnosis, not adjustment to match the old number. Prefer reaggregating the exact
 same prefixes; cross-GPU absolute latencies are not directly comparable.
 
-VOTE uses a separately labeled H1 protocol and H1 native reference, not the H8
-ranking. AWQ precision/memory and offline calibration costs remain explicit. ASR's
+VOTE uses CogACT's native sixteen-predict/eight-execute overlap, normally two votes.
+Its tie follows the original equation, selecting the older disagreeing prediction;
+this sparse-committee adaptation is not the original dense multi-vote setting.
+OFT's eight-step predictions do not overlap at H8, so that binding is unsupported.
+No H1 baseline or extra model calls are substituted. AWQ precision/memory and offline
+calibration costs remain explicit. ASR's
 auxiliary refresh stays in total compute timing; real-robot overlap/serve latency
 is a different, currently unmeasured claim.
 
-**Implementation status (2026-09-25):** The lightweight protocol replaces the old
+**Measurement history:** The lightweight protocol replaces the old
 full-trajectory repeated timing. Dev-200 evidence is reused only for the same policy,
 checkpoint and audited implementation. Native reference capture is complete; all
 37 integrated backend/method scopes now have compact timing and matched Dev-200

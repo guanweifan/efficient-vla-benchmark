@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: 6bc97b0fbc2091a71d1174523bbd83a075550d1a2c8cc751e418c95451baf95f
+coverage_summary_sha256: da011f4ea03317ff8920aa66817e38e5436d2b6879c5917e6f627af2f3621037
 source_compatibility:
 - development_runtime: 0dd68a00d775d3a36a95e949eb2e0fe708456ae4c6fd03fde045ccd5695cc8f2
   timing_runtime: b30a41d426f30c6f8e7731d6ab35fe56ea52ac691f601faf83c2daff72e9c099
@@ -21,7 +21,7 @@ source_compatibility:
 timing_workloads:
   openvla_oft: 01f8a93fc0bd522be3ef1d2dbee981ad1bb53ed9c1bf76b404808060bdedbefe
   cogact: 6c0e509fe062fdc393d7edbf668d29450250b99e9b163a5bad5597796e7420bc
-final_runtime_source_sha256: 168f6e3a995a6aa0a9dc473471ba1e7006299c4da6480897d0dbbdca6e019894
+final_runtime_source_sha256: 550676449fc89a52d6aa11873e2380b4fd71e521550eae6747073139a3420f4b
 configurations:
 - config: configs/experiments/cogact/baseline.yaml
   status: primary
@@ -33,16 +33,6 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-41-4-cogact-1--native-pre
-- config: configs/experiments/cogact/baseline_horizon1.yaml
-  status: primary
-  section: Reference
-  reason: Separate matched-cadence reference for VOTE.
-  scope: Native H1 control.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 14ac367a1ff2fcdccd71c123235a5879d950eca0ebed49cf9c4aaf76769d6989
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 14ac367a1ff2fcdccd71c123235a5879d950eca0ebed49cf9c4aaf76769d6989
-  timing_record: compact-42-1-cogact-vote--native-pre
 - config: configs/experiments/cogact/actuation_slack_refresh_keep25.yaml
   status: primary
   section: '5.1'
@@ -53,6 +43,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-41-4-cogact-1--actuation_slack_refresh_keep25
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/adp.yaml
   status: primary
   section: '5.1'
@@ -63,6 +56,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-0-cogact-token-retry--adp
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/dart.yaml
   status: primary
   section: '5.1'
@@ -73,6 +69,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-0-cogact-1--dart
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/depth_cache_primary.yaml
   status: primary
   section: '5.1'
@@ -83,6 +82,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-41-4-cogact-1--depth_cache_primary
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/divprune.yaml
   status: primary
   section: '5.1'
@@ -93,6 +95,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-0-cogact-1--divprune
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/fastv.yaml
   status: primary
   section: '5.1'
@@ -103,6 +108,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-0-cogact-1--fastv
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/flash_vla_keep224.yaml
   status: primary
   section: '5.1'
@@ -113,6 +121,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-0-cogact-token-retry--flash_vla_keep224
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/safe_pruner.yaml
   status: primary
   section: '5.1'
@@ -123,6 +134,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-0-cogact-token-retry--safe_pruner
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/sparsevlm.yaml
   status: primary
   section: '5.1'
@@ -133,6 +147,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-0-cogact-1--sparsevlm
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/specprune_vla_static96.yaml
   status: primary
   section: '5.1'
@@ -143,6 +160,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-2-cogact-inputs-retry--specprune_vla_static96
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/st_merge_keep192.yaml
   status: pending_core
   section: '5.1'
@@ -163,6 +183,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: cache-v2-45-6-cogact--action_cache
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/c3ache_conditioned_residual_prefix6.yaml
   status: primary
   section: '5.2'
@@ -173,6 +196,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: cache-v2-45-6-cogact--c3ache_conditioned_residual_prefix6
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/dp_cache.yaml
   status: primary
   section: '5.2'
@@ -183,6 +209,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: cache-v1-45-6-cogact--dp_cache
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/efficient_vla_cache3.yaml
   status: primary
   section: '5.2'
@@ -193,6 +222,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-42-0-cogact-quant--efficient_vla_cache3
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/temporal_redundancy_visual_update75.yaml
   status: primary
   section: '5.2'
@@ -203,6 +235,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: cache-v3-45-6-cogact--temporal_redundancy_visual_update75
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/vla_cache.yaml
   status: primary
   section: '5.2'
@@ -213,6 +248,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-2-cogact-inputs-retry--vla_cache
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/vla_infoentropy.yaml
   status: primary
   section: '5.2'
@@ -223,6 +261,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-2-cogact-inputs-retry--vla_infoentropy
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/sp_vla.yaml
   status: primary
   section: '5.3'
@@ -233,16 +274,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-0-cogact-token-retry--sp_vla
-- config: configs/experiments/cogact/vote_ensemble.yaml
-  status: primary
-  section: '5.5'
-  reason: H1 comparison only; no claim of H8 acceleration.
-  scope: Action ensemble at matched H1 cadence.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: f6b608bfced978188d89978e816e2ba29cbd6e9d12a4dc5656cb146d2d4a955f
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 14ac367a1ff2fcdccd71c123235a5879d950eca0ebed49cf9c4aaf76769d6989
-  timing_record: compact-42-1-cogact-vote--vote_ensemble
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/cogact/awq_fp16_kernel.yaml
   status: primary
   section: '6.1'
@@ -253,6 +287,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-42-0-cogact-quant--awq_fp16_kernel
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/baseline.yaml
   status: primary
   section: Reference
@@ -263,16 +300,6 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-124-7-openvla_oft-quant--native-pre
-- config: configs/experiments/openvla_oft/baseline_horizon1.yaml
-  status: primary
-  section: Reference
-  reason: Separate matched-cadence reference for VOTE.
-  scope: Native H1 control.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: d1432ffd8638abf10c9ab9ecc527a43f7e12f650a6c7b7bd4e66d09134d065c5
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: d1432ffd8638abf10c9ab9ecc527a43f7e12f650a6c7b7bd4e66d09134d065c5
-  timing_record: compact-45-5-openvla_oft-1--native-pre
 - config: configs/experiments/openvla_oft/actuation_slack_refresh_deletion.yaml
   status: primary
   section: '5.1'
@@ -283,6 +310,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-5-openvla_oft-recheck--actuation_slack_refresh_deletion
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/adp.yaml
   status: primary
   section: '5.1'
@@ -293,6 +323,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-6-openvla_oft-2--adp
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/dart_layer4.yaml
   status: primary
   section: '5.1'
@@ -303,6 +336,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-6-openvla_oft-1--dart_layer4
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/depth_cache_primary.yaml
   status: primary
   section: '5.1'
@@ -313,6 +349,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-5-openvla_oft-recheck--depth_cache_primary
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/divprune.yaml
   status: primary
   section: '5.1'
@@ -323,6 +362,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-6-openvla_oft-1--divprune
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/efficient_vla.yaml
   status: primary
   section: '5.1'
@@ -333,6 +375,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-7-openvla_oft-2--efficient_vla
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/fastv.yaml
   status: primary
   section: '5.1'
@@ -343,6 +388,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-6-openvla_oft-1--fastv
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/flash_vla_keep192.yaml
   status: primary
   section: '5.1'
@@ -353,6 +401,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-6-openvla_oft-2--flash_vla_keep192
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/safe_pruner.yaml
   status: primary
   section: '5.1'
@@ -363,6 +414,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-6-openvla_oft-2--safe_pruner
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/sparsevlm.yaml
   status: primary
   section: '5.1'
@@ -373,6 +427,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-6-openvla_oft-1--sparsevlm
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/specprune_vla_score_first.yaml
   status: primary
   section: '5.1'
@@ -383,6 +440,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-7-openvla_oft-1--specprune_vla_score_first
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/st_merge_keep192.yaml
   status: pending_core
   section: '5.1'
@@ -423,6 +483,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-7-openvla_oft-1--vla_pruner
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/temporal_redundancy_visual.yaml
   status: primary
   section: '5.2'
@@ -433,6 +496,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: cache-v1-45-7-oft-recheck--temporal_redundancy_visual
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/vla_cache.yaml
   status: primary
   section: '5.2'
@@ -443,6 +509,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-7-openvla_oft-1--vla_cache
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/vla_infoentropy.yaml
   status: primary
   section: '5.2'
@@ -453,6 +522,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-7-openvla_oft-1--vla_infoentropy
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/sp_vla.yaml
   status: primary
   section: '5.3'
@@ -463,16 +535,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-6-openvla_oft-2--sp_vla
-- config: configs/experiments/openvla_oft/vote_ensemble.yaml
-  status: primary
-  section: '5.5'
-  reason: H1 comparison only; no claim of H8 acceleration.
-  scope: Action ensemble at matched H1 cadence.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: fe1c47c9ecd7373e5744dfcb53a13ba295d4b6543240f380be2724ba3453f792
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: d1432ffd8638abf10c9ab9ecc527a43f7e12f650a6c7b7bd4e66d09134d065c5
-  timing_record: compact-45-5-openvla_oft-1--vote_ensemble
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 - config: configs/experiments/openvla_oft/awq_fp16_kernel.yaml
   status: primary
   section: '6.1'
@@ -483,6 +548,9 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-124-7-openvla_oft-quant--awq_fp16_kernel
+  search:
+    complete: false
+    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
 timing_protocol: libero_replay4x128_v1
 auxiliary_configurations:
 - config: configs/experiments/openvla_oft/awq.yaml

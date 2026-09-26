@@ -75,6 +75,19 @@ def fixture():
         "baseline_development_summary_sha256": "summary",
         "baseline_development_experiment_id": "native",
         "timing_record": "method",
+        "search": {
+            "complete": True,
+            "stop": "mechanism_limit",
+            "reason": "Fixture exercises a faithful active negative result at its mechanism limit.",
+            "limitation": "Fixed instrument with no further admissible compute reduction.",
+            "evidence": [
+                {
+                    "development_summary_sha256": "summary",
+                    "development_experiment_id": "candidate",
+                    "timing_record": "method",
+                }
+            ],
+        },
     }
     selection = {
         "schema_version": 1,
@@ -208,6 +221,7 @@ def test_auxiliary_is_validated_without_entering_final_queue(reporter, monkeypat
             timing_record="auxiliary",
         )
     ]
+    selection["auxiliary_configurations"][0].pop("search")
     original = reporter.ExperimentConfig.load
     monkeypatch.setattr(
         reporter.ExperimentConfig,
@@ -232,4 +246,64 @@ def test_primary_cannot_be_duplicated_as_auxiliary(reporter):
         dict(selection["configurations"][0], status="auxiliary")
     ]
     with pytest.raises(ValueError, match="distinct alternative"):
+        reporter.build(selection, summaries, records, quality, manifest)
+
+
+def test_accuracy_eligible_is_not_search_complete(reporter):
+    selection, summaries, records, quality, manifest = fixture()
+    selection["configurations"][0].pop("search")
+    dev = summaries["summary"]["configurations"][0]
+    dev["successes"], dev["success_rate"] = 198, 0.99
+    for i, row in enumerate(dev["episode_results"]):
+        row["success"] = i < 198
+    result = reporter.build(selection, summaries, records, quality, manifest)
+    assert result["primary"][0]["development"]["target_met"]
+    assert not result["primary"][0]["search"]["complete"]
+    assert not result["final_launch_candidates"]
+
+
+@pytest.mark.parametrize("case", ["missing", "target_met", "boundary", "plateau", "limit"])
+def test_search_closure_requires_resolvable_evidence(reporter, case):
+    selection, summaries, records, quality, manifest = fixture()
+    search = selection["configurations"][0]["search"]
+    if case == "missing":
+        search["evidence"] = []
+    if case == "target_met":
+        search["stop"] = "target_met"
+    if case == "boundary":
+        search["stop"] = "accuracy_boundary"
+        dev = summaries["summary"]["configurations"][0]
+        dev["successes"], dev["success_rate"] = 198, 0.99
+        for i, row in enumerate(dev["episode_results"]):
+            row["success"] = i < 198
+    if case == "plateau":
+        search["stop"] = "latency_plateau"
+    if case == "limit":
+        search.pop("limitation")
+    with pytest.raises(ValueError):
+        reporter.build(selection, summaries, records, quality, manifest)
+
+
+def test_faster_eligible_candidate_cannot_be_ignored(reporter):
+    selection, summaries, records, quality, manifest = fixture()
+    better = copy.deepcopy(summaries["summary"]["configurations"][0])
+    better["experiment_id"] = "faster"
+    better["config"]["parameters"] = {"keep_ratio": 0.25}
+    better["successes"], better["success_rate"] = 198, 0.99
+    for i, row in enumerate(better["episode_results"]):
+        row["success"] = i < 198
+    summaries["summary"]["configurations"].append(better)
+    records["faster"] = copy.deepcopy(records["method"])
+    records["faster"]["run"]["run_id"] = "faster"
+    records["faster"]["run"]["metadata"]["config"] = better["config"]
+    records["faster"]["task_macro_speedup"] = 1.3
+    quality["groups"][0]["jobs"].append("faster")
+    selection["configurations"][0]["search"]["evidence"].append(
+        {
+            "development_summary_sha256": "summary",
+            "development_experiment_id": "faster",
+            "timing_record": "faster",
+        }
+    )
+    with pytest.raises(ValueError, match="faster eligible"):
         reporter.build(selection, summaries, records, quality, manifest)

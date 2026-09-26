@@ -74,6 +74,109 @@ def environment_identity(source, backend):
     }
 
 
+def check_search(selected, config, dev, reference, summaries, records, valid_runs, manifest):
+    """Require evidence of search closure, independently of accuracy eligibility."""
+    if config["method"] == "none":
+        return {"complete": True, "stop": "native_reference", "reason": "Fixed native reference"}
+    search = selected.get("search", {})
+    if search.get("complete") is not True:
+        return {
+            "complete": False,
+            "stop": "pending",
+            "reason": search.get("reason", "Not reviewed"),
+        }
+    allowed = {
+        "accuracy_boundary",
+        "latency_plateau",
+        "mechanism_limit",
+        "no_feasible_configuration",
+    }
+    if search.get("stop") not in allowed or not search.get("reason"):
+        raise ValueError(
+            "Completed search needs an explicit boundary or limitation, not target_met"
+        )
+    candidates = []
+    for evidence in search.get("evidence", []):
+        candidate = None
+        if evidence.get("development_experiment_id"):
+            matches = [
+                row
+                for row in summaries[evidence["development_summary_sha256"]]["configurations"]
+                if row["experiment_id"] == evidence["development_experiment_id"]
+            ]
+            if len(matches) != 1:
+                raise ValueError("Search candidate development evidence is missing or ambiguous")
+            candidate = matches[0]
+            check_development(candidate, manifest)
+            candidate_config = candidate["config"]
+            if candidate["backend"]["checkpoint_sha256"] != dev["backend"]["checkpoint_sha256"]:
+                raise ValueError("Search candidate checkpoint differs")
+        timing = None
+        if evidence.get("timing_record"):
+            timing = records[evidence["timing_record"]]
+            if timing["run"]["run_id"] not in valid_runs:
+                raise ValueError("Search candidate timing has no valid quality cohort")
+            measured = timing["run"]["metadata"]
+            candidate_config = measured["config"]
+            if candidate and policy_identity(candidate["config"]) != policy_identity(
+                candidate_config
+            ):
+                raise ValueError("Search candidate Dev/timing configurations differ")
+            if measured["backend"]["checkpoint_sha256"] != dev["backend"]["checkpoint_sha256"]:
+                raise ValueError("Search candidate timing checkpoint differs")
+        if candidate is None and timing is None:
+            raise ValueError("Search evidence must resolve a measurement, not a free-text claim")
+        if scope_key(candidate_config) != scope_key(config) or any(
+            candidate_config.get(k) != config.get(k)
+            for k in ("model_variant", "precision", "execution_horizon", "backend_parameters")
+        ):
+            raise ValueError(
+                "Search evidence changes the method scope or fixed baseline conditions"
+            )
+        candidates.append((candidate, timing))
+    if not any(c and c["experiment_id"] == dev["experiment_id"] for c, _ in candidates):
+        raise ValueError("Completed search must include the selected development candidate")
+    complete_devs = [c for c, _ in candidates if c]
+    threshold = reference["successes"] - 6
+    if search["stop"] == "accuracy_boundary" and not any(
+        c["successes"] < threshold for c in complete_devs
+    ):
+        raise ValueError("Accuracy boundary requires an actually measured below-target candidate")
+    if (
+        search["stop"] == "latency_plateau"
+        and len({r["run"]["run_id"] for _, r in candidates if r}) < 2
+    ):
+        raise ValueError("Latency plateau requires at least two valid timed candidates")
+    if search["stop"] == "no_feasible_configuration" and (
+        len({c["experiment_id"] for c in complete_devs}) < 2
+        or any(c["successes"] >= threshold for c in complete_devs)
+    ):
+        raise ValueError("No-feasible closure disagrees with the measured candidate set")
+    if search["stop"] == "mechanism_limit" and not search.get("limitation"):
+        raise ValueError("Mechanism-limit closure needs the concrete unalterable constraint")
+    selected_record = records[selected["timing_record"]]
+    selected_speed = selected_record.get(
+        "workload_speedup", selected_record.get("task_macro_speedup")
+    )
+    faster = [
+        c["experiment_id"]
+        for c, r in candidates
+        if c
+        and r
+        and c["successes"] >= threshold
+        and r.get("workload_speedup", r.get("task_macro_speedup")) > selected_speed
+        and c["experiment_id"] != dev["experiment_id"]
+    ]
+    if faster and not search.get("tie_reason"):
+        raise ValueError(
+            "A faster eligible measured candidate needs an explicit selection explanation"
+        )
+    return {
+        **search,
+        "eligible_candidates": sum(c["successes"] >= threshold for c in complete_devs),
+    }
+
+
 def build(selection, summaries, records, quality, development_manifest, final_results=None):
     if selection.get("schema_version") != 1:
         raise ValueError("Unsupported selection schema")
@@ -96,6 +199,8 @@ def build(selection, summaries, records, quality, development_manifest, final_re
     seen, rows, pending, launch = set(), [], [], []
     for selected in selection["configurations"]:
         config = asdict(ExperimentConfig.load(Path(selected["config"])))
+        if config["execution_horizon"] != 8:
+            raise ValueError("Primary comparison uses H8; historical H1 is not a special exception")
         key = scope_key(config)
         if key in seen:
             raise ValueError("Multiple primary configurations for one backend/method scope")
@@ -233,7 +338,14 @@ def build(selection, summaries, records, quality, development_manifest, final_re
             row["config"] = selected["config"]
             pending.append(row)
             continue
+        row["search"] = check_search(
+            selected, config, dev, ref, summaries, records, quality_by_run, development_manifest
+        )
+        if final is not None and not row["search"]["complete"]:
+            raise ValueError("Final results cannot certify an unfinished parameter search")
         rows.append(row)
+        if not row["search"]["complete"]:
+            continue
         launch.append(
             {
                 "config": selected["config"],
@@ -303,7 +415,9 @@ def render(report):
         "not final accuracy. " + timing_description,
         "Native pre/post checks must pass. Final success",
         "is unmeasured until the owner schedules the frozen 2,000-episode campaign.",
-        "Low success and slowdowns remain reportable. VOTE H1 is separate from H8.",
+        "Low success and slowdowns remain reportable. All primary comparisons use H8.",
+        "Complete measurements do not certify parameter-search completion; unfinished",
+        "searches are excluded from the final launch list even when Dev meets the target.",
         "Selection targets at most 3 percentage points of Dev loss versus the matched",
         "native; this is not an outcome filter. Δ pp uses that same-cadence reference.",
         "Speedup >1 means faster and <1 means slower. Near-1 differences from one pass",
@@ -417,10 +531,16 @@ def main():
     a = p.parse_args()
     selection = yaml.safe_load(a.selection.read_text())
     summaries = {digest_file(f): json.loads(f.read_text()) for f in a.development_summary}
+    selected = selection["configurations"] + selection.get("auxiliary_configurations", [])
+    record_ids = {r["timing_record"] for r in selected if r.get("timing_record")}
+    record_ids.update(
+        e["timing_record"]
+        for r in selected
+        for e in r.get("search", {}).get("evidence", [])
+        if e.get("timing_record")
+    )
     records = {
-        r["timing_record"]: json.loads((a.records_dir / (r["timing_record"] + ".json")).read_text())
-        for r in selection["configurations"] + selection.get("auxiliary_configurations", [])
-        if r.get("timing_record")
+        name: json.loads((a.records_dir / (name + ".json")).read_text()) for name in record_ids
     }
     finals = [r for f in a.final_summary for r in json.loads(f.read_text())["configurations"]]
     report = build(
