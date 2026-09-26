@@ -9,8 +9,8 @@ weights, datasets or raw experiment artifacts.
 
 | Backend / variant | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|
-| OpenVLA-OFT / libero_joint | Fifteen scopes below | VLA-Cache, VLA-InfoEntropy, Temporal Redundancy visual core | SP-VLA | VOTE ensemble core | AWQ W4A16 |
-| CogACT / libero_joint | Eleven scopes below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache | SP-VLA | VOTE ensemble core | AWQ W4A16 |
+| OpenVLA-OFT / libero_joint | Fifteen scopes below | VLA-Cache, VLA-InfoEntropy, Temporal Redundancy visual core | SP-VLA | — | AWQ W4A16 |
+| CogACT / libero_joint | Eleven scopes below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache | SP-VLA | VOTE H8 two-vote adaptation | AWQ W4A16 |
 | starVLA | Source pinned only; runtime not implemented | — | — | — | — |
 
 OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,
@@ -26,7 +26,10 @@ These are common-checkpoint adaptations, not reproductions of published scores.
 TEAM-VLA, VLA-IAP and ST-Merge retain unverified paper interpretation choices.
 EfficientVLA exposes token pruning on OFT and a separately named DiT cache core
 on CogACT; neither includes layer pruning or the complete pipeline. FlashVLA excludes unresolved
-action reuse; VOTE implements the independent ensemble, not its trained architecture.
+action reuse; VOTE implements H8 overlapping-chunk voting, not its trained architecture.
+Native CogACT provides two aligned votes after warmup; its equation-defined tie
+selects the older prediction. OFT's eight-predict/eight-execute chunks do not
+overlap, so VOTE is not registered there. No H1 exception enters the primary table.
 DepthCache requires measured metric depth and excludes unresolved grasp/wrist
 control. ASR includes every auxiliary dense refresh in reported total cost;
 its primary-forward diagnostic is not end-to-end serving latency. SQAP-VLA remains

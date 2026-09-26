@@ -123,6 +123,15 @@ def test_unresolved_cogact_core_does_not_silently_use_oft_or_cache_component(nam
         select_method(ExperimentConfig("cogact", method=name, model_variant="libero_joint"), spec)
 
 
+def test_vote_without_native_overlap_is_not_registered_on_oft():
+    spec = BackendSpec("openvla_oft", "x:y", "x:z", ("libero_joint",), frozenset())
+    with pytest.raises(ValueError, match="Unsupported"):
+        select_method(
+            ExperimentConfig("openvla_oft", method="vote_ensemble", model_variant="libero_joint"),
+            spec,
+        )
+
+
 @pytest.mark.parametrize(
     "implementation",
     [

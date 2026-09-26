@@ -1,15 +1,10 @@
 schema_version: 1
 name: vote_ensemble
 category: action_chunking
-description: VOTE trajectory ensemble only; no single-ACT model architecture or training.
+description: VOTE H8 overlapping-chunk ensemble adaptation; no single-ACT training.
 config: efficient_vla_benchmark.methods.action_chunking.vote_ensemble.config:VoteConfig
 requires_artifact: false
 implementations:
-  openvla_oft:
-    variants: [libero_joint]
-    requires: [control_hooks, libero_cartesian_delta_actions]
-    factory: efficient_vla_benchmark.methods.action_chunking.vote_ensemble.implementations.openvla_oft.api:build
-    validate_experiment: efficient_vla_benchmark.methods.action_chunking.vote_ensemble.implementations.openvla_oft.api:validate_experiment
   cogact:
     variants: [libero_joint]
     requires: [control_hooks, libero_cartesian_delta_actions]

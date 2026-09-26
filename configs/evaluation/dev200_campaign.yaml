@@ -1,9 +1,7 @@
-# Original development campaign, NOT a final report selection or launch queue.
-# Includes matched H1 baselines and both AWQ kernel variants; no scheduling-only ablations.
+# Development entry points, NOT a final report selection or launch queue.
+# Unified H8; historical manifests retain their original H1 identities.
 openvla_oft:
   - baseline
-  - baseline_horizon1
-  - vote_ensemble
   - actuation_slack_refresh_deletion
   - awq
   - awq_fp16_kernel
@@ -26,7 +24,6 @@ openvla_oft:
   - vla_pruner
 cogact:
   - baseline
-  - baseline_horizon1
   - vote_ensemble
   - actuation_slack_refresh_deletion
   - awq

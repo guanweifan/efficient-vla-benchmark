@@ -2,4 +2,4 @@ method: vote_ensemble
 parameters:
   enabled: true
   similarity_threshold: 0.5
-  max_history: 3
+  history_chunks: 1

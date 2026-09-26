@@ -35,20 +35,19 @@ class VoteEnsemble(InferenceMethod):
         self.reset(None)
 
     def reset(self, context):
-        self.predictions = deque(maxlen=self.config.max_history + 1)
+        self.predictions = deque(maxlen=self.config.history_chunks + 1)
         self.candidate_count = self.selected_count = 0
 
     def on_plan(self, actions, step):
         if self.config.enabled:
+            if self.predictions and step <= self.predictions[-1][0]:
+                raise ValueError("Prediction starts must be strictly increasing")
             self.predictions.append((step, self.encode(actions.copy())))
 
     def transform_action(self, action, step):
         if not self.config.enabled:
             return action
-        while self.predictions and (
-            step - self.predictions[0][0] > self.config.max_history
-            or step >= self.predictions[0][0] + len(self.predictions[0][1])
-        ):
+        while self.predictions and step >= (self.predictions[0][0] + len(self.predictions[0][1])):
             self.predictions.popleft()
         candidates = [
             chunk[step - start]
@@ -66,7 +65,10 @@ class VoteEnsemble(InferenceMethod):
 
     def metadata(self):
         return {
-            "scope": "VOTE ensemble core only; no ACT-token training or action-head changes",
+            "scope": "VOTE H8 overlapping-chunk ensemble adaptation; not full VOTE",
+            "history": "original predictions indexed by execution time; expire at chunk end",
+            "committee": "one current plus at most one prior prediction on native CogACT H8",
+            "excluded": "single-ACT training, action-head changes, extra model calls",
             "reference": "arXiv:2507.05116v4 equations 8-10",
             "implementation": "independent paper implementation; public TEV code not located",
             "zero_cosine": "both zero: 1; one zero: 0",

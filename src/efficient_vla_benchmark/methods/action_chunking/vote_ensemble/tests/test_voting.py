@@ -1,8 +1,9 @@
 import numpy as np
 import pytest
 
+from ..codec import decode, encode
 from ..config import VoteConfig
-from ..implementations.openvla_oft.api import decode, encode, validate_experiment
+from ..implementations.cogact.api import validate_experiment
 from ..method import VoteEnsemble, ensemble_vote
 
 
@@ -25,7 +26,7 @@ def test_zero_vectors_and_singleton_are_finite():
 
 
 def test_alignment_uses_future_predictions_not_executed_history():
-    method = VoteEnsemble(VoteConfig.parse({}), lambda a: a, lambda a: a)
+    method = VoteEnsemble(VoteConfig(history_chunks=2), lambda a: a, lambda a: a)
     method.on_plan(np.array([[9.0, 9.0], [1, 0], [2, 0]]), 0)
     method.on_plan(np.array([[-1.0, 0], [3, 0], [4, 0]]), 1)
     np.testing.assert_array_equal(method.transform_action(np.zeros(2), 1), [1, 0])
@@ -41,7 +42,7 @@ def test_alignment_uses_future_predictions_not_executed_history():
 
 
 def test_history_bound_and_disabled_identity():
-    method = VoteEnsemble(VoteConfig.parse({"max_history": 2}), lambda a: a, lambda a: a)
+    method = VoteEnsemble(VoteConfig.parse({"history_chunks": 2}), lambda a: a, lambda a: a)
     for t in range(50):
         method.on_plan(np.ones((8, 7)), t)
         method.transform_action(np.ones(7), t)
@@ -67,17 +68,20 @@ def test_oft_codec_roundtrip_and_majority_gripper():
 def test_cadence_and_history_rejected_before_model_loading():
     from efficient_vla_benchmark.core.config import ExperimentConfig
 
-    with pytest.raises(ValueError, match="horizon=1"):
-        validate_experiment(ExperimentConfig("openvla_oft", execution_horizon=8), VoteConfig())
-    with pytest.raises(ValueError, match="seven historical"):
-        validate_experiment(ExperimentConfig("openvla_oft"), VoteConfig(max_history=8))
+    with pytest.raises(ValueError, match="horizon=8"):
+        validate_experiment(ExperimentConfig("cogact", execution_horizon=1), VoteConfig())
+    with pytest.raises(ValueError, match="one overlapping"):
+        validate_experiment(
+            ExperimentConfig("cogact", execution_horizon=8), VoteConfig(history_chunks=2)
+        )
 
 
 @pytest.mark.parametrize(
     "parameters",
     [
-        {"max_history": 0},
-        {"max_history": True},
+        {"history_chunks": 0},
+        {"history_chunks": True},
+        {"max_history": 3},
         {"similarity_threshold": 1},
         {"similarity_threshold": float("nan")},
         {"enabled": 1},

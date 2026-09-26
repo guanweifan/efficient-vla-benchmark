@@ -1,14 +1,14 @@
-"""Native sixteen-step diffusion predictions; paper-time-aligned voting."""
+"""Native sixteen-step predictions with H8 time-aligned two-candidate voting."""
 
 from ...codec import decode, encode
 
 
 def validate_experiment(experiment, config):
-    if experiment.execution_horizon != 1:
-        raise ValueError("VOTE's adjacent-time committee requires horizon=1 and a matched baseline")
-    if config.max_history >= 16:
+    if experiment.execution_horizon != 8:
+        raise ValueError("VOTE chunk adaptation requires execution_horizon=8")
+    if config.history_chunks * experiment.execution_horizon >= 16:
         raise ValueError(
-            "CogACT's sixteen-step predictions support at most fifteen historical steps"
+            "CogACT H8 supports one overlapping historical chunk, not extra independent votes"
         )
 
 
