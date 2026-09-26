@@ -1,0 +1,3 @@
+extends: temporal_redundancy_visual.yaml
+parameters:
+  update_ratio: 0.75
