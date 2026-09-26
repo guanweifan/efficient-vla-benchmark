@@ -22,12 +22,16 @@ a baseline replaying the **same** depth-bearing traces; depth conversion, transf
 and all selection work remain visible. Simulator rendering itself remains outside
 the existing policy-timing boundary, as it does for RGB.
 
-Five warmup query frames, three regions, five-step progressive window and maximum
-merge ratio 0.7 follow the publication. Unspecified choices are explicit engineering
+The reference defaults of five warmup query frames, three regions, five-step
+progressive window and maximum merge ratio 0.7 follow the publication.
+Unspecified choices are explicit engineering
 conventions: final-layer language saliency, population standard deviation, nearest
 metric-depth resampling and patch means/max edges, deterministic quantile-seeded
 10-step K-means, region-mean depth normalization, and exposed metric thresholds.
-They are fixed before LIBERO smoke, not tuned against success.
+These construction conventions and metric thresholds remain fixed. Selected
+presets may tune merge-rate bounds and the progressive window on Dev-200, while
+retaining depth-dependent budgets, both protection sets and dynamic restoration.
+The primary-selection manifest distinguishes these presets from reference defaults.
 
 Merging progressively extends existing groups using fresh current-frame features;
 it never averages stale features across time. Bipartite rounds handle budgets
