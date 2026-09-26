@@ -42,9 +42,11 @@ when that chunk has finished; a fitted action lasts one step, after which the ga
 is evaluated again. Never pad a fitted action into eight repeats or force the
 baseline to query every step. Only executed native actions count as model history.
 
-The common preset uses the author's spatial gate (ratio 0.4, Z 0.3, one gate step)
-for all four suites. It is an explicit untuned cross-suite preset, not the paper's
-suite-specific settings. All thresholds/window/fit parameters live in YAML.
+The reference preset uses the author's spatial gate (ratio 0.4, Z 0.3, one gate step)
+for all four suites, not the paper's suite-specific settings. Selected presets
+may change the pruning Z threshold and minimum number of native actions in the
+history. `min_model_actions: 3` still uses a SIX-command history; it does not
+shorten that history to three. All thresholds/window/fit parameters live in YAML.
 
 Use `configs/experiments/openvla_oft/sp_vla_scheduling.yaml` through the same evaluate
 and benchmark commands as baseline. Set `enabled: false` for a native control no-op.
@@ -58,8 +60,8 @@ XYZ ordering and history semantics, then declare the relevant action capability.
 
 ## CogACT binding
 
-The CogACT preset retains both scheduling and pruning with the same equations
-and untuned parameters. It reads one native SigLIP view, shares its patch mask
+The CogACT reference preset retains both scheduling and pruning with the same
+equations and initial parameters. It reads one native SigLIP view, shares its patch mask
 across fused DINO/SigLIP features, and keeps original causal LLM positions and
 cognition EOS. Native timm already executes its last block while returning the
 second-last features, so reversible Q/K hooks do not replace the vision encoder.
