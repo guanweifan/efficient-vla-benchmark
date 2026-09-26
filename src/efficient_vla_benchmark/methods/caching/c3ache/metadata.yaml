@@ -1,0 +1,5 @@
+schema_version: 1
+name: c3ache
+category: caching
+components_only: true
+description: Cross-chunk residual caching with explicit architecture-specific boundary.

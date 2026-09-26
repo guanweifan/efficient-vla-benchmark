@@ -1,0 +1,12 @@
+schema_version: 1
+name: c3ache_conditioned_residual
+category: caching
+description: C3ache cross-chunk residual core with a live CogACT conditioning prefix.
+config: efficient_vla_benchmark.methods.caching.c3ache.config:C3acheConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.caching.c3ache.implementations.cogact.api:build
+    validate_experiment: efficient_vla_benchmark.methods.caching.c3ache.implementations.cogact.api:validate_experiment
