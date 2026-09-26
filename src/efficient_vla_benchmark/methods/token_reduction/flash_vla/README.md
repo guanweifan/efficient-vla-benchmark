@@ -63,19 +63,9 @@ CogACT Dev-200 presets `flash_vla_keep192` and `flash_vla_layer4` vary only
 retention (160 to 192) or pruning layer (1 to 4). Complete FP32 SVD and its L1
 score remain unchanged. Action reuse remains excluded, including in all tables.
 
-Fixed CogACT Dev-200 scored 126/200 by default, 154/200 with keep192 and
-113/200 with layer4, versus native 183/200. Budget relief helped, whereas this
-later pruning layer did not. The residual 14.5-point gap at keep192 is retained;
-complete SVD checks do not establish that all lost accuracy is intrinsic to ICS.
-
-Readiness candidates `openvla_oft/flash_vla_keep192` and
-`cogact/flash_vla_keep224` test more conservative retention without changing the
-scoring equation, SVD solver, pruning layer or declared ICS-only scope. They are
-not selected defaults; their Dev-200 and full-cost timing must precede selection.
-## Readiness diagnostic (2026-09-25)
-
-On the frozen Dev-200 subset, OFT keep192 scored 196/200 and CogACT keep224
-scored 176/200, with no runtime errors. Native H8 references scored 198/200
-and 183/200. CogACT remains 3.5 percentage points below native; do not call
-this target-compliant or treat the 3-point selection target as an admission
-filter. These are ICS-only parameter comparisons, not evidence for action reuse.
+Later candidates refine retention around the observed accuracy boundary while
+keeping the scoring equation, complete SVD solver, pruning layer and ICS-only
+scope unchanged. Current selected presets and their Dev/timing evidence live in
+the central ledger and selection manifest. Complete SVD checks alone do not
+establish that lost accuracy is intrinsic to ICS; a near-unity speedup is not a
+reliable acceleration claim. No retention result validates missing action reuse.

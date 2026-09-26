@@ -34,7 +34,8 @@ OFT Dev-200 presets `dart_keep75` and `dart_layer4` change retention (0.5 to
 feature distances and sequential exclusion remain unchanged. Budgets retain
 the reference's extra visual pivots rather than silently forcing an exact ratio.
 
-Fixed OFT Dev-200 scored 184/200 by default, 190/200 with keep75 and 197/200
-with layer4, versus native 198/200. Delaying pruning was the stronger tested
-intervention; no pivot/scoring rule was replaced. This is a VLM-to-VLA parameter
-study, not an author-released VLA preset or independent final-test accuracy.
+The OFT report presets inherit layer4 from those diagnostics before tuning
+retention; no pivot/scoring rule is replaced. Current choices and their measured
+outcomes live only in the central selection manifest and result ledger. This is
+a VLM-to-VLA parameter study, not an author-released VLA preset or independent
+final-test accuracy.

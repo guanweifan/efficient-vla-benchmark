@@ -436,6 +436,12 @@ unchanged from `b293e89`. Existing native Dev evidence therefore remains the
 reference. New method Dev/timing pairs retain their actual runtime identities;
 no measurement revision or dirty-source flag is relabeled as a later clean commit.
 
+The H8 voting change at `e185205` changes only VOTE policy sources relative to
+the preceding selection. All non-VOTE method, backend and shared control/model
+sources remain identical; compatible prior Dev/timing evidence is retained for
+those scopes. VOTE receives fresh native-H8 evidence, never relabeled H1 results.
+Search-only configuration and reporting changes do not alter inference equations.
+
 ## Record results
 
 Keep canonical JSON records in ignored `outputs/result_records/`, raw runs under

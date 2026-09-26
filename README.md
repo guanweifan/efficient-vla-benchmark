@@ -43,10 +43,9 @@ refines them with the native DDIM tail; it is not a reproduction of flow-model s
 No trained few-step sampler is advertised. Read each
 [method README](src/efficient_vla_benchmark/methods/) before using its results.
 
-CogACT ST-Merge's current preset has 0/4 development-smoke successes (native 3/4),
-without runtime errors. It is a measured negative configuration, not accuracy-
-validated support. Per-preset outcomes, including newer batches, are in the ledger. These checks
-are not formal success-rate measurements.
+Executable bindings do not by themselves certify fidelity. The result ledger
+separates admitted method scopes from unresolved TEAM-VLA, VLA-IAP and ST-Merge
+interpretations. Their diagnostic outcomes are not certified algorithm findings.
 
 ## Install and run
 
@@ -112,6 +111,9 @@ The [selection workflow](docs/development.md#selection-and-final-measurement-wor
 targets one primary configuration per backend/method; poor faithful results remain
 reportable. Useful raw evidence stays local under `outputs/result_records/`, outside Git;
 unneeded results are retired after dependency checks, not archived indefinitely.
+Use [primary_selection.yaml](configs/evaluation/primary_selection.yaml) to select
+the currently frozen report presets. Generic method presets retain reference or
+initial migration defaults; they are not necessarily the selected hyperparameters.
 Do not equate replay speed, mechanism tests or four-episode smoke with formal
 accuracy or closed-loop task completion time.
 

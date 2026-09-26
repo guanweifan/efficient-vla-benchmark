@@ -27,8 +27,9 @@ No policy training, predictor training or KV-cache acceleration is involved.
 - Store exactly 512 VISUAL reference features. The source updates its feature
   cache after appending proprio, potentially giving 513 features for 512 saliency
   entries; the port prevents that feature/score indexing mismatch.
-- Use one 25% retention preset across all four suites, rather than the author's
-  task-specific 10–30% settings and separate weights. Actual full-refresh frequency
+- The reference preset uses 25% retention across all four suites, rather than the
+  author's task-specific 10–30% settings and separate weights. Dev-selected retention
+  remains shared across suites. Actual full-refresh frequency
   and retained-token counts are recorded; nominal sparse ratio is not average cost.
 - Only required attention rows/layers are probed, with FP32 head reduction.
   No replacement Transformers installation, full-layer attention retention, hidden

@@ -25,12 +25,14 @@ CogACT port. No contiguous renumbering of action slots is allowed.
 
 The pruning layers, rank scale and rank tolerance are explicitly configured
 benchmark settings, not claimed author-tuned VLA settings. Default rank scale
-0.25, recycling 0.3 and clustering 0.1 are fixed before LIBERO testing.
+0.25, recycling 0.3 and clustering 0.1 define the reference preset. Dev-selected
+presets vary rank scale; the recycling/clustering equations and fractions stay fixed.
 All rank, probing and clustering overhead is included in timing.
 
 ## CogACT binding
 
 CogACT raters exclude final cognition EOS and use native causal attention.
 Merged visual rows retain latest-member anchors; all language and cognition
-positions survive unchanged. Rank/clustering policy and fixed presets are shared
-with OFT, while each backend retains its native attention and action head.
+positions survive unchanged. Rank/clustering policy is shared with OFT, while
+selected rank scales are backend-specific and constant across suites. Each backend
+retains its native attention and action head.

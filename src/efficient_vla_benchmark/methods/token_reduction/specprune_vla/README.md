@@ -20,7 +20,7 @@ The backend decoder owns token-layout/RoPE/attention/cache primitives;
 the common controller owns execution. No other method's code is imported.
 
 Use `configs/experiments/openvla_oft/specprune_vla.yaml` with the shared evaluation and
-benchmark commands. Timing requires `--mode control` and complete schema-2 traces;
+benchmark commands. Timing requires `--mode control` and complete control traces;
 sparse query-only replay cannot reproduce the lookback/controller mechanism.
 Internal switches exist for ablations; all three mechanisms are enabled by default.
 
@@ -99,20 +99,9 @@ the first layer-10 pruning; other layers are unchanged. This is an intentional
 schedule ablation, NOT a correction to the pinned author's executable defaults.
 The latter initialize scores to zero and first update at layer 14.
 
-Fixed Dev-200 outcomes (default / static128 / score_first) were 157 / 182 / 193
-out of 200 on OFT and 115 / 174 / 166 on CogACT, versus native 198 and 183.
-This supports budget and scheduling sensitivity, not an implementation-error
-claim: score_first intentionally differs from the pinned default. CogACT's higher-
-success variant is static128; do not generalize one backend's schedule
-choice to the other. Preserve both presets and their independently timed costs.
-
-Readiness candidate `cogact/specprune_vla_static96` reduces the static DELETION
-cap from 128 to 96 per view. It preserves the pinned importance/pruning schedule,
-dynamic pruning and action controller; 96 does not denote the final retained count.
-It requires its own Dev-200 and timing evidence before selection.
-## Readiness diagnostic (2026-09-25)
-
-CogACT static96 scored 182/200 on the frozen Dev subset, versus 174/200 for
-static128 and native 183/200. These limits cap STATIC DELETIONS, not retained
-tokens. All scoring, moving-object protection and query-level pruning rules
-remain unchanged. Timing must be measured for this exact preset before selection.
+OFT report presets inherit the disclosed score-first schedule and tune dynamic
+retention. CogACT report presets retain the pinned importance schedule and tune
+the static DELETION cap; this number is not the final retained count. Do not
+generalize one backend's schedule choice to the other or call score-first an
+author-code bug fix. Current Dev outcomes, exact timing and chosen configurations
+live in the central ledger/selection manifest rather than stale diagnostic tables.

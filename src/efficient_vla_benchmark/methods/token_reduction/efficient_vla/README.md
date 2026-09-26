@@ -78,7 +78,7 @@ change the per-query refresh interval from 5 to 2 or 3 denoiser calls. They
 retain separate attention/MLP caches, live residuals and conditioning, CFG
 branches, native DDIM steps and native action RNG. No token pruning is combined.
 
-Fixed CogACT Dev-200 scored 165/200 at N=5 and 177/200 at both N=2 and N=3,
-versus native 183/200. More frequent refresh recovers accuracy without changing
-the ten native denoising calls. Equal aggregate counts do not mean identical
-episode outcomes; compare paired timing before choosing between N=2 and N=3.
+The report selection additionally tests intermediate refresh intervals, without
+changing the ten native denoising calls. Equal aggregate success counts do not
+imply identical episode outcomes. Consult the central selection manifest and
+ledger for current choices, paired timing and retained accuracy-boundary evidence.
