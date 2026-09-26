@@ -20,3 +20,19 @@ rejected. Sampling, CFG, RNG, normalization and action cadence remain native.
 Cache entries retain both CFG rows; reset at episode/instruction changes and
 errors. Disabled/interval-one modes attach no wrappers. No within-query
 EfficientVLA cache is combined. Include live-prefix and bookkeeping overhead.
+
+## Selected CogACT boundary
+
+Use `c3ache_conditioned_residual_prefix6.yaml` for the selected report configuration:
+six live blocks, two cached steps, refresh interval two. The initial one-block /
+seven-step preset scored 1/200; reducing to two cached steps alone gave 79/200;
+six live blocks recovered 183/200, equal to the matched native Dev count.
+All candidates retain active cross-chunk reuse; none is a baseline no-op.
+The initial and conservative presets are diagnostic configurations, not defaults
+for the report. Their evidence remains separate from the one primary selection.
+
+A two-trace native diagnostic found that high residual cosine similarity can
+still yield large errors after the output head. This motivates reducing the
+cached suffix, not changing DDIM or claiming the original Fast-WAM result.
+The selected port's roughly 1% measured speed difference is not robust evidence
+of a useful end-to-end gain under a single compact timing pass.

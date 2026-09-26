@@ -1,0 +1,4 @@
+extends: c3ache_conditioned_residual.yaml
+parameters:
+  refresh_interval: 2
+  cache_steps: 2
