@@ -1,9 +1,10 @@
 # EfficientVLA independent cores
 
-Independent paper-based implementation of [section 3.3](https://arxiv.org/html/2506.10100v1).
+Independent paper-based cores from [sections 3.2-3.4](https://arxiv.org/html/2506.10100v1).
 The OFT ID `efficient_vla` implements token pruning only. The separately selected
-CogACT ID `efficient_vla_diffusion_cache` implements section 3.4 only. Neither is
-the full pipeline: no layer pruning or joint token/cache configuration is included.
+CogACT ID `efficient_vla_diffusion_cache` implements section 3.4 only. The
+OFT/CogACT ID `efficient_vla_layer_pruning` implements section 3.2 only. None is
+the full pipeline: these independent cores are never jointly selected.
 The [author repository](https://github.com/YantaiYang-05/EfficientVLA) remains
 unavailable through live access at the 2026-09-22 audit; neither core claims
 author-code parity.
@@ -70,6 +71,29 @@ this published rule. The paper reports CogACT, so this is an unresolved
 paper/native-implementation discrepancy, not evidence that the authors' method
 cannot work. Keep this scope unregistered until a verifiable attention convention
 resolves it; the cache-core result cannot stand in for token pruning.
+
+## Static layer-pruning core
+
+Equation 1 scores every native decoder layer as one minus its input/output cosine
+similarity, averaged over ALL token positions within each sample, then equally
+across samples. Calibrate on a fixed balanced RLDS training subset with the common
+`calibrate` command; never use Dev/final episodes. The default 32 samples/seed zero
+are disclosed benchmark calibration choices, not a verified author recipe.
+
+Select the lowest-scoring `prune_layers` indices with stable index tie-breaking,
+remove those non-contiguous layers and preserve the order of survivors. The decoder
+module list is physically shortened; removed weights move to CPU for reversible
+detach, with cache layer indices adjusted to the compact stack. They are not left
+resident on GPU behind no-op forward hooks. Detach restores the exact original
+modules, indices, depth and device without changing weights. Native attention,
+all visual tokens, final normalization, action head and H8 cadence remain unchanged.
+
+This is static model compression (survey Section 3.3), also relevant as a depth-
+reduction reference near Section 5.3; it is not adaptive layer routing or a new
+paper. PruneNet MLP compression is excluded, as are token pruning and DiT caching.
+Calibration scores and their training/checkpoint/source identities live in a
+separate checksummed-provenance artifact; changing the number of removed layers
+does not require recalibration. Every selected count gets its own Dev/timing pair.
 
 ## Bounded development diagnostics
 

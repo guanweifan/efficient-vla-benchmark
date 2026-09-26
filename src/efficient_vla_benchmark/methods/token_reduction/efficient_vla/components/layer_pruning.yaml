@@ -1,0 +1,19 @@
+schema_version: 1
+name: efficient_vla_layer_pruning
+category: model_compression
+description: Independent static non-contiguous layer-pruning core, not dynamic routing or full EfficientVLA.
+config: efficient_vla_benchmark.methods.token_reduction.efficient_vla.layer_config:LayerPruningConfig
+requires_artifact: true
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder]
+    factory: efficient_vla_benchmark.methods.token_reduction.efficient_vla.implementations.openvla_oft.layers:build
+    preflight: efficient_vla_benchmark.methods.token_reduction.efficient_vla.implementations.openvla_oft.layers:preflight
+    calibrate: efficient_vla_benchmark.methods.token_reduction.efficient_vla.implementations.openvla_oft.layers:calibrate
+  cogact:
+    variants: [libero_joint]
+    requires: [llama_decoder]
+    factory: efficient_vla_benchmark.methods.token_reduction.efficient_vla.implementations.cogact.layers:build
+    preflight: efficient_vla_benchmark.methods.token_reduction.efficient_vla.implementations.cogact.layers:preflight
+    calibrate: efficient_vla_benchmark.methods.token_reduction.efficient_vla.implementations.cogact.layers:calibrate

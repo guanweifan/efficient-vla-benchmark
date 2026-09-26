@@ -1,0 +1,5 @@
+method: efficient_vla_layer_pruning
+parameters:
+  prune_layers: 4
+  calibration_samples: 32
+  calibration_seed: 0
