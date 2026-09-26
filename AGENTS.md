@@ -129,5 +129,9 @@ remains source-only. FlashVLA action reuse and VLA-IAP's CogACT semantic constru
 remain unresolved. Native tail refinement is supported only through ActionCache's
 explicitly scoped frozen-bank port, not a trained few-step sampler. SQAP-VLA
 is deferred pending activation-granularity clarification. DepthCache primary and
-ASR deletion are explicitly scoped components, never full-paper reproductions;
+ASR deletion/KV reuse are explicitly scoped components, never full-paper reproductions;
 do not silently promote excluded or unverified mechanisms to implemented status.
+EcoVLA's dynamic channels/heads and EfficientVLA's static layer core require
+training-only calibration artifacts. They do not compose with other methods.
+A learned router/exit/expert cannot be replaced by untrained heuristics; the
+training-dependent candidate audit in the development guide is not runtime support.

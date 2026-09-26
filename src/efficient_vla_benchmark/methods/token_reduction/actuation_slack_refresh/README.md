@@ -61,8 +61,10 @@ Tests check immutable clean KV, missing-base rejection and real-checkpoint
 cold/no-op/reset/detach/RNG behavior. Measurements must additionally pass the common
 smoke, Dev-200 and full-cost replay before this scope enters the primary ledger.
 
-## Bounded development diagnostics
+## Deletion-only development diagnostics
 
+The following counts describe deletion only, not the independent KV-reuse scope.
+Consult the central ledger for current selections of both instruments.
 CogACT Dev-200 presets `actuation_slack_refresh_keep25` and
 `actuation_slack_refresh_keep50` raise the primary-view retention ratio from 0.1
 to 0.25 or 0.5. Dense first chunks, unconditional same-frame dense refresh,

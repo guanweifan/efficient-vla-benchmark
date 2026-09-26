@@ -6,7 +6,7 @@ CogACT ID `efficient_vla_diffusion_cache` implements section 3.4 only. The
 OFT/CogACT ID `efficient_vla_layer_pruning` implements section 3.2 only. None is
 the full pipeline: these independent cores are never jointly selected.
 The [author repository](https://github.com/YantaiYang-05/EfficientVLA) remains
-unavailable through live access at the 2026-09-22 audit; neither core claims
+unavailable through live access at the 2026-09-22 audit; none of these cores claims
 author-code parity.
 
 ## OFT token-pruning core

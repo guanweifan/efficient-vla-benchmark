@@ -9,8 +9,8 @@ weights, datasets or raw experiment artifacts.
 
 | Backend / variant | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|
-| OpenVLA-OFT / libero_joint | Fifteen scopes below | VLA-Cache, VLA-InfoEntropy, Temporal Redundancy visual core | SP-VLA | — | AWQ W4A16 |
-| CogACT / libero_joint | Eleven scopes below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache | SP-VLA | VOTE H8 two-vote adaptation | AWQ W4A16 |
+| OpenVLA-OFT / libero_joint | Fifteen scopes below | VLA-Cache, VLA-InfoEntropy, Temporal Redundancy visual core, ASR KV reuse | SP-VLA, EcoVLA | — | AWQ W4A16 |
+| CogACT / libero_joint | Eleven scopes below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache | SP-VLA, EcoVLA | VOTE H8 two-vote adaptation | AWQ W4A16 |
 | starVLA | Source pinned only; runtime not implemented | — | — | — | — |
 
 OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,
@@ -24,8 +24,12 @@ are not additional algorithms.
 
 These are common-checkpoint adaptations, not reproductions of published scores.
 TEAM-VLA, VLA-IAP and ST-Merge retain unverified paper interpretation choices.
-EfficientVLA exposes token pruning on OFT and a separately named DiT cache core
-on CogACT; neither includes layer pruning or the complete pipeline. FlashVLA excludes unresolved
+EfficientVLA exposes token pruning on OFT, a separately named DiT cache core
+on CogACT, and calibrated static layer pruning on both. Each is an independent
+scope, never the complete pipeline or a combination. Layer pruning belongs to
+model compression, not dynamic routing. EcoVLA conditionally prunes coupled FFN
+channels and whole attention heads with real sparse GEMMs, not whole layers.
+FlashVLA excludes unresolved
 action reuse; VOTE implements H8 overlapping-chunk voting, not its trained architecture.
 Native CogACT provides two aligned votes after warmup; its equation-defined tie
 selects the older prediction. OFT's eight-predict/eight-execute chunks do not
@@ -77,7 +81,8 @@ evb benchmark --config configs/experiments/openvla_oft/specprune_vla.yaml \
 ```
 
 The caller defines the resource variables. Change the experiment YAML to select a
-supported backend/method pair and parameters; AWQ and ActionCache also need
+supported backend/method pair and parameters; AWQ, ActionCache, EcoVLA and
+EfficientVLA layer pruning also need
 `--artifact-path`. ActionCache requires its independently collected frozen bank;
 see its [population instructions](src/efficient_vla_benchmark/methods/caching/action_cache/README.md).
 Timing uses the four trace files selected by the frozen workload, not arbitrary

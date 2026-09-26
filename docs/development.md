@@ -112,6 +112,26 @@ Full-retention/no-op adapters must match the appropriate native reference and
 detach cleanly. Eager-versus-fused attention and quantized kernel precision
 differences must be declared, not hidden behind an assertion of bitwise parity.
 
+`model_ops.indexed_linear` provides real indexed row/column GEMMs and fused
+gate/up/SiLU/product kernels. It owns no channel-ranking policy. EcoVLA owns
+coupled FFN/head masks, trigger history and its interleaved statistics stream;
+all stream joins belong inside the shared full-cost timing boundary. Tests compare
+FP16/BF16 kernels against materialized native linear algebra. Token count is a
+non-specializing runtime argument: warmed kernels must not recompile for another
+instruction length. GPU regression tests check bitwise static/dynamic parity and
+cache-size invariance. Pre-fix EcoVLA timings are retired, not mixed into selection;
+development runs keep their actual source hashes under an explicit arithmetic
+compatibility audit. Triton JIT requires
+matching Python development headers; machine-specific include locations stay in
+ignored environment launchers, never public configuration.
+
+EfficientVLA layer pruning physically shortens the decoder and offloads removed
+weights; reversible detach restores modules, indices and native depth. Its static
+ranking and EcoVLA's initial energies use separate checksummed training-only
+calibration artifacts. Retention/depth candidates reuse the same frozen artifact.
+ASR KV reuse keeps an immutable complete dense base: sparse active-row updates
+are temporary, and only the full auxiliary pass publishes the next base/gate.
+
 ## Add a method
 
 Create `src/efficient_vla_benchmark/methods/<category>/<paper_id>/`:
@@ -151,6 +171,29 @@ scheduling; VLA-Cache shares complete statistics/reuse policy; AWQ separates nat
 decoder targets from common calibration/packing. Read their tests and READMEs.
 [External method template](../templates/method/README.md) demonstrates the
 `efficient_vla_benchmark.methods` entry point, not a useful acceleration algorithm.
+
+## Training-dependent candidate boundary
+
+These audited candidates are NOT registered implementations. Their core requires
+learned parameters or independently trained control policies; a random/rule-based
+stand-in would change the contribution. Large fine-tuning remains owner-scheduled.
+Published costs below are source recipes, not estimates for our joint checkpoint.
+
+| Candidate / intended first backend | Core missing without training | Verified cost or unresolved condition |
+|---|---|---|
+| [LAC](https://arxiv.org/html/2602.00686v1) / OFT, then CogACT | RAFT-small-conditioned selector + ratio predictor; attention alignment then task-loss training | Backbone frozen, but stage-II gradients pass through it; no verified duration or complete executable recipe |
+| [DySL-VLA](https://github.com/PKU-SEC-Lab/DYSL_VLA/tree/cabc0d8bbd2f90807695182a502e64160efeaa42/DySL-VLA-openvla-oft) / OFT | Learned skip adapters and router, static anchors, action-consistency verification | Default spatial script resumes at 150k and stops at 350005; roughly 200k additional optimizer updates, not a short router calibration |
+| [MoLe-VLA](https://github.com/RoyZry98/MoLe-VLA-Pytorch/tree/8ae45f8bd513e9901528ff92468dd08f3ab309f6) / CogACT | STAR router, top-k layers, task/distillation/load-balancing losses | Checked launcher trains LLM, batch 512, 100 epochs on eight GPUs; not router-only |
+| [DeeR-VLA](https://arxiv.org/html/2411.02359v1) / OFT | Trained multi-exit shared temporal head, auxiliary exits, randomized exits and threshold optimization | Original 3B recipes: 14–25 h on eight V100s; native final head at intermediate layers is not equivalent |
+| [A1 MLP core](https://arxiv.org/html/2604.05672v2) / OFT | Shared-head random-depth training and early-exit criterion | Published LIBERO fine-tuning: 50k steps, batch 128; FM variant is not a drop-in CogACT DDIM port |
+| [ActDistill](https://arxiv.org/html/2511.18082v1) / CogACT, then OFT | Graph teacher probes plus jointly trained student/router | One teacher-probe epoch, then five end-to-end student epochs; not merely a frozen-backbone gate |
+| [MoDE](https://arxiv.org/html/2412.12953v1) / CogACT | Learned noise-conditioned expert denoisers before routing-cache/fusion | Original LIBERO-10 recipe: 50 epochs, four A6000s, about two hours; joint-40-task CogACT cost unmeasured |
+| [ElegantVLA](https://arxiv.org/html/2605.29438v1) / CogACT | Two-stage Maskable PPO scheduler over backbone and denoiser reuse | Requires independent training rollouts; verified rollout budget/weights unavailable; teacher rules alone are not the method |
+
+These are training/budget deferrals, not claims that the native backends are
+fundamentally incompatible. Revisit after agreeing a train/validation split,
+compute budget and trained-artifact contract; never use Dev/final outcomes as
+training rewards. Keep SP-VLA's already integrated scope separate from this queue.
 
 ## Add a backend
 
@@ -360,7 +403,10 @@ policy compute, not task-macro performance or closed-loop completion time. Do no
 report repeat standard deviation from one pass, or mix historical protocols in the
 primary table. The current primary comparison is H8; old H1 evidence is not eligible.
 
-Use fresh model processes and fixed CPU threads. A small batch on the same GPU may
+Use fresh model processes and fixed CPU threads. Concurrent timing processes need
+disjoint CPU affinity sets as well as separate GPUs; remapping a GPU must also
+revalidate its CPU assignment. Reject cohorts affected by resource contention.
+A small batch on the same GPU may
 share native pre/post references. Accept at most 3% native latency drift and no
 observed thermal slowdown during measured replay intervals; loading, warmup and
 trace-file decoding are outside those intervals. Inspect telemetry per run: a method's thermal failure excludes that
