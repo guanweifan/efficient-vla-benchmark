@@ -1,0 +1,4 @@
+extends:
+- ./efficient_vla_cache3.yaml
+parameters:
+  cache_interval: 4
