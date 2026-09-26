@@ -18,6 +18,7 @@ openvla_oft:
   - specprune_vla
   - st_merge
   - team_vla
+  - temporal_redundancy_visual
   - vla_cache
   - vla_infoentropy
   - vla_iap
@@ -25,6 +26,9 @@ openvla_oft:
 cogact:
   - baseline
   - vote_ensemble
+  - action_cache
+  - c3ache_conditioned_residual
+  - dp_cache
   - actuation_slack_refresh_deletion
   - awq
   - awq_fp16_kernel
@@ -40,5 +44,6 @@ cogact:
   - sparsevlm
   - specprune_vla
   - st_merge
+  - temporal_redundancy_visual
   - vla_cache
   - vla_infoentropy

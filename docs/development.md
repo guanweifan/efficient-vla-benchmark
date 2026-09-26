@@ -386,12 +386,10 @@ is a different, currently unmeasured claim.
 
 **Measurement history:** The lightweight protocol replaces the old
 full-trajectory repeated timing. Dev-200 evidence is reused only for the same policy,
-checkpoint and audited implementation. Native reference capture is complete; all
-37 integrated backend/method scopes now have compact timing and matched Dev-200
-evidence. There are 33 primary method selections and four unresolved-core diagnostic
-entries, plus four cadence-matched native references and three useful auxiliaries.
-Unresolved cores and auxiliaries are not default final-run candidates.
-No final 2,000-episode campaign has been launched.
+checkpoint and audited implementation. The generated result ledger is authoritative
+for current scope counts, selected configurations and search closure. Historical H1
+rows are not H8 evidence; unresolved cores and auxiliaries are not default final-run
+candidates. Final measurement still requires separate owner scheduling.
 
 The completed protocol transition compared 37 compatible old/new configurations:
 four used identical reaggregated prefixes, the others had explicitly different

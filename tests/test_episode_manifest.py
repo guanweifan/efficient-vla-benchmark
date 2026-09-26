@@ -182,10 +182,10 @@ def test_current_campaign_matrix_is_executable(manifest):
     matrix = yaml.safe_load(Path("configs/evaluation/dev200_campaign.yaml").read_text())
     complete = module.plan(matrix, manifest, "example", 8)
     baseline = module.plan(matrix, manifest, "example", 8, True)
-    assert len(complete["jobs"]) == 40 * 8
+    assert len(complete["jobs"]) == sum(len(presets) for presets in matrix.values()) * 8
     assert len(baseline["jobs"]) == 2 * 8
     assert len({j["id"] for j in complete["jobs"]}) == len(complete["jobs"])
-    assert module.progress_summary(complete) == {"jobs": 320}
+    assert module.progress_summary(complete) == {"jobs": len(complete["jobs"])}
 
 
 def test_progress_counts_observed_episodes_not_dispatch_jobs():
