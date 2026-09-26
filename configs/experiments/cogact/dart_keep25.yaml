@@ -1,0 +1,4 @@
+extends:
+- ./dart.yaml
+parameters:
+  keep_ratio: 0.25
