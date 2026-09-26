@@ -16,3 +16,16 @@ def test_class_and_instance_forward_restore_and_idempotence():
     patches.close()
     assert a.forward(2) == 3 and b.forward(2) == 4
     assert "forward" not in a.__dict__
+
+
+def test_named_sampler_method_restored():
+    class Sampler:
+        def sample(self):
+            return 3
+
+    sampler = Sampler()
+    patches = ForwardPatches()
+    patches.wrap(sampler, lambda original: lambda: original() + 2, "sample")
+    assert sampler.sample() == 5
+    patches.close()
+    assert sampler.sample() == 3 and "sample" not in sampler.__dict__

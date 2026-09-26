@@ -5,17 +5,17 @@ class ForwardPatches:
     def __init__(self):
         self.saved = []
 
-    def wrap(self, module, factory):
-        previous = module.__dict__.get("forward")
-        had_instance = "forward" in module.__dict__
-        replacement = factory(module.forward)
-        self.saved.append((module, had_instance, previous))
-        module.forward = replacement
+    def wrap(self, module, factory, attribute="forward"):
+        previous = module.__dict__.get(attribute)
+        had_instance = attribute in module.__dict__
+        replacement = factory(getattr(module, attribute))
+        self.saved.append((module, attribute, had_instance, previous))
+        setattr(module, attribute, replacement)
 
     def close(self):
-        for module, had_instance, previous in reversed(self.saved):
+        for module, attribute, had_instance, previous in reversed(self.saved):
             if had_instance:
-                module.forward = previous
+                setattr(module, attribute, previous)
             else:
-                del module.forward
+                delattr(module, attribute)
         self.saved.clear()
