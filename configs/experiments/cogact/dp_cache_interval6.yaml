@@ -1,0 +1,4 @@
+extends:
+- ./dp_cache.yaml
+parameters:
+  cache_interval: 6

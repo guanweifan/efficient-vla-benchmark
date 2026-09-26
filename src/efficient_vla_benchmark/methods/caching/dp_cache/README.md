@@ -14,6 +14,10 @@ Reset at each action query/episode/error, and restore instance forwards on close
 
 The ten-call CogACT schedule uses zero-based call indices, NOT training timesteps.
 The initial candidate window 2–7 and interval 2 are explicit migration parameters,
-not a claim that the paper's 20–80 window applies unchanged. Profile native training
-observations before freezing the selection. Include all cache management in timing.
+not a claim that the paper's 20–80 window applies unchanged. A native stability
+probe on sixteen training observations supports a middle window: adjacent-output
+relative L1 changes rise sharply at the final steps. The ignored training-only
+profile is retained separately from Dev-200, which checks the reuse interval and
+neighboring window boundaries. This is not a learned sampler or the paper's
+original checkpoint schedule. Include all cache management in timing.
 Disabled/interval-one paths attach no wrappers and must preserve native output/RNG.
