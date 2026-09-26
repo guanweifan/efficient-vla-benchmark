@@ -1,0 +1,4 @@
+extends:
+- ./action_cache.yaml
+parameters:
+  hit_threshold: 0.8
