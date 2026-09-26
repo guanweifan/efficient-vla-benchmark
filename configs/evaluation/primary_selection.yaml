@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: da011f4ea03317ff8920aa66817e38e5436d2b6879c5917e6f627af2f3621037
+coverage_summary_sha256: 152542b9db826ce00de7208134a7d46a47ca60e12d2e5695061f167e98773f57
 source_compatibility:
 - development_runtime: 0dd68a00d775d3a36a95e949eb2e0fe708456ae4c6fd03fde045ccd5695cc8f2
   timing_runtime: b30a41d426f30c6f8e7731d6ab35fe56ea52ac691f601faf83c2daff72e9c099
@@ -21,7 +21,7 @@ source_compatibility:
 timing_workloads:
   openvla_oft: 01f8a93fc0bd522be3ef1d2dbee981ad1bb53ed9c1bf76b404808060bdedbefe
   cogact: 6c0e509fe062fdc393d7edbf668d29450250b99e9b163a5bad5597796e7420bc
-final_runtime_source_sha256: 550676449fc89a52d6aa11873e2380b4fd71e521550eae6747073139a3420f4b
+final_runtime_source_sha256: e9198686f47d476cecb94eb04a7b06387177dcf906ca3ff48b3352d867eeb238
 configurations:
 - config: configs/experiments/cogact/baseline.yaml
   status: primary
@@ -36,7 +36,7 @@ configurations:
 - config: configs/experiments/cogact/actuation_slack_refresh_keep25.yaml
   status: primary
   section: '5.1'
-  reason: 178/200 meets the 3-pp target; keep25 costs less than eligible keep50 in matched compact replay.
+  reason: Keep25% gives178/200; stronger keep17.5% gives169/200. Retain the faithful full-cost slowdown.
   scope: Deletion core with full auxiliary refresh cost.
   development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
   development_experiment_id: 1745acc6a866125188a9997d38d3a193bf3f2238f71a72e8522ed6a2933d2115
@@ -44,90 +44,199 @@ configurations:
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-41-4-cogact-1--actuation_slack_refresh_keep25
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/cogact/adp.yaml
+    stop: accuracy_boundary
+    reason: Keep25% gives178/200; stronger keep17.5% gives169/200. Retain the faithful full-cost slowdown.
+    complete: true
+    evidence:
+    - development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
+      development_experiment_id: 3e9ab07826e30785e609207a39c4c964aadc37185ff424e01b3643cfb527bd3c
+      timing_record: compact-41-4-cogact-1--actuation_slack_refresh_keep50
+    - development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
+      development_experiment_id: 1745acc6a866125188a9997d38d3a193bf3f2238f71a72e8522ed6a2933d2115
+      timing_record: compact-41-4-cogact-1--actuation_slack_refresh_keep25
+    - development_summary_sha256: bc2f4761463e0c32c50922fd4bad2e2707cca97e96db11738ec7f6a7b7c62e34
+      development_experiment_id: b8990adbad77e39403c4b4b79409b22dd259cfc2e37136d1f72008660801587c
+      timing_record: search-r1-recheck2-41-7-cogact--actuation_slack_refresh_deletion_keep175
+- config: configs/experiments/cogact/adp_keep125.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate meets Dev loss target.
+  reason: Keep12.5% gives182/200 and the fastest eligible timing;6.25% falls to170/200. Preserve the reference
+    motion gate and dense-refresh cap.
   scope: Adaptive pruning.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 42449ae56acdde4b772b59d1e06aae9fd967c8b2218fc23decbb18768ba3af66
+  development_summary_sha256: 4843470d80aad0c2d784c3ec775c6e41f3ac1d7077ecf9736fa7bca68b280cd7
+  development_experiment_id: c903c16ec47f230039b17243336af1865e56397c01e2dab8090c51685f02efe1
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-token-retry--adp
+  timing_record: search-r16-41-7-cogact--adp_keep125
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/cogact/dart.yaml
+    stop: accuracy_boundary
+    reason: Keep12.5% gives182/200 and the fastest eligible timing;6.25% falls to170/200. Preserve the
+      reference motion gate and dense-refresh cap.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 42449ae56acdde4b772b59d1e06aae9fd967c8b2218fc23decbb18768ba3af66
+      timing_record: compact-43-0-cogact-token-retry--adp
+    - development_summary_sha256: 04967f9ac56a46407082b9454b9696d78459cd50ef25d66f7d3099d35e6374dd
+      development_experiment_id: 5ae42dcd9a49be38a9d27cb8b6e8c7144a3850408509d9a4bb6bb7f90cdcaf17
+      timing_record: search-r1-45-6-cogact-1--adp_keep50
+    - development_summary_sha256: 97334883687d5e5cc40571768b1e83e3ae231c45f22bf8887a272227a1ffda7d
+      development_experiment_id: 074418ca66c2cc460b8f3ce1e077fa83c4cc92f84d61423294b478101b1c73ca
+      timing_record: search-r456-41-6-cogact-2--adp_keep25
+    - development_summary_sha256: 4843470d80aad0c2d784c3ec775c6e41f3ac1d7077ecf9736fa7bca68b280cd7
+      development_experiment_id: c903c16ec47f230039b17243336af1865e56397c01e2dab8090c51685f02efe1
+      timing_record: search-r16-41-7-cogact--adp_keep125
+    - development_summary_sha256: 64d6001f4285588bb850a2190a8d0e967ac6afe0c8a5494980b2621b7665cd3f
+      development_experiment_id: a21d05912633745d269f877956a739f077a23a3487e2a7cd9a8dbb77048f7d1f
+      timing_record: search-r24-recheck-125-6-cogact--adp_keep0625
+- config: configs/experiments/cogact/dart_keep25.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate meets Dev loss target.
+  reason: Keep25% gives179/200; stronger18.75% and12.5% fall to164/200 and141/200.
   scope: Pivot-based token selection.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 703d93d8a87981631d66e7a6466a8793d795eecd9b2805b7525f54bf65efa389
+  development_summary_sha256: b5f081846fb8cb718432334b4541c78a3f22c72e4acff2a9855646398977a0dd
+  development_experiment_id: 4d0507e9f3f98e0b60899e6bb2a488f0ffbf66ec8b09cad2cde88a13c1f7d9c5
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-1--dart
+  timing_record: search-r1-45-5-cogact-0--dart_keep25
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/cogact/depth_cache_primary.yaml
+    stop: accuracy_boundary
+    reason: Keep25% gives179/200; stronger18.75% and12.5% fall to164/200 and141/200.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 703d93d8a87981631d66e7a6466a8793d795eecd9b2805b7525f54bf65efa389
+      timing_record: compact-43-0-cogact-1--dart
+    - development_summary_sha256: b5f081846fb8cb718432334b4541c78a3f22c72e4acff2a9855646398977a0dd
+      development_experiment_id: 4d0507e9f3f98e0b60899e6bb2a488f0ffbf66ec8b09cad2cde88a13c1f7d9c5
+      timing_record: search-r1-45-5-cogact-0--dart_keep25
+    - development_summary_sha256: a97327f8f37b8fdc5a294782773cf0fa4a83cff1d2ffe581ff98778236ddafab
+      development_experiment_id: 5970da5f88c61c0b2a15972d4ca4f08a95790f0d5aac3c8b1418ba6733c34bc4
+    - development_summary_sha256: 3a09185e2cf7744313cd58c740eed9a8f547909c93e913011a03de8164f337e5
+      development_experiment_id: 46204a0a46133c72c7c2cf62afd8f19f35fc7a6bb1a69bfdcf5392fcbcd8b07f
+- config: configs/experiments/cogact/depth_cache_primary_floor75.yaml
   status: primary
   section: '5.1'
-  reason: Meets Dev target; protected tokens limit observed compression.
+  reason: Minimum merge0.75 gives177/200 and1.159x;0.85 also gives177/200 with only0.73% more measured
+    speed. Retain the less aggressive0.75 setting as a practical one-pass timing tie.
   scope: Primary-view depth merging only; unknown wrist/carrying rules excluded.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 8f0ed815f5f86fb2088cb19f63a81b6e9c0637fab2ddf178cd6f1bcf9fa202d6
+  development_summary_sha256: 2ba48ab413e7eafca1292e03c4ba580400b905436bfc28864f3f545ffe5dc63b
+  development_experiment_id: 7d96c64920f5c4d64b45d896c858a33e184162a558c5beaa4f093c393720d34a
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-41-4-cogact-1--depth_cache_primary
+  timing_record: search-r27-41-7-cogact--depth_cache_primary_floor75
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/cogact/divprune.yaml
+    stop: latency_plateau
+    reason: Minimum merge0.75 gives177/200 and1.159x;0.85 also gives177/200 with only0.73% more measured
+      speed. Retain the less aggressive0.75 setting as a practical one-pass timing tie.
+    tie_reason: The0.73% speed difference is not treated as a reliable advantage from one pass. With equal
+      Dev success, prefer the reference-closer lower minimum merge rate; this is a conservative selection
+      tie, not a statistical equivalence claim.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 8f0ed815f5f86fb2088cb19f63a81b6e9c0637fab2ddf178cd6f1bcf9fa202d6
+      timing_record: compact-41-4-cogact-1--depth_cache_primary
+    - development_summary_sha256: 6489e08254393e7c526ec416db11ed7fed6821a6e9afb8e909533d208979ff30
+      development_experiment_id: e0e949ad3101c5cf4691662c62818963285a33a7e2715bd38843fd8790ddf777
+      timing_record: search-r1-45-7-cogact-2--depth_cache_primary_merge90
+    - development_summary_sha256: cb3700519a320fbaf30bcfa4d6ee91ad4a2fc89c60d2776d9d7dab803d6f1679
+      development_experiment_id: 83bf2363a03bce75be2a524cbf497b7343f56d06d7f5d7d34aca92a449688a35
+      timing_record: search-r23-41-7-cogact-3--depth_cache_primary_window2
+    - development_summary_sha256: 7ed000559260e3609d03786b1993160112a778950c69792360d1eefc0d77cc8c
+      development_experiment_id: ec8e53ce445fac1aaba0a4a7f440952a67a71b2a17ba69b1d064422a347b5b6c
+      timing_record: search-r18-125-5-cogact--depth_cache_primary_floor25
+    - development_summary_sha256: 766f76016ae5b9ca5113adc89e31dca09badde915f721b282f8ebee744bf6e01
+      development_experiment_id: dd5fa1d69d8b61f952936d1524c19e0d54740e0294a18efdd6232bd5911b1ec7
+      timing_record: search-r25-125-5-cogact--depth_cache_primary_floor50
+    - development_summary_sha256: 2ba48ab413e7eafca1292e03c4ba580400b905436bfc28864f3f545ffe5dc63b
+      development_experiment_id: 7d96c64920f5c4d64b45d896c858a33e184162a558c5beaa4f093c393720d34a
+      timing_record: search-r27-41-7-cogact--depth_cache_primary_floor75
+    - development_summary_sha256: d833e0fb6a68cc41a3f27933e968b1abfa698fc7a21e22b8f10e58f5080c5e30
+      development_experiment_id: 2d2189af4d3d7dfc56d4f9f196ec42fcf5d2f3fc86e9de7cc4288140ee7be6ce
+      timing_record: search-r28-recheck-41-7-cogact--depth_cache_primary_floor85
+- config: configs/experiments/cogact/divprune_keep375.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate meets Dev loss target.
+  reason: Keep37.5% gives185/200 and improves paired speed; keep25% falls to175/200.
   scope: Diversity-based token selection.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 0450741919be84698dcad7bdb2ac98811edad1574c09cabcf4871983a05ff1ae
+  development_summary_sha256: b46e4288f8bd4f3544078e0f2ac0cc788d22802770ed7443d8cf92ac115f5f96
+  development_experiment_id: aa02db4d4648252bb86bbb9ce105d0cf3e3ee94946947a46d744454db64ec2bc
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-1--divprune
+  timing_record: search-r10-recheck-41-7-cogact--divprune_keep375
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/cogact/fastv.yaml
+    stop: accuracy_boundary
+    reason: Keep37.5% gives185/200 and improves paired speed; keep25% falls to175/200.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 0450741919be84698dcad7bdb2ac98811edad1574c09cabcf4871983a05ff1ae
+      timing_record: compact-43-0-cogact-1--divprune
+    - development_summary_sha256: b46e4288f8bd4f3544078e0f2ac0cc788d22802770ed7443d8cf92ac115f5f96
+      development_experiment_id: aa02db4d4648252bb86bbb9ce105d0cf3e3ee94946947a46d744454db64ec2bc
+      timing_record: search-r10-recheck-41-7-cogact--divprune_keep375
+    - development_summary_sha256: ce57dc5ea4a63a71d42ae51dfdc004d19e88cf4f7424fe5a27cd5eb7e206931b
+      development_experiment_id: 8ceb735ef7bd3a36c56740eb4661dd497c9a412f102fecbbdca11adf306167ea
+      timing_record: search-r1-45-5-cogact-0--divprune_keep25
+- config: configs/experiments/cogact/fastv_keep25.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate meets Dev loss target.
+  reason: Keep25% gives180/200 and the fastest eligible measured timing;18.75% gives178/200 without further
+    acceleration, while12.5% falls to173/200.
   scope: Attention-based visual token pruning.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 27489ccc7f64a43601970748ec169d8a89d2c6547eaa078682debf490749bc32
+  development_summary_sha256: 82cf3669e0b438fe8356fb5c27b24a30e52a2334cf09188cc9a6284d2b8656ef
+  development_experiment_id: a581c15da97c796e59b7c3a2ceb059e77d7abc62ff64e4b11386f5ac9ed724bf
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-1--fastv
+  timing_record: search-r1-45-5-cogact-0--fastv_keep25
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/cogact/flash_vla_keep224.yaml
+    stop: accuracy_boundary
+    reason: Keep25% gives180/200 and the fastest eligible measured timing;18.75% gives178/200 without
+      further acceleration, while12.5% falls to173/200.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 27489ccc7f64a43601970748ec169d8a89d2c6547eaa078682debf490749bc32
+      timing_record: compact-43-0-cogact-1--fastv
+    - development_summary_sha256: 82cf3669e0b438fe8356fb5c27b24a30e52a2334cf09188cc9a6284d2b8656ef
+      development_experiment_id: a581c15da97c796e59b7c3a2ceb059e77d7abc62ff64e4b11386f5ac9ed724bf
+      timing_record: search-r1-45-5-cogact-0--fastv_keep25
+    - development_summary_sha256: 505cb408b4b4600dd5e0d2d29d227a44e2ea8f7824aa0f33264badf2b8a1991f
+      development_experiment_id: 62aea9c79a11b05a9a307e024d1d20a794ba4a403ea7e35a92b2232aa1fc9e27
+      timing_record: search-r20-41-7-cogact--fastv_keep1875
+    - development_summary_sha256: 4656c26e2e070a77f3416714e6bfefc2271625a377242fbbc3782675941cf13e
+      development_experiment_id: d8582efcc1f43b55affec40df1f93cccad83e9965df88bacad21ec98f3718293
+- config: configs/experiments/cogact/flash_vla_keep232.yaml
   status: primary
   section: '5.1'
-  reason: 176/200 versus 154/200 at keep192; one episode below Dev target.
+  reason: Keep232 recovers179/200 versus176/200 at224 and is faster than240; near-unity speed is not a
+    reliable gain claim.
   scope: Active ICS core only; unconfirmed action reuse excluded.
-  development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
-  development_experiment_id: 6e80dea7bbd83095f95c6bd8dd8a0c5b1584398e9ae1259930ba1c8915e4cdac
+  development_summary_sha256: fdad30adff64ae193d573ab0e59a19cab5d38a2dc3236d7b7758435ed4cdaf07
+  development_experiment_id: 78e61c2a5e331e0593f782b04a4ccec96cf5e2a17892ffc603699eabb99d3a44
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-token-retry--flash_vla_keep224
+  timing_record: search-r17-125-5-cogact--flash_vla_keep232
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: accuracy_boundary
+    reason: Keep232 recovers179/200 versus176/200 at224 and is faster than240; near-unity speed is not
+      a reliable gain claim.
+    complete: true
+    evidence:
+    - development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
+      development_experiment_id: 6e80dea7bbd83095f95c6bd8dd8a0c5b1584398e9ae1259930ba1c8915e4cdac
+      timing_record: compact-43-0-cogact-token-retry--flash_vla_keep224
+    - development_summary_sha256: fdad30adff64ae193d573ab0e59a19cab5d38a2dc3236d7b7758435ed4cdaf07
+      development_experiment_id: 78e61c2a5e331e0593f782b04a4ccec96cf5e2a17892ffc603699eabb99d3a44
+      timing_record: search-r17-125-5-cogact--flash_vla_keep232
+    - development_summary_sha256: 12b1771c3d2f4a38b48f338baf5b0c49645653eb568320b8a6d4c5c305284d9f
+      development_experiment_id: c99d5ebc1c167c6678a6cda1fbc71bf2c4f930cb6f7483b453ecad6c56c6bd88
+      timing_record: search-r1-recheck2-41-7-cogact--flash_vla_keep240
 - config: configs/experiments/cogact/safe_pruner.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate meets Dev loss target.
+  reason: Keep25% meets177/200; stronger keep18.75% and12.5% give174/200 and163/200.
   scope: Task-aware token pruning.
   development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   development_experiment_id: bdc7820db41f431415a887ed411fead64ed546d22e056708ae5ef56344353f26
@@ -135,34 +244,70 @@ configurations:
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-0-cogact-token-retry--safe_pruner
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/cogact/sparsevlm.yaml
+    stop: accuracy_boundary
+    reason: Keep25% meets177/200; stronger keep18.75% and12.5% give174/200 and163/200.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: bdc7820db41f431415a887ed411fead64ed546d22e056708ae5ef56344353f26
+      timing_record: compact-43-0-cogact-token-retry--safe_pruner
+    - development_summary_sha256: 97de0d8608d18c2f825ab09b211789236ecdde4cb4b651dfa2c93e4c9f339722
+      development_experiment_id: 9b460557d39ebdc7860ff2a219b55b2efc2ba8bd3c03318f0be99a5f16c46baf
+    - development_summary_sha256: 00d2044694e1ae351e2ed4ceed0a79dfae5efad1ea4728ec6c5028e83ce9be68
+      development_experiment_id: 86f7898a3c323721cb7d9be47013a019276f51ff75e9f40511652de340901a4c
+      timing_record: search-r1-45-6-cogact-1--safe_pruner_keep125
+- config: configs/experiments/cogact/sparsevlm_rank625.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate meets Dev loss target.
+  reason: Rank scale0.625 gives183/200 and1.434x; stronger0.75 gives164/200 for little additional speed.
+    Keep task-related selection and recycling active.
   scope: Task-related selection and token recycling.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 19e55b9daed5d94fe5e3c51402cfe296a0a1cb52a519fa5e24cc0025772342e2
+  development_summary_sha256: d8421aa1b4712e1848862df5566da903c8b7da15fa652ca1382c872f7e8bfb1d
+  development_experiment_id: a0d03b1c34f2357464e19f61ff9e670df3480f699f5e4978512b777c19bea8ba
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-1--sparsevlm
+  timing_record: search-r23-41-7-cogact--sparsevlm_rank625
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/cogact/specprune_vla_static96.yaml
+    stop: accuracy_boundary
+    reason: Rank scale0.625 gives183/200 and1.434x; stronger0.75 gives164/200 for little additional speed.
+      Keep task-related selection and recycling active.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 19e55b9daed5d94fe5e3c51402cfe296a0a1cb52a519fa5e24cc0025772342e2
+      timing_record: compact-43-0-cogact-1--sparsevlm
+    - development_summary_sha256: 376d21787388a77b023184cd3d67259ffbb235067f41572593fb4c0fb300a19b
+      development_experiment_id: be6096afc3be23bbe2d37061ba3ba8723bf13dda4084924373d94218c95a5999
+      timing_record: search-r1-45-6-cogact-1--sparsevlm_rank50
+    - development_summary_sha256: d8421aa1b4712e1848862df5566da903c8b7da15fa652ca1382c872f7e8bfb1d
+      development_experiment_id: a0d03b1c34f2357464e19f61ff9e670df3480f699f5e4978512b777c19bea8ba
+      timing_record: search-r23-41-7-cogact--sparsevlm_rank625
+    - development_summary_sha256: ec3f28a8db704271a5a7b4b784e9022093a496ab83ff34548763931436d5cc8e
+      development_experiment_id: 757f2b2447d4495add44fac68d3ede7150975588b654ba818f92732bb24e45d3
+      timing_record: search-r9-recheck-41-6-cogact--sparsevlm_rank75
+- config: configs/experiments/cogact/specprune_vla_static112.yaml
   status: primary
   section: '5.1'
-  reason: 182/200 versus 174/200 at static128; cap denotes deletions.
+  reason: Static deletion112 gives180/200 and the fastest tested eligible timing; deletion128 gives174/200.
   scope: Static/dynamic pruning with bounded static deletion.
-  development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
-  development_experiment_id: f11bd3ab2edf722f6cafdee4b9a5ded3164b79889d30a90afebf71887d62dc96
+  development_summary_sha256: 04f9453d6ebb1e52f45c68ae06678232214e6586896a911013500d28f17bda9d
+  development_experiment_id: d1a060bd5b0c4e31b979a8f9e8d98c7a9ae441766e68e7ca093b06fcbda92f0e
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-2-cogact-inputs-retry--specprune_vla_static96
+  timing_record: search-r1-recheck2-41-7-cogact--specprune_vla_static112
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: accuracy_boundary
+    reason: Static deletion112 gives180/200 and the fastest tested eligible timing; deletion128 gives174/200.
+    complete: true
+    evidence:
+    - development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
+      development_experiment_id: f11bd3ab2edf722f6cafdee4b9a5ded3164b79889d30a90afebf71887d62dc96
+      timing_record: compact-43-2-cogact-inputs-retry--specprune_vla_static96
+    - development_summary_sha256: 04f9453d6ebb1e52f45c68ae06678232214e6586896a911013500d28f17bda9d
+      development_experiment_id: d1a060bd5b0c4e31b979a8f9e8d98c7a9ae441766e68e7ca093b06fcbda92f0e
+      timing_record: search-r1-recheck2-41-7-cogact--specprune_vla_static112
+    - development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
+      development_experiment_id: b222be6835713b1bb7b490fd083736c4ac616b7a52b34f8e38a94c347d58c257
 - config: configs/experiments/cogact/st_merge_keep192.yaml
   status: pending_core
   section: '5.1'
@@ -173,23 +318,48 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-2-cogact-3--st_merge_keep192
-- config: configs/experiments/cogact/action_cache.yaml
+- config: configs/experiments/cogact/action_cache_threshold80.yaml
   status: primary
   section: '5.2'
-  reason: Threshold 0.90 from independent prefill; two native tail steps; frozen bank.
+  reason: Threshold0.80 with two native tail steps gives178/200 and1.180x. Threshold0.75 gives176/200;
+    one tail step at0.80 gives171/200. Preserve the frozen independent bank and full retrieval/refinement
+    cost.
   scope: DDIM refinement adaptation; 1412 pairs from 77/80 independent successful episodes.
-  development_summary_sha256: b4142c75a7e05218bfba9e3ae3e19edc72693c1c3ef58647c56305eb93477ed8
-  development_experiment_id: 4b3d636daaf8c5a63af7431e8272b01f48762c2bb6a0d52b81a0ffc211f184b4
+  development_summary_sha256: 3c0f0fdb212c7268fadfcccfd0a014156aff176eacc58f2baee76c5566df604f
+  development_experiment_id: 07d39fad8017a5d0d5e41055d16e57df95a07b79ae182ff50b46b5188ba61b1a
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: cache-v2-45-6-cogact--action_cache
+  timing_record: search-r1112-124-6-cogact--action_cache_threshold80
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: accuracy_boundary
+    reason: Threshold0.80 with two native tail steps gives178/200 and1.180x. Threshold0.75 gives176/200;
+      one tail step at0.80 gives171/200. Preserve the frozen independent bank and full retrieval/refinement
+      cost.
+    complete: true
+    evidence:
+    - development_summary_sha256: b4142c75a7e05218bfba9e3ae3e19edc72693c1c3ef58647c56305eb93477ed8
+      development_experiment_id: 4b3d636daaf8c5a63af7431e8272b01f48762c2bb6a0d52b81a0ffc211f184b4
+      timing_record: cache-v2-45-6-cogact--action_cache
+    - development_summary_sha256: e8d6ed820407f49687cfe44315636212ff5e0f510f93366883ea3d03f67f7a42
+      development_experiment_id: ca9da46c9ad33ea5c6cbe6fa8829851ca433d0a825ff804ba235ffc18812f2fa
+      timing_record: search-r1-recheck-41-6-cogact-4--action_cache_threshold85
+    - development_summary_sha256: 3c0f0fdb212c7268fadfcccfd0a014156aff176eacc58f2baee76c5566df604f
+      development_experiment_id: 07d39fad8017a5d0d5e41055d16e57df95a07b79ae182ff50b46b5188ba61b1a
+      timing_record: search-r1112-124-6-cogact--action_cache_threshold80
+    - development_summary_sha256: 9f28358ab66577b5a463bde113ad88f2db26dffab021beb42e48d151bc412453
+      development_experiment_id: b05f450df5fc8626d003d7e1bbd239c17580af46002a66428212b8e5856c8976
+      timing_record: search-r22-41-7-cogact--action_cache_threshold75
+    - development_summary_sha256: 642acd7d46749f41511ffa3d1bd81f959727238f0657dd328684e5926cef917f
+      development_experiment_id: 6c8db100b68fd8607b9c834fe1c57e00ef79872f4bab3e607306c0ee9f9d7564
+      timing_record: search-r18-125-5-cogact--action_cache_threshold85_refine1
+    - development_summary_sha256: b8f812820f0861f01a4e71aca1d42dd22fed21244e47893c112cd685df3717de
+      development_experiment_id: aaef488dea4f8cd987e8b3454bd44fb33b3e0146d716c9002bc91614132c6846
+      timing_record: search-r22-41-7-cogact--action_cache_threshold80_refine1
 - config: configs/experiments/cogact/c3ache_conditioned_residual_prefix6.yaml
   status: primary
   section: '5.2'
-  reason: Six live blocks selected after shorter-prefix residuals caused severe Dev loss.
+  reason: Prefix4 is not faster than prefix6 and lowers success; caching four steps falls to162/200. Retain183/200
+    with no reliable speedup claim.
   scope: Cross-chunk residual core; two cached steps, refresh interval two; not full Fast-WAM.
   development_summary_sha256: ba718ed1e3d21f4b87e36ccf569f4c63c188d60dec7e6cd6f02f7e5d3f1ce421
   development_experiment_id: c692772b868aa42a4d774070b8028db7bf93ab031712cb7cb5d7b65d9cd03d6e
@@ -197,38 +367,82 @@ configurations:
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: cache-v2-45-6-cogact--c3ache_conditioned_residual_prefix6
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/cogact/dp_cache.yaml
+    stop: accuracy_boundary
+    reason: Prefix4 is not faster than prefix6 and lowers success; caching four steps falls to162/200.
+      Retain183/200 with no reliable speedup claim.
+    complete: true
+    evidence:
+    - development_summary_sha256: ba718ed1e3d21f4b87e36ccf569f4c63c188d60dec7e6cd6f02f7e5d3f1ce421
+      development_experiment_id: c692772b868aa42a4d774070b8028db7bf93ab031712cb7cb5d7b65d9cd03d6e
+      timing_record: cache-v2-45-6-cogact--c3ache_conditioned_residual_prefix6
+    - development_summary_sha256: 421780b698af3dde05e54d4e0e29ac2deb2e993cdfda00af44d7b3ee2a8c686e
+      development_experiment_id: 19255934d4bfd8a5a9272836de18406139a3b2644f929ed9f4334b8b8a7ffeea
+      timing_record: search-r1-recheck-41-6-cogact-4--c3ache_conditioned_residual_prefix4
+    - development_summary_sha256: 553bdb2687887df33f0d3ae355b506b63ea90fa438e95c88f0683151006f9d13
+      development_experiment_id: dd56a938ebbfaa65e475f7a9bd9475af98d064ab4142c849065722f8332d76f1
+      timing_record: search-r1112-124-6-cogact--c3ache_conditioned_residual_prefix4_steps4
+- config: configs/experiments/cogact/dp_cache_interval6.yaml
   status: primary
   section: '5.2'
-  reason: Middle-window output reuse meets the Dev loss target.
+  reason: Interval6 fills the profiled middle window2..7 and gives182/200 with1.110x. Extending to2..8
+    or1..8 gives134/200 or130/200. Keep all native DDIM transitions and both CFG branches.
   scope: Native denoiser output reuse only; no VAE/compiler pipeline.
-  development_summary_sha256: 0151c5d817556bcd8f7f08cd0f55b1a40f4c58d0733fe96987033f0fb3328b3d
-  development_experiment_id: 6458d39a74fadb3f25082501ae8d88486a7a1520c726bf6c23a4f9e9f328e5fb
+  development_summary_sha256: fdc1a3c77ea53176ed5c34e5a500c799477deca031ec1d0b0de8cfda0247c0b1
+  development_experiment_id: 2243cf3b022aafef382570f434f2e1fc298613e6434860a84873d27be7ca3d16
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: cache-v1-45-6-cogact--dp_cache
+  timing_record: search-r1112-124-6-cogact--dp_cache_interval6
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/cogact/efficient_vla_cache3.yaml
+    stop: accuracy_boundary
+    reason: Interval6 fills the profiled middle window2..7 and gives182/200 with1.110x. Extending to2..8
+      or1..8 gives134/200 or130/200. Keep all native DDIM transitions and both CFG branches.
+    complete: true
+    evidence:
+    - development_summary_sha256: 0151c5d817556bcd8f7f08cd0f55b1a40f4c58d0733fe96987033f0fb3328b3d
+      development_experiment_id: 6458d39a74fadb3f25082501ae8d88486a7a1520c726bf6c23a4f9e9f328e5fb
+      timing_record: cache-v1-45-6-cogact--dp_cache
+    - development_summary_sha256: 7c887dc1d4ea304e67dec2771f2d8301bc567de512023d175989ff989ea7906a
+      development_experiment_id: c7ea25b24d8658e069436c645e6925dd5f6bf9f5431a85a9615989f8ac41869e
+      timing_record: search-r1-recheck-41-6-cogact-4--dp_cache_interval3
+    - development_summary_sha256: fdc1a3c77ea53176ed5c34e5a500c799477deca031ec1d0b0de8cfda0247c0b1
+      development_experiment_id: 2243cf3b022aafef382570f434f2e1fc298613e6434860a84873d27be7ca3d16
+      timing_record: search-r1112-124-6-cogact--dp_cache_interval6
+    - development_summary_sha256: 580892b37a62729266500021a0f5b9833e30b063e825ff9782b58183d524489a
+      development_experiment_id: 34367385b17cf08def991ee2ad8b6f5cf8f71bb537fff6db3d9a5101df9aac41
+      timing_record: search-r26-41-7-cogact--dp_cache_window2_8_interval7
+    - development_summary_sha256: f1743528105287eed407b46fd53e478471d6cecd8890a640a6eb6328aaa81100
+      development_experiment_id: 614061951bc6ea904240842aa0a26579c5edca286982f1e4ca31d5eb847b3ac9
+      timing_record: search-r21-125-5-cogact--dp_cache_window1_8_interval8
+- config: configs/experiments/cogact/efficient_vla_diffusion_cache_interval4.yaml
   status: primary
   section: '5.2'
-  reason: 177/200 after bounded cache-interval tuning.
+  reason: Interval4 gives186/200; interval5 falls to165/200. Choose the eligible stronger cache with its
+    own paired timing.
   scope: Within-sampling DiT feature cache; native sampler unchanged.
-  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
-  development_experiment_id: e265084237e3a715d4af23bf9fd4aa704cc121ee7b3e70d5addd79efc2792590
+  development_summary_sha256: b60a5a18a21e6405ee67a7957bec0885789b873c3cefbf763b2f932361405fbd
+  development_experiment_id: d1b43467534ec99b6bf7a6d3eb7523fd184068eb8834ff9d9d5e4a2d6d8d1f31
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-42-0-cogact-quant--efficient_vla_cache3
+  timing_record: search-r1-recheck-41-7-cogact-5--efficient_vla_diffusion_cache_interval4
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: accuracy_boundary
+    reason: Interval4 gives186/200; interval5 falls to165/200. Choose the eligible stronger cache with
+      its own paired timing.
+    complete: true
+    evidence:
+    - development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
+      development_experiment_id: e265084237e3a715d4af23bf9fd4aa704cc121ee7b3e70d5addd79efc2792590
+      timing_record: compact-42-0-cogact-quant--efficient_vla_cache3
+    - development_summary_sha256: b60a5a18a21e6405ee67a7957bec0885789b873c3cefbf763b2f932361405fbd
+      development_experiment_id: d1b43467534ec99b6bf7a6d3eb7523fd184068eb8834ff9d9d5e4a2d6d8d1f31
+      timing_record: search-r1-recheck-41-7-cogact-5--efficient_vla_diffusion_cache_interval4
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 2e99d4df59fd76c5961cbf0ce7b5e263c64eb81b2b7f72f60da5893bac5920e3
 - config: configs/experiments/cogact/temporal_redundancy_visual_update75.yaml
   status: primary
   section: '5.2'
-  reason: Update75 selected after update50 scored 168/200; retain measured full-cost overhead.
+  reason: Update75% gives180/200; update62.5% falls to174/200. No tested reliable acceleration at the
+    accuracy target.
   scope: Visual attention core; trained action branch excluded.
   development_summary_sha256: 2f05e428a06da31cbce59353e5c2386005074786ec46812c27b16ac635843e85
   development_experiment_id: fd8de3e4c0776b169a8a488af5f09a840a22c597869235a171387ed9ab2adca5
@@ -236,25 +450,55 @@ configurations:
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: cache-v3-45-6-cogact--temporal_redundancy_visual_update75
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/cogact/vla_cache.yaml
+    stop: accuracy_boundary
+    reason: Update75% gives180/200; update62.5% falls to174/200. No tested reliable acceleration at the
+      accuracy target.
+    complete: true
+    evidence:
+    - development_summary_sha256: 2f05e428a06da31cbce59353e5c2386005074786ec46812c27b16ac635843e85
+      development_experiment_id: fd8de3e4c0776b169a8a488af5f09a840a22c597869235a171387ed9ab2adca5
+      timing_record: cache-v3-45-6-cogact--temporal_redundancy_visual_update75
+    - development_summary_sha256: a3b4438bf5efa80d6f37378fb7537b34441ecabcc3362be693d0708eeb2b79fe
+      development_experiment_id: 14f2132ff07c5cef4640bd7c37dfbbd47717e74e51be90abb891b3aaaabb40bb
+      timing_record: search-r1-recheck-41-7-cogact-5--temporal_redundancy_visual_update625
+- config: configs/experiments/cogact/vla_cache_budget256_protect75.yaml
   status: primary
   section: '5.2'
-  reason: Existing candidate meets Dev loss target.
+  reason: Budget256 with75 protected tokens gives179/200 and1.272x;50 protected tokens falls to161/200.
+    Preserve task protection, complete entropy statistics, and native KV visibility.
   scope: Query-row reuse with retained visual KV.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: f9612931a47706abef36d9251e82bcf9c0ceeb249fce9e68412d8214f5a29fcb
+  development_summary_sha256: 30921db8261615979782a3163b8dd5d6c5316d8fd278faa689f43a4b3be8ec27
+  development_experiment_id: 9927e2ef608b3b72e97501649002c6a57b707b0566404abae53f571a1422666f
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-2-cogact-inputs-retry--vla_cache
+  timing_record: search-r25-125-5-cogact--vla_cache_budget256_protect75
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: accuracy_boundary
+    reason: Budget256 with75 protected tokens gives179/200 and1.272x;50 protected tokens falls to161/200.
+      Preserve task protection, complete entropy statistics, and native KV visibility.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: f9612931a47706abef36d9251e82bcf9c0ceeb249fce9e68412d8214f5a29fcb
+      timing_record: compact-43-2-cogact-inputs-retry--vla_cache
+    - development_summary_sha256: 3dc79351c7a18ac39d36e12b2d4621de994248be4e434780acc1565910208d2e
+      development_experiment_id: 2f8a507a979151089b585b75c6dd993e1f073c0c1ea87faa40621f9532747254
+      timing_record: search-r1-45-7-cogact-2--vla_cache_budget224
+    - development_summary_sha256: 46cfbe9775a176999c4f1079e7af0c864ba214fa490f734f40a74d181cf02e37
+      development_experiment_id: 7657cff6811737b9072fb536a8fc5688282fa0d5d6d0ded749a93dede9d6d084
+      timing_record: search-r10-recheck-41-7-cogact--vla_cache_budget256
+    - development_summary_sha256: 30921db8261615979782a3163b8dd5d6c5316d8fd278faa689f43a4b3be8ec27
+      development_experiment_id: 9927e2ef608b3b72e97501649002c6a57b707b0566404abae53f571a1422666f
+      timing_record: search-r25-125-5-cogact--vla_cache_budget256_protect75
+    - development_summary_sha256: a564d59e4b30373fe8b562e4435961c71c36ba498c185d6f14cee0f6cb313110
+      development_experiment_id: cc588e44494703fbf11755837843c301ca1b1b8975b2119a934f50b7cabb3e31
+      timing_record: search-r18-125-5-cogact--vla_cache_budget256_protect50
 - config: configs/experiments/cogact/vla_infoentropy.yaml
   status: primary
   section: '5.2'
-  reason: 175/200; tested static100 yielded 174/200, so retain original active setting.
+  reason: Native-output SDPA still gives173/200; stricter similarity thresholds give175/200 and a smaller
+    budget gives174/200. Keep the reference-close175/200 full-entropy port as an explicitly below-target
+    result.
   scope: Entropy-guided query-row reuse; below Dev loss target.
   development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   development_experiment_id: 3e7f5140c644c221a9a02a45731cf1e949650a3564053c9d662f85e37b11cabb
@@ -262,25 +506,93 @@ configurations:
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-2-cogact-inputs-retry--vla_infoentropy
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/cogact/sp_vla.yaml
+    stop: no_feasible_configuration
+    reason: Native-output SDPA still gives173/200; stricter similarity thresholds give175/200 and a smaller
+      budget gives174/200. Keep the reference-close175/200 full-entropy port as an explicitly below-target
+      result.
+    limitation: No tested active full-entropy configuration meets177/200. All original complete-statistics
+      costs, native visibility, and H8 execution remain intact; do not infer failure of the published
+      checkpoint.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 3e7f5140c644c221a9a02a45731cf1e949650a3564053c9d662f85e37b11cabb
+      timing_record: compact-43-2-cogact-inputs-retry--vla_infoentropy
+    - development_summary_sha256: c58408949929abe5b6d0e01da4f7268f5a861d8b6e8263c31ec679dd23808c21
+      development_experiment_id: 72863257387e829e4c5d102d961fddf2f81b16c5ee9f1ee0010cb5b4ae5638e5
+      timing_record: search-r1-recheck-41-7-cogact-5--vla_infoentropy_threshold999
+    - development_summary_sha256: eec0d5b13970a126d5f21e6e20d18abc2d6681d643cd32c97591a00978a5fd5b
+      development_experiment_id: 759ff2cbad8b2c008859811bee46475cc644192f47783d6b18e430ef1d23f237
+      timing_record: search-r15-41-6-cogact--vla_infoentropy_threshold9999
+    - development_summary_sha256: 0f6402d7a45190d73e87855a639c5487aed9af13c9e3033d22061cbbd40828b9
+      development_experiment_id: 3f611480a5792459dee430f086f93084b96cce8fe2d08308d5d268e1e7a7db3d
+      timing_record: search-r24-recheck-125-6-cogact--vla_infoentropy_sdpa150
+    - development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
+      development_experiment_id: 9566b1fc8ecf0c99e00660d307fb2102619007b878aa103c81b470833a9abc89
+- config: configs/experiments/cogact/sp_vla_z025_min_actions3.yaml
   status: primary
   section: '5.3'
-  reason: Existing candidate meets Dev loss target.
+  reason: Minimum three native actions in the unchanged six-command history, with pruning Z threshold
+    0.25, gives 178/200. Requiring only two native actions gives 176/200. Keep pruning and scheduling
+    together.
   scope: Pruning plus executed-action scheduling.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 27d4793d914e2be7c1eb929c254b8661581eaefb1a68530fc1c0746d0cd764d9
+  development_summary_sha256: 01b10f13a1574133be4c9293d133d0cd18e4e8d51a1eaa17b96f59817832fb62
+  development_experiment_id: e5ff0e4f5f44dd1112561436b4d6c982a84db488c0c2af8cdb0c3228fdc657a8
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-0-cogact-token-retry--sp_vla
+  timing_record: search-r20-41-7-cogact--sp_vla_z025_history3
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: accuracy_boundary
+    reason: Minimum three native actions in the unchanged six-command history, with pruning Z threshold
+      0.25, gives 178/200. Requiring only two native actions gives 176/200. Keep pruning and scheduling
+      together.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 27d4793d914e2be7c1eb929c254b8661581eaefb1a68530fc1c0746d0cd764d9
+      timing_record: compact-43-0-cogact-token-retry--sp_vla
+    - development_summary_sha256: 212071148ec930e2d50adce39692c552097e201e5517a69d827aba82a1c741c6
+      development_experiment_id: a9d8c1eceac3827d3f040804bb4ae7c459ded5728a2a4f93ffed6cb24c11b247
+      timing_record: search-r1-45-7-cogact-2--sp_vla_z025
+    - development_summary_sha256: 01b10f13a1574133be4c9293d133d0cd18e4e8d51a1eaa17b96f59817832fb62
+      development_experiment_id: e5ff0e4f5f44dd1112561436b4d6c982a84db488c0c2af8cdb0c3228fdc657a8
+      timing_record: search-r20-41-7-cogact--sp_vla_z025_history3
+    - development_summary_sha256: 710f7e136d18f48bf89ead1fff593259e3f53e0652c64de688edb62e58eba46a
+      development_experiment_id: 70b0de49da529b130793f3c22bedbdb5339cb51c8db2f235b9740553230ee798
+      timing_record: search-r10-recheck-41-7-cogact--sp_vla_z025_history2
+- config: configs/experiments/cogact/vote_ensemble_h8.yaml
+  status: primary
+  section: '5.5'
+  reason: H8 thresholds0.25/0.50/0.75 give174/174/172 of200, all below177; retain reference0.50 as an
+    explicit negative two-vote adaptation.
+  scope: H8 two-vote overlapping-chunk ensemble core; no single-ACT architecture or extra queries.
+  development_summary_sha256: d05124356c86ed72019f3280fa4a25d3a9b72aba79198b583f5702303136be3c
+  development_experiment_id: 9ebbbb6d52e6b5e4131af9d6bc14a493375a387d02bb298bceedb70680ac660c
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: search-vote-124-6-cogact--vote_ensemble_h8
+  search:
+    stop: no_feasible_configuration
+    reason: H8 thresholds0.25/0.50/0.75 give174/174/172 of200, all below177; retain reference0.50 as an
+      explicit negative two-vote adaptation.
+    limitation: Native16-predict/8-execute permits one historical chunk and no reduction in model-call
+      frequency. Threshold changes retain the original equation and tie rule; no single-ACT architecture
+      or extra queries are introduced.
+    complete: true
+    evidence:
+    - development_summary_sha256: d05124356c86ed72019f3280fa4a25d3a9b72aba79198b583f5702303136be3c
+      development_experiment_id: 9ebbbb6d52e6b5e4131af9d6bc14a493375a387d02bb298bceedb70680ac660c
+      timing_record: search-vote-124-6-cogact--vote_ensemble_h8
+    - development_summary_sha256: 33abaa30bef34ae77e3ce14717de2a31e48ed68f6dd7fcebbf351bc4cfe824d1
+      development_experiment_id: 0fc244c5bbf97cc7fc785c8001b4393c7be0bc29ccca320093d80ad3271562f0
+      timing_record: search-r15-41-6-cogact--vote_ensemble_h8_threshold25
+    - development_summary_sha256: 53b0882c6647f039c44e32b6e8d9464fef316c4bc723e5f6babbd700fac2e64d
+      development_experiment_id: 33c7619175d6c0660aff06ad13616dbbddbd657a78195b65049e91b30ebd973e
+      timing_record: search-r15-41-6-cogact--vote_ensemble_h8_threshold75
 - config: configs/experiments/cogact/awq_fp16_kernel.yaml
   status: primary
   section: '6.1'
-  reason: Selected FP16-kernel W4A16; BF16 retained as a labeled precision auxiliary.
+  reason: FP16 is the faster eligible option among both measured supported kernel precisions.
   scope: Explicit FP16 cast boundary; training-only calibration.
   development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   development_experiment_id: be03b017c6a40862b3ebc5afa78a0ce2cf31111d49e8763c1fe5d0650391c117
@@ -288,8 +600,18 @@ configurations:
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-42-0-cogact-quant--awq_fp16_kernel
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: mechanism_limit
+    reason: FP16 is the faster eligible option among both measured supported kernel precisions.
+    limitation: The pinned packed W4 kernel fixes bits=4 and group_size=128; changing calibration search
+      does not reduce online operator geometry.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: be03b017c6a40862b3ebc5afa78a0ce2cf31111d49e8763c1fe5d0650391c117
+      timing_record: compact-42-0-cogact-quant--awq_fp16_kernel
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: a223cf526c859a8a6071ba21da16d2be890c981c5048f52ab863fda22eace8dc
+      timing_record: compact-42-0-cogact-quant--awq
 - config: configs/experiments/openvla_oft/baseline.yaml
   status: primary
   section: Reference
@@ -303,7 +625,8 @@ configurations:
 - config: configs/experiments/openvla_oft/actuation_slack_refresh_deletion.yaml
   status: primary
   section: '5.1'
-  reason: Retain active configuration; full auxiliary cost is included.
+  reason: Halving retention to5% lowers success without improving full-cost timing; dense auxiliary refresh
+    remains included.
   scope: Deletion core; not real-robot overlap.
   development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   development_experiment_id: 2e2b75988b34636d5fa39e24e573aa4a159c179d48954e47203a23897921b39c
@@ -311,38 +634,78 @@ configurations:
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-5-openvla_oft-recheck--actuation_slack_refresh_deletion
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/openvla_oft/adp.yaml
+    stop: latency_plateau
+    reason: Halving retention to5% lowers success without improving full-cost timing; dense auxiliary
+      refresh remains included.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 2e2b75988b34636d5fa39e24e573aa4a159c179d48954e47203a23897921b39c
+      timing_record: compact-45-5-openvla_oft-recheck--actuation_slack_refresh_deletion
+    - development_summary_sha256: c1e6ce41e3e80cf23109472ea4de5576d9ef0037b04258ee147f0a63edb206f8
+      development_experiment_id: 2842374ae2419be0d06657bafe503fe0b586983da2e8130dd791bf9f3c69e02d
+      timing_record: search-r1-45-6-openvla_oft-4--actuation_slack_refresh_deletion_keep05
+- config: configs/experiments/openvla_oft/adp_keep1875.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate meets Dev loss target.
+  reason: Keep18.75% gives195/200 and the fastest eligible timing; keep12.5% falls to189/200 without further
+    measured speed benefit.
   scope: Adaptive pruning.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 83f9aeebdff8a240e92f929ab699eaabc470de89ecc663c04837580dce3f412a
+  development_summary_sha256: 72c64be2bf3952d5664d596a34369573b4a992ca7e4dac6fcc49b7aa3c135926
+  development_experiment_id: 58bdb42316badeba12a20a4e3522c93743998b542c79bde2983afc2f661b1e64
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-6-openvla_oft-2--adp
+  timing_record: search-recovery-125-6-openvla_oft-0--adp_keep1875
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/openvla_oft/dart_layer4.yaml
+    stop: accuracy_boundary
+    reason: Keep18.75% gives195/200 and the fastest eligible timing; keep12.5% falls to189/200 without
+      further measured speed benefit.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 83f9aeebdff8a240e92f929ab699eaabc470de89ecc663c04837580dce3f412a
+      timing_record: compact-45-6-openvla_oft-2--adp
+    - development_summary_sha256: daf383d33b0f480332f4bbfdb5c08fb46c4fdfcec22c4e67690bcd7511f7b178
+      development_experiment_id: 1d3819218fa554d8fce6d290cd9aabb43c0453a2547586e4a97e304f7aa80e91
+      timing_record: search-r23-124-7-openvla_oft-1--adp_keep25
+    - development_summary_sha256: 72c64be2bf3952d5664d596a34369573b4a992ca7e4dac6fcc49b7aa3c135926
+      development_experiment_id: 58bdb42316badeba12a20a4e3522c93743998b542c79bde2983afc2f661b1e64
+      timing_record: search-recovery-125-6-openvla_oft-0--adp_keep1875
+    - development_summary_sha256: f96ccd8f15c956eabbec575c186c857ea23d935f7aaac76d51a47609e04a8b2b
+      development_experiment_id: aca05b865ebaaa4a2756c1cfdca8aed263b51a9f2e4e7b3c0b1f574fc81adb43
+      timing_record: search-r78-124-6-openvla_oft--adp_keep125
+- config: configs/experiments/openvla_oft/dart_keep1875.yaml
   status: primary
   section: '5.1'
-  reason: 197/200 versus 184/200 at the original layer.
+  reason: Keep18.75% is the fastest tested eligible point (195/200); keep12.5% gives191/200.
   scope: Pivot-based token selection, later pruning layer.
-  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
-  development_experiment_id: 03a1390651f10da98428fda879b3bb34131f032a02463218beb1c31648b493b9
+  development_summary_sha256: aa43214a8630e06aa3312adb7af627e9acc861ec584de872fb92e6724f838257
+  development_experiment_id: 66630bb5525cf103faf07c776372466697caa7b3d157a532be1923dda958a0ab
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-6-openvla_oft-1--dart_layer4
+  timing_record: search-r78-124-6-openvla_oft--dart_keep1875
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: accuracy_boundary
+    reason: Keep18.75% is the fastest tested eligible point (195/200); keep12.5% gives191/200.
+    complete: true
+    evidence:
+    - development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
+      development_experiment_id: 03a1390651f10da98428fda879b3bb34131f032a02463218beb1c31648b493b9
+      timing_record: compact-45-6-openvla_oft-1--dart_layer4
+    - development_summary_sha256: f4a519be124361be68baeddf3a40570ec4c2fc6444c395b8c53a2c50a1682a94
+      development_experiment_id: 3be6521d8e486dfbb171057fd855ba8f0afa94cb1f9bbc1b34789a1489efee3d
+      timing_record: search-r1-45-5-openvla_oft-0--dart_keep25
+    - development_summary_sha256: aa43214a8630e06aa3312adb7af627e9acc861ec584de872fb92e6724f838257
+      development_experiment_id: 66630bb5525cf103faf07c776372466697caa7b3d157a532be1923dda958a0ab
+      timing_record: search-r78-124-6-openvla_oft--dart_keep1875
+    - development_summary_sha256: 7d3ac9b4810c022ec2dacaba0c26bea83532b7032f487877e3033f927fdf3143
+      development_experiment_id: ad73a798f928eb51dc0c37bbc2453cfe7c0803faa6af04cb1cc1c5986466c8b2
+      timing_record: search-r23-124-7-openvla_oft-1--dart_keep125
 - config: configs/experiments/openvla_oft/depth_cache_primary.yaml
   status: primary
   section: '5.1'
-  reason: Meets Dev target; protected tokens limit observed compression.
+  reason: Ceiling0.90,progressive window2,and minimum merge0.25 all retain196/200 but do not improve full-cost
+    timing. Keep reference-close primary-view core; wrist and ambiguous carrying logic remain excluded.
   scope: Primary-view depth merging only; unknown wrist/carrying rules excluded.
   development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   development_experiment_id: 23ee03e39b8e019f7c9674baabb00b045f8f303a25ea442dd81e7a27516cb331
@@ -350,12 +713,28 @@ configurations:
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-5-openvla_oft-recheck--depth_cache_primary
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: latency_plateau
+    reason: Ceiling0.90,progressive window2,and minimum merge0.25 all retain196/200 but do not improve
+      full-cost timing. Keep reference-close primary-view core; wrist and ambiguous carrying logic remain
+      excluded.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 23ee03e39b8e019f7c9674baabb00b045f8f303a25ea442dd81e7a27516cb331
+      timing_record: compact-45-5-openvla_oft-recheck--depth_cache_primary
+    - development_summary_sha256: 6d38e48ab16caeeda7d38294b079d787618bb0675172015ac7c1d0ed48095fe6
+      development_experiment_id: 5642a0cd467d9f642ba4b11f642fa843bf1e77e7486f3886c9260325405a93af
+      timing_record: search-r1-45-7-openvla_oft-2--depth_cache_primary_merge90
+    - development_summary_sha256: 62775b1f282a28db766bbac97b4dbb99a91a6b774b87331213ff9abcbdfb527f
+      development_experiment_id: c036becabd09866f1b1840a0fc44b18dfd57a9e7dd86a8a61239f2d80654a621
+      timing_record: search-r23-124-6-openvla_oft-0--depth_cache_primary_window2
+    - development_summary_sha256: 65ccd9ea03a7c5cb1b70c2b54d15fedba83b655a527832ec10d3a7d46c681277
+      development_experiment_id: 56b8c44a33e92732aabe3048edd7ba16e74cfeb751ab645c42ec0949f5f520af
+      timing_record: search-recovery-125-6-openvla_oft-1--depth_cache_primary_floor25
 - config: configs/experiments/openvla_oft/divprune.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate meets Dev loss target.
+  reason: Keep50% remains the only eligible tested point; keep43.75%,37.5%,25% give191,187,188/200.
   scope: Diversity-based token selection.
   development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   development_experiment_id: 4482ae63177ce1099a9ba5360b83ab01317cb8d5519527dbd8aecd75cb083aea
@@ -363,38 +742,81 @@ configurations:
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-6-openvla_oft-1--divprune
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/openvla_oft/efficient_vla.yaml
+    stop: accuracy_boundary
+    reason: Keep50% remains the only eligible tested point; keep43.75%,37.5%,25% give191,187,188/200.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 4482ae63177ce1099a9ba5360b83ab01317cb8d5519527dbd8aecd75cb083aea
+      timing_record: compact-45-6-openvla_oft-1--divprune
+    - development_summary_sha256: f07f46402f5e7056b02d3a6f8dd5fe7ca1173a69028b41bef49f86385f462909
+      development_experiment_id: 01916e6bc71f7ad31608f2ff4dd8c544af10fc501a0ec40802dc2ab607df7127
+      timing_record: search-r9-124-6-openvla_oft--divprune_keep4375
+    - development_summary_sha256: 89761f8bad7859d2b4a08930e23906cc33af8fbdc7b74dd9a177f31c9da2faa7
+      development_experiment_id: f0ca48818d07466430f6da3f2c8dfe0a333a3b1f712272e5576f1d73c65ffdb1
+      timing_record: search-r23-124-7-openvla_oft-1--divprune_keep375
+    - development_summary_sha256: 2e2b5bef3b234297177f25b2160a8eb3d923e63cdcf9c482123002fd4762c405
+      development_experiment_id: c02b514a2b5a121bc2d2fbfcfe494309b695e957b9e266e6126a1387aeca07f5
+      timing_record: search-r1-45-5-openvla_oft-0--divprune_keep25
+- config: configs/experiments/openvla_oft/efficient_vla_keep96.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate meets Dev loss target.
+  reason: Keep96/view gives197/200; stronger80 and64 give191/200 and182/200. Preserve all selection components.
   scope: Declared OFT token-reduction core.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: fa758c551bfb39b4f8a0a122e5dd9b278d42ceb1728352c67697012322438fb3
+  development_summary_sha256: 8f8b9037a57d840e49ae8ccf68cec506da4fcb3729b8538d64a913c8a09e5803
+  development_experiment_id: 3695d50ab9056a7d393c7c8d6715f33a53c29ae90306facde37abedda3e5ff38
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-7-openvla_oft-2--efficient_vla
+  timing_record: search-r10-124-6-openvla_oft--efficient_vla_keep96
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/openvla_oft/fastv.yaml
+    stop: accuracy_boundary
+    reason: Keep96/view gives197/200; stronger80 and64 give191/200 and182/200. Preserve all selection
+      components.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: fa758c551bfb39b4f8a0a122e5dd9b278d42ceb1728352c67697012322438fb3
+      timing_record: compact-45-7-openvla_oft-2--efficient_vla
+    - development_summary_sha256: 8f8b9037a57d840e49ae8ccf68cec506da4fcb3729b8538d64a913c8a09e5803
+      development_experiment_id: 3695d50ab9056a7d393c7c8d6715f33a53c29ae90306facde37abedda3e5ff38
+      timing_record: search-r10-124-6-openvla_oft--efficient_vla_keep96
+    - development_summary_sha256: fbaf16ab53d4f89c7fbab776f3219a8c9725f28d60903c151b971ebbb62ef502
+      development_experiment_id: 9cc91ce4c88ad4639d1af3e4dbbf4496d6773d1d1b32cc5e3d48d0844c0df85c
+      timing_record: search-recovery-125-6-openvla_oft-1--efficient_vla_keep80
+    - development_summary_sha256: a5566ba04caa42d865547c78f0403852dd5295ecc22752222321665a8e866d45
+      development_experiment_id: 72668ab9cb7d7292b5bdb0b2bdc121842857fb5fca45169ec7345fb2460e97d0
+      timing_record: search-r1-45-5-openvla_oft-3--efficient_vla_keep64
+- config: configs/experiments/openvla_oft/fastv_keep3125.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate preserves native Dev successes.
+  reason: Keep31.25% is the fastest tested eligible point (193/200); keep25% falls to183/200.
   scope: Attention-based visual token pruning.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 66828e8ed4865b10d7301a447b0fa90beb10e83827a02f0aac1c8551701e69d1
+  development_summary_sha256: e2c6471bde15634790c92f417f9afd7d5d13c790836bc85916be8ad0ccb21ddc
+  development_experiment_id: 0070caa61e8205fba10bab5c41cfc52a5789f0750f949eaa45166da55407fc23
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-6-openvla_oft-1--fastv
+  timing_record: search-r456-124-6-openvla_oft-0--fastv_keep3125
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: accuracy_boundary
+    reason: Keep31.25% is the fastest tested eligible point (193/200); keep25% falls to183/200.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 66828e8ed4865b10d7301a447b0fa90beb10e83827a02f0aac1c8551701e69d1
+      timing_record: compact-45-6-openvla_oft-1--fastv
+    - development_summary_sha256: 6bd62f055e2e36d2d83d5bac9bce6b094cffb5e8a9169ea3869a3ac83e7d5209
+      development_experiment_id: 07d9ad3cc67a967d9f019e244a6da647c4f643148027cb3c527dc158daf4d341
+      timing_record: search-r23-124-6-openvla_oft-0--fastv_keep375
+    - development_summary_sha256: e2c6471bde15634790c92f417f9afd7d5d13c790836bc85916be8ad0ccb21ddc
+      development_experiment_id: 0070caa61e8205fba10bab5c41cfc52a5789f0750f949eaa45166da55407fc23
+      timing_record: search-r456-124-6-openvla_oft-0--fastv_keep3125
+    - development_summary_sha256: 19a674a5eb91600bbbf01216b6c3a669622e7abfcc234911759be85becdfc535
+      development_experiment_id: ff76090f2e8e56522cc2d2cecc989b31dc3ba8ba69a8a054abb583add82f24c0
+      timing_record: search-r1-45-5-openvla_oft-0--fastv_keep25
 - config: configs/experiments/openvla_oft/flash_vla_keep192.yaml
   status: primary
   section: '5.1'
-  reason: 196/200 versus 190/200 before retention adjustment.
+  reason: Keep176 retains 196/200 but is not faster; retain keep192 and report the full-cost slowdown.
   scope: ICS core only; action reuse is unconfirmed and excluded.
   development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
   development_experiment_id: 143755ed1aee192a41d545ed818b591dcfb00fc7d0f0c93802b56b060fb7f84e
@@ -402,47 +824,93 @@ configurations:
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-6-openvla_oft-2--flash_vla_keep192
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/openvla_oft/safe_pruner.yaml
+    stop: latency_plateau
+    reason: Keep176 retains 196/200 but is not faster; retain keep192 and report the full-cost slowdown.
+    complete: true
+    evidence:
+    - development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
+      development_experiment_id: 143755ed1aee192a41d545ed818b591dcfb00fc7d0f0c93802b56b060fb7f84e
+      timing_record: compact-45-6-openvla_oft-2--flash_vla_keep192
+    - development_summary_sha256: 739312f5d398ba8bff8118068e2535a1fc38cb7dab29af90d818f684667d8d8c
+      development_experiment_id: 80814b68af6d575252526e2765c6ca00d0de19a590325a1d013a173b6931d685
+      timing_record: search-r1-45-5-openvla_oft-3--flash_vla_keep176
+- config: configs/experiments/openvla_oft/safe_pruner_keep1875.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate meets Dev loss target.
+  reason: Keep18.75% meets192/200; stronger keep12.5% falls to189/200.
   scope: Task-aware token pruning.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 21e11d22bc36089d4007bafe5b33d9b790947dbef1e904ab92e73336bf26ffec
+  development_summary_sha256: 6b50a2a76224132d956e1f1d2bd326bb5376b3b6f29e7a7ed112a64ef79af608
+  development_experiment_id: c6224353d91f72c020e1c61e427e9cec0964ba782497b05e1fe7db110a06ab07
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-6-openvla_oft-2--safe_pruner
+  timing_record: search-r23-124-6-openvla_oft-0--safe_pruner_keep1875
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/openvla_oft/sparsevlm.yaml
+    stop: accuracy_boundary
+    reason: Keep18.75% meets192/200; stronger keep12.5% falls to189/200.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 21e11d22bc36089d4007bafe5b33d9b790947dbef1e904ab92e73336bf26ffec
+      timing_record: compact-45-6-openvla_oft-2--safe_pruner
+    - development_summary_sha256: 6b50a2a76224132d956e1f1d2bd326bb5376b3b6f29e7a7ed112a64ef79af608
+      development_experiment_id: c6224353d91f72c020e1c61e427e9cec0964ba782497b05e1fe7db110a06ab07
+      timing_record: search-r23-124-6-openvla_oft-0--safe_pruner_keep1875
+    - development_summary_sha256: 063da1efb43c2dad9ab14a8b146723f39cdb525fd6f6e04cf211625518f07db8
+      development_experiment_id: ca75ecc11fe121380ec814a04b3649bb223bfa3935d8eb4341bd3d3a8d66e4de
+      timing_record: search-r1-45-6-openvla_oft-1--safe_pruner_keep125
+- config: configs/experiments/openvla_oft/sparsevlm_rank50.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate meets Dev loss target.
+  reason: Rank scale0.50 gives192/200; stronger0.625 and0.75 give190/200 and168/200. Recycling remains
+    active.
   scope: Task-related selection and token recycling.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 071e8857510d6e9ed29997e514942f2950f8af42284c5bba9ff50ba0b2c7f6ef
+  development_summary_sha256: 5a0500ebc96e060282d831e45ccbd182b5f9bac6c2fe8521aabd72a0238b1678
+  development_experiment_id: f20516d6ae83064a018e357944d7325885f1af3fbba0a8788ea76117ee0b48b1
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-6-openvla_oft-1--sparsevlm
+  timing_record: search-r1-45-6-openvla_oft-1--sparsevlm_rank50
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/openvla_oft/specprune_vla_score_first.yaml
+    stop: accuracy_boundary
+    reason: Rank scale0.50 gives192/200; stronger0.625 and0.75 give190/200 and168/200. Recycling remains
+      active.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 071e8857510d6e9ed29997e514942f2950f8af42284c5bba9ff50ba0b2c7f6ef
+      timing_record: compact-45-6-openvla_oft-1--sparsevlm
+    - development_summary_sha256: 5a0500ebc96e060282d831e45ccbd182b5f9bac6c2fe8521aabd72a0238b1678
+      development_experiment_id: f20516d6ae83064a018e357944d7325885f1af3fbba0a8788ea76117ee0b48b1
+      timing_record: search-r1-45-6-openvla_oft-1--sparsevlm_rank50
+    - development_summary_sha256: 02ef21ded1e2bcdef13b132c5ab4c5f6fa21b9b31268a1c4fb3bd1389070ebcf
+      development_experiment_id: 04998449d7ae614c99298a7127f91b65977f1f766b3bde70ce93569683b43d44
+      timing_record: search-r14-124-6-openvla_oft--sparsevlm_rank625
+    - development_summary_sha256: 0648cf58170118c570469d3eb80648f1c7fc61b50e864d077752ca8409302984
+      development_experiment_id: ea94c0abcdb88589cff25a5418406dd9fdac3b63601c846215a881e09dba383d
+      timing_record: search-r456-124-6-openvla_oft-0--sparsevlm_rank75
+- config: configs/experiments/openvla_oft/specprune_vla_dynamic80.yaml
   status: primary
   section: '5.1'
-  reason: 193/200 versus 158/200 for original timing; intentional ablation.
+  reason: Dynamic keep80% gives195/200; keep60% gives190/200. Score-first migration scope remains explicit.
   scope: Score-before-first-prune variant, not author-default scheduling.
-  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
-  development_experiment_id: 4ad4e29d8c6340d9596de67535f4e4319935c722593a0e5be25a3e5974120685
+  development_summary_sha256: 249255080815b02b120b9e6a91624ff0885bc3f58aad19ef99fe73b8a5078aac
+  development_experiment_id: 3f7f62a0d04cbdcedc73cbab0a908e099270f7205d965fe8d0a7e4558eadb206
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-7-openvla_oft-1--specprune_vla_score_first
+  timing_record: search-r1-45-6-openvla_oft-4--specprune_vla_dynamic80
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: accuracy_boundary
+    reason: Dynamic keep80% gives195/200; keep60% gives190/200. Score-first migration scope remains explicit.
+    complete: true
+    evidence:
+    - development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
+      development_experiment_id: 4ad4e29d8c6340d9596de67535f4e4319935c722593a0e5be25a3e5974120685
+      timing_record: compact-45-7-openvla_oft-1--specprune_vla_score_first
+    - development_summary_sha256: 249255080815b02b120b9e6a91624ff0885bc3f58aad19ef99fe73b8a5078aac
+      development_experiment_id: 3f7f62a0d04cbdcedc73cbab0a908e099270f7205d965fe8d0a7e4558eadb206
+      timing_record: search-r1-45-6-openvla_oft-4--specprune_vla_dynamic80
+    - development_summary_sha256: 89de3035fa7b26fe3c5015105d04bbe5c64a8d14bc03c127bd5b888b103b2120
+      development_experiment_id: 8885083b5f6c14b47f52e590f40ca7dab45f8a434d5e550e6db2a97b541b0cdd
+      timing_record: search-r14-124-6-openvla_oft--specprune_vla_dynamic60
 - config: configs/experiments/openvla_oft/st_merge_keep192.yaml
   status: pending_core
   section: '5.1'
@@ -473,23 +941,39 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-7-openvla_oft-3--vla_iap
-- config: configs/experiments/openvla_oft/vla_pruner.yaml
+- config: configs/experiments/openvla_oft/vla_pruner_keep125.yaml
   status: primary
   section: '5.1'
-  reason: Existing candidate meets Dev loss target.
+  reason: Keep12.5% gives193/200; stronger9.375% and6.25% give181/200 and171/200. Preserve dual-score
+    selection.
   scope: Declared progressive visual pruning core.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: bdc953860094a1e5dc0a255f8c0bc53142570fbd610242920303d1b1a1216310
+  development_summary_sha256: 62d92922462ca9e99beede5bb473bfd2698468e2f02bf95bfe7623e9c12a528c
+  development_experiment_id: 67e27456b57078bbcc5d7a69c66702def13efe6de9858c124b549353013a056f
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-7-openvla_oft-1--vla_pruner
+  timing_record: search-r1-45-5-openvla_oft-3--vla_pruner_keep125
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: accuracy_boundary
+    reason: Keep12.5% gives193/200; stronger9.375% and6.25% give181/200 and171/200. Preserve dual-score
+      selection.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: bdc953860094a1e5dc0a255f8c0bc53142570fbd610242920303d1b1a1216310
+      timing_record: compact-45-7-openvla_oft-1--vla_pruner
+    - development_summary_sha256: 62d92922462ca9e99beede5bb473bfd2698468e2f02bf95bfe7623e9c12a528c
+      development_experiment_id: 67e27456b57078bbcc5d7a69c66702def13efe6de9858c124b549353013a056f
+      timing_record: search-r1-45-5-openvla_oft-3--vla_pruner_keep125
+    - development_summary_sha256: 69fcbc0d4c78ac49c2ab1c9efbfc3da52db06e1ae5244f8f60ca683d9fb64758
+      development_experiment_id: b6c5c1617d27f097a0ee821d76a01d69d48bb43120e78f768c8d8262ce8efcb4
+      timing_record: search-recovery-125-6-openvla_oft-1--vla_pruner_keep09375
+    - development_summary_sha256: 3f06ec25d8c0d17b9470d2f6be32bcb933d930297846984ea44ffa3a5751318b
+      development_experiment_id: 8a9decc7d2ed1ea85b59c406f0204ee830a0002da28555513cb0185c9d06f569
+      timing_record: search-r10-124-6-openvla_oft--vla_pruner_keep0625
 - config: configs/experiments/openvla_oft/temporal_redundancy_visual.yaml
   status: primary
   section: '5.2'
-  reason: Retain active half-row reuse; report measured full-cost slowdown.
+  reason: Update50% gives192/200; update25% falls to182/200 without a timing benefit. Report the slowdown.
   scope: Visual attention core; trained action branch excluded.
   development_summary_sha256: 0151c5d817556bcd8f7f08cd0f55b1a40f4c58d0733fe96987033f0fb3328b3d
   development_experiment_id: a0480729b2ee658d04b2ce8dc01bd888cadca71e070a130a2cb0143cf2efd768
@@ -497,51 +981,111 @@ configurations:
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: cache-v1-45-7-oft-recheck--temporal_redundancy_visual
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/openvla_oft/vla_cache.yaml
+    stop: accuracy_boundary
+    reason: Update50% gives192/200; update25% falls to182/200 without a timing benefit. Report the slowdown.
+    complete: true
+    evidence:
+    - development_summary_sha256: 0151c5d817556bcd8f7f08cd0f55b1a40f4c58d0733fe96987033f0fb3328b3d
+      development_experiment_id: a0480729b2ee658d04b2ce8dc01bd888cadca71e070a130a2cb0143cf2efd768
+      timing_record: cache-v1-45-7-oft-recheck--temporal_redundancy_visual
+    - development_summary_sha256: c81cc81766bf6b8828043ff1d3ed431b86173778c13e355eaf1b109be8c7ff2f
+      development_experiment_id: c76e246e169473b07975a71a82daa9cd83997d2d89250d46ac52ca3f1acd6fc8
+      timing_record: search-r1-45-6-openvla_oft-4--temporal_redundancy_visual_update25
+- config: configs/experiments/openvla_oft/vla_cache_budget256_protect50.yaml
   status: primary
   section: '5.2'
-  reason: Existing candidate meets Dev loss target; retain any measured overhead honestly.
+  reason: Budget256 with50 protected tokens gives194/200 and1.043x full-cost speed;25 protected tokens
+    falls to190/200. Task protection and complete entropy statistics remain active.
   scope: Query-row reuse with retained visual KV.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 05bde38fdbf83dfb4f0928768c7d460b51ef106a49e29eeb6aaf7783da1da17d
+  development_summary_sha256: e3f5dd01dff97cf63c8627caa44d3f56634e5df53a2fe478bf8530dfb50137c7
+  development_experiment_id: 561783bb97b9dc7ae23abc9105ba90b1f11eb6468d675580da273605d05e9a77
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-7-openvla_oft-1--vla_cache
+  timing_record: search-recovery-125-6-openvla_oft-0--vla_cache_budget256_protect50
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/openvla_oft/vla_infoentropy.yaml
+    stop: accuracy_boundary
+    reason: Budget256 with50 protected tokens gives194/200 and1.043x full-cost speed;25 protected tokens
+      falls to190/200. Task protection and complete entropy statistics remain active.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 05bde38fdbf83dfb4f0928768c7d460b51ef106a49e29eeb6aaf7783da1da17d
+      timing_record: compact-45-7-openvla_oft-1--vla_cache
+    - development_summary_sha256: 22f36da375f189e3dd9ccb3bdd1749b2a8a21c7efc796d5ef9e6b66c260afcfd
+      development_experiment_id: 739daf7c69833a054aed2bfa4ab590b61a12315a6f2fd78e9fa9d92f4b316475
+      timing_record: search-r1-45-7-openvla_oft-2--vla_cache_budget224
+    - development_summary_sha256: 3f737da7e90f428064887837883ff7ad53236ad6dceea2de07f03c8c73322113
+      development_experiment_id: c1d848518d39f73c3abe221fbca5cda0995a5c2d672cf16bf89bf870fcf7cec4
+      timing_record: search-r13-124-6-openvla_oft--vla_cache_budget256
+    - development_summary_sha256: e3f5dd01dff97cf63c8627caa44d3f56634e5df53a2fe478bf8530dfb50137c7
+      development_experiment_id: 561783bb97b9dc7ae23abc9105ba90b1f11eb6468d675580da273605d05e9a77
+      timing_record: search-recovery-125-6-openvla_oft-0--vla_cache_budget256_protect50
+    - development_summary_sha256: 2f4e0059819b9e9b6591ee8918b799d8cf338aa8f40ca9d1cc40d1f5a3f5d3c3
+      development_experiment_id: 8929e53f6faafe9666aeb79b7771bf565593c0cfd1ed9905a820e0ee1eaac8d9
+      timing_record: search-r24-125-6-openvla_oft--vla_cache_budget256_protect25
+- config: configs/experiments/openvla_oft/vla_infoentropy_budget224.yaml
   status: primary
   section: '5.2'
-  reason: Existing candidate meets Dev loss target; retain full reuse overhead.
+  reason: Budget224 meets192/200 and reduces full-cost overhead;256 falls to189/200 and reducing entropy
+    protection quotas gives179/200. No reliable acceleration over native is claimed.
   scope: Entropy-guided query-row reuse with retained KV.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: fc132144e01cbf7c6a681a8b9f59e0010c7cb55a4742809365070e9632b55733
+  development_summary_sha256: 0b5e061326124128edb9a80b623f6f07cadb851f8437c4b367f34d721ecc6c67
+  development_experiment_id: 84aa0e0fe7b5e53c2b930e0a2b6cfdefaecd2fe9632e8e5b60d683594fb9d11f
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-7-openvla_oft-1--vla_infoentropy
+  timing_record: search-r1-45-7-openvla_oft-5--vla_infoentropy_budget224
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
-- config: configs/experiments/openvla_oft/sp_vla.yaml
+    stop: accuracy_boundary
+    reason: Budget224 meets192/200 and reduces full-cost overhead;256 falls to189/200 and reducing entropy
+      protection quotas gives179/200. No reliable acceleration over native is claimed.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: fc132144e01cbf7c6a681a8b9f59e0010c7cb55a4742809365070e9632b55733
+      timing_record: compact-45-7-openvla_oft-1--vla_infoentropy
+    - development_summary_sha256: 0b5e061326124128edb9a80b623f6f07cadb851f8437c4b367f34d721ecc6c67
+      development_experiment_id: 84aa0e0fe7b5e53c2b930e0a2b6cfdefaecd2fe9632e8e5b60d683594fb9d11f
+      timing_record: search-r1-45-7-openvla_oft-5--vla_infoentropy_budget224
+    - development_summary_sha256: 732dfb3584158e9b073d0f1e01af551e9ac8f658c3b0bebe25941f0e2c299a65
+      development_experiment_id: 4a0dbae39850e5cd1ee459740cbcf938bc11634a459d843f286a062743007122
+      timing_record: search-r13-124-6-openvla_oft--vla_infoentropy_budget256
+    - development_summary_sha256: 7b1fed0defbff39987fe1c1cfaee540ac1c442b7c5782b4a94d3500582537dc8
+      development_experiment_id: f7246f5cd6687d505114d743907a738470b99b7ec46abffbc4df44249e1d3e04
+      timing_record: search-recovery-125-6-openvla_oft-0--vla_infoentropy_budget256_quotas20_30
+- config: configs/experiments/openvla_oft/sp_vla_z025_min_actions3.yaml
   status: primary
   section: '5.3'
-  reason: Existing candidate meets Dev loss target.
+  reason: Minimum three native actions in the unchanged six-command history, with pruning Z threshold
+    0.25, gives 195/200. Requiring only two native actions gives 191/200. Keep pruning and scheduling
+    together.
   scope: Pruning plus executed-action scheduling.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: c321f89069f8c73c936a1388ee57c00bab318a500a5f81d0ec5b9074a94a23a8
+  development_summary_sha256: e0b8e83ddfdf3713c22176223369d8fad9e48b7b565aa8a7bbbfe593a2640c15
+  development_experiment_id: 1d80b73d202ee632e4220288cfd3bec1fc5f2a62bb5baa5325fe800195a10572
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-6-openvla_oft-2--sp_vla
+  timing_record: search-r78-124-6-openvla_oft--sp_vla_z025_history3
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: accuracy_boundary
+    reason: Minimum three native actions in the unchanged six-command history, with pruning Z threshold
+      0.25, gives 195/200. Requiring only two native actions gives 191/200. Keep pruning and scheduling
+      together.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: c321f89069f8c73c936a1388ee57c00bab318a500a5f81d0ec5b9074a94a23a8
+      timing_record: compact-45-6-openvla_oft-2--sp_vla
+    - development_summary_sha256: 8e1e84a27a5ecfe0bd2a0f0b61a6457ccbaa1851774f86ede74a71656cb8811e
+      development_experiment_id: 45d1b2e44c4374213d3e73c83e8e715fa839063fcc7f360d0771856e046f4eb8
+      timing_record: search-r1-45-7-openvla_oft-2--sp_vla_z025
+    - development_summary_sha256: e0b8e83ddfdf3713c22176223369d8fad9e48b7b565aa8a7bbbfe593a2640c15
+      development_experiment_id: 1d80b73d202ee632e4220288cfd3bec1fc5f2a62bb5baa5325fe800195a10572
+      timing_record: search-r78-124-6-openvla_oft--sp_vla_z025_history3
+    - development_summary_sha256: a1e6339862135e81ad33f177733233d3374e5efef40f8a3a5d14d3b2c0170170
+      development_experiment_id: 859578dfea8c90d01617bc49ad2f4d7aa012b7cf52b3ed5f6c7315e3d01f1c00
 - config: configs/experiments/openvla_oft/awq_fp16_kernel.yaml
   status: primary
   section: '6.1'
-  reason: Measured FP16-kernel W4A16 candidate; compare retained BF16 auxiliary.
+  reason: FP16 is the faster eligible option among both measured supported kernel precisions.
   scope: Explicit FP16 cast boundary; training-only calibration.
   development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   development_experiment_id: 566ed69c9ce2db872ba40344f9123dac0ba1db2f05ef3c240c7f156406fe6d66
@@ -549,8 +1093,18 @@ configurations:
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-124-7-openvla_oft-quant--awq_fp16_kernel
   search:
-    complete: false
-    reason: Speedward headroom audit in progress; previous accuracy eligibility is not search closure.
+    stop: mechanism_limit
+    reason: FP16 is the faster eligible option among both measured supported kernel precisions.
+    limitation: The pinned packed W4 kernel fixes bits=4 and group_size=128; changing calibration search
+      does not reduce online operator geometry.
+    complete: true
+    evidence:
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 566ed69c9ce2db872ba40344f9123dac0ba1db2f05ef3c240c7f156406fe6d66
+      timing_record: compact-124-7-openvla_oft-quant--awq_fp16_kernel
+    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+      development_experiment_id: 5d64703c2acfcfe4a33ed22f76215b16457c1d61cc0be948e134f97124f509cf
+      timing_record: compact-124-7-openvla_oft-quant--awq
 timing_protocol: libero_replay4x128_v1
 auxiliary_configurations:
 - config: configs/experiments/openvla_oft/awq.yaml
