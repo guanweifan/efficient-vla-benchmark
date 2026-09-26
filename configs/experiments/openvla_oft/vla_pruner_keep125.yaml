@@ -1,0 +1,4 @@
+extends:
+- ./vla_pruner.yaml
+parameters:
+  keep_ratio: 0.125
