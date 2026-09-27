@@ -109,7 +109,7 @@ def load_result(directory):
     }
 
 
-def render(records):
+def render(records, auxiliary=()):
     if not records:
         return ""
     if len({r["metadata"]["corpus_sha256"] for r in records}) != 1:
@@ -142,7 +142,7 @@ def render(records):
         label = m["codec"] + (
             " / " + ", ".join(f"{k}={v}" for k, v in params.items()) if params else ""
         )
-        device = m.get("gpu") or m["device"]
+        device = m.get("gpu") or record["quality"].get("cpu_model", m["device"])
         lines.append(
             f"| {label} | {device} | {s['windows']} | {s['mse']:.7f} | {s['mae']:.5f} | "
             f"{s['gripper_sign_agreement']:.4f} | {s['tokens_per_frame']:.3f} | "
@@ -154,4 +154,26 @@ def render(records):
             f"| `{r['run_id']}` | `{r['provenance']['source']['commit']}` | "
             f"`{r['files_sha256']['summary.json']}` |"
         )
+    if auxiliary:
+        if any(r["metadata"]["corpus_sha256"] != first["corpus_sha256"] for r in auxiliary):
+            raise ValueError("Auxiliary codec device checks use a different corpus")
+        lines += [
+            "",
+            "<details>",
+            "<summary>Codec device checks (auxiliary, not default rows)</summary>",
+            "",
+            "The small spline workload is faster on native CPU; both devices use four OpenMP "
+            "threads and the same corpus. Retain the CUDA comparison, not a second primary.",
+            "",
+            "| Run | Device | Raw MSE | Encode / decode ms per window | Summary SHA256 |",
+            "|---|---|---:|---:|---|",
+        ]
+        for r in auxiliary:
+            s, m = r["summary"], r["metadata"]["codec"]
+            lines.append(
+                f"| `{r['run_id']}` | {m.get('gpu') or m['device']} | {s['mse']:.7f} | "
+                f"{s['encode_ms']:.3f} / {s['decode_ms']:.3f} | "
+                f"`{r['files_sha256']['summary.json']}` |"
+            )
+        lines += ["", "</details>"]
     return "\n".join(lines) + "\n"

@@ -569,6 +569,7 @@ def main():
     p.add_argument("--timing-quality", type=Path, required=True)
     p.add_argument("--final-summary", type=Path, action="append", default=[])
     p.add_argument("--codec-run", type=Path, action="append", default=[])
+    p.add_argument("--codec-auxiliary-run", type=Path, action="append", default=[])
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--evidence-output", type=Path, required=True)
     a = p.parse_args()
@@ -604,7 +605,18 @@ def main():
     ):
         raise ValueError("Existing codec evidence must be supplied; refuse to silently drop it")
     report["action_codecs"] = [load_result(directory) for directory in a.codec_run]
-    a.output.write_text(render(report) + render_codecs(report["action_codecs"]))
+    if (
+        not a.codec_auxiliary_run
+        and a.output.exists()
+        and "Codec device checks" in a.output.read_text()
+    ):
+        raise ValueError("Existing auxiliary codec checks must be supplied")
+    report["auxiliary_action_codecs"] = [
+        load_result(directory) for directory in a.codec_auxiliary_run
+    ]
+    a.output.write_text(
+        render(report) + render_codecs(report["action_codecs"], report["auxiliary_action_codecs"])
+    )
     a.evidence_output.parent.mkdir(parents=True, exist_ok=True)
     a.evidence_output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     print(

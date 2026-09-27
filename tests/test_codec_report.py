@@ -48,6 +48,10 @@ def test_codec_record_is_independent_and_checksummed(tmp_path):
     table = render([record])
     assert "not policy success" in table and "test_codec" in table
     assert "Speedup |" not in table
+    assert "Codec device checks" in render([record], [record])
+    altered = dict(record, metadata=dict(record["metadata"], corpus_sha256="b" * 64))
+    with pytest.raises(ValueError, match="different corpus"):
+        render([record], [altered])
 
 
 @pytest.mark.parametrize("change", ["summary", "quality", "telemetry", "provenance"])
