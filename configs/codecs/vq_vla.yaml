@@ -1,0 +1,2 @@
+factory: efficient_vla_benchmark.action_codecs.implementations.vq_vla.adapter:VqVla
+parameters: {}

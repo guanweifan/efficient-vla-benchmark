@@ -10,6 +10,7 @@ outputs/
 artifacts/
 _private/
 .cache/
+/third_party/runtimes/action_codecs/
 __pycache__/
 *.py[cod]
 *.egg-info/

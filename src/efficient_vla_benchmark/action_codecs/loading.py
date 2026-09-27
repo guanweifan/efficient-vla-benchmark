@@ -38,6 +38,18 @@ def load_module(path, name):
     return sys.modules[key]
 
 
+def verified_sources(directory, repository, revision):
+    directory = Path(directory)
+    manifest = json.loads((directory / "source_manifest.json").read_text())
+    if manifest["repository"] != repository or manifest["revision"] != revision:
+        raise ValueError("Unexpected codec source revision")
+    for row in manifest["files"]:
+        path = directory / row["name"]
+        if not path.resolve().is_relative_to(directory.resolve()) or digest(path) != row["sha256"]:
+            raise ValueError("Codec source changed since pinned fetch")
+    return manifest
+
+
 def factory(specification):
     module, name = specification.split(":", 1)
     if not module.startswith("efficient_vla_benchmark.action_codecs.implementations."):
