@@ -1,0 +1,14 @@
+schema_version: 1
+name: bac
+category: caching
+description: Block-specific ACS residual caching with calibrated Bubbling Union protection.
+config: efficient_vla_benchmark.methods.caching.bac.config:BACConfig
+requires_artifact: true
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.caching.bac.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.caching.bac.implementations.cogact.api:preflight
+    calibrate: efficient_vla_benchmark.methods.caching.bac.implementations.cogact.api:calibrate
+    validate_experiment: efficient_vla_benchmark.methods.caching.bac.implementations.cogact.api:validate_experiment

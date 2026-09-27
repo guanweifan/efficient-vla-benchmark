@@ -1,0 +1,7 @@
+method: bac
+parameters:
+  enabled: true
+  num_updates: 6
+  protected_blocks: 5
+  calibration_samples: 64
+  calibration_seed: 0
