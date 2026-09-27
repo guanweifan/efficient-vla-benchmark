@@ -254,6 +254,14 @@ population episodes are not replaced. Evaluation never updates this bank. Report
 population cost separately from steady-state lookup/refinement; an 80-episode bank
 is not free training data or part of the final 2,000-episode success measurement.
 
+`evaluation.libero.independent` freezes caller-declared independent placement
+groups before outcomes are observed. It excludes all fifty standard states per
+task and cross-group physical duplicates (simulator time does not create a new
+placement). Search quick/confirmation groups use this separate population, never
+Dev/final outcomes. The runner calls the same episode loop, preserves failures,
+verifies resource/state hashes, and refuses silent retries. Search algorithms own
+their fitness and authorized episode budget; this shared utility owns neither.
+
 LIBERO smoke uses task 0 / initial state 0 / seed 0 in each suite, ten settling steps,
 then limits of 220/280/300/520 control steps for Spatial/Object/Goal/Long. CUDA/EGL
 selection must agree. Outputs retain metadata, episodes (including errors), summary,
