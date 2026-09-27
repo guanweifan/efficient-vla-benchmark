@@ -1,0 +1,5 @@
+factory: efficient_vla_benchmark.action_codecs.implementations.beast.adapter:Beast
+parameters:
+  num_basis: 5
+  degree: 4
+  gripper_zero_order: false
