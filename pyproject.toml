@@ -11,6 +11,8 @@ dependencies = ["numpy>=1.24,<2", "PyYAML>=6", "packaging>=23"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "ruff>=0.6"]
+pace = ["scipy>=1.8.1,<2"]
+pace-calibration = ["scipy>=1.8.1,<2", "pyarrow==17.0.0"]
 
 [project.scripts]
 evb = "efficient_vla_benchmark.cli:main"

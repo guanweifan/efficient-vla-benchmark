@@ -1,0 +1,7 @@
+method: pace
+parameters:
+  enabled: true
+  smoothing_window: 3
+  minimum_spacing: 2
+  calibration_percentile: 5.0
+  max_horizon: null

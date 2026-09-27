@@ -1,0 +1,19 @@
+schema_version: 1
+name: pace
+category: action_chunking
+description: Training-calibrated prominent speed valleys select a real execution prefix.
+config: efficient_vla_benchmark.methods.action_chunking.pace.config:PACEConfig
+requires_artifact: true
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [control_hooks, libero_cartesian_delta_actions]
+    factory: efficient_vla_benchmark.methods.action_chunking.pace.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.action_chunking.pace.implementations.cogact.api:preflight
+    validate_experiment: efficient_vla_benchmark.methods.action_chunking.pace.implementations.cogact.api:validate_experiment
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [control_hooks, libero_cartesian_delta_actions]
+    factory: efficient_vla_benchmark.methods.action_chunking.pace.implementations.openvla_oft.api:build
+    preflight: efficient_vla_benchmark.methods.action_chunking.pace.implementations.openvla_oft.api:preflight
+    validate_experiment: efficient_vla_benchmark.methods.action_chunking.pace.implementations.openvla_oft.api:validate_experiment
