@@ -15,7 +15,7 @@ Each speedup uses its own same-GPU native pair; the displayed native row is
 not a universal denominator. Absolute latency across GPU pairs is descriptive.
 Measured GPU models: NVIDIA GeForce RTX 3090.
 
-Selection digest: `e5c83f44b24169659fe28c8e95570805c7c850554269b922e9e1098931687ba8`.
+Selection digest: `99e58902a150c48761ba3c833d97dd9a15aebb89fca869457bbe6549a6acf5d0`.
 
 ## cogact
 
@@ -35,14 +35,19 @@ Selection digest: `e5c83f44b24169659fe28c8e95570805c7c850554269b922e9e1098931687
 | 5.1 | `specprune_vla_static112` | 8 | 90.0% (180) | -1.5 | 20.290 | 1.139× | 14.63 | — | Static deletion112 gives180/200 and the fastest tested eligible timing; deletion128 gives174/200. Static/dynamic pruning with bounded static deletion. Search: accuracy_boundary. |
 | 5.2 | `action_cache_threshold80` | 8 | 89.0% (178) | -2.5 | 19.958 | 1.180× | 14.75 | — | Threshold0.80 with two native tail steps gives178/200 and1.180x. Threshold0.75 gives176/200; one tail step at0.80 gives171/200. Preserve the frozen independent bank and full retrieval/refinement cost. DDIM refinement adaptation; 1412 pairs from 77/80 independent successful episodes. Search: accuracy_boundary. |
 | 5.2 | `actuation_slack_refresh_kv_keep50` | 8 | 89.5% (179) | -2.0 | 46.395 | 0.499× | 14.74 | — | asr_kv_keep50 gives 179/200, fastest valid timing among tested configurations meeting >= 177/200. Measured below-target boundary: asr_kv_keep10=37/200, asr_kv_keep25=126/200, asr_kv_keep375=176/200. Retain the full-cost slowdown; auxiliary work is not free actuation overlap. ASR immutable dense-base KV reuse with unconditional same-frame full auxiliary refresh; no composition. Search: accuracy_boundary. |
+| 5.2 | `bac_updates4` | 8 | 88.5% (177) | -3.0 | 21.983 | 1.061× | 14.73 | — | Four ACS updates gives177/200. Stronger three/two updates give169/152; six gives175 and is slower. Preserve BUA and global schedule allocation. ACS plus BUA; native CFG/DDIM residuals and frozen training-only statistics. Search: accuracy_boundary. |
 | 5.2 | `c3ache_conditioned_residual_prefix6` | 8 | 91.5% (183) | +0.0 | 22.971 | 1.012× | 14.73 | — | Prefix4 is not faster than prefix6 and lowers success; caching four steps falls to162/200. Retain183/200 with no reliable speedup claim. Cross-chunk residual core; two cached steps, refresh interval two; not full Fast-WAM. Search: accuracy_boundary. |
 | 5.2 | `dp_cache_interval6` | 8 | 91.0% (182) | -0.5 | 21.215 | 1.110× | 14.73 | — | Interval6 fills the profiled middle window2..7 and gives182/200 with1.110x. Extending to2..8 or1..8 gives134/200 or130/200. Keep all native DDIM transitions and both CFG branches. Native denoiser output reuse only; no VAE/compiler pipeline. Search: accuracy_boundary. |
 | 5.2 | `efficient_vla_diffusion_cache_interval4` | 8 | 93.0% (186) | +1.5 | 21.208 | 1.093× | 14.73 | — | Interval4 gives186/200; interval5 falls to165/200. Choose the eligible stronger cache with its own paired timing. Within-sampling DiT feature cache; native sampler unchanged. Search: accuracy_boundary. |
+| 5.2 | `evo_budget168` | 8 | 89.5% (179) | -2.0 | 22.656 | 1.030× | 14.73 | — | Measured candidates: evo_budget168=179/200, evo=165/200, evo_budget72=146/200. Choose the fastest eligible candidate. Layout search was frozen before Dev:640 independent episodes,24 candidates; none met the independent confirmation target. No convergence or global optimality claim. Globally budgeted residual cache with frozen independent rollout-searched layouts. Search: accuracy_boundary. |
 | 5.2 | `temporal_redundancy_visual_update75` | 8 | 90.0% (180) | -1.5 | 23.954 | 0.970× | 14.85 | — | Update75% gives180/200; update62.5% falls to174/200. No tested reliable acceleration at the accuracy target. Visual attention core; trained action branch excluded. Search: accuracy_boundary. |
+| 5.2 | `v_aefusion_s1` | 8 | 91.5% (183) | +0.0 | 24.227 | 0.973× | 14.74 | — | S1 gives183/200 and the fastest full-cost timing among all five active overlap windows; S5=177 and S9=14. All measured settings are slower than native. Stale-cognition early native head steps overlapped on a CUDA stream, mandatory fresh tail; no assumed actuation slack. Search: latency_plateau. |
 | 5.2 | `vla_cache_budget256_protect75` | 8 | 89.5% (179) | -2.0 | 18.407 | 1.272× | 14.75 | — | Budget256 with75 protected tokens gives179/200 and1.272x;50 protected tokens falls to161/200. Preserve task protection, complete entropy statistics, and native KV visibility. Query-row reuse with retained visual KV. Search: accuracy_boundary. |
 | 5.2 | `vla_infoentropy` | 8 | 87.5% (175) | -4.0 | 20.307 | 1.140× | 14.75 | — | Native-output SDPA still gives173/200; stricter similarity thresholds give175/200 and a smaller budget gives174/200. Keep the reference-close175/200 full-entropy port as an explicitly below-target result. Entropy-guided query-row reuse; below Dev loss target. Search: no_feasible_configuration. |
 | 5.3 | `eco_vla_keep60` | 8 | 92.0% (184) | +0.5 | 20.089 | 1.162× | 15.77 | — | eco_keep60 gives 184/200, fastest valid timing among tested configurations meeting >= 177/200. Measured below-target boundary: eco_keep50=167/200, eco_keep55=175/200. EcoVLA dynamic FFN-channel and whole-head core; declared trigger/grouping conventions and frozen training prior. Search: accuracy_boundary. |
 | 5.3 | `sp_vla_z025_min_actions3` | 8 | 89.0% (178) | -2.5 | 17.825 | 1.292× | 14.73 | — | Minimum three native actions in the unchanged six-command history, with pruning Z threshold 0.25, gives 178/200. Requiring only two native actions gives 176/200. Keep pruning and scheduling together. Pruning plus executed-action scheduling. Search: accuracy_boundary. |
+| 5.4 | `keystone_k3` | 8 | 92.0% (184) | +0.5 | 23.715 | 0.996× | 14.73 | — | K3 gives184/200 and is fastest among measured active candidate counts; K4 gives178/200, while K8/K16 add latency. No measured end-to-end acceleration. Batched native-DDIM candidates and guarded geometric selection, not a trained sampler. Search: mechanism_limit. |
+| 5.4 | `probeflow_eps0015` | 8 | 90.5% (181) | -1.0 | 21.510 | 1.083× | 14.73 | — | Measured candidates: probeflow=182/200, probeflow_eps0015=181/200, probeflow_eps03=176/200, probeflow_eps01=167/200. Choose the fastest eligible candidate. Adaptive lookahead core through the tested native DDIM coordinate bridge; not FM-trained. Search: accuracy_boundary. |
 | 5.5 | `vote_ensemble_h8` | 8 | 87.0% (174) | -4.5 | 23.720 | 0.996× | 14.73 | — | H8 thresholds0.25/0.50/0.75 give174/174/172 of200, all below177; retain reference0.50 as an explicit negative two-vote adaptation. H8 two-vote overlapping-chunk ensemble core; no single-ACT architecture or extra queries. Search: no_feasible_configuration. |
 | 6.1 | `awq_fp16_kernel` | 8 | 91.0% (182) | -0.5 | 17.005 | 1.356× | 5.90 | — | FP16 is the faster eligible option among both measured supported kernel precisions. Explicit FP16 cast boundary; training-only calibration. Search: mechanism_limit. |
 
@@ -116,14 +121,19 @@ Recorded revisions predating history cleanup can be resolved through the
 | cogact / `specprune_vla_static112` | `d1a060bd5b0c4e31b979a8f9e8d98c7a9ae441766e68e7ca093b06fcbda92f0e` | `search-r1-recheck2-41-7-cogact--specprune_vla_static112` | `faabaa5959b49364a808c7327559087f3cf1c892` / `faabaa5959b49364a808c7327559087f3cf1c892` | `b9d53df2dc6d5ca8f0c09c47384cd94f376351308573344ce8c9a53c7fe2029a` |
 | cogact / `action_cache_threshold80` | `07d39fad8017a5d0d5e41055d16e57df95a07b79ae182ff50b46b5188ba61b1a` | `search-r1112-124-6-cogact--action_cache_threshold80` | `faabaa5959b49364a808c7327559087f3cf1c892` / `96c738e00f6342e85790130ea2e660eec6d30dee` | `88c1bdc966c9cf2b464b5fb3ff19d3dd563b43307a139f155bea7b90bf2c1f4b` |
 | cogact / `actuation_slack_refresh_kv_keep50` | `a335934e5a3e5f57336b356f9da9fd8d227ab7e9155a6fc2b2f13d17f5a74f10` | `routing-asr-v2-45-6-cogact--asr_kv_keep50` | `86343119fa1e50550eb90a994b9e4a6cebd779b3` / `86343119fa1e50550eb90a994b9e4a6cebd779b3` | `98252b428fb9dc09532504ff45493504345b8a1eab3a4bbe7a0ae9800440dd64` |
+| cogact / `bac_updates4` | `ead4b40ef77bafdf2f26a73525b15a847f5459460cbf7dd48a5eceb065cfc8ee` | `bac-v1-41-7-recheck4-cogact--bac_updates4` | `d338c60a1fe7d206157b70cb47227c35c664f2ac` / `d338c60a1fe7d206157b70cb47227c35c664f2ac` | `007e78c7dcac729f7653dccccd38164545312bd8c4192240e6e4ae925548bc0a` |
 | cogact / `c3ache_conditioned_residual_prefix6` | `c692772b868aa42a4d774070b8028db7bf93ab031712cb7cb5d7b65d9cd03d6e` | `cache-v2-45-6-cogact--c3ache_conditioned_residual_prefix6` | `d3c46d34696eb47f753dba3306526bad5ad461c7` / `d3c46d34696eb47f753dba3306526bad5ad461c7` | `539f67019c803f6333f2f804c123a83bd0f31e373402b7c5fc321eab70d1662a` |
 | cogact / `dp_cache_interval6` | `2243cf3b022aafef382570f434f2e1fc298613e6434860a84873d27be7ca3d16` | `search-r1112-124-6-cogact--dp_cache_interval6` | `faabaa5959b49364a808c7327559087f3cf1c892` / `96c738e00f6342e85790130ea2e660eec6d30dee` | `6cc089a6b63d02a883e2f84613bb972e5b3daceebb692db6142c4778323e59a5` |
 | cogact / `efficient_vla_diffusion_cache_interval4` | `d1b43467534ec99b6bf7a6d3eb7523fd184068eb8834ff9d9d5e4a2d6d8d1f31` | `search-r1-recheck-41-7-cogact-5--efficient_vla_diffusion_cache_interval4` | `faabaa5959b49364a808c7327559087f3cf1c892` / `faabaa5959b49364a808c7327559087f3cf1c892` | `513e6fb4b5cd17be3ac8adabfe3493923cfcd6da35be5c5ba6ce3774e013a3c2` |
+| cogact / `evo_budget168` | `d653e21d06192fafc907bcf141442ab7c5e7d0d604c36c323215b48c87412cc2` | `evo-v1-124-7-cogact--evo_budget168` | `195d27fa6e65889e964e9a23483d43319b57e50c` / `195d27fa6e65889e964e9a23483d43319b57e50c` | `fae1a7db1d8fb71f002d70731365848c236d3202250687bc7ab2dd56fada4bca` |
 | cogact / `temporal_redundancy_visual_update75` | `fd8de3e4c0776b169a8a488af5f09a840a22c597869235a171387ed9ab2adca5` | `cache-v3-45-6-cogact--temporal_redundancy_visual_update75` | `d3c46d34696eb47f753dba3306526bad5ad461c7` / `d3c46d34696eb47f753dba3306526bad5ad461c7` | `35d15909a0b0e2be29c00576968e94183efe13ea35c330a6d70b828780b89793` |
+| cogact / `v_aefusion_s1` | `1195ea8e4181a5a4bf42f16aa8077a9344695797ff52f31f050cab5d4de04539` | `v-aefusion-v1-125-7-drift-recheck-cogact--v_aefusion_s1` | `f21d38df23182cf63c82159c4e1b7834d9259752` / `f21d38df23182cf63c82159c4e1b7834d9259752` | `1cf44684809e41e1c1ade1316d2f5720095b7c47c926f7528191922f92c08c47` |
 | cogact / `vla_cache_budget256_protect75` | `9927e2ef608b3b72e97501649002c6a57b707b0566404abae53f571a1422666f` | `search-r25-125-5-cogact--vla_cache_budget256_protect75` | `faabaa5959b49364a808c7327559087f3cf1c892` / `faabaa5959b49364a808c7327559087f3cf1c892` | `9a790606de30f1470c6aa17f60f15bb3253c85fe273d641090a7df9f82b65292` |
 | cogact / `vla_infoentropy` | `3e7f5140c644c221a9a02a45731cf1e949650a3564053c9d662f85e37b11cabb` | `compact-43-2-cogact-inputs-retry--vla_infoentropy` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `3330159196088131057ec15ea17cdc1667f6f9668632ed2266ff747cae62d186` |
 | cogact / `eco_vla_keep60` | `9b3df9db8fb40e0e1a2088fc5ec34728f4cef5d25c363dff38c9bc22ecf8a308` | `routing-eco-dyn1-45-7-cogact--eco_keep60` | `0281aa8f0f59a2ef08380f36ea95362b27748d90` / `a7c6b45a939067ff2dd25b438068333659391ed2` | `4a8fd532058d373edabd54bf8fa874bfca0d9ead3c2433f15df23d7a03cc7794` |
 | cogact / `sp_vla_z025_min_actions3` | `e5ff0e4f5f44dd1112561436b4d6c982a84db488c0c2af8cdb0c3228fdc657a8` | `search-r20-41-7-cogact--sp_vla_z025_history3` | `faabaa5959b49364a808c7327559087f3cf1c892` / `faabaa5959b49364a808c7327559087f3cf1c892` | `1f5fb02f8a6417f3a9c787db7838353c79a99c4b2111031977193c1ca41774f9` |
+| cogact / `keystone_k3` | `f13cedd6f644a8494c160c48269b65b6ea280edf87ec9a40223127add688bd2a` | `keystone-v1-125-6-cogact--keystone_k3` | `93f4848e25b37cd2928241719cd8557f4e652bf8` / `93f4848e25b37cd2928241719cd8557f4e652bf8` | `ac0630d0ddc3f1f1ff62e255ed92748eacbf230a7ec28842e29181187b9d7196` |
+| cogact / `probeflow_eps0015` | `b71a6562b1dcf2888da0ea30fe58e81609ab848e884364482b68948389d09403` | `probeflow-eps0015-v1-41-7-cogact--probeflow_eps0015` | `b7db84fde6b0dcbd96eac64c37b43b7376929991` / `b7db84fde6b0dcbd96eac64c37b43b7376929991` | `43f7ec53f3b6aebe8fcf70d6d266fd38511d1a846f32c040c5e8898ef32ba25a` |
 | cogact / `vote_ensemble_h8` | `9ebbbb6d52e6b5e4131af9d6bc14a493375a387d02bb298bceedb70680ac660c` | `search-vote-124-6-cogact--vote_ensemble_h8` | `faabaa5959b49364a808c7327559087f3cf1c892` / `faabaa5959b49364a808c7327559087f3cf1c892` | `8f775c6f832ad620cd65450fa517502a6cd0c29bc684c904f4710b310e2a0baa` |
 | cogact / `awq_fp16_kernel` | `be03b017c6a40862b3ebc5afa78a0ce2cf31111d49e8763c1fe5d0650391c117` | `compact-42-0-cogact-quant--awq_fp16_kernel` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `465838d6af15428eace0f168b48392ce6886137b` | `cb173d2eb42c17ac8ae3398af5f884071e082d7e3ed7db8ac15db2f40bfa4a61` |
 | openvla_oft / `baseline` | `83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e` | `compact-124-7-openvla_oft-quant--native-pre` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `77575dfbcb36ed385377a886f994a3d21e6cb2eb1de5d620f896aea2f9f493cd` |
@@ -154,3 +164,45 @@ Recorded revisions predating history cleanup can be resolved through the
 | openvla_oft / `st_merge_keep192` | `d6e8965949d65ac92a7079a13bbe478bc63fd38ef9d9657f513d8051b75f9a46` | `compact-45-5-openvla_oft-recheck--st_merge_keep192` | `1dc47be1a1e7d1cd8623a50e329d3a72e5daa8ef` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `945d70c1affb3d3c243e7eed3a688112f005fbf591f8e87be257572bd16dc62a` |
 | openvla_oft / `team_vla_merge160` | `02fc7c9f038ee76b07c85196460993479de227eba74c4343cca09310552f327c` | `compact-45-7-openvla_oft-3--team_vla_merge160` | `1dc47be1a1e7d1cd8623a50e329d3a72e5daa8ef` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `5f45fec789ab8a8b09723be9fa5fcb66ebf42d78ee443fa28c56b7be88d7a7bd` |
 | openvla_oft / `vla_iap` | `0a6a2c9c71aefa83b1f9ce71ac8d7813d3bb4ed9c4494769d977fdf123756ae0` | `compact-45-7-openvla_oft-3--vla_iap` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `c51e783e5187bfc02f9c44dd8c91c8309d4a26383cb18a190dfa3dd0378a862b` |
+
+## Independent action codec reconstruction
+
+Frozen corpus `01a8ae346abe98d43ddc307e2ab3db08c99a0229b58074e7b199ec2cd4500762`; 40-frame windows, one per episode, disjoint calibration/evaluation episodes; 4 evaluated suites.
+This is in-domain demonstration reconstruction, not policy success or VLA speedup.
+Latency includes representation transforms and CPU/device transfers; native CPU and GPU implementations are labeled separately. Nominal bits are not entropy-coded size.
+BEAST basis variants are retained rate–distortion points, not extra policy defaults.
+X-Tokenizer uses a disclosed command-integrated pose representation and the initial observed state at decode; its conditional result is not an unconditional codec score.
+Pretraining overlap is not excluded; native block sizes/receptive fields differ.
+
+| Codec / preset | Device | Windows | Raw MSE | Raw MAE | Gripper sign | Tokens/frame | Bits/frame | Encode ms/window | Decode ms/window |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| fast_plus | AMD EPYC 7532 32-Core Processor | 128 | 0.0004145 | 0.01077 | 1.0000 | 1.661 | 18.266 | 0.375 | 0.185 |
+| beast / degree=4, gripper_zero_order=False, num_basis=5 | AMD EPYC 7532 32-Core Processor | 128 | 0.0110235 | 0.04374 | 0.9955 | 0.875 | 7.000 | 5.145 | 2.510 |
+| beast / degree=4, gripper_zero_order=False, num_basis=10 | AMD EPYC 7532 32-Core Processor | 128 | 0.0043754 | 0.02078 | 0.9990 | 1.750 | 14.000 | 15.913 | 7.933 |
+| beast / degree=4, gripper_zero_order=False, num_basis=20 | AMD EPYC 7532 32-Core Processor | 128 | 0.0018109 | 0.00951 | 0.9994 | 3.500 | 28.000 | 38.072 | 18.877 |
+| vq_vla | NVIDIA GeForce RTX 3090 | 128 | 0.0026424 | 0.02868 | 0.9996 | 0.800 | 6.400 | 101.025 | 84.979 |
+| actioncodec | NVIDIA GeForce RTX 3090 | 128 | 0.0010591 | 0.01865 | 1.0000 | 0.800 | 8.800 | 17.214 | 17.007 |
+| x_tokenizer | NVIDIA GeForce RTX 3090 | 128 | 0.4746804 | 0.33120 | 0.4721 | 1.000 | 11.000 | 7.747 | 9.015 |
+
+| Codec run | Measurement commit | Summary SHA256 |
+|---|---|---|
+| `codec-fast-plus-v2` | `e70caf8f8b9e7bc6d405012a433b3a49e2ae2c30` | `46540bca1f06d946a1c06ccf7fbeddf6b287eba6c6f5c0a30fc7432d1020d145` |
+| `codec-beast-basis5-cpu-v1` | `605176e8ebd79f155d88cf2c82899ae60adb16f4` | `9c0a0e9f21ae289414ea26f8a0f0d1984ec6b907eee99302866d3b7724e52d4b` |
+| `codec-beast-cpu-v1` | `605176e8ebd79f155d88cf2c82899ae60adb16f4` | `bb837a9657aa0e23d9c43153683338fabebd23398ef163657ee09ab69d45b429` |
+| `codec-beast-basis20-cpu-v1` | `605176e8ebd79f155d88cf2c82899ae60adb16f4` | `e45c502dcd85c6f6de87a66a11cc960c53982024538d5aeab29fd5a06b2c19d3` |
+| `codec-vq-vla-v2` | `e70caf8f8b9e7bc6d405012a433b3a49e2ae2c30` | `f7aed049337f6fd3af8f8a19c3c8f07c37f942b661a258c42127d25a93efb4ab` |
+| `codec-actioncodec-v2` | `e70caf8f8b9e7bc6d405012a433b3a49e2ae2c30` | `4f550c96c00a8cdb15d7ccb91d36101706646ced4dc726fd20b82818ea3f5f4a` |
+| `codec-x-tokenizer-v2` | `e70caf8f8b9e7bc6d405012a433b3a49e2ae2c30` | `48b67ed993ca192227e3a4fa247437d069a7cdbe4a8d02dfdfbc34ed5d822cec` |
+
+<details>
+<summary>Codec device checks (auxiliary, not default rows)</summary>
+
+The small spline workload is faster on native CPU; both devices use four OpenMP threads and the same corpus. Retain the CUDA comparison, not a second primary.
+
+| Run | Device | Raw MSE | Encode / decode ms per window | Summary SHA256 |
+|---|---|---:|---:|---|
+| `codec-beast-basis5-v2` | NVIDIA GeForce RTX 3090 | 0.0110235 | 13.278 / 6.622 | `436c77b75ccdf01c1824675dce9e767066ab145d398e8fc7c23e26a97f2b46b8` |
+| `codec-beast-v2` | NVIDIA GeForce RTX 3090 | 0.0043754 | 45.569 / 22.683 | `b12c622bb6c26123c969eaaec6b41187f1ef829ee51cff00eb2d925e2325b575` |
+| `codec-beast-basis20-v2` | NVIDIA GeForce RTX 3090 | 0.0018109 | 110.388 / 54.901 | `0785ce3eaa2bdc7a03aeb3bccb4cacd95ffb4f6da40eb880e63b507ad5bf4ad6` |
+
+</details>
