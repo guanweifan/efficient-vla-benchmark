@@ -1,0 +1,3 @@
+extends: [keystone.yaml]
+parameters:
+  num_samples: 3

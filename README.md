@@ -13,6 +13,11 @@ weights, datasets or raw experiment artifacts.
 | CogACT / libero_joint | Eleven scopes below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache | SP-VLA, EcoVLA | VOTE H8 two-vote adaptation | AWQ W4A16 |
 | starVLA | Source pinned only; runtime not implemented | — | — | — | — |
 
+Action generation additionally exposes KeyStone on CogACT: one shared VLM context,
+batched independent native DDIM candidates and guarded cluster-medoid selection.
+Its registration is not a measured acceleration claim; consult the result ledger
+for completed measurements. Deterministic OFT L1 sampling is unsupported.
+
 OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,
 EfficientVLA token core, ST-Merge and FlashVLA ICS, plus FastV, DivPrune, DART,
 SparseVLM v1, DepthCache primary-view core and ASR deletion instrument.

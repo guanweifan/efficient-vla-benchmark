@@ -107,6 +107,12 @@ unpaced replay is not proof of real-robot deadline feasibility.
   a model class. Methods own cache policy, shape guards and lifecycle; shared code
   owns only reversible binding. Visual attention reuse preserves native grid/MLPs,
   while denoiser output and cross-chunk residual caches are separate methods.
+- A candidate-generation method may expand the native action-sampler batch after
+  one cognition encoding. Preserve conditional/unconditional pairing, timestep
+  convention and native postprocessing; return one real selected chunk. Shared
+  context is not K repeated VLM passes. All candidates and selection cost belong
+  in full-cost timing. KeyStone owns its geometric selection within
+  `methods/action_generation/keystone/`; it does not change the DDIM schedule.
 
 Full-retention/no-op adapters must match the appropriate native reference and
 detach cleanly. Eager-versus-fused attention and quantized kernel precision

@@ -1,0 +1,12 @@
+schema_version: 1
+name: keystone
+category: action_generation
+description: Shared-context independent action samples with guarded cluster-medoid selection.
+config: efficient_vla_benchmark.methods.action_generation.keystone.config:KeyStoneConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.action_generation.keystone.implementations.cogact.api:build
+    validate_experiment: efficient_vla_benchmark.methods.action_generation.keystone.implementations.cogact.api:validate_experiment

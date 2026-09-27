@@ -1,0 +1,7 @@
+method: keystone
+parameters:
+  enabled: true
+  num_samples: 4
+  num_clusters: 2
+  unimodal_tau: 0.3
+  selection_horizon: 8
