@@ -1,0 +1,11 @@
+schema_version: 1
+name: unipc
+category: action_generation
+description: UniPC bh2 predictor-corrector integration with recycled evaluations.
+config: efficient_vla_benchmark.methods.action_generation.unipc.config:UniPCConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.action_generation.unipc.implementations.cogact.api:build
