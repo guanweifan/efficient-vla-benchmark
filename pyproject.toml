@@ -23,7 +23,7 @@ exclude = ["*.tests", "*.tests.*"]
 efficient_vla_benchmark = ["methods/**/metadata.yaml", "methods/**/components/*.yaml"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "src/efficient_vla_benchmark/methods", "backends/openvla_oft/tests"]
+testpaths = ["tests", "src/efficient_vla_benchmark/methods", "src/efficient_vla_benchmark/action_codecs", "backends/openvla_oft/tests"]
 addopts = "--import-mode=importlib"
 markers = ["gpu: requires an explicitly selected real model and GPU", "libero: requires LIBERO"]
 

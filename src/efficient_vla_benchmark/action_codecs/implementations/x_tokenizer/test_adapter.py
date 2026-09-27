@@ -4,14 +4,16 @@ import numpy as np
 import pytest
 
 from efficient_vla_benchmark.action_codecs.core import Context
-from efficient_vla_benchmark.action_codecs.implementations.x_tokenizer.representation import (
-    command_path,
-    observed_reference,
-    raw_commands,
-)
 
 
 def test_command_embedding_round_trip_without_future_states():
+    pytest.importorskip("scipy")
+    from efficient_vla_benchmark.action_codecs.implementations.x_tokenizer.representation import (
+        command_path,
+        observed_reference,
+        raw_commands,
+    )
+
     rng = np.random.default_rng(91)
     actions = rng.uniform(-0.9, 0.9, (40, 7)).astype(np.float32)
     actions[:, 6] = np.where(actions[:, 6] > 0, 1, -1)
@@ -36,6 +38,9 @@ def test_released_x_tokenizer_and_frozen_statistics():
     from efficient_vla_benchmark.action_codecs.corpus import Corpus
     from efficient_vla_benchmark.action_codecs.implementations.x_tokenizer.adapter import (
         XTokenizerCodec,
+    )
+    from efficient_vla_benchmark.action_codecs.implementations.x_tokenizer.representation import (
+        command_path,
     )
 
     corpus = Corpus(directory)
