@@ -1,0 +1,8 @@
+method: dvac
+parameters:
+  enabled: true
+  alpha: 2.0
+  tail_steps: 5
+  window_size: 5
+  min_horizon: 1
+  max_horizon: 16
