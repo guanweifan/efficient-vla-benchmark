@@ -1,0 +1,3 @@
+extends: dvac.yaml
+parameters:
+  alpha: 8.0

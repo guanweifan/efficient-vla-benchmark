@@ -1,0 +1,3 @@
+extends: aac_k5.yaml
+parameters:
+  movement_threshold: 5.0
