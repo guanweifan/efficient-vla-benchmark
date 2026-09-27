@@ -1,0 +1,3 @@
+extends: aac_k5_m5.yaml
+parameters:
+  num_samples: 4
