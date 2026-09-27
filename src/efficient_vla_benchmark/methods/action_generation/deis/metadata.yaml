@@ -1,0 +1,11 @@
+schema_version: 1
+name: deis
+category: action_generation
+description: DEIS log-rho multistep exponential integration with stable clean-endpoint limit.
+config: efficient_vla_benchmark.methods.action_generation.deis.config:DEISConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.action_generation.deis.implementations.cogact.api:build
