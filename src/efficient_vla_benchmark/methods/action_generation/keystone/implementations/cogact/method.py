@@ -5,6 +5,7 @@ from dataclasses import asdict
 import torch
 
 from efficient_vla_benchmark.core.method import InferenceMethod
+from efficient_vla_benchmark.model_ops.candidate_sampling import expand_candidates
 from efficient_vla_benchmark.model_ops.forward_patch import ForwardPatches
 
 from ...selection import select_index
@@ -71,12 +72,7 @@ class KeyStone(InferenceMethod):
             k = self.config.num_samples
             # Retain the native first draw, then generate K-1 independent samples.
             # DDIM eta=0 still consumes random draws internally; never reseed here.
-            extra = torch.randn((k - 1, *noise.shape[1:]), device=noise.device).to(noise.dtype)
-            expanded_noise = torch.cat((noise[:1], extra), dim=0)
-            expanded_z = z[:1].expand(k, *z.shape[1:])
-            if cfg:
-                expanded_noise = torch.cat((expanded_noise, expanded_noise), dim=0)
-                expanded_z = torch.cat((expanded_z, z[1:2].expand(k, *z.shape[1:])), dim=0)
+            expanded_noise, expanded_z = expand_candidates(noise, z, k, cfg)
             kwargs = dict(model_kwargs, z=expanded_z)
             samples = original(
                 model,
