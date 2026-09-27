@@ -51,6 +51,11 @@ the new task. API-v1 predictors without optional control hooks keep native behav
    the model to establish fresh state; this replacement hook is not consulted.
 3. A real query invokes `on_plan(full_chunk_copy, step)` before prefix selection.
    `step` is the absolute control index. Predictions are not executed history.
+   Optional `select_execution_horizon(full_chunk_copy, default_horizon)` then
+   returns a Python integer in [1, actual predicted length]. Without this hook,
+   cadence is unchanged. Adaptive prefixes cannot pad or extend the prediction.
+   `selected_execution_horizon` diagnostics record the current selected prefix;
+   interrupts can still shorten actual execution. Queue refills remain real queries.
 4. `transform_action(action_copy, step)` may aggregate predictions, then
    `after_action(final_action_copy, remaining)` receives the actual emitted command.
    Returning true requests clearing the remaining queue before the next step.
@@ -452,7 +457,13 @@ Average ALL measured control-step latencies, including queue-consumption steps;
 divide the matched native mean by the method mean. This is representative-input
 policy compute, not task-macro performance or closed-loop completion time. Do not
 report repeat standard deviation from one pass, or mix historical protocols in the
-primary table. The current primary comparison is H8; old H1 evidence is not eligible.
+primary table. The primary native reference is H8; old H1 evidence is not eligible.
+For an explicitly adaptive-horizon method, H8 remains its reference/default, not
+a claim that every prefix executes eight actions. The shared controller serves
+the method-selected real prefix. Keep predicted length and checkpoint unchanged;
+record selected horizons, actual emitted actions and query counts. Include all
+selection and multi-candidate work. This is the mechanism being measured, not an
+unreported cadence change; label these rows adaptive instead of fixed H8.
 
 Use fresh model processes and fixed CPU threads. Concurrent timing processes need
 disjoint CPU affinity sets as well as separate GPUs; remapping a GPU must also

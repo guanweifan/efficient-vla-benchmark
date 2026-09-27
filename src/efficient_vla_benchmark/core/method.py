@@ -20,6 +20,14 @@ class InferenceMethod:
         """Inspect a copied full environment-ready chunk at its start step."""
         pass
 
+    def select_execution_horizon(self, actions, default_horizon: int) -> int:
+        """Select a real prefix after on_plan, without modifying predictions.
+
+        The default preserves native cadence. An adaptive method may select
+        between one and the number of actually predicted actions; no padding.
+        """
+        return default_horizon
+
     def transform_action(self, action, step: int):
         """Return one environment-ready command; called on every control step."""
         return action

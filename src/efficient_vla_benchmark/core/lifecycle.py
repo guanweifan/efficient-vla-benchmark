@@ -79,6 +79,14 @@ class MethodHost:
         if self.method:
             self.method.on_plan(actions, step)
 
+    def select_execution_horizon(self, actions, default_horizon):
+        self._ensure_open()
+        return (
+            self.method.select_execution_horizon(actions, default_horizon)
+            if self.method
+            else default_horizon
+        )
+
     def transform_action(self, action, step):
         self._ensure_open()
         return self.method.transform_action(action, step) if self.method else action

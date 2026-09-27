@@ -24,6 +24,7 @@ class ChunkPolicy:
         self._action_dim = None
         self._context = None
         self._instruction = None
+        self.selected_horizon = None
 
     def reset(self, context: EpisodeContext) -> None:
         self._queue.clear()
@@ -32,6 +33,7 @@ class ChunkPolicy:
         self._action_dim = None
         self._context = context
         self._instruction = None
+        self.selected_horizon = None
         self.predictor.reset(context)
 
     def step(self, observation: Observation) -> ActionDecision:
@@ -40,6 +42,7 @@ class ChunkPolicy:
         if self._instruction is not None and observation.instruction != self._instruction:
             self._queue.clear()
             self._action_dim = None
+            self.selected_horizon = None
             self.predictor.reset(self._context)
         self._instruction = observation.instruction
         self.predictor.observe(observation)
@@ -68,7 +71,16 @@ class ChunkPolicy:
             hook = getattr(self.predictor, "on_plan", None)
             if hook:
                 hook(actions.copy(), step)
-            self._queue.extend(a.copy() for a in actions[: self.execution_horizon])
+            hook = getattr(self.predictor, "select_execution_horizon", None)
+            horizon = (
+                hook(actions.copy(), self.execution_horizon) if hook else self.execution_horizon
+            )
+            if type(horizon) is not int or not 1 <= horizon <= len(actions):
+                raise ValueError(
+                    "Selected execution horizon must be an integer within the real chunk"
+                )
+            self.selected_horizon = horizon
+            self._queue.extend(a.copy() for a in actions[:horizon])
             self.query_count += 1
             queried = True
         if action is None:
@@ -83,7 +95,11 @@ class ChunkPolicy:
             self._queue.clear()
         hook = getattr(self.predictor, "control_diagnostics", None)
         diagnostics = dict(hook()) if hook else {}
-        diagnostics.update(replan_requested=bool(replanned), action_source=source)
+        diagnostics.update(
+            replan_requested=bool(replanned),
+            action_source=source,
+            selected_execution_horizon=self.selected_horizon,
+        )
         return ActionDecision(action, queried, diagnostics)
 
     def _validate_action(self, action):
