@@ -92,7 +92,7 @@ def test_first_order_native_grid_equivalence_rng_and_detach(rows):
     assert "ddim_sample_loop" not in sampler.__dict__
 
 
-@pytest.mark.parametrize("steps", [3, 4, 6, 8, 10])
+@pytest.mark.parametrize("steps", [3, 4, 5, 6, 8, 10])
 @pytest.mark.parametrize("spacing", ["time_uniform", "log_snr"])
 def test_high_order_active_and_history_resets(steps, spacing, monkeypatch):
     host, sampler = native_host()
@@ -150,6 +150,8 @@ def test_real_model_parity_active_solver_reset_and_cleanup(model_path, trace_pat
         DPMSolverPPConfig(num_steps=3),
         DPMSolverPPConfig(num_steps=6, spacing="log_snr"),
         DPMSolverPPConfig(num_steps=6, order=3),
+        DPMSolverPPConfig(num_steps=5, spacing="log_snr"),
+        DPMSolverPPConfig(num_steps=5, order=3),
     ):
         method = build(host, config, None)
         host.attach_method(method)

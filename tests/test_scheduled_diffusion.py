@@ -14,7 +14,7 @@ def test_uniform_grid_is_exact_native_ten_step_reference():
 
 
 @pytest.mark.parametrize("spacing", ["time_uniform", "log_snr"])
-@pytest.mark.parametrize("steps", [3, 4, 6, 8, 10])
+@pytest.mark.parametrize("steps", [3, 4, 5, 6, 8, 10])
 def test_budget_does_not_change_native_start_or_terminal_prediction(spacing, steps):
     alpha = np.cos(np.linspace(0.02, 1.5, 100)) ** 2
     grid = inference_grid(alpha, 90, steps, spacing)
