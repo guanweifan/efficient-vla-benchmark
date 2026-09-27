@@ -244,6 +244,10 @@ def make_record(run_dir, baseline_dir, section, label, preset, smoke_dir=None):
     a, b = left["config"]["execution_horizon"], right["config"]["execution_horizon"]
     if a != b:
         differences["execution_horizon"] = {"method": a, "baseline": b}
+    a = left["backend"].get("method_details", {}).get("execution_horizon_policy", "native")
+    b = right["backend"].get("method_details", {}).get("execution_horizon_policy", "native")
+    if a != b:
+        differences["execution_horizon_policy"] = {"method": a, "baseline": b}
     record = {
         "schema_version": 1,
         "section": section,

@@ -74,6 +74,29 @@ def environment_identity(source, backend):
     }
 
 
+def cadence(metadata):
+    """Read executed-prefix policy from measured metadata, never the preset name."""
+    policy = (
+        metadata.get("backend", {})
+        .get("method_details", {})
+        .get("execution_horizon_policy", "native")
+    )
+    if policy not in {"native", "adaptive"}:
+        raise ValueError("Unknown measured execution-horizon policy")
+    if metadata["config"]["method"] == "none" and policy != "native":
+        raise ValueError("A native reference cannot have adaptive execution")
+    predicted = metadata.get("backend", {}).get("predicted_horizon")
+    if policy == "adaptive" and (type(predicted) is not int or predicted < 1):
+        raise ValueError("Adaptive execution requires the measured predicted horizon")
+    return policy, predicted
+
+
+def cadence_label(row):
+    if row["execution_horizon_policy"] == "adaptive":
+        return f"adaptive ≤{row['predicted_horizon']}"
+    return str(row["horizon"])
+
+
 def check_search(
     selected, config, dev, reference, summaries, records, valid_runs, manifest, selection
 ):
@@ -127,6 +150,8 @@ def check_search(
             if measured["backend"]["checkpoint_sha256"] != dev["backend"]["checkpoint_sha256"]:
                 raise ValueError("Search candidate timing checkpoint differs")
             cohort = valid_runs[timing["run"]["run_id"]]
+            cadence(measured)
+            cadence(timing["baseline"]["metadata"])
             baseline = timing["baseline"]["metadata"]["config"]
             if (
                 timing["baseline"]["run_id"] != cohort["baseline_pre"]
@@ -267,6 +292,8 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         record = records[selected["timing_record"]]
         timing = record["run"]["metadata"]
         baseline = record["baseline"]["metadata"]
+        horizon_policy, predicted_horizon = cadence(timing)
+        cadence(baseline)
         if policy_identity(timing["config"]) != policy_identity(config):
             raise ValueError("Preset differs from measured timing configuration")
         if timing["backend"]["checkpoint_sha256"] != dev["backend"]["checkpoint_sha256"]:
@@ -311,6 +338,7 @@ def build(selection, summaries, records, quality, development_manifest, final_re
             raise ValueError("Missing development baseline")
         ref = refs[0]
         check_development(ref, development_manifest)
+        cadence(ref)
         if (
             ref["config"]["execution_horizon"] != config["execution_horizon"]
             or ref["backend"]["checkpoint_sha256"] != dev["backend"]["checkpoint_sha256"]
@@ -344,6 +372,8 @@ def build(selection, summaries, records, quality, development_manifest, final_re
             "section": selected["section"],
             "preset": Path(selected["config"]).stem,
             "horizon": config["execution_horizon"],
+            "execution_horizon_policy": horizon_policy,
+            "predicted_horizon": predicted_horizon,
             "scope": selected["scope"],
             "reason": selected["reason"],
             "hardware": timing.get("hardware", {}),
@@ -456,11 +486,13 @@ def render(report):
         "not final accuracy. " + timing_description,
         "Native pre/post checks must pass. Final success",
         "is unmeasured until the owner schedules the frozen 2,000-episode campaign.",
-        "Low success and slowdowns remain reportable. All primary comparisons use H8.",
+        "Low success and slowdowns remain reportable. All native references use H8.",
+        "Adaptive rows execute real method-selected prefixes; H8 is their reference/default,",
+        "not their fixed execution length. The shown upper bound is native prediction length.",
         "Complete measurements do not certify parameter-search completion; unfinished",
         "searches are excluded from the final launch list even when Dev meets the target.",
         "Selection targets at most 3 percentage points of Dev loss versus the matched",
-        "native; this is not an outcome filter. Δ pp uses that same-cadence reference.",
+        "native; this is not an outcome filter. Δ pp uses that same native-H8 reference.",
         "Speedup >1 means faster and <1 means slower. Near-1 differences from one pass",
         "do not establish a reliable gain; no repeat standard deviation is claimed.",
         "Each speedup uses its own same-GPU native pair; the displayed native row is",
@@ -474,7 +506,7 @@ def render(report):
         lines += [
             f"## {backend}",
             "",
-            "| Section | Preset | H | Dev SR (n/200) | Δ pp | ms/control | "
+            "| Section | Preset | Execution H | Dev SR (n/200) | Δ pp | ms/control | "
             "Speedup | Peak GiB | Final SR (n/2000) | Selection / scope |",
             "|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
         ]
@@ -492,7 +524,7 @@ def render(report):
                 else "—"
             )
             lines.append(
-                f"| {r['section']} | `{r['preset']}` | {r['horizon']} | "
+                f"| {r['section']} | `{r['preset']}` | {cadence_label(r)} | "
                 f"{d['successes'] / 2:.1f}% ({d['successes']}) | {d['delta_pp']:+.1f} | "
                 f"{t['mean_ms']:.3f} | {t['speedup']:.3f}× | "
                 f"{memory} | {final} | "
@@ -506,13 +538,15 @@ def render(report):
             "",
             "Secondary evidence only; these do not enter the default final-evaluation queue.",
             "",
-            "| Backend / preset | Dev SR (n/200) | ms/control | Speedup | Reason / scope |",
-            "|---|---:|---:|---:|---|",
+            "| Backend / preset | Execution H | Dev SR (n/200) | ms/control | "
+            "Speedup | Reason / scope |",
+            "|---|---|---:|---:|---:|---|",
         ]
         for r in report["auxiliary"]:
             d, t = r["development"], r["timing"]
             lines.append(
-                f"| {r['backend']} / `{r['preset']}` | {d['successes'] / 2:.1f}% "
+                f"| {r['backend']} / `{r['preset']}` | {cadence_label(r)} | "
+                f"{d['successes'] / 2:.1f}% "
                 f"({d['successes']}) | {t['mean_ms']:.3f} | {t['speedup']:.3f}× | "
                 f"{r['reason']} {r['scope']} |"
             )

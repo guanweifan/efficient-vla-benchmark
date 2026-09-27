@@ -338,3 +338,61 @@ def test_search_alternatives_need_matched_timing_provenance(reporter, case):
         timing["run"]["metadata"]["source"]["packages"] = {"torch": "other"}
     with pytest.raises(ValueError, match="Search"):
         reporter.build(selection, summaries, records, quality, manifest)
+
+
+def test_adaptive_cadence_is_not_rendered_as_fixed_h8(reporter):
+    selection, summaries, records, quality, manifest = fixture()
+    backend = dict(
+        summaries["summary"]["configurations"][0]["backend"],
+        predicted_horizon=16,
+        method_details={"execution_horizon_policy": "adaptive"},
+    )
+    summaries["summary"]["configurations"][0]["backend"] = backend
+    records["method"]["run"]["metadata"]["backend"] = backend
+    result = reporter.build(selection, summaries, records, quality, manifest)
+    row = result["primary"][0]
+    assert row["horizon"] == 8  # Reference/default, not the actual adaptive prefix.
+    assert row["execution_horizon_policy"] == "adaptive"
+    assert row["predicted_horizon"] == 16
+    assert "adaptive ≤16" in reporter.render(result)
+    assert "All native references use H8" in reporter.render(result)
+    assert len(result["final_launch_candidates"]) == 1
+
+
+@pytest.mark.parametrize(
+    "method,policy,predicted",
+    [
+        ("test_method", "unknown", 16),
+        ("test_method", "adaptive", None),
+        ("test_method", "adaptive", True),
+        ("test_method", "adaptive", 0),
+        ("none", "adaptive", 16),
+    ],
+)
+def test_invalid_cadence_metadata_is_rejected(reporter, method, policy, predicted):
+    with pytest.raises(ValueError):
+        reporter.cadence(
+            {
+                "config": {"method": method, "execution_horizon": 8},
+                "backend": {
+                    "predicted_horizon": predicted,
+                    "method_details": {"execution_horizon_policy": policy},
+                },
+            }
+        )
+
+
+def test_legacy_native_metadata_remains_readable(reporter):
+    row = reporter.build(*fixture())["primary"][0]
+    assert row["execution_horizon_policy"] == "native"
+    assert reporter.cadence_label(row) == "8"
+
+
+def test_adaptive_native_reference_is_rejected_in_join(reporter):
+    selection, summaries, records, quality, manifest = fixture()
+    records["method"]["baseline"]["metadata"]["backend"] = {
+        "predicted_horizon": 16,
+        "method_details": {"execution_horizon_policy": "adaptive"},
+    }
+    with pytest.raises(ValueError, match="native reference"):
+        reporter.build(selection, summaries, records, quality, manifest)

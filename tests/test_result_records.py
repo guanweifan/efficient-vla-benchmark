@@ -109,6 +109,20 @@ def test_rejects_inconsistent_raw_data(tmp_path, recorder):
         recorder.timing_evidence(run)
 
 
+def test_export_discloses_adaptive_execution_against_native(tmp_path, recorder):
+    run, baseline = tmp_path / "method", tmp_path / "native"
+    write_run(run)
+    write_run(baseline)
+    meta = json.loads((run / "metadata.json").read_text())
+    meta["backend"]["method_details"] = {"execution_horizon_policy": "adaptive"}
+    (run / "metadata.json").write_text(json.dumps(meta))
+    record = recorder.make_record(run, baseline, "5.5", "Example", "configs/example.yaml")
+    assert record["comparison_differences"]["execution_horizon_policy"] == {
+        "method": "adaptive",
+        "baseline": "native",
+    }
+
+
 def test_rejects_incomparable_baseline(tmp_path, recorder):
     run, baseline = tmp_path / "example-run", tmp_path / "baseline"
     write_run(run)
