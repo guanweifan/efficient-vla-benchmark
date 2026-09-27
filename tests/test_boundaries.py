@@ -8,6 +8,15 @@ import pytest
     "relative,source",
     [
         ("src/efficient_vla_benchmark/evaluation/bad.py", "import torch"),
+        ("src/efficient_vla_benchmark/action_codecs/evaluation.py", "import torch"),
+        (
+            "src/efficient_vla_benchmark/action_codecs/implementations/a/adapter.py",
+            "import efficient_vla_backend_cogact",
+        ),
+        (
+            "src/efficient_vla_benchmark/action_codecs/implementations/a/adapter.py",
+            "from ..b import adapter",
+        ),
         (
             "src/efficient_vla_benchmark/evaluation/bad.py",
             "import efficient_vla_benchmark.model_ops.vision",
@@ -46,6 +55,17 @@ def test_optional_model_operations_may_import_tensor_runtimes(tmp_path):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     path = tmp_path / "src/efficient_vla_benchmark/model_ops/attention.py"
+    path.parent.mkdir(parents=True)
+    path.write_text("import torch\nimport transformers\n")
+    assert not module.violations(tmp_path)
+
+
+def test_codec_adapter_may_import_optional_runtime(tmp_path):
+    script = Path(__file__).resolve().parents[1] / "scripts/check_boundaries.py"
+    spec = importlib.util.spec_from_file_location("boundary_checker", script)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    path = tmp_path / "src/efficient_vla_benchmark/action_codecs/implementations/a/adapter.py"
     path.parent.mkdir(parents=True)
     path.write_text("import torch\nimport transformers\n")
     assert not module.violations(tmp_path)

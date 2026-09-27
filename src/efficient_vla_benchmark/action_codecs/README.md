@@ -34,6 +34,9 @@ Prepare in a data environment; run codecs in their isolated optional environment
 ```bash
 python -m efficient_vla_benchmark.action_codecs.prepare \
   --dataset-root "$RLDS_ROOT" --output "$CORPUS_DIR"
+python -m efficient_vla_benchmark.action_codecs.run \
+  --config configs/codecs/fast_plus.yaml --assets "$FAST_PLUS_DIR" \
+  --corpus "$CORPUS_DIR" --output "$RESULT_DIR"
 ```
 
 The dataset's nominal frame rate is not assumed. Native embodiment labels may name

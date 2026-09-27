@@ -34,6 +34,10 @@ def violations(root):
             common = path.is_relative_to(package) and relative.parts[2] != "methods"
             plugin = relative.parts[0] == "backends"
             optional_ops = path.is_relative_to(package) and relative.parts[2] == "model_ops"
+            codec_impl = path.is_relative_to(package) and relative.parts[2:4] == (
+                "action_codecs",
+                "implementations",
+            )
             for name in imported:
                 if (
                     "methods" in relative.parts
@@ -45,11 +49,18 @@ def violations(root):
                     name.startswith(("efficient_vla_backend_", "efficient_vla_benchmark.methods."))
                     or (
                         not optional_ops
+                        and not codec_impl
                         and name.split(".")[0] in {"torch", "transformers", "prismatic", "starVLA"}
                     )
                     or (not optional_ops and name.startswith("efficient_vla_benchmark.model_ops"))
                 ):
                     failures.append(f"{relative}: common code imports runtime-specific {name}")
+                if codec_impl and name.startswith(
+                    "efficient_vla_benchmark.action_codecs.implementations."
+                ):
+                    own = relative.parts[4]
+                    if name.split(".")[3] != own:
+                        failures.append(f"{relative}: imports another codec implementation {name}")
                 if plugin and name.startswith("efficient_vla_benchmark.methods."):
                     failures.append(f"{relative}: backend imports a paper method")
                 if "methods" in relative.parts and name.startswith(
