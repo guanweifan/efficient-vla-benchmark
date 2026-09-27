@@ -122,3 +122,12 @@ ASR uses a disclosed cognition-attention gate, not nonexistent DiT patch attenti
 its discarded dense pass retains the native sampler and restores RNG afterwards.
 The common runtime joins auxiliary work for full-cost timing. None of these ports
 changes DDIM steps, CFG, normalization, native action head or executed horizon.
+
+## Optional sampler replacement
+
+`sampling.EpsilonSamplerContract` exposes the original epsilon-prediction noise
+schedule, native DDIM start and discarded-draw count to a selected method.
+The original CFG model callback and action conversion remain native. Install
+`backends/cogact[samplers]` for the pinned optional scheduler dependency; baseline
+loading does not import it. Solver equations and budget decisions belong to the
+selected method, not this backend. Model weights remain read-only.

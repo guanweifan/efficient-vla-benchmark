@@ -158,6 +158,15 @@ calibration artifacts. Retention/depth candidates reuse the same frozen artifact
 ASR KV reuse keeps an immutable complete dense base: sparse active-row updates
 are temporary, and only the full auxiliary pass publishes the next base/gate.
 
+Optional fixed-grid solvers use a backend-owned `EpsilonSamplerContract` and the
+shared `model_ops.scheduled_diffusion` executor. The contract pins the native
+training noise table, finite-noise starting index and reference RNG advance.
+Each method supplies its own pinned scheduler and owns its update equations.
+Integer time/log-SNR grids keep the same start and last prediction index; repeated
+indices are rejected. Scheduler history is per query, not shared across chunks.
+The clean endpoint, active high-order updates and discarded native RNG draws need
+independent tests. This interface does not alter native DDIM or execution cadence.
+
 ## Add a method
 
 Create `src/efficient_vla_benchmark/methods/<category>/<paper_id>/`:

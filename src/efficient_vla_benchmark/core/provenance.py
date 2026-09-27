@@ -87,6 +87,7 @@ def source_metadata() -> dict:
         "tensorflow-datasets",
         "timm",
         "tokenizers",
+        "diffusers",
         "efficient-vla-benchmark",
     ):
         try:
