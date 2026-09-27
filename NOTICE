@@ -1,4 +1,11 @@
-Third-party notices for token-reduction adaptations
+Third-party notices for source-based adaptations
+
+AutoHorizon: hatchetProject/AutoHorizon at
+c7504f1756109103f2cfcc2e23f1b1a23841c885, released under Apache-2.0.
+The bidirectional selector is adapted into an isolated validated module;
+boolean run detection replaces the equivalent convolution. Native CogACT
+attention capture and lifecycle bindings are new. The Apache-2.0 terms below
+also apply to this adapted selector.
 
 The independently organized ADP, VLA-Pruner and SAFE-Pruner ports adapt algorithms
 from the pinned repositories linked in their method READMEs. Their implementations

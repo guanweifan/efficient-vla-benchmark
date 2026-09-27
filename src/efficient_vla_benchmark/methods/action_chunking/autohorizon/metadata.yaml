@@ -1,0 +1,12 @@
+schema_version: 1
+name: autohorizon
+category: action_chunking
+description: Bidirectional action-attention soft pointers choose an executed prefix.
+config: efficient_vla_benchmark.methods.action_chunking.autohorizon.config:AutoHorizonConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.action_chunking.autohorizon.implementations.cogact.api:build
+    validate_experiment: efficient_vla_benchmark.methods.action_chunking.autohorizon.implementations.cogact.api:validate_experiment
