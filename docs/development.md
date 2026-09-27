@@ -550,6 +550,16 @@ sources remain identical; compatible prior Dev/timing evidence is retained for
 those scopes. VOTE receives fresh native-H8 evidence, never relabeled H1 results.
 Search-only configuration and reporting changes do not alter inference equations.
 
+The adaptive-prefix hook at `6e508c4` retains native H8 queue contents for methods
+without an override; its new bounds checks and diagnostics do not alter actions.
+The candidate-expansion extraction at `32b60e5` retains KeyStone's native-first
+draw, tensor operation order and CFG pairing, checked against its prior equations
+and by real-model RNG/reset/detach tests. This scoped arithmetic audit supports
+reuse of compatible success evidence, not relabeling historical latency as a new
+runtime measurement. The search presets and method-test changes at `168c846`
+alter runtime fingerprints but no inference equations. Preserve every actual
+source identity and explicitly audit cross-revision Dev/timing joins.
+
 ## Record results
 
 Keep canonical JSON records in ignored `outputs/result_records/`, raw runs under

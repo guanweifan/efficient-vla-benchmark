@@ -9,16 +9,26 @@ weights, datasets or raw experiment artifacts.
 
 | Backend / variant | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|
-| OpenVLA-OFT / libero_joint | Fifteen scopes below | VLA-Cache, VLA-InfoEntropy, Temporal Redundancy visual core, ASR KV reuse | SP-VLA, EcoVLA | — | AWQ W4A16 |
-| CogACT / libero_joint | Eleven scopes below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache, BAC, V-AEFusion, EVO | SP-VLA, EcoVLA | VOTE H8 two-vote adaptation | AWQ W4A16 |
+| OpenVLA-OFT / libero_joint | Fifteen scopes below | VLA-Cache, VLA-InfoEntropy, Temporal Redundancy visual core, ASR KV reuse | SP-VLA, EcoVLA | PACE Cartesian core | AWQ W4A16 |
+| CogACT / libero_joint | Eleven scopes below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache, BAC, V-AEFusion, EVO | SP-VLA, EcoVLA | VOTE H8 two-vote adaptation, PACE Cartesian core, AutoHorizon, DVAC, AAC | AWQ W4A16 |
 | starVLA | Source pinned only; runtime not implemented | — | — | — | — |
 
 Action generation additionally exposes KeyStone (batched native candidates and
-guarded cluster-medoid selection) and ProbeFlow (lookahead-guided adaptive steps)
-on CogACT. ProbeFlow uses an explicitly tested DDIM coordinate bridge, not a claim
+guarded cluster-medoid selection), ProbeFlow (lookahead-guided adaptive steps),
+and DPM-Solver++, UniPC and DEIS (high-order few-step sampling) on CogACT.
+The fixed-grid solvers preserve native finite-noise initialization and CFG.
+ProbeFlow uses an explicitly tested DDIM coordinate bridge, not a claim
 that CogACT was flow-matching trained. Fixed-Euler presets are diagnostic controls.
 Registration is not a measured acceleration claim; consult the result ledger for
-completed measurements. Deterministic OFT L1 sampling is unsupported.
+completed measurements. Diffusion-sampler replacements and stochastic-candidate
+methods do not support OFT's deterministic L1 head.
+
+PACE, AutoHorizon, DVAC and AAC select a real prefix of the unchanged native
+prediction; no padding or longer learned action head is introduced. Native H8
+remains the comparator, not a claim that their executed length is fixed at eight.
+PACE supports both backends; the other three use native CogACT denoiser signals.
+AAC includes all independent candidates and entropy computation in its full cost.
+OFT PACE can shorten but cannot extend its eight-action native prediction.
 
 OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,
 EfficientVLA token core, ST-Merge and FlashVLA ICS, plus FastV, DivPrune, DART,
@@ -88,7 +98,7 @@ evb benchmark --config configs/experiments/openvla_oft/specprune_vla.yaml \
 ```
 
 The caller defines the resource variables. Change the experiment YAML to select a
-supported backend/method pair and parameters; AWQ, ActionCache, EcoVLA and
+supported backend/method pair and parameters; AWQ, ActionCache, EcoVLA, PACE and
 EfficientVLA layer pruning also need
 `--artifact-path`. BAC also requires frozen training-only branch statistics for its
 ACS schedules and Bubbling Union protection. ActionCache requires its independently
@@ -96,9 +106,13 @@ collected frozen bank; see its
 [population instructions](src/efficient_vla_benchmark/methods/caching/action_cache/README.md).
 EVO requires frozen globally budgeted layouts selected using independent rollouts,
 never Dev/final feedback. Its offline search is separately authorized and costed.
+PACE needs frozen task-level prominence statistics from training demonstrations;
+its artifact is not built from Dev or final outcomes. See its
+[calibration instructions](src/efficient_vla_benchmark/methods/action_chunking/pace/README.md).
 Timing uses the four trace files selected by the frozen workload, not arbitrary
 smoke observations: at most 128 continuous controls per suite, one measured pass.
-Matched native references use the same inputs, GPU and execution cadence.
+Matched native references use the same inputs and GPU at H8; adaptive-prefix
+methods disclose their actual cadence and include selection overhead.
 LIBERO defaults to four smoke episodes, not a formal success-rate campaign.
 For depth-aware methods, record native baseline traces with `--depth` first;
 their method presets enable depth during evaluation. RGB-only traces are rejected.
