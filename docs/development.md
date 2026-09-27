@@ -262,6 +262,14 @@ Dev/final outcomes. The runner calls the same episode loop, preserves failures,
 verifies resource/state hashes, and refuses silent retries. Search algorithms own
 their fitness and authorized episode budget; this shared utility owns neither.
 
+EVO's prior/native reference, quick search and confirmation groups are all disjoint.
+The native rollouts supply only initialization dissimilarity and the reference
+success target; rollout fitness drives schedule selection. Reserve the complete
+episode allocation before dispatch, including failures. Freeze and checksum layouts
+before Dev/timing. Report bounded-search target failures honestly, not as convergence.
+First/final branch refreshes count toward the actual global budget; native DDIM,
+CFG and action/control conventions stay unchanged.
+
 LIBERO smoke uses task 0 / initial state 0 / seed 0 in each suite, ten settling steps,
 then limits of 220/280/300/520 control steps for Spatial/Object/Goal/Long. CUDA/EGL
 selection must agree. Outputs retain metadata, episodes (including errors), summary,

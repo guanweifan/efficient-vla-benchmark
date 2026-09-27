@@ -10,7 +10,7 @@ weights, datasets or raw experiment artifacts.
 | Backend / variant | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|
 | OpenVLA-OFT / libero_joint | Fifteen scopes below | VLA-Cache, VLA-InfoEntropy, Temporal Redundancy visual core, ASR KV reuse | SP-VLA, EcoVLA | — | AWQ W4A16 |
-| CogACT / libero_joint | Eleven scopes below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache, BAC, V-AEFusion | SP-VLA, EcoVLA | VOTE H8 two-vote adaptation | AWQ W4A16 |
+| CogACT / libero_joint | Eleven scopes below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache, BAC, V-AEFusion, EVO | SP-VLA, EcoVLA | VOTE H8 two-vote adaptation | AWQ W4A16 |
 | starVLA | Source pinned only; runtime not implemented | — | — | — | — |
 
 Action generation additionally exposes KeyStone (batched native candidates and
@@ -91,8 +91,11 @@ The caller defines the resource variables. Change the experiment YAML to select 
 supported backend/method pair and parameters; AWQ, ActionCache, EcoVLA and
 EfficientVLA layer pruning also need
 `--artifact-path`. BAC also requires frozen training-only branch statistics for its
-ACS schedules and Bubbling Union protection. ActionCache requires its independently collected frozen bank;
-see its [population instructions](src/efficient_vla_benchmark/methods/caching/action_cache/README.md).
+ACS schedules and Bubbling Union protection. ActionCache requires its independently
+collected frozen bank; see its
+[population instructions](src/efficient_vla_benchmark/methods/caching/action_cache/README.md).
+EVO requires frozen globally budgeted layouts selected using independent rollouts,
+never Dev/final feedback. Its offline search is separately authorized and costed.
 Timing uses the four trace files selected by the frozen workload, not arbitrary
 smoke observations: at most 128 continuous controls per suite, one measured pass.
 Matched native references use the same inputs, GPU and execution cadence.

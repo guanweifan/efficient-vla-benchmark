@@ -1,0 +1,12 @@
+schema_version: 1
+name: evo
+category: caching
+description: Offline rollout-driven evolutionary global residual-cache schedules.
+config: efficient_vla_benchmark.methods.caching.evo.config:EVOConfig
+requires_artifact: true
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.caching.evo.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.caching.evo.implementations.cogact.api:preflight
