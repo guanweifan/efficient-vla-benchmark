@@ -1,0 +1,6 @@
+method: dpm_solver_pp
+parameters:
+  enabled: true
+  num_steps: 6
+  order: 2
+  spacing: time_uniform

@@ -1,0 +1,3 @@
+extends:
+  - baseline.yaml
+  - ../../methods/dpm_solver_pp.yaml

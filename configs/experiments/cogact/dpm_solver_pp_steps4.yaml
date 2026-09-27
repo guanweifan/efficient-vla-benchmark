@@ -1,0 +1,3 @@
+extends: dpm_solver_pp.yaml
+parameters:
+  num_steps: 4

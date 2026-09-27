@@ -1,0 +1,11 @@
+schema_version: 1
+name: dpm_solver_pp
+category: action_generation
+description: DPM-Solver++ multistep data-prediction integration with midpoint updates.
+config: efficient_vla_benchmark.methods.action_generation.dpm_solver_pp.config:DPMSolverPPConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.action_generation.dpm_solver_pp.implementations.cogact.api:build
