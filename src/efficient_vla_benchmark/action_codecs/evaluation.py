@@ -36,27 +36,34 @@ def evaluate(codec, corpus, output, *, warmup=10):
         actions_checked(codec.decode(packet, context), len(action))
         codec.synchronize()
     results = []
+    pass_start = time.time()
     with (output / "windows.jsonl").open("w") as stream:
         for row in rows:
             action, context = corpus.window(row)
             result = {k: row[k] for k in ("key", "suite", "episode_index", "offset")}
             try:
                 codec.synchronize()
+                encode_start = time.time()
                 t0 = time.perf_counter()
                 packet = codec.encode(action.copy(), context)
                 codec.synchronize()
                 t1 = time.perf_counter()
+                encode_end = time.time()
                 # Only the discrete payload and declared initial observation reach decode.
                 packet = Packet(packet.ids.copy(), packet.vocabulary, packet.horizon)
+                decode_start = time.time()
                 t2 = time.perf_counter()
                 recon = actions_checked(codec.decode(packet, context), len(action))
                 codec.synchronize()
                 t3 = time.perf_counter()
+                decode_end = time.time()
                 error = recon.astype(np.float64) - action
                 result.update(
                     status="completed",
                     encode_ms=(t1 - t0) * 1000,
                     decode_ms=(t3 - t2) * 1000,
+                    encode_window={"start": encode_start, "end": encode_end},
+                    decode_window={"start": decode_start, "end": decode_end},
                     mse=float(np.mean(error**2)),
                     per_dimension_mse=np.mean(error**2, axis=0).tolist(),
                     mae=float(np.mean(np.abs(error))),
@@ -69,6 +76,10 @@ def evaluate(codec, corpus, output, *, warmup=10):
             stream.write(json.dumps(result, sort_keys=True) + "\n")
             stream.flush()
             results.append(result)
+    pass_end = time.time()
+    (output / "measurement_window.json").write_text(
+        json.dumps({"start": pass_start, "end": pass_end}, sort_keys=True) + "\n"
+    )
     if codec.metadata() != identity:
         raise ValueError("Codec/calibration identity changed during evaluation")
     good = [r for r in results if r["status"] == "completed"]

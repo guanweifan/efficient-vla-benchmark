@@ -108,8 +108,14 @@ for calibration, measurement boundaries and result recording.
 
 ## Repository layout
 
+Independent [action codec evaluation](src/efficient_vla_benchmark/action_codecs/README.md)
+supports FAST+, BEAST, VQ-VLA, ActionCodec and X-Tokenizer in an isolated optional
+environment. It compares reconstruction/rate/latency on one frozen demonstration
+corpus, not policy success or end-to-end VLA acceleration.
+
 - `src/efficient_vla_benchmark/`: lightweight contracts and common harnesses;
   `methods/<category>/<method>/` owns each paper, with per-backend implementations.
+  `action_codecs/implementations/<codec>/` owns independent discrete representations.
 - `backends/<backend>/`: optional integration package and pinned native `upstream/`.
 - `configs/`: portable experiment presets; no machine-local resource locations.
 - `third_party/`: pinned algorithm references, runtimes and LIBERO.

@@ -17,6 +17,14 @@ with the [OFT](../backends/openvla_oft/README.md) and
 | calibration | read-only training-observation sampling | quantizer-specific search/packing |
 | evaluation | environment protocol, seeds, stopping and outcomes | concrete model or method imports |
 | profiling | timing boundaries, replay and aggregation | model internals or policy changes |
+| action_codecs | discrete packet/context contract, demonstration corpus and reconstruction measurement | policy heads, closed-loop success or policy speed claims |
+
+Action codecs use the [independent codec contract](../src/efficient_vla_benchmark/action_codecs/README.md).
+Only selected `implementations/<codec>/` modules import their optional tensor runtime;
+they never import backends or each other. Decoder input is discrete payload plus
+explicitly declared context, not saved encoder features or future observations.
+One common frozen corpus and calibrated-only statistics support rate–distortion
+comparison. This extension does not change the policy Dev/timing protocols.
 
 Backend plugins depend on core. A selected method binding may depend on its backend,
 but shared method equations must not. Entry-point and method-metadata discovery is

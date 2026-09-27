@@ -29,7 +29,27 @@ knows no codec/model names. Tensor runtimes are loaded only by selected adapters
 - A failed decode remains an error; no zero fallback or successful-only averages.
   Record exact corpus, weights, runtime, source, calibration and adapter identities.
 
-Prepare in a data environment; run codecs in their isolated optional environment:
+Prepare in the existing RLDS data environment. For codec evaluation, use a separate
+Python 3.10 environment; do not install over either policy environment:
+
+```bash
+python3.10 -m venv .venv-codecs
+.venv-codecs/bin/python -m pip install \
+  -r src/efficient_vla_benchmark/action_codecs/requirements.txt
+.venv-codecs/bin/python -m pip install -e .
+```
+
+The validated GPU build is PyTorch 2.5.1+cu124. Choose the matching official CUDA
+wheel for the host; do not change policy packages. Assets are supplied separately
+and verified against each adapter's pinned manifest. VQ-VLA and X-Tokenizer need
+their small pinned source subsets, obtained without cloning whole policy projects:
+
+```bash
+python -m efficient_vla_benchmark.action_codecs.fetch_sources \
+  --output "$CODEC_SOURCES"
+```
+
+Run preparation/evaluation in the corresponding environment:
 
 ```bash
 python -m efficient_vla_benchmark.action_codecs.prepare \
@@ -38,6 +58,20 @@ python -m efficient_vla_benchmark.action_codecs.run \
   --config configs/codecs/fast_plus.yaml --assets "$FAST_PLUS_DIR" \
   --corpus "$CORPUS_DIR" --output "$RESULT_DIR"
 ```
+
+Choose `configs/codecs/{fast_plus,beast,vq_vla,actioncodec,x_tokenizer}.yaml`.
+VQ-VLA/X-Tokenizer additionally take `--sources` pointing to their fetched subset;
+GPU adapters take `--device cuda:0`. FAST+ uses native CPU DCT/BPE. BEAST's basis5,
+basis10 and basis20 presets expose rate–distortion choices, not policy tuning.
+Only released quantizers are used; each adapter README states representation,
+calibration, tiling and decoder-side-information limits.
+
+Each result records per-window timestamps plus a measured-pass interval for
+external GPU-quality checks. Use one clean frozen source and an idle GPU, record
+thermal flags throughout that interval, and retain failed quality checks separately
+from accepted latency. This sampler cannot certify absence of sub-poll transients.
+The timing protocol is still one pass, not a best-of-repeat. Codec dependencies
+and measurement records stay isolated from policy results.
 
 The dataset's nominal frame rate is not assumed. Native embodiment labels may name
 another rate; without a verified conversion, report frames rather than physical Hz.

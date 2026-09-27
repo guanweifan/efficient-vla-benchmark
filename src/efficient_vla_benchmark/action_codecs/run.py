@@ -28,6 +28,7 @@ def main():
     config = yaml.safe_load(a.config.read_text())
     if set(config) != {"factory", "parameters"}:
         raise ValueError("Codec config must contain factory and parameters only")
+    source_before = source_metadata()
     corpus = Corpus(a.corpus)
     calibration = {"corpus_sha256": corpus.sha256, "quantiles": fit_quantiles(corpus)}
     codec = factory(config["factory"])(
@@ -40,8 +41,10 @@ def main():
     )
     try:
         result = evaluate(codec, corpus, a.output)
+        source_after = source_metadata()
         provenance = {
-            "source": source_metadata(),
+            "source": source_before,
+            "source_unchanged": source_before == source_after,
             "driver_version": driver_version(),
             "config": config,
             "config_sha256": digest(a.config),
@@ -55,6 +58,8 @@ def main():
             json.dumps(provenance, indent=2, sort_keys=True) + "\n"
         )
         print(json.dumps(result, indent=2, sort_keys=True))
+        if source_before != source_after:
+            raise RuntimeError("Source/runtime identity changed during codec evaluation")
         if not result["complete"]:
             raise SystemExit(1)
     finally:

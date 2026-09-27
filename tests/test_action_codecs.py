@@ -115,6 +115,13 @@ def test_harness_counts_real_tokens_and_raw_error(tmp_path):
     assert report["tokens_per_frame"] == 7 and report["nominal_bits_per_frame"] == 56
     assert 0 < report["mse"] < 0.0001
     assert report["encode_ms"] > 0 and report["decode_ms"] > 0
+    window = json.loads((tmp_path / "result/measurement_window.json").read_text())
+    for line in (tmp_path / "result/windows.jsonl").read_text().splitlines():
+        row = json.loads(line)
+        assert window["start"] <= row["encode_window"]["start"]
+        assert row["encode_window"]["start"] <= row["encode_window"]["end"]
+        assert row["encode_window"]["end"] <= row["decode_window"]["start"]
+        assert row["decode_window"]["start"] <= row["decode_window"]["end"] <= window["end"]
     with pytest.raises(FileExistsError):
         evaluate(DummyCodec(), corpus, tmp_path / "result")
 

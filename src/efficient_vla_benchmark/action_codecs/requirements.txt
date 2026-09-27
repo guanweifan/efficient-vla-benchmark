@@ -1,0 +1,14 @@
+# Isolated Python 3.10 codec environment; never install over a policy environment.
+torch==2.5.1
+torchvision==0.20.1
+numpy==1.26.4
+scipy==1.15.3
+transformers==4.57.1
+vector-quantize-pytorch==1.27.15
+einops==0.8.1
+diffusers==0.30.3
+timm==0.9.16
+accelerate==1.10.1
+omegaconf==2.3.0
+matplotlib==3.10.9
+tdigest==0.5.2.2
