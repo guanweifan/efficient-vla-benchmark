@@ -113,6 +113,12 @@ unpaced replay is not proof of real-robot deadline feasibility.
   context is not K repeated VLM passes. All candidates and selection cost belong
   in full-cost timing. KeyStone owns its geometric selection within
   `methods/action_generation/keystone/`; it does not change the DDIM schedule.
+- V-AEFusion overlaps a separate action-head stream with the current native VLM
+  call. Previous cognition conditions only a fixed early denoising window; the
+  fresh tail remains compulsory. Its private worker RNG cannot fork/restore global
+  RNG concurrently. Native draws, sampler steps and all joins remain accounted for.
+  CUDA stream-interval overlap is diagnostic, not proof of simultaneous kernels
+  or reduced end-to-end latency. Reset/close join work before releasing state.
 
 Full-retention/no-op adapters must match the appropriate native reference and
 detach cleanly. Eager-versus-fused attention and quantized kernel precision

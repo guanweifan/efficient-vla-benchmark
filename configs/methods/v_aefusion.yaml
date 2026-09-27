@@ -1,0 +1,4 @@
+method: v_aefusion
+parameters:
+  enabled: true
+  stale_steps: 5

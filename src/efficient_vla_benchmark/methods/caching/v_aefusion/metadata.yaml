@@ -1,0 +1,12 @@
+schema_version: 1
+name: v_aefusion
+category: caching
+description: Concurrent stale-conditioned early denoising and fresh VLM inference.
+config: efficient_vla_benchmark.methods.caching.v_aefusion.config:VAEFusionConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.caching.v_aefusion.implementations.cogact.api:build
+    validate_experiment: efficient_vla_benchmark.methods.caching.v_aefusion.implementations.cogact.api:validate_experiment
