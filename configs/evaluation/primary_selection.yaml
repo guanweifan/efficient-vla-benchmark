@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: de0ad2edbe56f6a7069bee3b5a15a4754a65bd3678b1d473e81d7998d7a55421
+coverage_summary_sha256: 041fe262cf860b7e24651af98a8e413ea7db1ccfa54c801d28db363c7fa07bb3
 source_compatibility:
 - development_runtime: 0dd68a00d775d3a36a95e949eb2e0fe708456ae4c6fd03fde045ccd5695cc8f2
   timing_runtime: b30a41d426f30c6f8e7731d6ab35fe56ea52ac691f601faf83c2daff72e9c099
@@ -28,10 +28,20 @@ source_compatibility:
   reason: Audited isolated additions and unchanged ASR/control/harness; EcoVLA kernel arithmetic and launch
     grids are unchanged. Only token count stops specializing the Triton JIT; real GPU static/dynamic bitwise
     parity and cache invariance pass. Original source hashes are retained.
+- development_runtime: 56a7866593362e249ddc8d878bb2ad0c4d0f9654e5f21726c2a6cc0f99fbe6c2
+  timing_runtime: f5d2fde249a8b0e96d597e4abe8288b645aa979f3ffd7b962301568c8ed6838f
+  reason: Audited 409 identical inference/config-metadata files under src/backends; the only runtime-fingerprint
+    differences are three solver regression tests. Original hashes and commits are retained; configuration
+    and active dependencies must still match.
+- development_runtime: f5d2fde249a8b0e96d597e4abe8288b645aa979f3ffd7b962301568c8ed6838f
+  timing_runtime: 56a7866593362e249ddc8d878bb2ad0c4d0f9654e5f21726c2a6cc0f99fbe6c2
+  reason: Audited 409 identical inference/config-metadata files under src/backends; the only runtime-fingerprint
+    differences are three solver regression tests. Original hashes and commits are retained; configuration
+    and active dependencies must still match.
 timing_workloads:
   openvla_oft: 01f8a93fc0bd522be3ef1d2dbee981ad1bb53ed9c1bf76b404808060bdedbefe
   cogact: 6c0e509fe062fdc393d7edbf668d29450250b99e9b163a5bad5597796e7420bc
-final_runtime_source_sha256: 2f10d368e4539dc002b2f2cd54e4d28d2a0b03a29c87a53413746e8ad93553d2
+final_runtime_source_sha256: 56a7866593362e249ddc8d878bb2ad0c4d0f9654e5f21726c2a6cc0f99fbe6c2
 configurations:
 - config: configs/experiments/cogact/baseline.yaml
   status: primary
@@ -749,6 +759,86 @@ configurations:
     - development_summary_sha256: 710f7e136d18f48bf89ead1fff593259e3f53e0652c64de688edb62e58eba46a
       development_experiment_id: 70b0de49da529b130793f3c22bedbdb5339cb51c8db2f235b9740553230ee798
       timing_record: search-r10-recheck-41-7-cogact--sp_vla_z025_history2
+- config: configs/experiments/cogact/deis_steps4_log_snr.yaml
+  status: primary
+  section: '5.4'
+  reason: Four log-SNR evaluations give 181/200 and 1.2104x. Three give 174/200 below 177; five gives
+    184/200 but is slower. Preserve active high-order updates and the native finite-noise start.
+  scope: Native CogACT log-rho high-order sampler with stable clean-endpoint limit; no training.
+  search:
+    complete: true
+    reason: Four log-SNR evaluations give 181/200 and 1.2104x. Three give 174/200 below 177; five gives
+      184/200 but is slower. Preserve active high-order updates and the native finite-noise start.
+    evidence:
+    - development_summary_sha256: 85392ec8606cb66d65b69b5af41e557e3591c91b151bda947bb92e2cf5c032c1
+      development_experiment_id: 32ebb2a64a62285df011cdca359fb07a8ca9707f875372a632eb86105dec3599
+      timing_record: solver-v1-41-6-cogact--deis
+    - development_summary_sha256: 85392ec8606cb66d65b69b5af41e557e3591c91b151bda947bb92e2cf5c032c1
+      development_experiment_id: 7224951c3b1fcac49680e43aaf4719d77eb9bd54731a2ea2dfd3a8b8211953d2
+      timing_record: solver-v1-41-6-cogact--deis_steps3
+    - development_summary_sha256: eb2182826f6c63fa8b70e632367a78c8a7af89aa197a2c1ed6eec74705a089e8
+      development_experiment_id: e747f2d30981eb565d4747858430849d8d1991b8c62e52243d2c769f1736ea6a
+      timing_record: solver-boundary-v1-41-4--deis_steps4
+    - development_summary_sha256: 8b7333e7b2b148be045ebf79b905399c1dd33c8ef8abfc94653fd2befe2498ea
+      development_experiment_id: e94fda90daf936ad2cea367a5e47a183b69700f6a2b95c83f4972c53400200e0
+      timing_record: unipc-grid-v1-41-4--deis_steps5
+    - development_summary_sha256: 47778d5512624ef7aee1975dd8a332c1e97809a7623fbc8ce3385f46f57106a8
+      development_experiment_id: fbfcb6119ff9fb1aa85eb1c55deb13a4be2669a7f7e79e962adfa5744e9d7fa1
+      timing_record: solver-logsnr-v1-124-3--deis_steps5_log_snr
+    - development_summary_sha256: db99817e28be20f50d0d1793147973c19796ee187f15bd8cbaedac0e5f722500
+      development_experiment_id: dc1e9de85d1f757ecdd3858b4c1afcef07824477522fee1941e070d34b31d4f4
+      timing_record: action-boundary-v1-41-4--deis_steps4_log_snr
+    - development_summary_sha256: d00369aa54c50d51daa9f36196b48768fdeac7fc85b68667e58630d7056b79c3
+      development_experiment_id: 2bdc0bb43d8abcbf0e23c3c43f45f9f268f1d6a6a96ae6c2a8c2ac6ef7b7758d
+      timing_record: terminal-boundary-v1-124-7--deis_steps3_log_snr
+    stop: accuracy_boundary
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: db99817e28be20f50d0d1793147973c19796ee187f15bd8cbaedac0e5f722500
+  development_experiment_id: dc1e9de85d1f757ecdd3858b4c1afcef07824477522fee1941e070d34b31d4f4
+  timing_record: action-boundary-v1-41-4--deis_steps4_log_snr
+- config: configs/experiments/cogact/dpm_solver_pp_steps5_log_snr.yaml
+  status: primary
+  section: '5.4'
+  reason: Five log-SNR evaluations give 186/200. Four give 178/200 and only approximately 0.7% higher
+    paired speedup; three fall to 143/200. Prefer the higher-success near-tied five-step configuration.
+  scope: Pinned high-order sampler with native finite-noise initialization, CFG and H8; not image-paper
+    score reproduction.
+  search:
+    complete: true
+    reason: Five log-SNR evaluations give 186/200. Four give 178/200 and only approximately 0.7% higher
+      paired speedup; three fall to 143/200. Prefer the higher-success near-tied five-step configuration.
+    evidence:
+    - development_summary_sha256: 85392ec8606cb66d65b69b5af41e557e3591c91b151bda947bb92e2cf5c032c1
+      development_experiment_id: 8f5f0a7dc6cdab07131dc0ab69be133cadde74319eb12c4c79086244734645c8
+      timing_record: solver-v1-41-4-cogact--dpm_solver_pp
+    - development_summary_sha256: 85392ec8606cb66d65b69b5af41e557e3591c91b151bda947bb92e2cf5c032c1
+      development_experiment_id: ed9b3e418a214fd3302d26118843a3b404c85c305069e5d49fdafc36a72dc3c0
+      timing_record: solver-v1-41-4-cogact--dpm_solver_pp_steps3
+    - development_summary_sha256: de402a208b4c60a6ef323c4388aa7c01aa5e684701abdf11a902689f677e7741
+      development_experiment_id: 8f0867233431f899a9c11636c4c3b874ec7c6b849572e07e0a0e0e308a96bef5
+      timing_record: solver-boundary-v1-41-4--dpm_solver_pp_steps4
+    - development_summary_sha256: d298fbb1e4662745fb3487c916d46f62ced1f2a3a3b98de43a0e5d3a4af9f703
+      development_experiment_id: e607cf6f96ba430c364ac7dad3625005a0b58ff8827ad665be09029c78438110
+      timing_record: pace-v1-45-7-cogact--dpm_solver_pp_steps5
+    - development_summary_sha256: 47778d5512624ef7aee1975dd8a332c1e97809a7623fbc8ce3385f46f57106a8
+      development_experiment_id: 1b547fe83c074247bb74416d6adbcbc23da32485504606d80e450a554027cde5
+      timing_record: solver-logsnr-v1-124-3--dpm_solver_pp_steps5_log_snr
+    - development_summary_sha256: db99817e28be20f50d0d1793147973c19796ee187f15bd8cbaedac0e5f722500
+      development_experiment_id: 9b33cb2bfb636072b28c428889070fdb0922073d9bf2621a32c0c9a77e652177
+      timing_record: action-boundary-v1-41-4--dpm_solver_pp_steps4_log_snr
+    - development_summary_sha256: 28610447cd4b516221d7f3408e355461568ca2dee992df7317bc101076777ae0
+      development_experiment_id: 6312da0a419d8286fd9a1a52bf6ee904fcf63c417941d3ac28723c0991ab5189
+      timing_record: dpm-minimum-v1-45-6--dpm_solver_pp_steps3_log_snr
+    stop: accuracy_boundary
+    tie_reason: The approximately 0.7% speed difference from single passes on matched GPU pairs is smaller
+      than the larger observed native pre/post drift (approximately 1.0%); it is not treated as a reliable
+      advantage. Prefer 186/200 over 178/200, not a statistical equivalence claim.
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: 47778d5512624ef7aee1975dd8a332c1e97809a7623fbc8ce3385f46f57106a8
+  development_experiment_id: 1b547fe83c074247bb74416d6adbcbc23da32485504606d80e450a554027cde5
+  timing_record: solver-logsnr-v1-124-3--dpm_solver_pp_steps5_log_snr
 - config: configs/experiments/cogact/keystone_k3.yaml
   status: primary
   section: '5.4'
@@ -805,6 +895,192 @@ configurations:
     - development_summary_sha256: a7115dbad1441c02f54ca3a8c89d998f0db17cce02fa330b6091d465af46945e
       development_experiment_id: a9d6fa9cb03c4c303485ae4e363a4c195876afde9799ecd581de091ebe49d1cb
       timing_record: probeflow-v1-41-7-cogact--probeflow_eps01
+- config: configs/experiments/cogact/unipc_steps5_log_snr.yaml
+  status: primary
+  section: '5.4'
+  reason: Five log-SNR evaluations give 183/200; four give 171/200. Uniform five steps and its order-three
+    variant give 168/200; six uniform steps are slower.
+  scope: Native CogACT predictor-corrector sampler; unchanged checkpoint, CFG and H8.
+  search:
+    complete: true
+    reason: Five log-SNR evaluations give 183/200; four give 171/200. Uniform five steps and its order-three
+      variant give 168/200; six uniform steps are slower.
+    evidence:
+    - development_summary_sha256: 85392ec8606cb66d65b69b5af41e557e3591c91b151bda947bb92e2cf5c032c1
+      development_experiment_id: 93f5055d3400261c3ae84b89c4cb79e4a4fe4cf1f533f03990dbb772de39ca25
+      timing_record: solver-v1-recheck-41-4-cogact--unipc
+    - development_summary_sha256: 85392ec8606cb66d65b69b5af41e557e3591c91b151bda947bb92e2cf5c032c1
+      development_experiment_id: 9a5005259313744e686945be8222b813179978cef0ba32accdc23c8c7a75191e
+      timing_record: solver-v1-recheck-41-4-cogact--unipc_steps3
+    - development_summary_sha256: eb2182826f6c63fa8b70e632367a78c8a7af89aa197a2c1ed6eec74705a089e8
+      development_experiment_id: 71ed0bd1932eee3a873770baf4c68a57d2b47e69368529394d6ec0275f470769
+      timing_record: solver-boundary-v1-41-4--unipc_steps4
+    - development_summary_sha256: 8b7333e7b2b148be045ebf79b905399c1dd33c8ef8abfc94653fd2befe2498ea
+      development_experiment_id: bb1b730f2b63bf28fa7b5a0ddd7589b8c0859285484ea32031dd72c2368b1e76
+      timing_record: adaptive-headroom-v1-125-7--unipc_steps5
+    - development_summary_sha256: ccd1ea52f6853a976d539ac6a2f7b0b3e33d1eed01dee8a128f1c136a246bb54
+      development_experiment_id: cf8068e163cf89f2debf324104e2e7cd79a8499929585b4551622218df296333
+      timing_record: unipc-grid-v1-41-4--unipc_steps5_log_snr
+    - development_summary_sha256: ccd1ea52f6853a976d539ac6a2f7b0b3e33d1eed01dee8a128f1c136a246bb54
+      development_experiment_id: 3911c218aa9b71743c28bf9009f2b61142cc6a9dad7f4e9a26387426f22c1ad7
+      timing_record: unipc-grid-v1-41-4--unipc_steps5_order3
+    - development_summary_sha256: 47778d5512624ef7aee1975dd8a332c1e97809a7623fbc8ce3385f46f57106a8
+      development_experiment_id: 5b52d906eca7e0efffe781c3859c01848e0ba4ac3d4698c629db3d6cc1386279
+      timing_record: action-boundary-v1-41-4--unipc_steps4_log_snr
+    stop: accuracy_boundary
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: ccd1ea52f6853a976d539ac6a2f7b0b3e33d1eed01dee8a128f1c136a246bb54
+  development_experiment_id: cf8068e163cf89f2debf324104e2e7cd79a8499929585b4551622218df296333
+  timing_record: unipc-grid-v1-41-4--unipc_steps5_log_snr
+- config: configs/experiments/cogact/aac_k4_m10.yaml
+  status: primary
+  section: '5.5'
+  reason: K4 with movement threshold 10 gives 179/200 and 37 replay queries. Threshold 8 gives 181/200
+    with 44 queries; threshold 12 gives 176/200, below the 177/200 target. Choose the faster eligible
+    midpoint with all candidate and selector costs.
+  scope: Shared-cognition stochastic candidates, Gaussian/Bernoulli entropy and movement floor; all candidate
+    and selector costs included. Entropy determines two measured query horizons at the selected setting.
+  search:
+    complete: true
+    reason: K4 with movement threshold 10 gives 179/200 and 37 replay queries. Threshold 8 gives 181/200
+      with 44 queries; threshold 12 gives 176/200, below the 177/200 target. Choose the faster eligible
+      midpoint with all candidate and selector costs.
+    evidence:
+    - development_summary_sha256: 1fec0fb7a4dcfb866132fbb79072ac13f272006156acb1cb6e58c62157405e33
+      development_experiment_id: b01195acd870f0ad2fb5ea6873bd2c6538346508b9a19a7984f6ea5adc94ce79
+      timing_record: aac-v1-125-6--aac
+    - development_summary_sha256: 1fec0fb7a4dcfb866132fbb79072ac13f272006156acb1cb6e58c62157405e33
+      development_experiment_id: cd132d5d65431eb2428f815b5b2f6ebc2e2ebda74506b73d5e976409790329b6
+      timing_record: aac-k5-thermal-recheck-v1-124-3--aac_k5
+    - development_summary_sha256: 1fec0fb7a4dcfb866132fbb79072ac13f272006156acb1cb6e58c62157405e33
+      development_experiment_id: d26842c55ea60e9bb85ff70b8a0b86a8b2877c622ebaa4d16137fb15f5902e1c
+      timing_record: aac-v1-125-6--aac_k5_m5
+    - development_summary_sha256: 3d316105d030a613df868b0010e82f8f682c73d1086324ffc654d868cfde67ef
+      development_experiment_id: 6d6213dc7ddc7dce4c51968462474b1c49ce3f2446d7f804bcb7e128a5e2fed0
+      timing_record: aac-movement-v1-124-7--aac_k4_m8
+    - development_summary_sha256: 20a58c12af8e419138513e974f1c902d87bf825e120b2920575e5750794eeaad
+      development_experiment_id: 3db7ca8a11decfa47bc4b88d4509b73daee3464a0b308d1068a5007ae88fc2e9
+      timing_record: action-boundary-v1-41-4--aac_k4_m5
+    - development_summary_sha256: b1fecad48b92ffab1f8ea885004340be9b429cea4dfaff20dc49d4800a7f3e74
+      development_experiment_id: 8dcc94c0e7e28d1c3a1a0d6f0b7002cf63c5fd8ca4b979a3cab684817c342198
+      timing_record: terminal-boundary-v1-124-7--aac_k4_m12
+    - development_summary_sha256: dec96b8d38b9494090f13a126b43e9c47288173490bc147da9dd57fdf0decc06
+      development_experiment_id: fa975a896114f7549968864960fe908aa4c1fdc1bae29e9f0bc28e0e6a179542
+      timing_record: aac-midpoint-v1-124-7--aac_k4_m10
+    stop: accuracy_boundary
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: dec96b8d38b9494090f13a126b43e9c47288173490bc147da9dd57fdf0decc06
+  development_experiment_id: fa975a896114f7549968864960fe908aa4c1fdc1bae29e9f0bc28e0e6a179542
+  timing_record: aac-midpoint-v1-124-7--aac_k4_m10
+- config: configs/experiments/cogact/autohorizon_zero_plateau.yaml
+  status: primary
+  section: '5.5'
+  reason: Hold threshold 1e-6 gives 182/200. Hold 0.03 and 0.01 both give 181/200; all three give 36 replay
+    queries and approximately 1.71x speed. The near-zero positive setting and 0.01 have exactly the same
+    replay query/horizon sequence.
+  scope: Author bidirectional attention selector with native DiT action attention; unchanged predictions
+    and adaptive execution.
+  search:
+    complete: true
+    reason: Hold threshold 1e-6 gives 182/200. Hold 0.03 and 0.01 both give 181/200; all three give 36
+      replay queries and approximately 1.71x speed. The near-zero positive setting and 0.01 have exactly
+      the same replay query/horizon sequence.
+    evidence:
+    - development_summary_sha256: e38e51eae4c5e9d42a821c5dae3745297196dd8db828bba65472cd3de7d6450e
+      development_experiment_id: 741d85aa09cad00318bb19021c6e05ea74e1091165911ab537a0b6207d11c9ba
+      timing_record: adaptive-v1-41-4-autohorizon--autohorizon
+    - development_summary_sha256: e38e51eae4c5e9d42a821c5dae3745297196dd8db828bba65472cd3de7d6450e
+      development_experiment_id: 86fc6dbbfbaa305daf2c7e7b0f9f9cebfebdb30f5e477ace9f8b95cf7eca4f46
+      timing_record: adaptive-v1-41-4-autohorizon--autohorizon_hold01
+    - development_summary_sha256: 1fec0fb7a4dcfb866132fbb79072ac13f272006156acb1cb6e58c62157405e33
+      development_experiment_id: 3d57b1a294dff83a682941137410d954f199942dac6cafc6bb49ad90f55a20c1
+      timing_record: adaptive-headroom-v1-125-7--autohorizon_hold003
+    - development_summary_sha256: 20a58c12af8e419138513e974f1c902d87bf825e120b2920575e5750794eeaad
+      development_experiment_id: 2f80fb6420a81e981c876fe111d7f2ff086fc15b978fcc7eb4d430a91005a444
+      timing_record: action-boundary-v1-41-4--autohorizon_hold001
+    - development_summary_sha256: b1fecad48b92ffab1f8ea885004340be9b429cea4dfaff20dc49d4800a7f3e74
+      development_experiment_id: 8d7946f564951304d00c6c201e4e29020090c9c8bd637646e4805ef2f478bdbb
+      timing_record: terminal-boundary-v1-124-7--autohorizon_zero_plateau
+    stop: latency_plateau
+    limitation: Further lowering the already positive near-zero plateau threshold has no demonstrated
+      query-count headroom. Exact-zero soft-pointer advances remain eligible holds; the attention selector
+      is not disabled.
+    tie_reason: Hold 0.03 is only approximately 0.17% faster than 1e-6 in single-pass paired ratios, below
+      the larger observed native drift of approximately 0.87%. Prefer 182/200 over 181/200 under the predeclared
+      practical tie rule; no statistical equivalence claim.
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: b1fecad48b92ffab1f8ea885004340be9b429cea4dfaff20dc49d4800a7f3e74
+  development_experiment_id: 8d7946f564951304d00c6c201e4e29020090c9c8bd637646e4805ef2f478bdbb
+  timing_record: terminal-boundary-v1-124-7--autohorizon_zero_plateau
+- config: configs/experiments/cogact/dvac_alpha16.yaml
+  status: primary
+  section: '5.5'
+  reason: Alpha 16 gives 179/200 and the fastest tested eligible execution. Its 35 replay queries reach
+    the minimum allowed by first-query H8 and subsequent native H16 capacity.
+  scope: Native DDIM clean-estimate variance and causal rolling threshold; real adaptive prefixes, native
+    H8 comparator.
+  search:
+    complete: true
+    reason: Alpha 16 gives 179/200 and the fastest tested eligible execution. Its 35 replay queries reach
+      the minimum allowed by first-query H8 and subsequent native H16 capacity.
+    evidence:
+    - development_summary_sha256: e38e51eae4c5e9d42a821c5dae3745297196dd8db828bba65472cd3de7d6450e
+      development_experiment_id: b3f9acc90a22bd313de8021610ae6e22460d180f1f34b5d4336e4663b198be02
+      timing_record: adaptive-v1-41-4-dvac--dvac
+    - development_summary_sha256: e38e51eae4c5e9d42a821c5dae3745297196dd8db828bba65472cd3de7d6450e
+      development_experiment_id: b0c57470dd6bce76405df85623ded650bd26edf25298987a9d0cd269c27fa35a
+      timing_record: adaptive-v1-41-4-dvac--dvac_alpha4
+    - development_summary_sha256: 1fec0fb7a4dcfb866132fbb79072ac13f272006156acb1cb6e58c62157405e33
+      development_experiment_id: 989f624a890cb2502ca11e7dd0d1607d355fe2b519bb9ed45e1c5fdb0db18d9e
+      timing_record: adaptive-headroom-v1-125-7--dvac_alpha8
+    - development_summary_sha256: 20a58c12af8e419138513e974f1c902d87bf825e120b2920575e5750794eeaad
+      development_experiment_id: 013a316e42b4389e0133d66b66fe8d5171c2ecc6d718893044ba79122c793675
+      timing_record: action-boundary-v1-41-4--dvac_alpha16
+    stop: mechanism_limit
+    limitation: Each trace must execute the native H8 bootstrap; all subsequent measured queries select
+      the real sixteen-action maximum. Increasing alpha cannot reduce replay query count. Dev still has
+      41 episodes with extra adaptive queries.
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: 20a58c12af8e419138513e974f1c902d87bf825e120b2920575e5750794eeaad
+  development_experiment_id: 013a316e42b4389e0133d66b66fe8d5171c2ecc6d718893044ba79122c793675
+  timing_record: action-boundary-v1-41-4--dvac_alpha16
+- config: configs/experiments/cogact/pace_p95.yaml
+  status: primary
+  section: '5.5'
+  reason: Percentile 95 gives 180/200 and 32 replay queries, the minimum for four fixed prefixes under
+    native H16. Only one Dev episode shortens execution at this aggressive setting.
+  scope: Demonstration-calibrated smoothed Cartesian-speed core; excludes joint-space and bimanual variants.
+    Near-full-chunk operation; no measured comparison against a fixed-H16 control.
+  search:
+    complete: true
+    reason: Percentile 95 gives 180/200 and 32 replay queries, the minimum for four fixed prefixes under
+      native H16. Only one Dev episode shortens execution at this aggressive setting.
+    evidence:
+    - development_summary_sha256: d298fbb1e4662745fb3487c916d46f62ced1f2a3a3b98de43a0e5d3a4af9f703
+      development_experiment_id: c5d6d6024f10a6627817cd34c6a2153fa854ff5a96f6d565754ca52b633cf45f
+      timing_record: pace-v1-45-7-cogact--pace
+    - development_summary_sha256: d298fbb1e4662745fb3487c916d46f62ced1f2a3a3b98de43a0e5d3a4af9f703
+      development_experiment_id: 307fbc3c12fad2535f4975e28a6f0408d3731f577e6c958c3a5cfdeb7009f13b
+      timing_record: pace-v1-45-7-cogact--pace_p25
+    - development_summary_sha256: 8b7333e7b2b148be045ebf79b905399c1dd33c8ef8abfc94653fd2befe2498ea
+      development_experiment_id: f9d0a5135edf18d496ee0974ab89d84046288a07d6dd9ec6e62d377b88221131
+      timing_record: pace-p75-infra-recheck-v1-124-7-cogact--pace_p75
+    - development_summary_sha256: 20a58c12af8e419138513e974f1c902d87bf825e120b2920575e5750794eeaad
+      development_experiment_id: 1be3bc0431ea8a702c1293340180bfd62cb49d12277955aca6700897aa10140a
+      timing_record: action-boundary-v1-41-4--pace_p95
+    stop: mechanism_limit
+    limitation: A percentile above 95 cannot reduce replay query count below 32 without extending the
+      trained prediction. This is near-full-chunk operation, not evidence of superiority over an unmeasured
+      fixed-H16 control.
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: 20a58c12af8e419138513e974f1c902d87bf825e120b2920575e5750794eeaad
+  development_experiment_id: 1be3bc0431ea8a702c1293340180bfd62cb49d12277955aca6700897aa10140a
+  timing_record: action-boundary-v1-41-4--pace_p95
 - config: configs/experiments/cogact/vote_ensemble_h8.yaml
   status: primary
   section: '5.5'
@@ -1426,6 +1702,35 @@ configurations:
       timing_record: search-r78-124-6-openvla_oft--sp_vla_z025_history3
     - development_summary_sha256: a1e6339862135e81ad33f177733233d3374e5efef40f8a3a5d14d3b2c0170170
       development_experiment_id: 859578dfea8c90d01617bc49ad2f4d7aa012b7cf52b3ed5f6c7315e3d01f1c00
+- config: configs/experiments/openvla_oft/pace_p75.yaml
+  status: primary
+  section: '5.5'
+  reason: Percentile 75 gives 197/200 and the least overhead among measured eligible presets, but remains
+    slower than native. Its replay uses 57 H8 queries; seven Dev episodes still trigger shorter prefixes.
+  scope: Demonstration-calibrated Cartesian core on native eight-action predictions; no padded or extended
+    action head.
+  search:
+    complete: true
+    reason: Percentile 75 gives 197/200 and the least overhead among measured eligible presets, but remains
+      slower than native. Its replay uses 57 H8 queries; seven Dev episodes still trigger shorter prefixes.
+    evidence:
+    - development_summary_sha256: d298fbb1e4662745fb3487c916d46f62ced1f2a3a3b98de43a0e5d3a4af9f703
+      development_experiment_id: cccb3484af7386b4fc1b7513309d3188671d552df40129a32bbfc516d0b42f0f
+      timing_record: pace-v1-45-7-openvla_oft--pace
+    - development_summary_sha256: d298fbb1e4662745fb3487c916d46f62ced1f2a3a3b98de43a0e5d3a4af9f703
+      development_experiment_id: edb7f7926b7d8c9c59ea5a685364ed0bc29ee833c91db99591d7c7fe83422402
+      timing_record: pace-v1-45-7-openvla_oft--pace_p25
+    - development_summary_sha256: 8b7333e7b2b148be045ebf79b905399c1dd33c8ef8abfc94653fd2befe2498ea
+      development_experiment_id: 2e34e92ba91fbe225e913e7cd5341acf71609375e3f7ed860e05437c00266be9
+      timing_record: pace-p75-infra-recheck-v1-124-3-openvla_oft--pace_p75
+    stop: mechanism_limit
+    limitation: OFT predicts only eight actions and already executes H8 natively; PACE can only shorten
+      this prefix, so it cannot reduce replay query count. Retain the negative full-cost result.
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  development_summary_sha256: 8b7333e7b2b148be045ebf79b905399c1dd33c8ef8abfc94653fd2befe2498ea
+  development_experiment_id: 2e34e92ba91fbe225e913e7cd5341acf71609375e3f7ed860e05437c00266be9
+  timing_record: pace-p75-infra-recheck-v1-124-3-openvla_oft--pace_p75
 - config: configs/experiments/openvla_oft/awq_fp16_kernel.yaml
   status: primary
   section: '6.1'

@@ -4,22 +4,24 @@ One selected configuration per backend/method scope. Dev-200 is tuning evidence,
 not final accuracy. Timing uses frozen four-suite prefixes (at most 128 controls each), ten warmup queries, one pass and the mean over all measured controls.
 Native pre/post checks must pass. Final success
 is unmeasured until the owner schedules the frozen 2,000-episode campaign.
-Low success and slowdowns remain reportable. All primary comparisons use H8.
+Low success and slowdowns remain reportable. All native references use H8.
+Adaptive rows execute real method-selected prefixes; H8 is their reference/default,
+not their fixed execution length. The shown upper bound is native prediction length.
 Complete measurements do not certify parameter-search completion; unfinished
 searches are excluded from the final launch list even when Dev meets the target.
 Selection targets at most 3 percentage points of Dev loss versus the matched
-native; this is not an outcome filter. Δ pp uses that same-cadence reference.
+native; this is not an outcome filter. Δ pp uses that same native-H8 reference.
 Speedup >1 means faster and <1 means slower. Near-1 differences from one pass
 do not establish a reliable gain; no repeat standard deviation is claimed.
 Each speedup uses its own same-GPU native pair; the displayed native row is
 not a universal denominator. Absolute latency across GPU pairs is descriptive.
 Measured GPU models: NVIDIA GeForce RTX 3090.
 
-Selection digest: `99e58902a150c48761ba3c833d97dd9a15aebb89fca869457bbe6549a6acf5d0`.
+Selection digest: `50b62217637d42827609802ba19d65873fe3a07dc3d47a1d0560821bf92b6713`.
 
 ## cogact
 
-| Section | Preset | H | Dev SR (n/200) | Δ pp | ms/control | Speedup | Peak GiB | Final SR (n/2000) | Selection / scope |
+| Section | Preset | Execution H | Dev SR (n/200) | Δ pp | ms/control | Speedup | Peak GiB | Final SR (n/2000) | Selection / scope |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
 | Reference | `baseline` | 8 | 91.5% (183) | +0.0 | 23.399 | 1.000× | 14.73 | — | Native H8 reference. Native model. Search: native_reference. |
 | 3.3 | `efficient_vla_layer_prune04` | 8 | 93.0% (186) | +1.5 | 21.797 | 1.071× | 13.19 | — | layer_prune04 gives 186/200, fastest valid timing among tested configurations meeting >= 177/200. Measured below-target boundary: layer_prune08=114/200, layer_prune06=156/200, layer_prune05=165/200. EfficientVLA calibrated static non-contiguous layer core, not dynamic routing or the full pipeline. Search: accuracy_boundary. |
@@ -46,14 +48,21 @@ Selection digest: `99e58902a150c48761ba3c833d97dd9a15aebb89fca869457bbe6549a6acf
 | 5.2 | `vla_infoentropy` | 8 | 87.5% (175) | -4.0 | 20.307 | 1.140× | 14.75 | — | Native-output SDPA still gives173/200; stricter similarity thresholds give175/200 and a smaller budget gives174/200. Keep the reference-close175/200 full-entropy port as an explicitly below-target result. Entropy-guided query-row reuse; below Dev loss target. Search: no_feasible_configuration. |
 | 5.3 | `eco_vla_keep60` | 8 | 92.0% (184) | +0.5 | 20.089 | 1.162× | 15.77 | — | eco_keep60 gives 184/200, fastest valid timing among tested configurations meeting >= 177/200. Measured below-target boundary: eco_keep50=167/200, eco_keep55=175/200. EcoVLA dynamic FFN-channel and whole-head core; declared trigger/grouping conventions and frozen training prior. Search: accuracy_boundary. |
 | 5.3 | `sp_vla_z025_min_actions3` | 8 | 89.0% (178) | -2.5 | 17.825 | 1.292× | 14.73 | — | Minimum three native actions in the unchanged six-command history, with pruning Z threshold 0.25, gives 178/200. Requiring only two native actions gives 176/200. Keep pruning and scheduling together. Pruning plus executed-action scheduling. Search: accuracy_boundary. |
+| 5.4 | `deis_steps4_log_snr` | 8 | 90.5% (181) | -1.0 | 19.396 | 1.210× | 14.73 | — | Four log-SNR evaluations give 181/200 and 1.2104x. Three give 174/200 below 177; five gives 184/200 but is slower. Preserve active high-order updates and the native finite-noise start. Native CogACT log-rho high-order sampler with stable clean-endpoint limit; no training. Search: accuracy_boundary. |
+| 5.4 | `dpm_solver_pp_steps5_log_snr` | 8 | 93.0% (186) | +1.5 | 19.486 | 1.201× | 14.73 | — | Five log-SNR evaluations give 186/200. Four give 178/200 and only approximately 0.7% higher paired speedup; three fall to 143/200. Prefer the higher-success near-tied five-step configuration. Pinned high-order sampler with native finite-noise initialization, CFG and H8; not image-paper score reproduction. Search: accuracy_boundary. |
 | 5.4 | `keystone_k3` | 8 | 92.0% (184) | +0.5 | 23.715 | 0.996× | 14.73 | — | K3 gives184/200 and is fastest among measured active candidate counts; K4 gives178/200, while K8/K16 add latency. No measured end-to-end acceleration. Batched native-DDIM candidates and guarded geometric selection, not a trained sampler. Search: mechanism_limit. |
 | 5.4 | `probeflow_eps0015` | 8 | 90.5% (181) | -1.0 | 21.510 | 1.083× | 14.73 | — | Measured candidates: probeflow=182/200, probeflow_eps0015=181/200, probeflow_eps03=176/200, probeflow_eps01=167/200. Choose the fastest eligible candidate. Adaptive lookahead core through the tested native DDIM coordinate bridge; not FM-trained. Search: accuracy_boundary. |
+| 5.4 | `unipc_steps5_log_snr` | 8 | 91.5% (183) | +0.0 | 20.275 | 1.162× | 14.73 | — | Five log-SNR evaluations give 183/200; four give 171/200. Uniform five steps and its order-three variant give 168/200; six uniform steps are slower. Native CogACT predictor-corrector sampler; unchanged checkpoint, CFG and H8. Search: accuracy_boundary. |
+| 5.5 | `aac_k4_m10` | adaptive ≤16 | 89.5% (179) | -2.0 | 14.073 | 1.664× | 14.73 | — | K4 with movement threshold 10 gives 179/200 and 37 replay queries. Threshold 8 gives 181/200 with 44 queries; threshold 12 gives 176/200, below the 177/200 target. Choose the faster eligible midpoint with all candidate and selector costs. Shared-cognition stochastic candidates, Gaussian/Bernoulli entropy and movement floor; all candidate and selector costs included. Entropy determines two measured query horizons at the selected setting. Search: accuracy_boundary. |
+| 5.5 | `autohorizon_zero_plateau` | adaptive ≤16 | 91.0% (182) | -0.5 | 13.632 | 1.716× | 14.73 | — | Hold threshold 1e-6 gives 182/200. Hold 0.03 and 0.01 both give 181/200; all three give 36 replay queries and approximately 1.71x speed. The near-zero positive setting and 0.01 have exactly the same replay query/horizon sequence. Author bidirectional attention selector with native DiT action attention; unchanged predictions and adaptive execution. Search: latency_plateau. |
+| 5.5 | `dvac_alpha16` | adaptive ≤16 | 89.5% (179) | -2.0 | 13.080 | 1.795× | 14.73 | — | Alpha 16 gives 179/200 and the fastest tested eligible execution. Its 35 replay queries reach the minimum allowed by first-query H8 and subsequent native H16 capacity. Native DDIM clean-estimate variance and causal rolling threshold; real adaptive prefixes, native H8 comparator. Search: mechanism_limit. |
+| 5.5 | `pace_p95` | adaptive ≤16 | 90.0% (180) | -1.5 | 12.062 | 1.946× | 14.73 | — | Percentile 95 gives 180/200 and 32 replay queries, the minimum for four fixed prefixes under native H16. Only one Dev episode shortens execution at this aggressive setting. Demonstration-calibrated smoothed Cartesian-speed core; excludes joint-space and bimanual variants. Near-full-chunk operation; no measured comparison against a fixed-H16 control. Search: mechanism_limit. |
 | 5.5 | `vote_ensemble_h8` | 8 | 87.0% (174) | -4.5 | 23.720 | 0.996× | 14.73 | — | H8 thresholds0.25/0.50/0.75 give174/174/172 of200, all below177; retain reference0.50 as an explicit negative two-vote adaptation. H8 two-vote overlapping-chunk ensemble core; no single-ACT architecture or extra queries. Search: no_feasible_configuration. |
 | 6.1 | `awq_fp16_kernel` | 8 | 91.0% (182) | -0.5 | 17.005 | 1.356× | 5.90 | — | FP16 is the faster eligible option among both measured supported kernel precisions. Explicit FP16 cast boundary; training-only calibration. Search: mechanism_limit. |
 
 ## openvla_oft
 
-| Section | Preset | H | Dev SR (n/200) | Δ pp | ms/control | Speedup | Peak GiB | Final SR (n/2000) | Selection / scope |
+| Section | Preset | Execution H | Dev SR (n/200) | Δ pp | ms/control | Speedup | Peak GiB | Final SR (n/2000) | Selection / scope |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
 | Reference | `baseline` | 8 | 99.0% (198) | +0.0 | 24.793 | 1.000× | 14.98 | — | Native H8 reference. Native model. Search: native_reference. |
 | 3.3 | `efficient_vla_layer_prune03` | 8 | 96.5% (193) | -2.5 | 22.970 | 1.072× | 13.80 | — | layer_prune03 gives 193/200, fastest valid timing among tested configurations meeting >= 192/200. Measured below-target boundary: layer_prune04=181/200, layer_prune08=135/200. EfficientVLA calibrated static non-contiguous layer core, not dynamic routing or the full pipeline. Search: accuracy_boundary. |
@@ -75,17 +84,18 @@ Selection digest: `99e58902a150c48761ba3c833d97dd9a15aebb89fca869457bbe6549a6acf
 | 5.2 | `vla_infoentropy_budget224` | 8 | 96.0% (192) | -3.0 | 25.058 | 0.985× | 15.03 | — | Budget224 meets192/200 and reduces full-cost overhead;256 falls to189/200 and reducing entropy protection quotas gives179/200. No reliable acceleration over native is claimed. Entropy-guided query-row reuse with retained KV. Search: accuracy_boundary. |
 | 5.3 | `eco_vla_keep625` | 8 | 96.5% (193) | -2.5 | 23.660 | 1.037× | 17.04 | — | eco_keep625 gives 193/200, fastest valid timing among tested configurations meeting >= 192/200. Measured below-target boundary: eco_keep60=186/200, eco_keep50=190/200. EcoVLA dynamic FFN-channel and whole-head core; declared trigger/grouping conventions and frozen training prior. Search: accuracy_boundary. |
 | 5.3 | `sp_vla_z025_min_actions3` | 8 | 97.5% (195) | -1.5 | 20.921 | 1.184× | 14.68 | — | Minimum three native actions in the unchanged six-command history, with pruning Z threshold 0.25, gives 195/200. Requiring only two native actions gives 191/200. Keep pruning and scheduling together. Pruning plus executed-action scheduling. Search: accuracy_boundary. |
+| 5.5 | `pace_p75` | adaptive ≤8 | 98.5% (197) | -0.5 | 25.420 | 0.969× | 14.98 | — | Percentile 75 gives 197/200 and the least overhead among measured eligible presets, but remains slower than native. Its replay uses 57 H8 queries; seven Dev episodes still trigger shorter prefixes. Demonstration-calibrated Cartesian core on native eight-action predictions; no padded or extended action head. Search: mechanism_limit. |
 | 6.1 | `awq_fp16_kernel` | 8 | 97.5% (195) | -1.5 | 21.359 | 1.161× | 6.12 | — | FP16 is the faster eligible option among both measured supported kernel precisions. Explicit FP16 cast boundary; training-only calibration. Search: mechanism_limit. |
 
 ## Useful auxiliary configurations
 
 Secondary evidence only; these do not enter the default final-evaluation queue.
 
-| Backend / preset | Dev SR (n/200) | ms/control | Speedup | Reason / scope |
-|---|---:|---:|---:|---|
-| openvla_oft / `awq` | 99.0% (198) | 25.626 | 0.967× | Retained accuracy/precision alternative; not a second primary. BF16-kernel W4A16. |
-| cogact / `awq` | 91.5% (183) | 19.262 | 1.197× | Retained accuracy/precision alternative; not a second primary. BF16-kernel W4A16. |
-| cogact / `actuation_slack_refresh_keep50` | 91.0% (182) | 45.692 | 0.512× | 182/200 at higher full refresh cost than keep25. Deletion core; full auxiliary cost. |
+| Backend / preset | Execution H | Dev SR (n/200) | ms/control | Speedup | Reason / scope |
+|---|---|---:|---:|---:|---|
+| openvla_oft / `awq` | 8 | 99.0% (198) | 25.626 | 0.967× | Retained accuracy/precision alternative; not a second primary. BF16-kernel W4A16. |
+| cogact / `awq` | 8 | 91.5% (183) | 19.262 | 1.197× | Retained accuracy/precision alternative; not a second primary. BF16-kernel W4A16. |
+| cogact / `actuation_slack_refresh_keep50` | 8 | 91.0% (182) | 45.692 | 0.512× | 182/200 at higher full refresh cost than keep25. Deletion core; full auxiliary cost. |
 
 ## Not certified for final evaluation
 
@@ -132,8 +142,15 @@ Recorded revisions predating history cleanup can be resolved through the
 | cogact / `vla_infoentropy` | `3e7f5140c644c221a9a02a45731cf1e949650a3564053c9d662f85e37b11cabb` | `compact-43-2-cogact-inputs-retry--vla_infoentropy` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `3330159196088131057ec15ea17cdc1667f6f9668632ed2266ff747cae62d186` |
 | cogact / `eco_vla_keep60` | `9b3df9db8fb40e0e1a2088fc5ec34728f4cef5d25c363dff38c9bc22ecf8a308` | `routing-eco-dyn1-45-7-cogact--eco_keep60` | `0281aa8f0f59a2ef08380f36ea95362b27748d90` / `a7c6b45a939067ff2dd25b438068333659391ed2` | `4a8fd532058d373edabd54bf8fa874bfca0d9ead3c2433f15df23d7a03cc7794` |
 | cogact / `sp_vla_z025_min_actions3` | `e5ff0e4f5f44dd1112561436b4d6c982a84db488c0c2af8cdb0c3228fdc657a8` | `search-r20-41-7-cogact--sp_vla_z025_history3` | `faabaa5959b49364a808c7327559087f3cf1c892` / `faabaa5959b49364a808c7327559087f3cf1c892` | `1f5fb02f8a6417f3a9c787db7838353c79a99c4b2111031977193c1ca41774f9` |
+| cogact / `deis_steps4_log_snr` | `dc1e9de85d1f757ecdd3858b4c1afcef07824477522fee1941e070d34b31d4f4` | `action-boundary-v1-41-4--deis_steps4_log_snr` | `63619e6e99cc51608aac453854df7d7532141c89` / `63619e6e99cc51608aac453854df7d7532141c89` | `c23f67a9b7d2e56704b223075b4ad878b59506b849cdd5e9362d14a7655644c6` |
+| cogact / `dpm_solver_pp_steps5_log_snr` | `1b547fe83c074247bb74416d6adbcbc23da32485504606d80e450a554027cde5` | `solver-logsnr-v1-124-3--dpm_solver_pp_steps5_log_snr` | `cef999e911ddb656189e19a85f226cca6fc47b63` / `63a662a7bc49f0acf2fb7ed668d832baa5824236` | `acecbcef7427b3d7cf26bdcff09fea191621e3b87074fbbe6e107f07f494d65d` |
 | cogact / `keystone_k3` | `f13cedd6f644a8494c160c48269b65b6ea280edf87ec9a40223127add688bd2a` | `keystone-v1-125-6-cogact--keystone_k3` | `93f4848e25b37cd2928241719cd8557f4e652bf8` / `93f4848e25b37cd2928241719cd8557f4e652bf8` | `ac0630d0ddc3f1f1ff62e255ed92748eacbf230a7ec28842e29181187b9d7196` |
 | cogact / `probeflow_eps0015` | `b71a6562b1dcf2888da0ea30fe58e81609ab848e884364482b68948389d09403` | `probeflow-eps0015-v1-41-7-cogact--probeflow_eps0015` | `b7db84fde6b0dcbd96eac64c37b43b7376929991` / `b7db84fde6b0dcbd96eac64c37b43b7376929991` | `43f7ec53f3b6aebe8fcf70d6d266fd38511d1a846f32c040c5e8898ef32ba25a` |
+| cogact / `unipc_steps5_log_snr` | `cf8068e163cf89f2debf324104e2e7cd79a8499929585b4551622218df296333` | `unipc-grid-v1-41-4--unipc_steps5_log_snr` | `168c84610a7dc64b647ed6ad456bca1064bc3210` / `168c84610a7dc64b647ed6ad456bca1064bc3210` | `fe131c6b183d5dd1d54380816f695af70e586cb9398508d3323c1f76d195b717` |
+| cogact / `aac_k4_m10` | `fa975a896114f7549968864960fe908aa4c1fdc1bae29e9f0bc28e0e6a179542` | `aac-midpoint-v1-124-7--aac_k4_m10` | `4eae04f22d67e2067a3dc423f9f88b89ca88ad05` / `4eae04f22d67e2067a3dc423f9f88b89ca88ad05` | `2bdee731805b58425ad78211f209fd951e119680f07db28790f620f2c6f09fed` |
+| cogact / `autohorizon_zero_plateau` | `8d7946f564951304d00c6c201e4e29020090c9c8bd637646e4805ef2f478bdbb` | `terminal-boundary-v1-124-7--autohorizon_zero_plateau` | `b036649764b2e8ce3606c652809e63346545d76e` / `b036649764b2e8ce3606c652809e63346545d76e` | `4b683d06bee64403aab4b0a284678b65b0c8ddda44b4f8057bd769ce0df4e2d6` |
+| cogact / `dvac_alpha16` | `013a316e42b4389e0133d66b66fe8d5171c2ecc6d718893044ba79122c793675` | `action-boundary-v1-41-4--dvac_alpha16` | `63619e6e99cc51608aac453854df7d7532141c89` / `63619e6e99cc51608aac453854df7d7532141c89` | `07cfe833ef99c4b73c4eedb9d951d9176f18bc8ee2a481cd2d94588790d184fe` |
+| cogact / `pace_p95` | `1be3bc0431ea8a702c1293340180bfd62cb49d12277955aca6700897aa10140a` | `action-boundary-v1-41-4--pace_p95` | `63619e6e99cc51608aac453854df7d7532141c89` / `63619e6e99cc51608aac453854df7d7532141c89` | `909a2072c0bb0bd9ed517d3601a868e663ee687488b32a7f5e760b269b67e588` |
 | cogact / `vote_ensemble_h8` | `9ebbbb6d52e6b5e4131af9d6bc14a493375a387d02bb298bceedb70680ac660c` | `search-vote-124-6-cogact--vote_ensemble_h8` | `faabaa5959b49364a808c7327559087f3cf1c892` / `faabaa5959b49364a808c7327559087f3cf1c892` | `8f775c6f832ad620cd65450fa517502a6cd0c29bc684c904f4710b310e2a0baa` |
 | cogact / `awq_fp16_kernel` | `be03b017c6a40862b3ebc5afa78a0ce2cf31111d49e8763c1fe5d0650391c117` | `compact-42-0-cogact-quant--awq_fp16_kernel` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `465838d6af15428eace0f168b48392ce6886137b` | `cb173d2eb42c17ac8ae3398af5f884071e082d7e3ed7db8ac15db2f40bfa4a61` |
 | openvla_oft / `baseline` | `83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e` | `compact-124-7-openvla_oft-quant--native-pre` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `77575dfbcb36ed385377a886f994a3d21e6cb2eb1de5d620f896aea2f9f493cd` |
@@ -156,6 +173,7 @@ Recorded revisions predating history cleanup can be resolved through the
 | openvla_oft / `vla_infoentropy_budget224` | `84aa0e0fe7b5e53c2b930e0a2b6cfdefaecd2fe9632e8e5b60d683594fb9d11f` | `search-r1-45-7-openvla_oft-5--vla_infoentropy_budget224` | `faabaa5959b49364a808c7327559087f3cf1c892` / `faabaa5959b49364a808c7327559087f3cf1c892` | `e861dba523cc3c90a881ec09c1a03cccaf5a16b9d442ec1357d1ccd8ee898e4e` |
 | openvla_oft / `eco_vla_keep625` | `420ed8a10ec07dafaa45251f29e974609a77d157b8a62e3fd5c2212a0924d73a` | `routing-eco-dyn3-45-5-openvla_oft--eco_keep625` | `0281aa8f0f59a2ef08380f36ea95362b27748d90` / `a7c6b45a939067ff2dd25b438068333659391ed2` | `ec654378d1c2e997a3b0fe1c03a643623644a7fb818c14d65535b2dd3055fb02` |
 | openvla_oft / `sp_vla_z025_min_actions3` | `1d80b73d202ee632e4220288cfd3bec1fc5f2a62bb5baa5325fe800195a10572` | `search-r78-124-6-openvla_oft--sp_vla_z025_history3` | `faabaa5959b49364a808c7327559087f3cf1c892` / `faabaa5959b49364a808c7327559087f3cf1c892` | `bd1c4113caccb6ebfa41678e0b431f392f067adb6bc589dc2db7166a1de11913` |
+| openvla_oft / `pace_p75` | `2e34e92ba91fbe225e913e7cd5341acf71609375e3f7ed860e05437c00266be9` | `pace-p75-infra-recheck-v1-124-3-openvla_oft--pace_p75` | `63a662a7bc49f0acf2fb7ed668d832baa5824236` / `63a662a7bc49f0acf2fb7ed668d832baa5824236` | `bcdb72e29eff8cfbc4fa0c130ea1f84dcaa72cf41d4134ac7419a6ff3938321f` |
 | openvla_oft / `awq_fp16_kernel` | `566ed69c9ce2db872ba40344f9123dac0ba1db2f05ef3c240c7f156406fe6d66` | `compact-124-7-openvla_oft-quant--awq_fp16_kernel` | `e86cbe2edc52d3bc69122a66dc727a8aa1109d93` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `b1a7536157e29af90a22cc43bb47a37850b6d3ea9e3d8b499df6089f0311cab1` |
 | openvla_oft / `awq` | `5d64703c2acfcfe4a33ed22f76215b16457c1d61cc0be948e134f97124f509cf` | `compact-124-7-openvla_oft-quant--awq` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `8720ab41aa47c710bc8c10a98479089045df80598caa44b3cf79b9645c6b8a8d` |
 | cogact / `awq` | `a223cf526c859a8a6071ba21da16d2be890c981c5048f52ab863fda22eace8dc` | `compact-42-0-cogact-quant--awq` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `465838d6af15428eace0f168b48392ce6886137b` | `2b53ecaeb6d71307c5630e29c56920594ad7c3f6663d15eb0660d780aebc8f2f` |
