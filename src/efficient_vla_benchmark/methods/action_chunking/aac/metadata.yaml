@@ -1,0 +1,12 @@
+schema_version: 1
+name: aac
+category: action_chunking
+description: Parallel empirical action entropy selects a movement-constrained execution prefix.
+config: efficient_vla_benchmark.methods.action_chunking.aac.config:AACConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features, libero_cartesian_delta_actions, control_hooks]
+    factory: efficient_vla_benchmark.methods.action_chunking.aac.implementations.cogact.api:build
+    validate_experiment: efficient_vla_benchmark.methods.action_chunking.aac.implementations.cogact.api:validate_experiment

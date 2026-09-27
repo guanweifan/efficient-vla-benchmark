@@ -1,0 +1,7 @@
+method: aac
+parameters:
+  enabled: true
+  num_samples: 20
+  movement_threshold: 3.0
+  covariance_regularization: 0.000001
+  gripper_movement_weight: 0.2
