@@ -1,0 +1,3 @@
+extends: probeflow.yaml
+parameters:
+  diagnostic_fixed_steps: 2

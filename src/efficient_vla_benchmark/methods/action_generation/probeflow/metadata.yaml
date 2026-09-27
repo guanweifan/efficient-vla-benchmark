@@ -1,0 +1,11 @@
+schema_version: 1
+name: probeflow
+category: action_generation
+description: ProbeFlow adaptive solver with an explicit finite-noise CogACT DDIM coordinate bridge.
+config: efficient_vla_benchmark.methods.action_generation.probeflow.config:ProbeFlowConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.action_generation.probeflow.implementations.cogact.api:build

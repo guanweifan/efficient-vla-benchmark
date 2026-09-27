@@ -119,6 +119,12 @@ unpaced replay is not proof of real-robot deadline feasibility.
   RNG concurrently. Native draws, sampler steps and all joins remain accounted for.
   CUDA stream-interval overlap is diagnostic, not proof of simultaneous kernels
   or reduced end-to-end latency. Reset/close join work before releasing state.
+- An adaptive solver port must preserve the native finite-noise initial state,
+  conditioning, CFG pairing and action interface. ProbeFlow first verifies its
+  DDIM-to-linear-mixture coordinate bridge on the original grid; its adaptive grid
+  is then a separate accuracy question. Count discarded lookahead evaluations and
+  all coordinate/RNG overhead. Fixed-grid diagnostic controls are not algorithm
+  results, and an epsilon-prediction model is not relabeled as FM-trained.
 
 Full-retention/no-op adapters must match the appropriate native reference and
 detach cleanly. Eager-versus-fused attention and quantized kernel precision

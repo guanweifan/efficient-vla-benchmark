@@ -1,0 +1,8 @@
+method: probeflow
+parameters:
+  enabled: true
+  epsilon: 0.008
+  probe_time: 0.5
+  max_steps: 10
+  step_increment: 2
+  diagnostic_fixed_steps: 0
