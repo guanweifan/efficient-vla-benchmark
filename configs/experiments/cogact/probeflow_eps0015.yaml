@@ -1,0 +1,3 @@
+extends: probeflow.yaml
+parameters:
+  epsilon: 0.015
