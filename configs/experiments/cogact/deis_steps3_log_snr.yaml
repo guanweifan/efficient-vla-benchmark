@@ -1,0 +1,3 @@
+extends: deis_steps3.yaml
+parameters:
+  spacing: log_snr
