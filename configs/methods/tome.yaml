@@ -1,0 +1,3 @@
+method: tome
+parameters:
+  tokens_per_layer: 4

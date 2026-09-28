@@ -1,0 +1,15 @@
+schema_version: 1
+name: tome
+category: token_reduction
+description: Training-free ToMe vision merging with native-grid reconstruction before fusion.
+config: efficient_vla_benchmark.methods.token_reduction.tome.config:ToMeConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [visual_token_layout]
+    factory: efficient_vla_benchmark.methods.token_reduction.tome.implementations.openvla_oft.api:build
+  cogact:
+    variants: [libero_joint]
+    requires: [paired_vision_transform]
+    factory: efficient_vla_benchmark.methods.token_reduction.tome.implementations.cogact.api:build
