@@ -3,6 +3,37 @@
 import numpy as np
 
 
+class VisionFeatureProbe:
+    """Snapshot a selected native block output without altering its computation.
+
+    The consumer owns block/prefix selection and feature interpretation. Copies
+    protect observations from later in-place operations; take/clear/close release
+    them. This class neither executes a vision model nor constructs a CLS token.
+    """
+
+    def __init__(self, block):
+        self.features = []
+        self.handle = block.register_forward_hook(self._capture)
+
+    def _capture(self, module, args, output):
+        if not hasattr(output, "ndim") or output.ndim != 3:
+            raise ValueError("Vision feature probe requires a batched token feature tensor")
+        self.features.append(output.detach().clone())
+
+    def take(self):
+        features, self.features = self.features, []
+        return features
+
+    def clear(self):
+        self.features = []
+
+    def close(self):
+        if self.handle is not None:
+            self.handle.remove()
+            self.handle = None
+        self.clear()
+
+
 class VisionAttentionProbe:
     """Capture normalized timm Q/K for each view without changing attention output.
 
