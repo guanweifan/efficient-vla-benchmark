@@ -1,0 +1,12 @@
+schema_version: 1
+name: a3_official
+category: action_chunking
+description: A3 official-code version with global confidence and dual speculative verification.
+config: efficient_vla_benchmark.methods.action_chunking.a3_official.config:A3OfficialConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features, libero_cartesian_delta_actions, control_hooks]
+    factory: efficient_vla_benchmark.methods.action_chunking.a3_official.implementations.cogact.api:build
+    validate_experiment: efficient_vla_benchmark.methods.action_chunking.a3_official.implementations.cogact.api:validate_experiment

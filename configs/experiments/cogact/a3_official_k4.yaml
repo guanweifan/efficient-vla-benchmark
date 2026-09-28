@@ -1,0 +1,3 @@
+extends: a3_official.yaml
+parameters:
+  num_samples: 4

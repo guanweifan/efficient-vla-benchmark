@@ -1,0 +1,11 @@
+method: a3_official
+parameters:
+  enabled: true
+  num_samples: 8
+  num_denoising_steps: 10
+  action_horizon: 16
+  verification_chunk_size: 16
+  confidence_alpha: 0.8
+  confidence_epsilon: 0.00000001
+  delta_thresholds: [0.41, 0.35, 0.5, 0.5, 0.5, 0.5]
+  threshold_scale: 1.0

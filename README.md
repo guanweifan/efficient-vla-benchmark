@@ -10,7 +10,7 @@ weights, datasets or raw experiment artifacts.
 | Backend / variant | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|
 | OpenVLA-OFT / libero_joint | Fifteen scopes below | VLA-Cache, VLA-InfoEntropy, Temporal Redundancy visual core, ASR KV reuse | SP-VLA, EcoVLA | PACE Cartesian core | AWQ W4A16 |
-| CogACT / libero_joint | Eleven scopes below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache, BAC, V-AEFusion, EVO | SP-VLA, EcoVLA | VOTE H8 two-vote adaptation, PACE Cartesian core, AutoHorizon, DVAC, AAC | AWQ W4A16 |
+| CogACT / libero_joint | Eleven scopes below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache, BAC, V-AEFusion, EVO | SP-VLA, EcoVLA | VOTE H8 two-vote adaptation, PACE Cartesian core, AutoHorizon, DVAC, AAC, A³ official-code version | AWQ W4A16 |
 | starVLA | Source pinned only; runtime not implemented | — | — | — | — |
 
 Action generation additionally exposes KeyStone (batched native candidates and
@@ -29,6 +29,12 @@ remains the comparator, not a claim that their executed length is fixed at eight
 PACE supports both backends; the other three use native CogACT denoiser signals.
 AAC includes all independent candidates and entropy computation in its full cost.
 OFT PACE can shorten but cannot extend its eight-action native prediction.
+
+A³ is explicitly the [official-code version](src/efficient_vla_benchmark/methods/action_chunking/a3_official/README.md):
+global confidence, dual speculative verification and conditional rejection-action
+append, not the paper's clustering/medoid and strict-prefix variant. Its CogACT
+binding maps noisy-action conditioning to native DDIM coordinates. Every draft
+and verifier batch counts toward full cost; registration alone is not a result.
 
 OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,
 EfficientVLA token core, ST-Merge and FlashVLA ICS, plus FastV, DivPrune, DART,

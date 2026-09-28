@@ -126,6 +126,13 @@ unpaced replay is not proof of real-robot deadline feasibility.
   context is not K repeated VLM passes. All candidates and selection cost belong
   in full-cost timing. KeyStone owns its geometric selection within
   `methods/action_generation/keystone/`; it does not change the DDIM schedule.
+- A3's `a3_official` scope follows the pinned GR00T code, not the paper's clustering
+  version. Its candidate selection and dual verification own no environment loop.
+  The CogACT binding conditions known positions at both ends of each native DDIM
+  transition using the original query noise, retaining CFG and the clean endpoint.
+  Draft and both verification branches share one explicit step budget; optional
+  grid thinning preserves native starting/ending noise indices. Count every batch,
+  including rejected positions. Official padding is never accepted execution.
 - V-AEFusion overlaps a separate action-head stream with the current native VLM
   call. Previous cognition conditions only a fixed early denoising window; the
   fresh tail remains compulsory. Its private worker RNG cannot fork/restore global

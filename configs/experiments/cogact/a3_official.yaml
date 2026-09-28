@@ -1,0 +1,3 @@
+extends:
+  - baseline.yaml
+  - ../../methods/a3_official.yaml

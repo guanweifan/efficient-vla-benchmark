@@ -1,5 +1,13 @@
 Third-party notices for source-based adaptations
 
+A3 official-code version: INCEPTIONwang/A3 at
+96a85c698f3848f6e684e36a81caf6e275db2ecc, under Apache-2.0 terms below.
+Copyright 2025 The RLinf Authors.
+Global confidence, draft selection, parallel conditioning masks and dual-prefix
+acceptance are adapted from the released GR00T implementation into isolated
+backend-independent decisions. CogACT DDIM-coordinate conditioning and lifecycle
+bindings are new. This is not the paper's clustering/medoid version.
+
 AAC: Adaptive-Action-Chunking/libero at
 ff8c8e421f7805b5845a72d07fbd8f1171df74bf, under the MIT terms below.
 Copyright (c) 2023 Lifelong Robot Learning.
