@@ -1,0 +1,4 @@
+method: visionzip
+parameters:
+  keep_ratio: 0.5
+  dominant_ratio: 0.84375

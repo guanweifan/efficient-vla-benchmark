@@ -1,0 +1,15 @@
+schema_version: 1
+name: visionzip
+category: token_reduction
+description: VisionZip dominant selection and contextual aggregation before native projection.
+config: efficient_vla_benchmark.methods.token_reduction.visionzip.config:VisionZipConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout]
+    factory: efficient_vla_benchmark.methods.token_reduction.visionzip.implementations.openvla_oft.api:build
+  cogact:
+    variants: [libero_joint]
+    requires: [causal_visual_token_selection]
+    factory: efficient_vla_benchmark.methods.token_reduction.visionzip.implementations.cogact.api:build
