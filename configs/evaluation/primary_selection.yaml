@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: 041fe262cf860b7e24651af98a8e413ea7db1ccfa54c801d28db363c7fa07bb3
+coverage_summary_sha256: bf58f8ecf04c4e5976f0fbdfa5fabe11467dc4954a6a96d90eea726a1cc252f9
 source_compatibility:
 - development_runtime: 0dd68a00d775d3a36a95e949eb2e0fe708456ae4c6fd03fde045ccd5695cc8f2
   timing_runtime: b30a41d426f30c6f8e7731d6ab35fe56ea52ac691f601faf83c2daff72e9c099
@@ -41,7 +41,7 @@ source_compatibility:
 timing_workloads:
   openvla_oft: 01f8a93fc0bd522be3ef1d2dbee981ad1bb53ed9c1bf76b404808060bdedbefe
   cogact: 6c0e509fe062fdc393d7edbf668d29450250b99e9b163a5bad5597796e7420bc
-final_runtime_source_sha256: 56a7866593362e249ddc8d878bb2ad0c4d0f9654e5f21726c2a6cc0f99fbe6c2
+final_runtime_source_sha256: 36a5822cf2755cd6d920b62d45f8ed189f4456fbb793941ad6cadf4c47e57ee4
 configurations:
 - config: configs/experiments/cogact/baseline.yaml
   status: primary
@@ -933,6 +933,61 @@ configurations:
   development_summary_sha256: ccd1ea52f6853a976d539ac6a2f7b0b3e33d1eed01dee8a128f1c136a246bb54
   development_experiment_id: cf8068e163cf89f2debf324104e2e7cd79a8499929585b4551622218df296333
   timing_record: unipc-grid-v1-41-4--unipc_steps5_log_snr
+- config: configs/experiments/cogact/a3_official_k4_steps5.yaml
+  status: primary
+  section: '5.5'
+  scope: A3 official-code version; GR00T global confidence and dual verification through native conditional
+    DDIM; excludes paper clustering/medoid, strict-only prefix and W4A4 verifier
+  reason: K4 with five shared draft/verifier DDIM steps gives 179/200 (-2 pp) and 1.4791x, fastest tested
+    eligible setting. Four steps gives 176/200; three/two give 165/105. Six steps gives 175/200; smaller
+    K, relaxed tolerance and verification blocking do not recover the four-step target. Both verification
+    branches stay active. Near-full H16 execution; no fixed-H16 control claim.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: K4 with five shared draft/verifier DDIM steps gives 179/200 (-2 pp) and 1.4791x, fastest tested
+      eligible setting. Four steps gives 176/200; three/two give 165/105. Six steps gives 175/200; smaller
+      K, relaxed tolerance and verification blocking do not recover the four-step target. Both verification
+      branches stay active. Near-full H16 execution; no fixed-H16 control claim.
+    limitation: Bounded tested search, not a global optimum. Adaptive execution versus native H8; official
+      GR00T decision rules transferred through conditional DDIM, not GR00T numerical or paper-v4 fidelity.
+      W4A4 and clustering are excluded.
+    evidence:
+    - development_summary_sha256: 5fff33f8503d421dd0a20c24b700690041686d8ec53bd2d673830863df1f946c
+      development_experiment_id: e2040ab81cdb2c9e7a7ac08a4386d6bc57f3f64e92a0fbf3494e14036c713667
+      timing_record: a3-official-initial-v1-124-7--a3_official
+    - development_summary_sha256: 5fff33f8503d421dd0a20c24b700690041686d8ec53bd2d673830863df1f946c
+      development_experiment_id: 60be81153266c2695fb277bd8743d0a1c1ec41aa41eee9ecfb9504faa18f2bba
+      timing_record: a3-official-initial-v1-124-7--a3_official_k4
+    - development_summary_sha256: 590d18b97a93b0a177dd443cf10edc2d397bfb87d691528eebfb1a3d734578be
+      development_experiment_id: 2d5edbd0c67d37bcb038350e180a32c5d7dd3f4f251f238cad9b2df90e7af2d0
+      timing_record: a3-official-refine-v1-124-7--a3_official_k4_steps6
+    - development_summary_sha256: 590d18b97a93b0a177dd443cf10edc2d397bfb87d691528eebfb1a3d734578be
+      development_experiment_id: 4a6e0c9054ae649beed3fb1d79f361ce7b12b27ee8895d3f42fb91fe93d0950b
+      timing_record: a3-official-refine-v1-124-7--a3_official_k4_steps5
+    - development_summary_sha256: 5fff33f8503d421dd0a20c24b700690041686d8ec53bd2d673830863df1f946c
+      development_experiment_id: b93e707e080efbb24e2424b612cda463cbea23a4d893d579a551db40a6000f5b
+      timing_record: a3-official-initial-v1-124-7--a3_official_k4_steps4
+    - development_summary_sha256: 96772dd57e29ea8abf9533f3a613228ef2f6ceaf5e0a7b4888b573e5bfbe0e07
+      development_experiment_id: 7fdcff2abeff8eae0efbdb04a38fc6aad3aa17c1a43189fcda0c8826c3ab5843
+      timing_record: a3-official-refine-v1-124-7--a3_official_k4_steps3
+    - development_summary_sha256: 14924d876807b2e88a8bf49a8071568f12cf457a113010bfc4ea46083fe1f07b
+      development_experiment_id: 38eb2aaf1bd622d9781c4e929a4ed45a8799b6361125c523bc3e360db716c0ed
+      timing_record: a3-official-headroom-v1-45-6--a3_official_k4_steps2
+    - development_summary_sha256: 96772dd57e29ea8abf9533f3a613228ef2f6ceaf5e0a7b4888b573e5bfbe0e07
+      development_experiment_id: c778580bbf98067e2099d72c362ca799bdcca03a72415277b9321f617e7cc5a1
+      timing_record: a3-official-headroom-v1-45-6--a3_official_k3_steps4
+    - development_summary_sha256: 96772dd57e29ea8abf9533f3a613228ef2f6ceaf5e0a7b4888b573e5bfbe0e07
+      development_experiment_id: f76862b6c3dcfc8b404e205aca46be43e959a6e968dd1b55ce5e75a4e82c7911
+      timing_record: a3-official-headroom-v1-45-6--a3_official_k4_steps4_t15
+    - development_summary_sha256: 5fff33f8503d421dd0a20c24b700690041686d8ec53bd2d673830863df1f946c
+      development_experiment_id: b1a3c9d5dc616a416f5aefabb4ac03d7ff7c57fc0e849c58b2948ca6607b7348
+      timing_record: a3-official-initial-v1-124-7--a3_official_k4_steps4_v4
+  development_summary_sha256: 590d18b97a93b0a177dd443cf10edc2d397bfb87d691528eebfb1a3d734578be
+  development_experiment_id: 4a6e0c9054ae649beed3fb1d79f361ce7b12b27ee8895d3f42fb91fe93d0950b
+  timing_record: a3-official-refine-v1-124-7--a3_official_k4_steps5
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
 - config: configs/experiments/cogact/aac_k4_m10.yaml
   status: primary
   section: '5.5'
