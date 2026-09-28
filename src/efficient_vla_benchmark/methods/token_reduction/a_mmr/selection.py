@@ -19,9 +19,11 @@ def select_current_frame(patches, cls, target):
         raise ValueError("A-MMR target must retain between one and all patches")
     features = F.normalize(patches.float(), dim=-1, eps=1e-12)
     global_feature = F.normalize(cls.float(), dim=-1, eps=1e-12)
-    attention = features @ global_feature
+    with torch.autocast(device_type=patches.device.type, enabled=False):
+        attention = features @ global_feature
     importance = (attention - attention.min()) / (attention.max() - attention.min() + 1e-6)
-    similarities = (features @ features.T).clamp(-1, 1)
+    with torch.autocast(device_type=patches.device.type, enabled=False):
+        similarities = (features @ features.T).clamp(-1, 1)
     selected = torch.zeros(count, dtype=torch.bool, device=patches.device)
     maximum_similarity = None
     for _ in range(target):

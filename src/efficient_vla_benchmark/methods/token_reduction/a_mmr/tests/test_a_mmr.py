@@ -68,6 +68,17 @@ def test_zero_range_saliency_has_stable_unique_ties_not_diversity_fallback():
     ]
 
 
+def test_fp32_equations_are_isolated_from_native_autocast():
+    for seed in range(16):
+        rng = np.random.default_rng(seed)
+        features = torch.from_numpy(rng.normal(size=(64, 16)).astype(np.float32))
+        cls = torch.from_numpy(rng.normal(size=16).astype(np.float32))
+        expected = numpy_reference(features.numpy(), cls.numpy(), 24)
+        with torch.autocast(device_type="cpu", dtype=torch.bfloat16):
+            actual = select_current_frame(features, cls, 24)
+        np.testing.assert_array_equal(actual.numpy(), expected)
+
+
 @pytest.mark.parametrize("target", [0, -1, 5, True, 1.5])
 def test_invalid_target(target):
     with pytest.raises(ValueError, match="target"):
