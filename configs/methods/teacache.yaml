@@ -1,0 +1,8 @@
+method: teacache
+parameters:
+  enabled: true
+  threshold: 0.25
+  warmup_steps: 2
+  polynomial_degree: 4
+  calibration_samples: 32
+  calibration_seed: 0
