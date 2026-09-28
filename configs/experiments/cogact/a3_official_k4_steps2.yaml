@@ -1,0 +1,3 @@
+extends: a3_official_k4_steps4.yaml
+parameters:
+  num_denoising_steps: 2
