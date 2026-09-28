@@ -1,0 +1,15 @@
+schema_version: 1
+name: a_mmr_current_frame
+category: token_reduction
+description: A-MMR current-frame saliency/diversity selection, excluding navigation history.
+config: efficient_vla_benchmark.methods.token_reduction.a_mmr.config:AMMRConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout]
+    factory: efficient_vla_benchmark.methods.token_reduction.a_mmr.implementations.openvla_oft.api:build
+  cogact:
+    variants: [libero_joint]
+    requires: [causal_visual_token_selection]
+    factory: efficient_vla_benchmark.methods.token_reduction.a_mmr.implementations.cogact.api:build

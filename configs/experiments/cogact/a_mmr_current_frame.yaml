@@ -1,0 +1,3 @@
+extends:
+  - baseline.yaml
+  - ../../methods/a_mmr_current_frame.yaml
