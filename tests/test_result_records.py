@@ -503,7 +503,11 @@ def test_history_map_rejects_invalid_revisions(tmp_path, recorder, mapping):
 
 def test_tracked_history_map_contains_full_revisions(recorder):
     mapping = recorder.load_history_map()
-    assert len(mapping) == 81
+    assert len(mapping) >= 81  # Preserve the original map while allowing new rewrites.
+    assert all(
+        len(old) == len(new) == 40 and int(old, 16) >= 0 and int(new, 16) >= 0
+        for old, new in mapping.items()
+    )
 
 
 def test_diagnostic_rows_identify_backend_and_measurement_record(tmp_path, recorder):
