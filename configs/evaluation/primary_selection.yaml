@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: bf58f8ecf04c4e5976f0fbdfa5fabe11467dc4954a6a96d90eea726a1cc252f9
+coverage_summary_sha256: 7f7cc5d9c24fc25d556ac8bd8f0116c4fbe56a18c5eb72fb4912cbe72d13d03f
 source_compatibility:
 - development_runtime: 0dd68a00d775d3a36a95e949eb2e0fe708456ae4c6fd03fde045ccd5695cc8f2
   timing_runtime: b30a41d426f30c6f8e7731d6ab35fe56ea52ac691f601faf83c2daff72e9c099
@@ -38,10 +38,70 @@ source_compatibility:
   reason: Audited 409 identical inference/config-metadata files under src/backends; the only runtime-fingerprint
     differences are three solver regression tests. Original hashes and commits are retained; configuration
     and active dependencies must still match.
+- development_runtime: f53c327964579c1171aa9e7ba3232757fd8882222637951847f55b7e007a30b3
+  timing_runtime: 5d807ee954dc559d8c89f86b3c59eb1bab38e34f3f58ece4e58c3b2ac459892d
+  reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
+    and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
+    effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
+- development_runtime: 5d807ee954dc559d8c89f86b3c59eb1bab38e34f3f58ece4e58c3b2ac459892d
+  timing_runtime: f53c327964579c1171aa9e7ba3232757fd8882222637951847f55b7e007a30b3
+  reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
+    and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
+    effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
+- development_runtime: f53c327964579c1171aa9e7ba3232757fd8882222637951847f55b7e007a30b3
+  timing_runtime: c3d4bc0b98fa2366cd6cf53a0d94b5bc87a28cdc0b2d114ef1b9fd857f41b908
+  reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
+    and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
+    effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
+- development_runtime: c3d4bc0b98fa2366cd6cf53a0d94b5bc87a28cdc0b2d114ef1b9fd857f41b908
+  timing_runtime: f53c327964579c1171aa9e7ba3232757fd8882222637951847f55b7e007a30b3
+  reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
+    and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
+    effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
+- development_runtime: f53c327964579c1171aa9e7ba3232757fd8882222637951847f55b7e007a30b3
+  timing_runtime: 5dfa074da2bfa5dc68c1c5dc1dfd6dc740af3936fb5acd6053566dc0a0e6a963
+  reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
+    and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
+    effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
+- development_runtime: 5dfa074da2bfa5dc68c1c5dc1dfd6dc740af3936fb5acd6053566dc0a0e6a963
+  timing_runtime: f53c327964579c1171aa9e7ba3232757fd8882222637951847f55b7e007a30b3
+  reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
+    and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
+    effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
+- development_runtime: 5d807ee954dc559d8c89f86b3c59eb1bab38e34f3f58ece4e58c3b2ac459892d
+  timing_runtime: c3d4bc0b98fa2366cd6cf53a0d94b5bc87a28cdc0b2d114ef1b9fd857f41b908
+  reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
+    and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
+    effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
+- development_runtime: c3d4bc0b98fa2366cd6cf53a0d94b5bc87a28cdc0b2d114ef1b9fd857f41b908
+  timing_runtime: 5d807ee954dc559d8c89f86b3c59eb1bab38e34f3f58ece4e58c3b2ac459892d
+  reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
+    and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
+    effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
+- development_runtime: 5d807ee954dc559d8c89f86b3c59eb1bab38e34f3f58ece4e58c3b2ac459892d
+  timing_runtime: 5dfa074da2bfa5dc68c1c5dc1dfd6dc740af3936fb5acd6053566dc0a0e6a963
+  reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
+    and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
+    effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
+- development_runtime: 5dfa074da2bfa5dc68c1c5dc1dfd6dc740af3936fb5acd6053566dc0a0e6a963
+  timing_runtime: 5d807ee954dc559d8c89f86b3c59eb1bab38e34f3f58ece4e58c3b2ac459892d
+  reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
+    and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
+    effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
+- development_runtime: c3d4bc0b98fa2366cd6cf53a0d94b5bc87a28cdc0b2d114ef1b9fd857f41b908
+  timing_runtime: 5dfa074da2bfa5dc68c1c5dc1dfd6dc740af3936fb5acd6053566dc0a0e6a963
+  reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
+    and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
+    effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
+- development_runtime: 5dfa074da2bfa5dc68c1c5dc1dfd6dc740af3936fb5acd6053566dc0a0e6a963
+  timing_runtime: c3d4bc0b98fa2366cd6cf53a0d94b5bc87a28cdc0b2d114ef1b9fd857f41b908
+  reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
+    and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
+    effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
 timing_workloads:
   openvla_oft: 01f8a93fc0bd522be3ef1d2dbee981ad1bb53ed9c1bf76b404808060bdedbefe
   cogact: 6c0e509fe062fdc393d7edbf668d29450250b99e9b163a5bad5597796e7420bc
-final_runtime_source_sha256: 36a5822cf2755cd6d920b62d45f8ed189f4456fbb793941ad6cadf4c47e57ee4
+final_runtime_source_sha256: 5dfa074da2bfa5dc68c1c5dc1dfd6dc740af3936fb5acd6053566dc0a0e6a963
 configurations:
 - config: configs/experiments/cogact/baseline.yaml
   status: primary
@@ -82,6 +142,38 @@ configurations:
     - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
       development_experiment_id: ffc87b7975d78aff0ed47b5e2a5db588c9cdd0486959b4ee34f3a9b3b1aeae37
       timing_record: routing-layers-v5-45-7-cogact--layer_prune05
+- config: configs/experiments/cogact/a_mmr_current_frame_keep4375.yaml
+  status: primary
+  section: '5.1'
+  reason: Keep43.75% gives 179/200; keep37.5% falls to 175. Keep50% gives 177 with only about 2% higher
+    paired speed, treated as a practical tie.
+  scope: Independent current-frame A-MMR core; native causal anchors and FP32 selection.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Keep43.75% gives 179/200; keep37.5% falls to 175. Keep50% gives 177 with only about 2% higher
+      paired speed, treated as a practical tie.
+    evidence:
+    - development_summary_sha256: 18d25b27c0f6ad5da1f167cc63695f26ff2b8a46be8a5db0c16ab9eb27efd546
+      development_experiment_id: 59b8cf82da47ea46258afe4dcc86388d9b60d27de267d21bbf0a3eb10c69486f
+      timing_record: final-r13-41-g1-cogact-vision_select--a_mmr_current_frame
+    - development_summary_sha256: 18d25b27c0f6ad5da1f167cc63695f26ff2b8a46be8a5db0c16ab9eb27efd546
+      development_experiment_id: 8b08766f0e4ca66debde6f88a61e30a4e55541de521eac681eaba8b9b30bf1cb
+      timing_record: final-r13-41-g1-cogact-vision_select--a_mmr_current_frame_strong
+    - development_summary_sha256: fd9d495f1f3dad1267ce559989b4ba3b8dd53df685007094cce6c6f7b7bb8c1c
+      development_experiment_id: 5f887313733e9709bfc5d0615502899e2f3ee574a1a7b6ce0ed2faa3159a5db7
+      timing_record: final-r16-41-g1-cogact-svd-headroom--a_mmr_mid
+    - development_summary_sha256: babdf686664e007bd1f2ff6f275445c103edbdb457b6086ab51fe566521d7f13
+      development_experiment_id: 49d963de78d72de16e8800148ab541df1654c905c5d74eaf5e8525d416921764
+      timing_record: scoped-retained-r3-r1-41-g1-cogact--a_mmr_keep4375
+    tie_reason: The roughly 2% one-pass speed advantage of keep50% is not considered reliable enough to
+      outweigh its two fewer successes; retain keep43.75%. This is a conservative choice, not statistical
+      equivalence.
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: babdf686664e007bd1f2ff6f275445c103edbdb457b6086ab51fe566521d7f13
+  development_experiment_id: 49d963de78d72de16e8800148ab541df1654c905c5d74eaf5e8525d416921764
+  timing_record: scoped-retained-r3-r1-41-g1-cogact--a_mmr_keep4375
 - config: configs/experiments/cogact/actuation_slack_refresh_keep25.yaml
   status: primary
   section: '5.1'
@@ -228,6 +320,37 @@ configurations:
     - development_summary_sha256: ce57dc5ea4a63a71d42ae51dfdc004d19e88cf4f7424fe5a27cd5eb7e206931b
       development_experiment_id: 8ceb735ef7bd3a36c56740eb4661dd497c9a412f102fecbbdca11adf306167ea
       timing_record: search-r1-45-5-cogact-0--divprune_keep25
+- config: configs/experiments/cogact/eta_vla_ilsa_keep35.yaml
+  status: primary
+  section: '5.1'
+  reason: Keep35% gives 180/200; keep20% gives 179 with under 1% speed difference, while keep10% falls
+    to 165.
+  scope: ETA-VLA ILSA core only; native cognition/DDIM preserved, TFM excluded.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Keep35% gives 180/200; keep20% gives 179 with under 1% speed difference, while keep10% falls
+      to 165.
+    evidence:
+    - development_summary_sha256: 20b9345161b0209ad77a529d8f396e3712202d17d4fa14b830286b4190fb2804
+      development_experiment_id: 784a8192807fad1ca3cd5fd19e3e28ed3236ca10a2f7a817012f3794b352c5c6
+      timing_record: scoped-ilsa-r2-124-g5-cogact--ilsa
+    - development_summary_sha256: 20b9345161b0209ad77a529d8f396e3712202d17d4fa14b830286b4190fb2804
+      development_experiment_id: d2517995bb45aa422ce16688e054240a515dc5ca237a95f1f4676d0b642b3f37
+      timing_record: scoped-ilsa-strong-r1-124-g5-cogact--ilsa_keep35
+    - development_summary_sha256: cc20453681524076d7cb6bd282c14b36b4983e34222a8a5517cad8a47176265d
+      development_experiment_id: 6e9da1699fd1a34bb391c69e62a0bcb702d64431bfb0ecbc50f0466cd2f4ed37
+      timing_record: scoped-ilsa20-r1-40-g2-cogact--ilsa_keep20
+    - development_summary_sha256: a7b3064cf01d2f0e08fcba9be214e2916205025d3e39cbe23ec4a7f8fb9adf4e
+      development_experiment_id: 0b2fbf6f487862d09d972788f003ed7513fa24dc6f5cb1dc76147ae70c7b1336
+      timing_record: scoped-ilsa10-r1-41-g2-cogact--ilsa_keep10
+    tie_reason: Treat the under-1% one-pass speed difference as a practical tie; keep35% has one additional
+      success and is closer to the reference budget.
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: 20b9345161b0209ad77a529d8f396e3712202d17d4fa14b830286b4190fb2804
+  development_experiment_id: d2517995bb45aa422ce16688e054240a515dc5ca237a95f1f4676d0b642b3f37
+  timing_record: scoped-ilsa-strong-r1-124-g5-cogact--ilsa_keep35
 - config: configs/experiments/cogact/fastv_keep25.yaml
   status: primary
   section: '5.1'
@@ -360,50 +483,166 @@ configurations:
 - config: configs/experiments/cogact/st_merge_keep192.yaml
   status: pending_core
   section: '5.1'
-  reason: Source/target direction and one-to-many merge rule remain unresolved.
+  reason: Eq. 4 consumes source into target, unlike the provisional anchor-survival convention; one-to-many
+    collision/mass rules remain unspecified.
   scope: Uncertified spatial-temporal merging.
   development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
   development_experiment_id: 2715131409b114d95dc8dc1349d3ea4da8b4baa5ab6f0e78127aff0d3dc431eb
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-43-2-cogact-3--st_merge_keep192
+- config: configs/experiments/cogact/ties_keep575_h48.yaml
+  status: primary
+  section: '5.1'
+  reason: Keep57.5%/refresh48 gives 177/200. Keep50% at refresh48 falls to 171; refresh96 at keep57.5%
+    falls to 174. Keep65% variants are slower. Select the fastest eligible tested setting, not a claimed
+    global optimum.
+  scope: OpenReview revision core, native K=30/L=16; Dev-selected refresh48 executed controls versus reference
+    H=20. All rank-probe/selection work is charged.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Keep57.5%/refresh48 gives 177/200. Keep50% at refresh48 falls to 171; refresh96 at keep57.5%
+      falls to 174. Keep65% variants are slower. Select the fastest eligible tested setting, not a claimed
+      global optimum.
+    evidence:
+    - development_summary_sha256: 2c6b05a866e5dc5bc022d47694ee86f54d4fc71e9a292f09796b30bf8c5d3290
+      development_experiment_id: b5460454a4130354b34441ae181758d985648308399208ec32a372c0626be980
+      timing_record: scoped-ties-r1-124-g5-cogact--ties_keep50
+    - development_summary_sha256: 2c6b05a866e5dc5bc022d47694ee86f54d4fc71e9a292f09796b30bf8c5d3290
+      development_experiment_id: 92bfb339c22710dbda4f49040dae8ac30f395bbc975ac0376d57a943c7e44a70
+      timing_record: scoped-ties-r1-124-g5-cogact--ties_keep25
+    - development_summary_sha256: 7df79552b1012c111a417fe916b21bd19efcec6118066a38530c16e6c1669d67
+      development_experiment_id: 1110a01fba4772fa2f2149dc66129bb6b2f8eb5053720b650a418e68c909e18e
+      timing_record: scoped-ties65-r1-124-g4-cogact--ties_keep65
+    - development_summary_sha256: 393ac1f0a91b80d412dc9cd1e5e6117be6e18d91d4bc64fdeb1cb405e22d3494
+      development_experiment_id: 115075e94e6ae05e57969e67b6ab77ef0a95e93b54d14ebf81d9b5f099e43ebe
+      timing_record: scoped-ties-cog-refine-thermal-replacement-r1-124-g4-cogact--ties_keep575
+    - development_summary_sha256: 393ac1f0a91b80d412dc9cd1e5e6117be6e18d91d4bc64fdeb1cb405e22d3494
+      development_experiment_id: d1bd1f19b12154d23aafbc7bab6f0b1329bbbeca042678b50f38889457ae7da5
+      timing_record: scoped-ties-cog-refine-thermal-replacement-r1-124-g4-cogact--ties_keep65_h48
+    - development_summary_sha256: ca73cf8d17ecb5896c8ad3cdc022b1358d4bf2e9926c7fa747d20ffc0bd919b3
+      development_experiment_id: 61427584620a852d356394b0988b2ff5ecb1d4693e6fded4547f29b9d0359e45
+      timing_record: scoped-ties-cog-boundary-r1-124-g4-cogact--ties_keep575_h48
+    - development_summary_sha256: ca73cf8d17ecb5896c8ad3cdc022b1358d4bf2e9926c7fa747d20ffc0bd919b3
+      development_experiment_id: 7e9c87b6ac62824c69c75ada481a6f0d795951e9fd7577e8be1fce3de0221c46
+      timing_record: scoped-ties-cog-boundary-r1-124-g4-cogact--ties_keep65_h96
+    - development_summary_sha256: 8d25548b3b0787dd3bca989b4483739e5ecb14607b5a6c10aefe71454edb6323
+      development_experiment_id: 257a49c0b83cbdabdad0e19094cf433a3a44943c49978fd3d119e53af566c535
+      timing_record: scoped-ties-cog-final-boundary-r1-124-g4-cogact--ties_keep50_h48
+    - development_summary_sha256: 8d25548b3b0787dd3bca989b4483739e5ecb14607b5a6c10aefe71454edb6323
+      development_experiment_id: bee2bfc0258714aa0fa3bdc13f7e0511d11bc8f18786286c48075842e8c46995
+      timing_record: scoped-ties-cog-final-boundary-r1-124-g4-cogact--ties_keep575_h96
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: ca73cf8d17ecb5896c8ad3cdc022b1358d4bf2e9926c7fa747d20ffc0bd919b3
+  development_experiment_id: 61427584620a852d356394b0988b2ff5ecb1d4693e6fded4547f29b9d0359e45
+  timing_record: scoped-ties-cog-boundary-r1-124-g4-cogact--ties_keep575_h48
+- config: configs/experiments/cogact/tome.yaml
+  status: primary
+  section: '5.1'
+  reason: r=4 gives 181/200; r=8/9 gives 178/177 without a reliable speed gain, and r=10 falls to 166.
+    Report the slowdown.
+  scope: Classic ToMe comparison on native paired vision branches; unchanged cognition and DDIM.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: r=4 gives 181/200; r=8/9 gives 178/177 without a reliable speed gain, and r=10 falls to 166.
+      Report the slowdown.
+    evidence:
+    - development_summary_sha256: 1b62e41716f753a3edf900fd62c4310db29bb31ba05b5cf3a71fd2f0d15bd506
+      development_experiment_id: 8f1aac48a4d142d8ea5c03a9538b91a329c717f15ee4bb3ed002b01317424f42
+      timing_record: final-r1-45-g3-cogact-tome--tome
+    - development_summary_sha256: 1b62e41716f753a3edf900fd62c4310db29bb31ba05b5cf3a71fd2f0d15bd506
+      development_experiment_id: 88b11d4a525e40433b25d04d49387409ff5d6ab596a127820dba18be23500bf1
+      timing_record: final-r1-45-g3-cogact-tome--tome_r8
+    - development_summary_sha256: fd9d495f1f3dad1267ce559989b4ba3b8dd53df685007094cce6c6f7b7bb8c1c
+      development_experiment_id: efcfb5024244bbc5e4ec865524644b8021a0fcf198484075f39360dd33d68e25
+      timing_record: final-r16-41-g1-cogact-svd-headroom--tome_r9
+    - development_summary_sha256: 7cd17df53d796c379d845d6fc34e0bf6a9c85b4de5beb230e326cf91e209b13a
+      development_experiment_id: 718dcdd7b8100b43fa84660eaed56a0f46f110de77205a95d2500b90468a77f2
+      timing_record: final-r3-41-g1-cogact--tome_r16
+    - development_summary_sha256: 3643fe0c1d7ddb8b0bd32192f28c72102cbe9da7ed3326dde6718e2eca90e137
+      development_experiment_id: 6883f34038a807d578d933db1d6537144aa8ff1d7d952add0a1409bf69def061
+    - development_summary_sha256: 3643fe0c1d7ddb8b0bd32192f28c72102cbe9da7ed3326dde6718e2eca90e137
+      development_experiment_id: e5aee0e250db1ab592b6725a285aef9553162df3e53f75b535cec1215cd60b15
+    tie_reason: The largest eligible speed difference is under 1%; prefer the higher-success reference
+      setting rather than a faster-looking one-pass fluctuation.
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: 1b62e41716f753a3edf900fd62c4310db29bb31ba05b5cf3a71fd2f0d15bd506
+  development_experiment_id: 8f1aac48a4d142d8ea5c03a9538b91a329c717f15ee4bb3ed002b01317424f42
+  timing_record: final-r1-45-g3-cogact-tome--tome
+- config: configs/experiments/cogact/visionzip.yaml
+  status: primary
+  section: '5.1'
+  reason: Keep50% gives 177/200 and is faster than keep43.75%; a same-cohort diagnostic confirms the nonmonotonic
+    latency. Keep40.625% falls to 174.
+  scope: VisionZip dominant/contextual token core; fewer retained tokens need not imply faster kernels.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Keep50% gives 177/200 and is faster than keep43.75%; a same-cohort diagnostic confirms the
+      nonmonotonic latency. Keep40.625% falls to 174.
+    evidence:
+    - development_summary_sha256: 08483345391f5a6fc4551bdc322f11ea8aff1ea150077463c7ef897eafee44c9
+      development_experiment_id: 582fa08229544e485c67f97a3035e7ee7f30a16d96bb99063b5a99dae859215d
+      timing_record: final-r15-41-g1-cogact-visionzip--visionzip
+    - development_summary_sha256: 08483345391f5a6fc4551bdc322f11ea8aff1ea150077463c7ef897eafee44c9
+      development_experiment_id: 17cf76cf7382e59b489264cce5b3bdad2addf1e4f77047255cbd907d992862ed
+      timing_record: final-r15-41-g1-cogact-visionzip--visionzip_strong
+    - development_summary_sha256: fd9d495f1f3dad1267ce559989b4ba3b8dd53df685007094cce6c6f7b7bb8c1c
+      development_experiment_id: 9d52aa78154819af2506faa0ef09e2c082b94ab74d2996dbfe5761d31b19809d
+      timing_record: final-r16-41-g1-cogact-svd-headroom--visionzip_boundary
+    - development_summary_sha256: 0ae8cdc54afa900d25dc82c200941f3b95d131c84c036aba295338c830f21fea
+      development_experiment_id: 4e81f09a4fc1323fc5f55a46b1c81e8273ba6e715cc3a178ab15152d3d64a032
+      timing_record: scoped-r2-41-g1-cogact--visionzip_keep4375
+    - development_summary_sha256: 8d3474ff11603788a2cca7ef209bfee6d202ac3fd333ba1be1e335b9562ecace
+      development_experiment_id: 14b4dde2cf79b5d8304562d4d249499fd076b451040bdb294e5f60ade9ce363f
+      timing_record: scoped-r2-41-g1-cogact--visionzip_keep40625
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: 08483345391f5a6fc4551bdc322f11ea8aff1ea150077463c7ef897eafee44c9
+  development_experiment_id: 582fa08229544e485c67f97a3035e7ee7f30a16d96bb99063b5a99dae859215d
+  timing_record: final-r15-41-g1-cogact-visionzip--visionzip
 - config: configs/experiments/cogact/action_cache_threshold80.yaml
   status: primary
   section: '5.2'
-  reason: Threshold0.80 with two native tail steps gives178/200 and1.180x. Threshold0.75 gives176/200;
-    one tail step at0.80 gives171/200. Preserve the frozen independent bank and full retrieval/refinement
-    cost.
-  scope: DDIM refinement adaptation; 1412 pairs from 77/80 independent successful episodes.
-  development_summary_sha256: 3c0f0fdb212c7268fadfcccfd0a014156aff176eacc58f2baee76c5566df604f
-  development_experiment_id: 07d39fad8017a5d0d5e41055d16e57df95a07b79ae182ff50b46b5188ba61b1a
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: search-r1112-124-6-cogact--action_cache_threshold80
+  reason: Two-tail-step threshold0.8 gives 178/200. Clean zero-step thresholds0.8/0.85 give 163/176; threshold0.9
+    recovers 179 but is slower. Use the same frozen schema-2 bank. Historical schema-1 positive-tail boundaries
+    (identical keys/states) are 176/200 at threshold0.75 and 171/200 at one step; these are not relabeled
+    as schema-2 runs.
+  scope: Native DDIM refinement/clean-endpoint transfer; 1412 pairs from 77/80 independent episodes, no
+    online population.
   search:
-    stop: accuracy_boundary
-    reason: Threshold0.80 with two native tail steps gives178/200 and1.180x. Threshold0.75 gives176/200;
-      one tail step at0.80 gives171/200. Preserve the frozen independent bank and full retrieval/refinement
-      cost.
     complete: true
+    stop: accuracy_boundary
+    reason: Two-tail-step threshold0.8 gives 178/200. Clean zero-step thresholds0.8/0.85 give 163/176;
+      threshold0.9 recovers 179 but is slower. Use the same frozen schema-2 bank. Historical schema-1
+      positive-tail boundaries (identical keys/states) are 176/200 at threshold0.75 and 171/200 at one
+      step; these are not relabeled as schema-2 runs.
     evidence:
-    - development_summary_sha256: b4142c75a7e05218bfba9e3ae3e19edc72693c1c3ef58647c56305eb93477ed8
-      development_experiment_id: 4b3d636daaf8c5a63af7431e8272b01f48762c2bb6a0d52b81a0ffc211f184b4
-      timing_record: cache-v2-45-6-cogact--action_cache
-    - development_summary_sha256: e8d6ed820407f49687cfe44315636212ff5e0f510f93366883ea3d03f67f7a42
-      development_experiment_id: ca9da46c9ad33ea5c6cbe6fa8829851ca433d0a825ff804ba235ffc18812f2fa
-      timing_record: search-r1-recheck-41-6-cogact-4--action_cache_threshold85
-    - development_summary_sha256: 3c0f0fdb212c7268fadfcccfd0a014156aff176eacc58f2baee76c5566df604f
-      development_experiment_id: 07d39fad8017a5d0d5e41055d16e57df95a07b79ae182ff50b46b5188ba61b1a
-      timing_record: search-r1112-124-6-cogact--action_cache_threshold80
+    - development_summary_sha256: 5759fbb67384510a99adda4c2c13265b2fe2a9bb6656fabf3a01bf4c8138538e
+      development_experiment_id: fa4869053ce0277d0b08de91144a2ef4a540ea9bec6a5e3ac1e2cb264bb12d0f
+      timing_record: scoped-action-clean-r1-124-g2-cogact--action_zero_t080
+    - development_summary_sha256: 5759fbb67384510a99adda4c2c13265b2fe2a9bb6656fabf3a01bf4c8138538e
+      development_experiment_id: cafc1f861659729e267488d2e62539245572e80056ea6a4ae0a1c5bc6f17ad79
+      timing_record: scoped-action-zero90-thermal-replacement-r1-40-g1-cogact--action_zero_t090
+    - development_summary_sha256: 5759fbb67384510a99adda4c2c13265b2fe2a9bb6656fabf3a01bf4c8138538e
+      development_experiment_id: 2a8c58aa70873bd5b38a2b902d32a7b002bd68e2474d53d5d48e5725d8f32c54
+      timing_record: scoped-action-zero90-thermal-replacement-r1-40-g1-cogact--action_few2_t080
+    - development_summary_sha256: 3c19c5b2f44a8930e98f28165d29b1e6f716cec2beae819669baeab6465a1872
+      development_experiment_id: 2ff315d5d1032d4a703318614945de8a856b367c3a7effd7617624c0424a20d5
+      timing_record: scoped-action-midpoint-r1-124-g5-cogact--action_zero_t085
     - development_summary_sha256: 9f28358ab66577b5a463bde113ad88f2db26dffab021beb42e48d151bc412453
       development_experiment_id: b05f450df5fc8626d003d7e1bbd239c17580af46002a66428212b8e5856c8976
-      timing_record: search-r22-41-7-cogact--action_cache_threshold75
-    - development_summary_sha256: 642acd7d46749f41511ffa3d1bd81f959727238f0657dd328684e5926cef917f
-      development_experiment_id: 6c8db100b68fd8607b9c834fe1c57e00ef79872f4bab3e607306c0ee9f9d7564
-      timing_record: search-r18-125-5-cogact--action_cache_threshold85_refine1
     - development_summary_sha256: b8f812820f0861f01a4e71aca1d42dd22fed21244e47893c112cd685df3717de
       development_experiment_id: aaef488dea4f8cd987e8b3454bd44fb33b3e0146d716c9002bc91614132c6846
-      timing_record: search-r22-41-7-cogact--action_cache_threshold80_refine1
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: 5759fbb67384510a99adda4c2c13265b2fe2a9bb6656fabf3a01bf4c8138538e
+  development_experiment_id: 2a8c58aa70873bd5b38a2b902d32a7b002bd68e2474d53d5d48e5725d8f32c54
+  timing_record: scoped-action-zero90-thermal-replacement-r1-40-g1-cogact--action_few2_t080
 - config: configs/experiments/cogact/actuation_slack_refresh_kv_keep50.yaml
   status: primary
   section: '5.2'
@@ -579,6 +818,40 @@ configurations:
     - development_summary_sha256: adf0316479cfbe9d82fda8288f366d6db2b2da0bcff9a294bb6e80a7c8afe2a2
       development_experiment_id: a868bb187c1fca4c3c5fee289b116b8c8b408da37ea2f872ed2514b184a242cc
       timing_record: evo-v1-124-7-cogact--evo_budget72
+- config: configs/experiments/cogact/teacache_threshold05.yaml
+  status: primary
+  section: '5.2'
+  reason: Threshold0.5 gives 184/200. Threshold0.75 gives 181 with under 2% speed improvement; 0.875 and
+    1.0 fall to 172/173.
+  scope: Classic diffusion-cache comparison; frozen independent polynomial calibration and full native
+    sampler cost.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Threshold0.5 gives 184/200. Threshold0.75 gives 181 with under 2% speed improvement; 0.875
+      and 1.0 fall to 172/173.
+    evidence:
+    - development_summary_sha256: b0e44564b22078238ca295111c224061aa48dffbbf2b5aaa4cb40117e0090a3d
+      development_experiment_id: 33cd03a02790a32dd35c0f902476128b4a8c8ef8e194cfa0602a625d694e8a3d
+      timing_record: final-r4-41-g4-cogact-teacache--teacache
+    - development_summary_sha256: b0e44564b22078238ca295111c224061aa48dffbbf2b5aaa4cb40117e0090a3d
+      development_experiment_id: 5ec401498f2f120061fc6f6fd368690e08fe5f54c529d0b72f5dd735094bb659
+      timing_record: final-r4-41-g4-cogact-teacache--teacache_strong
+    - development_summary_sha256: 3643fe0c1d7ddb8b0bd32192f28c72102cbe9da7ed3326dde6718e2eca90e137
+      development_experiment_id: 3458511d60fddb4e11de085584c7d384443910cc5189750447a92e9031efc94d
+    - development_summary_sha256: 0ae8cdc54afa900d25dc82c200941f3b95d131c84c036aba295338c830f21fea
+      development_experiment_id: ef298c784b542a49ea7df81171b533d0e6b96c2ae4c1d389869accd176e27d25
+      timing_record: scoped-r1-41-g1-cogact--teacache_t075
+    - development_summary_sha256: 8d3474ff11603788a2cca7ef209bfee6d202ac3fd333ba1be1e335b9562ecace
+      development_experiment_id: 08ec96deaa933bc15d577ed1d8cee523487c4647a5a467d87e2f1f8a631b915d
+      timing_record: scoped-r2-41-g1-cogact--teacache_t0875
+    tie_reason: Treat the under-2% one-pass speed difference between 0.5 and 0.75 as a practical tie and
+      prefer the three additional successes at 0.5.
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: b0e44564b22078238ca295111c224061aa48dffbbf2b5aaa4cb40117e0090a3d
+  development_experiment_id: 5ec401498f2f120061fc6f6fd368690e08fe5f54c529d0b72f5dd735094bb659
+  timing_record: final-r4-41-g4-cogact-teacache--teacache_strong
 - config: configs/experiments/cogact/temporal_redundancy_visual_update75.yaml
   status: primary
   section: '5.2'
@@ -839,6 +1112,45 @@ configurations:
   development_summary_sha256: 47778d5512624ef7aee1975dd8a332c1e97809a7623fbc8ce3385f46f57106a8
   development_experiment_id: 1b547fe83c074247bb74416d6adbcbc23da32485504606d80e450a554027cde5
   timing_record: solver-logsnr-v1-124-3--dpm_solver_pp_steps5_log_snr
+- config: configs/experiments/cogact/falcon.yaml
+  status: primary
+  section: '5.4'
+  reason: Distance0.01/noise-floor10 gives 183/200 but no acceleration. Distance0.0125/0.015 gives 168/156;
+    floor0 at distance0.01 gives 174.
+  scope: Historical latent selection and native partial-DDIM denoising core; full-cost slowdown retained,
+    not a claim about published checkpoint performance.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Distance0.01/noise-floor10 gives 183/200 but no acceleration. Distance0.0125/0.015 gives 168/156;
+      floor0 at distance0.01 gives 174.
+    evidence:
+    - development_summary_sha256: 88b65e870fa8fc2829eac9b548434de1cc14c5cc45cd8ec62104a44441c2de8e
+      development_experiment_id: a535296a1663098a15937a0e061b1b48e9f6979a489acaffdac7e11b586370ae
+      timing_record: final-r24-41-g1-cogact-falcon-boundary--falcon
+    - development_summary_sha256: 88b65e870fa8fc2829eac9b548434de1cc14c5cc45cd8ec62104a44441c2de8e
+      development_experiment_id: 792bee03b3814aa28b199ecc7f5014080015519455e14a8ec13e9c6479b5897e
+      timing_record: final-r24-41-g1-cogact-falcon-boundary--falcon_strong
+    - development_summary_sha256: 0ae8cdc54afa900d25dc82c200941f3b95d131c84c036aba295338c830f21fea
+      development_experiment_id: 43b807aec470074b3c3d9cb13e836d35a86b7a4ff0b4f2c80ca6727b9fdfaaf8
+      timing_record: scoped-r1-41-g1-cogact--falcon_d02
+    - development_summary_sha256: 0ae8cdc54afa900d25dc82c200941f3b95d131c84c036aba295338c830f21fea
+      development_experiment_id: 4208ff809928a4eb4b38766052eb4089b700bb0ccad030bfe745089d4f2ee27e
+      timing_record: scoped-r1-41-g1-cogact--falcon_d03
+    - development_summary_sha256: 8d3474ff11603788a2cca7ef209bfee6d202ac3fd333ba1be1e335b9562ecace
+      development_experiment_id: 4e4f91a80f65f3a6ec19cfdb77b31061160db12bd112c26c02930b3e877371fc
+      timing_record: scoped-r2-41-g1-cogact--falcon_d0125
+    - development_summary_sha256: 8d3474ff11603788a2cca7ef209bfee6d202ac3fd333ba1be1e335b9562ecace
+      development_experiment_id: c9e402f5c61f7391ccd016d1e4e7e3d829f275e061951f24f90394999645c2f7
+      timing_record: scoped-r2-41-g1-cogact--falcon_d015
+    - development_summary_sha256: babdf686664e007bd1f2ff6f275445c103edbdb457b6086ab51fe566521d7f13
+      development_experiment_id: 6008c2ff2789548a718f7d364886c0133876006d34d50368cf845903e4f563c3
+      timing_record: scoped-retained-r3-r1-41-g1-cogact--falcon_floor0_d01
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: 88b65e870fa8fc2829eac9b548434de1cc14c5cc45cd8ec62104a44441c2de8e
+  development_experiment_id: a535296a1663098a15937a0e061b1b48e9f6979a489acaffdac7e11b586370ae
+  timing_record: final-r24-41-g1-cogact-falcon-boundary--falcon
 - config: configs/experiments/cogact/keystone_k3.yaml
   status: primary
   section: '5.4'
@@ -1230,6 +1542,34 @@ configurations:
     - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
       development_experiment_id: 4d5841c74fa9f501a353b8e29e29afb085d26b3b1af36d17906060b696e5c792
       timing_record: routing-layers-v3-45-5-openvla_oft--layer_prune03
+- config: configs/experiments/openvla_oft/a_mmr_current_frame_keep4375.yaml
+  status: primary
+  section: '5.1'
+  reason: Keep43.75% gives 196/200 and improves over keep50%; keep37.5% falls to 191 and keep25% to 181.
+  scope: Independent current-frame A-MMR core only; historical-memory/full-system claims excluded.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Keep43.75% gives 196/200 and improves over keep50%; keep37.5% falls to 191 and keep25% to
+      181.
+    evidence:
+    - development_summary_sha256: 18d25b27c0f6ad5da1f167cc63695f26ff2b8a46be8a5db0c16ab9eb27efd546
+      development_experiment_id: d2bb917784ac3a4ce05fe7ec0903fd137bdfa7a1c91f51118deb2c33b2f41645
+      timing_record: final-r13-41-g4-openvla_oft-vision_select--a_mmr_current_frame
+    - development_summary_sha256: 18d25b27c0f6ad5da1f167cc63695f26ff2b8a46be8a5db0c16ab9eb27efd546
+      development_experiment_id: f5ce218571cb4eed4c5eab6a133b56a189d2426058187ad0c5b20fe720a5527d
+      timing_record: final-r13-41-g4-openvla_oft-vision_select--a_mmr_current_frame_strong
+    - development_summary_sha256: fd9d495f1f3dad1267ce559989b4ba3b8dd53df685007094cce6c6f7b7bb8c1c
+      development_experiment_id: 73069dc51d3cc96aca17722db712e71f9d9b0def56406bf3dd124bfb52772e8e
+      timing_record: final-r16-41-g4-openvla_oft-svd-headroom--a_mmr_mid
+    - development_summary_sha256: 0ae8cdc54afa900d25dc82c200941f3b95d131c84c036aba295338c830f21fea
+      development_experiment_id: 66a171af08f81a0606d70a2d11896f249e8f7bb72659d192c72d7ebdb2aece2e
+      timing_record: scoped-r1-41-g0-openvla_oft--a_mmr_keep4375
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  development_summary_sha256: 0ae8cdc54afa900d25dc82c200941f3b95d131c84c036aba295338c830f21fea
+  development_experiment_id: 66a171af08f81a0606d70a2d11896f249e8f7bb72659d192c72d7ebdb2aece2e
+  timing_record: scoped-r1-41-g0-openvla_oft--a_mmr_keep4375
 - config: configs/experiments/openvla_oft/actuation_slack_refresh_deletion.yaml
   status: primary
   section: '5.1'
@@ -1394,6 +1734,35 @@ configurations:
     - development_summary_sha256: a5566ba04caa42d865547c78f0403852dd5295ecc22752222321665a8e866d45
       development_experiment_id: 72668ab9cb7d7292b5bdb0b2bdc121842857fb5fca45169ec7345fb2460e97d0
       timing_record: search-r1-45-5-openvla_oft-3--efficient_vla_keep64
+- config: configs/experiments/openvla_oft/eta_vla_ilsa_keep35.yaml
+  status: primary
+  section: '5.1'
+  reason: Keep35% gives 193/200; keep27.5% and keep20% both fall to 191. All semantic/diversity selection
+    overhead is included.
+  scope: ETA-VLA ILSA core only; TFM and training-dependent optimization excluded.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Keep35% gives 193/200; keep27.5% and keep20% both fall to 191. All semantic/diversity selection
+      overhead is included.
+    evidence:
+    - development_summary_sha256: 20b9345161b0209ad77a529d8f396e3712202d17d4fa14b830286b4190fb2804
+      development_experiment_id: 6cb0852ad988d597041251bd2a18cd759c8cf6809cd9c593a30bc4610818d44a
+      timing_record: scoped-ilsa-r2-124-g2-openvla_oft--ilsa
+    - development_summary_sha256: 20b9345161b0209ad77a529d8f396e3712202d17d4fa14b830286b4190fb2804
+      development_experiment_id: 3157a825330b27f0933447b028ad50eca148110d1f88720eb0b5a27522a35ac5
+      timing_record: scoped-ilsa-strong-r1-124-g4-openvla_oft--ilsa_keep35
+    - development_summary_sha256: cc20453681524076d7cb6bd282c14b36b4983e34222a8a5517cad8a47176265d
+      development_experiment_id: 328c9a70b04fdfa62d8e47c4c9e19a4e1fadefd2ba28c930715b99325e98b1a9
+      timing_record: scoped-ilsa20-r1-40-g0-openvla_oft--ilsa_keep20
+    - development_summary_sha256: a7b3064cf01d2f0e08fcba9be214e2916205025d3e39cbe23ec4a7f8fb9adf4e
+      development_experiment_id: 96ce73f30a31f45bb679971e1f8c42f6a03d7e7b3b5c5dfaf3f2254015f83301
+      timing_record: scoped-ilsa275-r1-41-g0-openvla_oft--ilsa_keep275
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  development_summary_sha256: 20b9345161b0209ad77a529d8f396e3712202d17d4fa14b830286b4190fb2804
+  development_experiment_id: 3157a825330b27f0933447b028ad50eca148110d1f88720eb0b5a27522a35ac5
+  timing_record: scoped-ilsa-strong-r1-124-g4-openvla_oft--ilsa_keep35
 - config: configs/experiments/openvla_oft/fastv_keep3125.yaml
   status: primary
   section: '5.1'
@@ -1522,7 +1891,8 @@ configurations:
 - config: configs/experiments/openvla_oft/st_merge_keep192.yaml
   status: pending_core
   section: '5.1'
-  reason: Source/target direction and one-to-many merge rule remain unresolved.
+  reason: Eq. 4 consumes source into target, unlike the provisional anchor-survival convention; one-to-many
+    collision/mass rules remain unspecified.
   scope: Uncertified spatial-temporal merging.
   development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
   development_experiment_id: d6e8965949d65ac92a7079a13bbe478bc63fd38ef9d9657f513d8051b75f9a46
@@ -1532,17 +1902,122 @@ configurations:
 - config: configs/experiments/openvla_oft/team_vla_merge160.yaml
   status: pending_core
   section: '5.1'
-  reason: Soft-weight direction and merge normalization lack an executable reference.
+  reason: Joint text/action top-M aggregation, Eq. 5-9 direction and normalization remain unverified;
+    author source has no executable resolution.
   scope: Uncertified merging equations.
   development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
   development_experiment_id: 02fc7c9f038ee76b07c85196460993479de227eba74c4343cca09310552f327c
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-45-7-openvla_oft-3--team_vla_merge160
+- config: configs/experiments/openvla_oft/ties_keep3125_h48.yaml
+  status: primary
+  section: '5.1'
+  reason: Keep31.25%/refresh48 gives 192/200. At refresh48, keep25% falls to 183; at keep31.25%, refresh96
+    falls to 188. Choose the fastest eligible tested configuration with all prefix-probe cost included.
+  scope: OpenReview revision core; explicitly approved OFT K=192 ranking-window transfer, L=16 and Dev-selected
+    refresh48 executed controls versus reference H=20.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Keep31.25%/refresh48 gives 192/200. At refresh48, keep25% falls to 183; at keep31.25%, refresh96
+      falls to 188. Choose the fastest eligible tested configuration with all prefix-probe cost included.
+    evidence:
+    - development_summary_sha256: 2c6b05a866e5dc5bc022d47694ee86f54d4fc71e9a292f09796b30bf8c5d3290
+      development_experiment_id: 6dcd9ba76a0e123ccabebc1cbcd4f1748f24a95e2bba73f1267453eeb4237aff
+      timing_record: scoped-ties-r1-124-g4-openvla_oft--ties_keep50
+    - development_summary_sha256: 2c6b05a866e5dc5bc022d47694ee86f54d4fc71e9a292f09796b30bf8c5d3290
+      development_experiment_id: 8d87620bd69c361fd29d5f0461140cd03dc04d91a15d65565f0045054f4a6a09
+      timing_record: scoped-ties-r1-124-g4-openvla_oft--ties_keep25
+    - development_summary_sha256: 0c766f9758746cd86f8114b00e7ac4ef9da548c1897abc8ddedc0c15b3e7025d
+      development_experiment_id: e6a07dd470f2d4318e4cbd05e092675099e9ebd63fb9c7e005890cb11e2c5cd4
+      timing_record: scoped-ties-oft-refine-r1-124-g4-openvla_oft--ties_keep3125
+    - development_summary_sha256: 0c766f9758746cd86f8114b00e7ac4ef9da548c1897abc8ddedc0c15b3e7025d
+      development_experiment_id: 31254c8a85efccc60e16a1fde54c6b3d5fbd8c73f4ec67cc6c360207afd9b1a2
+      timing_record: scoped-ties-oft-refine-r1-124-g4-openvla_oft--ties_keep3125_h48
+    - development_summary_sha256: 545eab74b87b3044ef98b9920dd0d41c69064e8eb62188688976d1957e2c5853
+      development_experiment_id: e62a5b0cc08e8b26cae4961d985ea13a1645e12a3e83ad6febd150585ce24b41
+      timing_record: scoped-ties-oft-boundary-r1-124-g4-openvla_oft--ties_keep25_h48
+    - development_summary_sha256: 545eab74b87b3044ef98b9920dd0d41c69064e8eb62188688976d1957e2c5853
+      development_experiment_id: 8d37170f0c5303bb9e92aa66648c37368470b6199a1a7323eea441a0f68e5c0e
+      timing_record: scoped-ties-oft-boundary-r1-124-g4-openvla_oft--ties_keep3125_h96
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  development_summary_sha256: 0c766f9758746cd86f8114b00e7ac4ef9da548c1897abc8ddedc0c15b3e7025d
+  development_experiment_id: 31254c8a85efccc60e16a1fde54c6b3d5fbd8c73f4ec67cc6c360207afd9b1a2
+  timing_record: scoped-ties-oft-refine-r1-124-g4-openvla_oft--ties_keep3125_h48
+- config: configs/experiments/openvla_oft/tome.yaml
+  status: primary
+  section: '5.1'
+  reason: r=4 gives 197/200. r=8/9 offers less than 1% timing improvement; r=10 falls to 176/200. Report
+    the full-cost slowdown.
+  scope: Classic ToMe comparison on native paired vision branches; dense projector bridge remains charged.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: r=4 gives 197/200. r=8/9 offers less than 1% timing improvement; r=10 falls to 176/200. Report
+      the full-cost slowdown.
+    evidence:
+    - development_summary_sha256: 1b62e41716f753a3edf900fd62c4310db29bb31ba05b5cf3a71fd2f0d15bd506
+      development_experiment_id: c6ea7e725aff569e8d525b3f060537340a0b2d95c15ecd4483ca57b3b42af6fe
+      timing_record: final-r1-45-g1-openvla_oft-tome--tome
+    - development_summary_sha256: 1b62e41716f753a3edf900fd62c4310db29bb31ba05b5cf3a71fd2f0d15bd506
+      development_experiment_id: a1a165d1dcadb94f99583d8c5c854282106070444371eb36a6424de61fd32ec7
+      timing_record: final-r3-41-g4-openvla_oft--tome_r8
+    - development_summary_sha256: fd9d495f1f3dad1267ce559989b4ba3b8dd53df685007094cce6c6f7b7bb8c1c
+      development_experiment_id: 2350884faf5275c18d61c10e2a3fe812d3e3a4d3e1b144eb3ad20758cc0a7ec5
+      timing_record: final-r16-41-g4-openvla_oft-svd-headroom--tome_r9
+    - development_summary_sha256: 7cd17df53d796c379d845d6fc34e0bf6a9c85b4de5beb230e326cf91e209b13a
+      development_experiment_id: 8b9ba24e5b90f3649b184f0bdd5e2fd05191524ca63ca5940ca117f037670f6a
+      timing_record: final-r3-41-g4-openvla_oft--tome_r16
+    - development_summary_sha256: 3643fe0c1d7ddb8b0bd32192f28c72102cbe9da7ed3326dde6718e2eca90e137
+      development_experiment_id: 026436501adba05002269dade74719198e6704151d1715dae4f9b5c1f64513dd
+    - development_summary_sha256: 3643fe0c1d7ddb8b0bd32192f28c72102cbe9da7ed3326dde6718e2eca90e137
+      development_experiment_id: dbedda047e67c6232911ed4a2ba8253bbd3ab42e89d9150c2387a6c3551b3554
+    tie_reason: r=4 and r=8 both give 197/200; the sub-1% one-pass speed difference is treated as a practical
+      tie, so retain the simpler reference setting.
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  development_summary_sha256: 1b62e41716f753a3edf900fd62c4310db29bb31ba05b5cf3a71fd2f0d15bd506
+  development_experiment_id: c6ea7e725aff569e8d525b3f060537340a0b2d95c15ecd4483ca57b3b42af6fe
+  timing_record: final-r1-45-g1-openvla_oft-tome--tome
+- config: configs/experiments/openvla_oft/visionzip_keep25.yaml
+  status: primary
+  section: '5.1'
+  reason: Keep25% gives 194/200. Stronger 21.875% and 18.75% fall to 191/189; select the fastest eligible
+    tested budget.
+  scope: VisionZip dominant/contextual token core with paired native patch membership.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Keep25% gives 194/200. Stronger 21.875% and 18.75% fall to 191/189; select the fastest eligible
+      tested budget.
+    evidence:
+    - development_summary_sha256: 08483345391f5a6fc4551bdc322f11ea8aff1ea150077463c7ef897eafee44c9
+      development_experiment_id: fc9baa180aa15f6491d960b3c48fd72a1ad54c3057ed8620aabf86c769af6b3c
+      timing_record: final-r15-41-g4-openvla_oft-visionzip--visionzip
+    - development_summary_sha256: 08483345391f5a6fc4551bdc322f11ea8aff1ea150077463c7ef897eafee44c9
+      development_experiment_id: 55a7bc9b7524a7e075006d2ffd6d2e87e9650f71bdafc82966fe32fd08e2f822
+      timing_record: final-r15-41-g4-openvla_oft-visionzip--visionzip_strong
+    - development_summary_sha256: fd9d495f1f3dad1267ce559989b4ba3b8dd53df685007094cce6c6f7b7bb8c1c
+      development_experiment_id: 4bfce64ccfd14ca93c2ba09f0df4615d1e270e9d9dc2a0d12a14371a85a1f25c
+      timing_record: final-r16-41-g4-openvla_oft-svd-headroom--visionzip_boundary
+    - development_summary_sha256: 0ae8cdc54afa900d25dc82c200941f3b95d131c84c036aba295338c830f21fea
+      development_experiment_id: 67fe416b2539aed62187025f1b1e938c85e6cc2dc3fb919ea8a45e269af3d147
+      timing_record: scoped-r1-41-g0-openvla_oft--visionzip_keep1875
+    - development_summary_sha256: 8d3474ff11603788a2cca7ef209bfee6d202ac3fd333ba1be1e335b9562ecace
+      development_experiment_id: 5d26c9509cd076bb21274c9439a64a38dd1dd5b4acfa920bf649f0a3f853fd90
+      timing_record: scoped-r2-41-g0-openvla_oft--visionzip_keep21875
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  development_summary_sha256: 08483345391f5a6fc4551bdc322f11ea8aff1ea150077463c7ef897eafee44c9
+  development_experiment_id: 55a7bc9b7524a7e075006d2ffd6d2e87e9650f71bdafc82966fe32fd08e2f822
+  timing_record: final-r15-41-g4-openvla_oft-visionzip--visionzip_strong
 - config: configs/experiments/openvla_oft/vla_iap.yaml
   status: pending_core
   section: '5.1'
-  reason: Semantic encoder/alignment and centering construction remain unverified.
+  reason: The semantic encoder/pooling remains unspecified. The post-cutoff IAprune v2 changes core equations,
+    so it cannot silently repair the in-scope v1.
   scope: Uncertified semantic-information scorer.
   development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   development_experiment_id: 0a6a2c9c71aefa83b1f9ce71ac8d7813d3bb4ed9c4494769d977fdf123756ae0
@@ -1841,3 +2316,15 @@ auxiliary_configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-41-4-cogact-1--actuation_slack_refresh_keep50
+- config: configs/experiments/cogact/action_cache_zero_threshold90.yaml
+  status: auxiliary
+  section: '5.2'
+  scope: Native DDIM refinement/clean-endpoint transfer; 1412 pairs from 77/80 independent episodes, no
+    online population.
+  reason: Verified zero-denoiser-call cache-hit endpoint; 179/200 with less speed than the two-step primary.
+    A distinct useful core endpoint, not a second default final run.
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  development_summary_sha256: 5759fbb67384510a99adda4c2c13265b2fe2a9bb6656fabf3a01bf4c8138538e
+  development_experiment_id: cafc1f861659729e267488d2e62539245572e80056ea6a4ae0a1c5bc6f17ad79
+  timing_record: scoped-action-zero90-thermal-replacement-r1-40-g1-cogact--action_zero_t090

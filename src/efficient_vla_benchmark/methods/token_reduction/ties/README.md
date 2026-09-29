@@ -33,9 +33,10 @@ An adjacent intersection with fewer than two tokens has undefined Kendall tau;
 it must never be assigned an invented similarity value. Degenerate soft
 calibration quantiles are rejected rather than divided by an arbitrary epsilon.
 
-The native H8 transfer uses refresh_steps=24, a chunk-aligned setting near the
-paper's H=20. H counts executed controls, not decoder calls or diffusion steps.
-This is a disclosed scheduling parameter, not the published H=20 recipe.
+The reference native H8 preset uses refresh_steps=24, a chunk-aligned setting near
+the paper's H=20. H counts executed controls, not decoder calls or diffusion steps.
+Additional refresh intervals are explicit Dev-selected parameters in the result
+ledger and selected presets, never a claim of the published H=20 recipe.
 Current-frame prefix-probe work, rank calculation and selection must all be
 included in replay; a future-depth tau must not be obtained free of charge.
 Native masks, RoPE, action slots/cognition readout, sampler, CFG and RNG stay native.
@@ -54,6 +55,11 @@ K is the correlation ranking window, NOT the retained-token budget. Never drop
 undefined calibration frames, insert a made-up tau or use Dev outcomes to fit
 the quantiles. Unexpected undefined online intersections retain dense rows and
 are explicitly counted in diagnostics, not silently interpreted as tau=0.
+The frozen quantiles were independently recomputed from all 100 training scores;
+OFT's scores were additionally checked against the saved native rankings.
+Calibration retains its actual development-source metadata: OFT's runtime matches
+the committed runtime; CogACT differs only in the native test's OFT K setting,
+not in calibration or inference code. No dirty measurement is relabeled clean.
 
 ## Use
 

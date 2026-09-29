@@ -58,3 +58,9 @@ and cardinality-versus-received-mass normalization affect the merged feature,
 not just an incidental hyperparameter. Increasing the anchor count cannot settle
 that interpretation. Retain the port diagnostics without certifying a faithful
 negative result or scheduling it as a confirmed primary method.
+
+The final source recheck still finds only README/assets at the pinned author
+revision. The missing joint text/action top-M aggregation is also a core issue,
+independent of the merge-direction/normalization ambiguity. No success-guided
+alternative interpretation is substituted. CogACT's absent LLM action-token set
+does not justify silently replacing that guidance with cognition-token scores.

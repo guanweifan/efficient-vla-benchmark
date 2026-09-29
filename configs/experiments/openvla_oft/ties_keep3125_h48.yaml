@@ -1,0 +1,5 @@
+extends:
+- ties.yaml
+parameters:
+  keep_ratio: 0.3125
+  refresh_steps: 48

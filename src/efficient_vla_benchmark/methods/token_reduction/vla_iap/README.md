@@ -46,3 +46,9 @@ encoder/alignment/centering construction controls both adaptive selection modes.
 Matching feature widths and passing equation tests do not establish semantic
 alignment. Retain the disclosed port diagnostics, but do not use its success
 loss as evidence that the published core fails or enter it as a confirmed primary.
+
+The final recheck still finds no encoder/pooling implementation at the pinned
+author revision. The renamed IAprune v2, dated 2026-08-26, is outside this review's
+2026-08-17 cutoff and changes semantic centering/temperature, motion normalization,
+mask budgeting and rank fusion. It is not a clarification that can silently
+repair v1. Keep the in-scope v1 provisional rather than mixing both algorithms.

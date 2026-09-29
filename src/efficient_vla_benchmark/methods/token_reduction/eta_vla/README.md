@@ -46,4 +46,6 @@ tests, four-suite smoke, Dev-200 and paired replay are separate acceptance gates
 Initial validation passed 18 independent equation/config/lifecycle tests and one
 real-model parity/active/reset/detach test on each backend. Four-suite smoke
 completed 4/4 successes with zero errors on each backend; this is a connectivity
-check, not a formal accuracy or speed claim. Dev selection remains pending.
+check, not a formal accuracy or speed claim. The central result ledger owns the
+subsequent Dev-200 selection, stronger-budget boundaries and paired full-cost
+timing; selected presets do not expand this ILSA-only mechanism scope.

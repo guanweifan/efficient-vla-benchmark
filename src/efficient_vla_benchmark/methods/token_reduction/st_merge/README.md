@@ -85,3 +85,9 @@ the text's one-to-many matching do not uniquely determine the current surviving-
 anchor/collision construction. Improved Dev success does not resolve that issue.
 Keep the disclosed port and useful diagnostics, but do not schedule a final
 benchmark row claiming a verified core or attribute its losses to the paper.
+
+The final v1 recheck makes the direction conflict explicit: Eq. 3 selects a
+match for source a, while Eq. 4 consumes a into target b. The provisional port
+instead preserves its proposing anchor. Reversing one assignment alone would
+not resolve one-to-many collisions, shared members and mass accounting. The
+linked author repository remains unavailable; both bindings stay pending core.

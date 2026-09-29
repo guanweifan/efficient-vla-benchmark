@@ -1,0 +1,4 @@
+extends:
+- eta_vla_ilsa.yaml
+parameters:
+  keep_ratio: 0.35

@@ -79,3 +79,11 @@ episodes. Initial threshold 0.90 was chosen before Dev evaluation from leave-one
 episode-out prefill similarity: expected hits span roughly 10–32% across suites,
 whereas 0.95 nearly disables retrieval in some suites. This is a disclosed
 CogACT-specific choice, not the original models' threshold.
+
+The authorized schema-2 recollection completed exactly 80 attempts at the same
+independent initial states: 77 successes, three retained failures and 1412 pairs.
+Keys, intermediate states, partitions and all episode outcomes match the old bank
+bitwise; only the actual clean endpoints are added. There were no replacement
+episodes or Dev/final-data collection. Zero/few-step Dev and replay evidence use
+this new bank explicitly; the ledger separates the primary from the useful
+zero-step endpoint instead of publishing two default configurations.
