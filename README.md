@@ -39,7 +39,7 @@ and verifier batch counts toward full cost; registration alone is not a result.
 OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,
 EfficientVLA token core, ST-Merge and FlashVLA ICS, plus FastV, DivPrune, DART,
 SparseVLM v1, DepthCache primary-view core, ASR deletion instrument, ToMe,
-VisionZip and A-MMR current-frame core.
+VisionZip, A-MMR current-frame core and ETA-VLA ILSA core.
 CogACT supports the same token scopes except VLA-Pruner, TEAM-VLA, VLA-IAP and
 EfficientVLA token core; its README explains those fidelity deferrals.
 SP-VLA includes pruning and
@@ -77,6 +77,9 @@ A-MMR implements current-frame selection only. Falcon provides historical-latent
 selection and partial native DDIM sampling on CogACT. These implementations are
 not a claim of completed Dev-200 selection or certified speedup; only frozen
 entries in the result ledger are reportable results.
+ETA-VLA supports only its training-free intra-LLM semantic selection and
+within-view diversity recycling; temporal fusion and the driving optimizer are
+excluded. This is an explicitly scoped manipulation transfer, not full ETA-VLA.
 
 Executable bindings do not by themselves certify fidelity. The result ledger
 separates admitted method scopes from unresolved TEAM-VLA, VLA-IAP and ST-Merge

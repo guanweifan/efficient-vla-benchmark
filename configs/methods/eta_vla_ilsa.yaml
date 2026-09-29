@@ -1,0 +1,5 @@
+method: eta_vla_ilsa
+parameters:
+  pruning_layer: 3
+  keep_ratio: 0.65
+  recycle_ratio: 0.1

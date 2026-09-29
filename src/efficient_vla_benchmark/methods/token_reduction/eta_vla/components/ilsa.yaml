@@ -1,0 +1,15 @@
+schema_version: 1
+name: eta_vla_ilsa
+category: token_reduction
+description: ETA-VLA ILSA semantic selection and within-view diversity recycling core.
+config: efficient_vla_benchmark.methods.token_reduction.eta_vla.config:ILSAConfig
+requires_artifact: false
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout]
+    factory: efficient_vla_benchmark.methods.token_reduction.eta_vla.implementations.openvla_oft.api:build
+  cogact:
+    variants: [libero_joint]
+    requires: [causal_visual_token_selection]
+    factory: efficient_vla_benchmark.methods.token_reduction.eta_vla.implementations.cogact.api:build

@@ -1,0 +1,3 @@
+extends:
+  - baseline.yaml
+  - ../../methods/eta_vla_ilsa.yaml
