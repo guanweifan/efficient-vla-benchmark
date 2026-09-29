@@ -1,0 +1,12 @@
+schema_version: 1
+name: falcon
+category: action_generation
+description: Historical latent probing and adaptive partial denoising on native DDIM.
+config: efficient_vla_benchmark.methods.action_generation.falcon.config:FalconConfig
+requires_artifact: false
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [dit_block_features]
+    factory: efficient_vla_benchmark.methods.action_generation.falcon.implementations.cogact.api:build
+    validate_experiment: efficient_vla_benchmark.methods.action_generation.falcon.implementations.cogact.api:validate_experiment

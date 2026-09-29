@@ -1,0 +1,9 @@
+method: falcon
+parameters:
+  distance_threshold: 0.01
+  exploration_rate: 0.1
+  temperature: 1.0
+  min_noise_level: 10
+  buffer_size: 20
+  reference_horizon: 8
+  selection_seed: 0
