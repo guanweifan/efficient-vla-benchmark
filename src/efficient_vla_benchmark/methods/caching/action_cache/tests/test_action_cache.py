@@ -19,7 +19,7 @@ def test_projection_exact_balance_and_rng_isolation():
     assert torch.equal(matrix, projection(4096, 50, 0.01, 42, "cpu"))
     for bad in (
         {"hit_threshold": 2},
-        {"refinement_steps": 0},
+        {"refinement_steps": -1},
         {"projection_seed": True},
         {"projection_density": 0},
     ):
@@ -79,16 +79,20 @@ def test_native_capture_frozen_hit_miss_tail_rng_and_detach(tmp_path):
         )
         expected_rng = torch.get_rng_state().clone()
         capture.after_query(native)
-        key, states = capture.pending[0]
+        key, states, clean = capture.pending[0]
+        torch.testing.assert_close(clean, native[0], rtol=0, atol=0)
         capture.close()
         np.savez(
             tmp_path / "bank.npz",
             keys=key.numpy()[None],
             states=states.numpy()[None],
+            clean_actions=clean.numpy()[None],
             suites=np.array([0]),
         )
         manifest = dict(
             kind="action_cache_cogact_native_success_bank",
+            schema_version=2,
+            clean_action_source="native_final_ddim_sample",
             key_dim=config.key_dim,
             projection_density=config.projection_density,
             projection_seed=config.projection_seed,
@@ -102,6 +106,9 @@ def test_native_capture_frozen_hit_miss_tail_rng_and_detach(tmp_path):
         (tmp_path / "manifest.json").write_text(json.dumps(manifest))
         for settings, hit in (
             (config, True),
+            (replace(config, refinement_steps=0), True),
+            (replace(config, refinement_steps=1), True),
+            (replace(config, refinement_steps=0, hit_threshold=1.0), False),
             (replace(config, hit_threshold=1.0), False),
             (replace(config, enabled=False), False),
         ):
@@ -109,8 +116,14 @@ def test_native_capture_frozen_hit_miss_tail_rng_and_detach(tmp_path):
             method.reset(SimpleNamespace(suite="libero_goal"))
             method.before_query({})
             torch.set_rng_state(rng)
+            calls = []
+
+            def denoiser(*args, **kwargs):
+                calls.append(1)
+                return model.forward_with_cfg(*args, **kwargs)
+
             actual = sampler.ddim_sample_loop(
-                model.forward_with_cfg,
+                denoiser,
                 noise.shape,
                 noise=noise,
                 clip_denoised=False,
@@ -120,14 +133,24 @@ def test_native_capture_frozen_hit_miss_tail_rng_and_detach(tmp_path):
             )
             method.after_query(actual)
             torch.testing.assert_close(actual, native, rtol=0, atol=0)
+            assert len(calls) == (settings.refinement_steps if settings.enabled and hit else 10)
             assert torch.equal(expected_rng, torch.get_rng_state())
             if settings.enabled:
                 assert host.query_diagnostics["action_cache_hit"] == hit
-                assert host.query_diagnostics["denoiser_evaluations"] == (2 if hit else 10)
+                assert host.query_diagnostics["denoiser_evaluations"] == (
+                    settings.refinement_steps if hit else 10
+                )
             method.close()
             method.close()
             assert "ddim_sample_loop" not in sampler.__dict__
         assert digest_file(tmp_path / "bank.npz") == manifest["bank_sha256"]
+        # Old banks stay usable for few-step refinement, never for zero steps.
+        manifest.pop("schema_version")
+        manifest.pop("clean_action_source")
+        (tmp_path / "manifest.json").write_text(json.dumps(manifest))
+        with pytest.raises(ValueError, match="captured native clean"):
+            ActionCache(host, replace(config, refinement_steps=0), tmp_path)
+        ActionCache(host, config, tmp_path).close()
 
 
 @pytest.mark.gpu
@@ -160,3 +183,67 @@ def test_real_frozen_bank_reset_and_disabled_parity(model_path, trace_path, arti
     host.detach_method()
     host.reset(context)
     np.testing.assert_array_equal(native, host.predict_chunk(frames[0]))
+
+
+@pytest.mark.gpu
+def test_native_clean_capture_zero_tail_and_rng(model_path, trace_path, tmp_path, request):
+    """Ephemeral equation fixture only; never a deployable population artifact."""
+    from efficient_vla_backend_cogact.backend import CogACTBackend
+
+    from efficient_vla_benchmark.core.provenance import digest_file
+    from efficient_vla_benchmark.evaluation.traces import load_trace
+
+    from ..implementations.cogact.capture import NativeActionCapture
+    from ..implementations.cogact.method import ActionCache
+
+    host = CogACTBackend(model_path)
+    request.addfinalizer(host.close)
+    context, frames, _ = load_trace(trace_path, require_control_steps=True)
+    host.reset(context)
+    native = host.predict_chunk(frames[0])
+    expected_rng = torch.cuda.get_rng_state().clone()
+    cfg = ActionCacheConfig(hit_threshold=-1)
+    capture = NativeActionCapture(host, cfg)
+    host.attach_method(capture)
+    host.reset(context)
+    np.testing.assert_array_equal(host.predict_chunk(frames[0]), native)
+    assert torch.equal(torch.cuda.get_rng_state(), expected_rng)
+    key, states, clean = capture.pending[0]
+    assert clean.shape == (16, 7) and bool(torch.isfinite(clean).all())
+    host.detach_method()
+    np.savez_compressed(
+        tmp_path / "bank.npz",
+        keys=key.numpy()[None],
+        states=states.numpy()[None],
+        clean_actions=clean.numpy()[None],
+        suites=np.array([0]),
+    )
+    manifest = dict(
+        kind="action_cache_cogact_native_success_bank",
+        schema_version=2,
+        clean_action_source="native_final_ddim_sample",
+        key_dim=cfg.key_dim,
+        projection_density=cfg.projection_density,
+        projection_seed=cfg.projection_seed,
+        bank_sha256=digest_file(tmp_path / "bank.npz"),
+        checkpoint_sha256=host.metadata()["checkpoint_sha256"],
+        sampler_parameters=asdict(host.parameters),
+        episodes_disjoint_from_evaluation=True,
+        suites=[context.suite],
+        population_sha256="EPHEMERAL-TEST-FIXTURE-NOT-FOR-EVALUATION",
+    )
+    (tmp_path / "manifest.json").write_text(json.dumps(manifest))
+    for refinement in (0, 1, 2):
+        method = ActionCache(host, replace(cfg, refinement_steps=refinement), tmp_path)
+        host.attach_method(method)
+        for _ in range(2):
+            host.reset(context)
+            np.testing.assert_array_equal(host.predict_chunk(frames[0]), native)
+            assert host.query_diagnostics["action_cache_hit"]
+            assert host.query_diagnostics["denoiser_evaluations"] == refinement
+            assert torch.equal(torch.cuda.get_rng_state(), expected_rng)
+        host.detach_method()
+        method.close()
+        host.reset(context)
+        np.testing.assert_array_equal(host.predict_chunk(frames[0]), native)
+    assert digest_file(tmp_path / "bank.npz") == manifest["bank_sha256"]

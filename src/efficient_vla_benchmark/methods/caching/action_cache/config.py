@@ -22,8 +22,8 @@ class ActionCacheConfig:
         for name in ("refinement_steps", "key_dim", "projection_seed"):
             if type(getattr(c, name)) is not int or getattr(c, name) < 0:
                 raise ValueError(f"{name} must be a nonnegative integer")
-        if c.refinement_steps < 1 or c.key_dim < 1:
-            raise ValueError("This binding requires positive key_dim and refinement_steps")
+        if c.key_dim < 1:
+            raise ValueError("This binding requires positive key_dim")
         if type(c.projection_density) not in (int, float) or not 0 < c.projection_density <= 1:
             raise ValueError("projection_density must be in (0, 1]")
         return c

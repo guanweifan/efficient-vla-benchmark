@@ -29,8 +29,13 @@ retrieval is across tasks within each partition, not across incompatible coordin
 One parameter setting serves all suites. Bank checksums/checkpoint/sampler identity
 are validated before use; data are read-only NPZ, never executable pickle.
 
-The implemented scope excludes zero-refinement actions and online evaluation cache
-population. Disabled mode uses untouched native sampling. Reset clears query state,
+A schema-2 bank additionally stores the actual conditional clean action returned
+by the final native DDIM transition. `refinement_steps: 0` retrieves this endpoint
+without a denoiser call; it never treats a noisy intermediate as a clean action.
+Zero- and few-step configurations use the SAME frozen bank, keys and partitions.
+Cache misses retain all native steps; skipped unused RNG draws are still consumed.
+Schema-1 banks remain usable for positive refinement, but cannot serve zero steps.
+Online evaluation cache population is excluded. Disabled mode uses untouched native sampling. Reset clears query state,
 not the immutable offline bank; close reverses only this instance's sampler wrapper.
 
 ## Population and frozen artifact
@@ -59,7 +64,17 @@ Existing outputs are rejected. Cache capacity is 3000; overflow is an error, not
 silent test-guided eviction. Population cost excludes loading and is not hidden in
 steady-state speedup.
 
-The current frozen bank contains 1412 pairs from 77/80 successful independent
+For a separately authorized clean-endpoint recollection, supply every original
+population shard to `--replay-population "$OLD_SHARD_0" "$OLD_SHARD_1" ...`.
+The collector verifies all eighty original identities and state hashes, replays
+those exact states, and writes an attempt record before each rollout. Failed
+episodes are retained without replacement. Do not restart an existing shard or
+exceed the owner's episode cap after an infrastructure error. Freeze verifies
+attempt/outcome agreement, native endpoint provenance and all held-out states.
+Both zero-step and few-step evaluation must explicitly select the new artifact;
+older results are not silently relabeled as measurements of the new bank.
+
+The initial schema-1 bank contains 1412 pairs from 77/80 successful independent
 episodes. Initial threshold 0.90 was chosen before Dev evaluation from leave-one-
 episode-out prefill similarity: expected hits span roughly 10–32% across suites,
 whereas 0.95 nearly disables retrieval in some suites. This is a disclosed

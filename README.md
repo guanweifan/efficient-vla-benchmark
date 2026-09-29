@@ -67,7 +67,8 @@ The new caches have distinct scopes: DP-Cache reuses native denoiser outputs;
 C³ache retains a live conditioning prefix and reuses cross-chunk suffix residuals;
 Temporal Redundancy reuses visual attention rows, excluding its trained action branch.
 ActionCache retrieves independently collected, frozen intermediate actions and
-refines them with the native DDIM tail; it is not a reproduction of flow-model scores.
+refines them with the native DDIM tail, or reuses a separately captured native
+clean endpoint at zero steps; it is not a reproduction of flow-model scores.
 No trained few-step sampler is advertised. Read each
 [method README](src/efficient_vla_benchmark/methods/) before using its results.
 

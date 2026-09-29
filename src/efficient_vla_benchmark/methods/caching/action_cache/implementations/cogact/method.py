@@ -27,6 +27,7 @@ class ActionCache(InferenceMethod):
         self.sampler = native_sampler(backend)
         with np.load(Path(artifact_path) / "bank.npz", allow_pickle=False) as bank:
             keys, states, suites = bank["keys"], bank["states"], bank["suites"]
+            clean = bank["clean_actions"] if "clean_actions" in bank else None
         steps = self.sampler.num_timesteps
         if (
             keys.ndim != 2
@@ -44,6 +45,13 @@ class ActionCache(InferenceMethod):
             or config.refinement_steps >= steps
         ):
             raise ValueError("Invalid ActionCache bank geometry or values")
+        if self.manifest.get("schema_version") == 2 and (
+            clean is None
+            or clean.shape != (len(keys), 16, 7)
+            or clean.dtype != np.float32
+            or not np.isfinite(clean).all()
+        ):
+            raise ValueError("Invalid native clean-action capture")
         self.banks = {}
         for index, suite in enumerate(self.manifest["suites"]):
             mask = suites == index
@@ -51,7 +59,10 @@ class ActionCache(InferenceMethod):
                 self.banks[suite] = (
                     torch.tensor(keys[mask], device=backend.device),
                     torch.tensor(
-                        states[mask, steps - config.refinement_steps], device=backend.device
+                        clean[mask]
+                        if config.refinement_steps == 0
+                        else states[mask, steps - config.refinement_steps],
+                        device=backend.device,
                     ),
                 )
         self.matrix = projection(
@@ -158,15 +169,21 @@ class ActionCache(InferenceMethod):
 
     def metadata(self):
         return dict(
-            scope="ActionCache frozen-bank retrieval and native DDIM refinement",
+            scope="ActionCache frozen-bank native DDIM tail or captured clean zero-step actions",
             implementation_basis="paper section 3, DDIM-tail adaptation of flow warm starts",
             config=asdict(self.config),
             requires_training=False,
             key_source="native final cognition embedding; fixed balanced ternary projection",
             cache_policy="frozen successful-prefill bank; no evaluation-outcome writes",
             partition="normalization suite; cross-task retrieval within a suite",
-            cached_object="actual normalized noisy actions before native tail transitions",
+            cached_object=(
+                "captured normalized final native actions"
+                if self.config.refinement_steps == 0
+                else "actual normalized noisy actions before native tail transitions"
+            ),
+            refinement_steps=self.config.refinement_steps,
+            artifact_schema=self.manifest.get("schema_version", 1),
             artifact_sha256=self.manifest["bank_sha256"],
             population_digest=self.manifest["population_sha256"],
-            excluded=["online population during evaluation", "zero-step action execution"],
+            excluded=["online population during evaluation"],
         )

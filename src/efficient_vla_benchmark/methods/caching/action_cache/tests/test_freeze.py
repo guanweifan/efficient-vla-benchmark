@@ -8,7 +8,8 @@ from efficient_vla_benchmark.core.provenance import stable_hash
 from ..freeze import freeze
 
 
-def test_freeze_requires_complete_disjoint_successful_population(tmp_path):
+@pytest.mark.parametrize("schema", [1, 2])
+def test_freeze_requires_complete_disjoint_successful_population(tmp_path, schema):
     source = tmp_path / "collection"
     source.mkdir()
     suites = ("libero_spatial", "libero_object", "libero_goal", "libero_10")
@@ -46,16 +47,41 @@ def test_freeze_requires_complete_disjoint_successful_population(tmp_path):
         sampler_parameters={"num_ddim_steps": 10},
         source={},
     )
+    if schema == 2:
+        metadata.update(
+            capture_schema=2,
+            clean_action_source="native_final_ddim_sample",
+            replay_population_sha256="frozen-original",
+        )
+        fields = ("suite", "task_id", "episode_id", "seed", "initial_state_sha256")
+        (source / "attempts.jsonl").write_text(
+            "".join(json.dumps({k: r[k] for k in fields}) + "\n" for r in rows)
+        )
     (source / "metadata.json").write_text(json.dumps(metadata))
     (source / "summary.json").write_text(
         json.dumps(dict(episodes=80, successes=79, pairs=79, wall_seconds=12))
     )
     (source / "episodes.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
-    np.savez(source / "bank.npz", keys=keys, states=values, suites=partitions)
+    payload = dict(keys=keys, states=values, suites=partitions)
+    if schema == 2:
+        payload["clean_actions"] = np.ones((len(keys), 16, 7), dtype=np.float32)
+    np.savez(source / "bank.npz", **payload)
     result = freeze([source], tmp_path / "bank", standards)
     assert result["entries"] == result["successful_episodes"] == 79
     assert result["population_episodes"] == 80
     assert result["episodes_disjoint_from_evaluation"]
+    assert result["schema_version"] == schema
+    if schema == 2:
+        assert result["clean_action_source"] == "native_final_ddim_sample"
+        with np.load(tmp_path / "bank/bank.npz", allow_pickle=False) as data:
+            np.testing.assert_array_equal(data["clean_actions"], payload["clean_actions"])
+    from ..implementations.cogact.populate import replay_states
+
+    replay, digest = replay_states([source])
+    assert len(replay) == 80 and digest
+    np.testing.assert_array_equal(replay[(0, 0)], [0, 100, 1])
+    with pytest.raises(ValueError, match="Duplicate"):
+        replay_states([source, source])
     with pytest.raises(FileExistsError):
         freeze([source], tmp_path / "bank", standards)
     standards[(suites[0], 0)][0] = [0, 100, 1]

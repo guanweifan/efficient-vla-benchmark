@@ -33,10 +33,16 @@ class NativeActionCapture(InferenceMethod):
 
     def _capture(self, original):
         def sample(model, x, t, *args, **kwargs):
+            expected = self.sampler.num_timesteps - 1 - len(self.current_states)
+            if expected < 0 or not bool((t == expected).all()):
+                raise RuntimeError("Native capture requires the complete descending DDIM schedule")
             if self.current_key is None:
                 self.current_key = key_for(kwargs["model_kwargs"]["z"], self.matrix).cpu()
             self.current_states.append(x[0].detach().cpu().clone())
-            return original(model, x, t, *args, **kwargs)
+            result = original(model, x, t, *args, **kwargs)
+            if expected == 0:
+                self.current_clean = result["sample"][0].detach().cpu().clone()
+            return result
 
         return sample
 
@@ -44,16 +50,21 @@ class NativeActionCapture(InferenceMethod):
         self.pending = []
         self.current_key = None
         self.current_states = []
+        self.current_clean = None
 
     def before_query(self, prepared):
         self.current_key = None
         self.current_states = []
+        self.current_clean = None
 
     def after_query(self, actions):
-        if len(self.current_states) != self.sampler.num_timesteps:
+        if len(self.current_states) != self.sampler.num_timesteps or self.current_clean is None:
             raise RuntimeError("Incomplete native trajectory capture")
-        self.pending.append((self.current_key, torch.stack(self.current_states)))
+        self.pending.append(
+            (self.current_key, torch.stack(self.current_states), self.current_clean)
+        )
         self.current_states = []
+        self.current_clean = None
 
     def close(self):
         self.patches.close()
@@ -63,4 +74,6 @@ class NativeActionCapture(InferenceMethod):
         return {
             "scope": "offline native trajectory capture; no acceleration",
             "cache_population_only": True,
+            "capture_schema": 2,
+            "clean_source": "conditional sample returned by native final DDIM transition",
         }

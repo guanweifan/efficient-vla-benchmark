@@ -17,6 +17,7 @@ def freeze(shards, output, standard_states):
     records, sources, entries = [], [], []
     identities, initial_hashes = set(), set()
     checkpoint, sampler = None, None
+    capture_schema, replay_digest = None, None
     seconds = []
     for directory in shards:
         metadata = json.loads((directory / "metadata.json").read_text())
@@ -24,6 +25,23 @@ def freeze(shards, output, standard_states):
         rows = [json.loads(s) for s in (directory / "episodes.jsonl").read_text().splitlines()]
         if metadata.get("kind") != "independent_native_action_cache_population":
             raise ValueError("Population is not a native independent collection")
+        schema = metadata.get("capture_schema", 1)
+        if schema not in (1, 2) or (capture_schema is not None and capture_schema != schema):
+            raise ValueError("Mixed or unsupported population capture schema")
+        if schema == 2:
+            if metadata.get("clean_action_source") != "native_final_ddim_sample":
+                raise ValueError("Clean actions lack native endpoint provenance")
+            attempts = [
+                json.loads(s) for s in (directory / "attempts.jsonl").read_text().splitlines()
+            ]
+            fields = ("suite", "task_id", "episode_id", "seed", "initial_state_sha256")
+            if [{k: r[k] for k in fields} for r in rows] != attempts:
+                raise ValueError("Population attempts differ from completed records")
+            digest = metadata.get("replay_population_sha256")
+            if capture_schema is not None and digest != replay_digest:
+                raise ValueError("Mixed frozen replay populations")
+            replay_digest = digest
+        capture_schema = schema
         actual = metadata["backend"]["checkpoint_sha256"]
         if checkpoint is not None and (
             checkpoint != actual or sampler != metadata["sampler_parameters"]
@@ -34,6 +52,14 @@ def freeze(shards, output, standard_states):
         seconds.append(summary["wall_seconds"])
         with np.load(directory / "bank.npz", allow_pickle=False) as data:
             keys, values, partitions = data["keys"], data["states"], data["suites"]
+            clean = data["clean_actions"] if "clean_actions" in data else None
+        if schema == 2 and (
+            clean is None
+            or clean.shape != (len(keys), 16, 7)
+            or clean.dtype != np.float32
+            or not np.isfinite(clean).all()
+        ):
+            raise ValueError("Invalid native clean action geometry or values")
         if (
             len(rows) != summary["episodes"]
             or sum(r["success"] for r in rows) != summary["successes"]
@@ -77,7 +103,13 @@ def freeze(shards, output, standard_states):
                 if end > len(keys) or not np.all(partitions[offset:end] == suite_index):
                     raise ValueError("Invalid population partition or pair count")
                 entries.append(
-                    (identity, keys[offset:end], values[offset:end], partitions[offset:end])
+                    (
+                        identity,
+                        keys[offset:end],
+                        values[offset:end],
+                        partitions[offset:end],
+                        clean[offset:end] if clean is not None else None,
+                    )
                 )
                 offset = end
             records.append(row)
@@ -119,13 +151,19 @@ def freeze(shards, output, standard_states):
             },
         )
     output.mkdir(parents=True, exist_ok=False)
-    np.savez_compressed(output / "bank.npz", keys=keys, states=states, suites=partitions)
+    payload = dict(keys=keys, states=states, suites=partitions)
+    if capture_schema == 2:
+        payload["clean_actions"] = np.concatenate([e[4] for e in entries])
+    np.savez_compressed(output / "bank.npz", **payload)
     (output / "population.json").write_text(
         json.dumps(dict(episodes=records, sources=sources), indent=2) + "\n"
     )
     (output / "prefill_profile.json").write_text(json.dumps(profile, indent=2) + "\n")
     manifest = dict(
         kind="action_cache_cogact_native_success_bank",
+        schema_version=capture_schema,
+        clean_action_source="native_final_ddim_sample" if capture_schema == 2 else None,
+        replay_population_sha256=replay_digest,
         key_dim=cfg.key_dim,
         projection_density=cfg.projection_density,
         projection_seed=cfg.projection_seed,
