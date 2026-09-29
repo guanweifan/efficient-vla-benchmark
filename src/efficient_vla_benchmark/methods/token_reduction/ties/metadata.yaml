@@ -1,0 +1,21 @@
+schema_version: 1
+name: ties
+category: token_reduction
+description: Revised TIES native inter-layer Kendall guided attention-uniform allocation.
+config: efficient_vla_benchmark.methods.token_reduction.ties.config:TIESConfig
+requires_artifact: true
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, visual_token_layout]
+    factory: efficient_vla_benchmark.methods.token_reduction.ties.implementations.openvla_oft.api:build
+    preflight: efficient_vla_benchmark.methods.token_reduction.ties.implementations.openvla_oft.api:preflight
+    calibrate: efficient_vla_benchmark.methods.token_reduction.ties.implementations.openvla_oft.api:calibrate
+    validate_experiment: efficient_vla_benchmark.methods.token_reduction.ties.implementations.openvla_oft.api:validate_experiment
+  cogact:
+    variants: [libero_joint]
+    requires: [causal_visual_token_selection]
+    factory: efficient_vla_benchmark.methods.token_reduction.ties.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.token_reduction.ties.implementations.cogact.api:preflight
+    calibrate: efficient_vla_benchmark.methods.token_reduction.ties.implementations.cogact.api:calibrate
+    validate_experiment: efficient_vla_benchmark.methods.token_reduction.ties.implementations.cogact.api:validate_experiment

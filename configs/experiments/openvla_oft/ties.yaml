@@ -1,0 +1,5 @@
+extends:
+  - baseline.yaml
+  - ../../methods/ties.yaml
+parameters:
+  ranking_topk: 192

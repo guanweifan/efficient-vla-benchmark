@@ -1,0 +1,5 @@
+method: ties
+parameters:
+  keep_ratio: 0.5
+  mode: soft
+  refresh_steps: 24

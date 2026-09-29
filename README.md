@@ -39,7 +39,7 @@ and verifier batch counts toward full cost; registration alone is not a result.
 OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,
 EfficientVLA token core, ST-Merge and FlashVLA ICS, plus FastV, DivPrune, DART,
 SparseVLM v1, DepthCache primary-view core, ASR deletion instrument, ToMe,
-VisionZip, A-MMR current-frame core and ETA-VLA ILSA core.
+VisionZip, A-MMR current-frame core, ETA-VLA ILSA core and TIES.
 CogACT supports the same token scopes except VLA-Pruner, TEAM-VLA, VLA-IAP and
 EfficientVLA token core; its README explains those fidelity deferrals.
 SP-VLA includes pruning and
@@ -81,6 +81,11 @@ entries in the result ledger are reportable results.
 ETA-VLA supports only its training-free intra-LLM semantic selection and
 within-view diversity recycling; temporal fusion and the driving optimizer are
 excluded. This is an explicitly scoped manipulation transfer, not full ETA-VLA.
+TIES follows the supplied OpenReview revision's Kendall-guided allocation, with
+training-only quantiles and all prefix-probe costs included. CogACT uses K=30;
+OFT uses the owner-approved K=192 ranking-window transfer because K=30 produces
+undefined correlations on its calibration frames. Both keep native H8, with
+24-control-step refresh; these parameter changes are not the published recipe.
 
 Executable bindings do not by themselves certify fidelity. The result ledger
 separates admitted method scopes from unresolved TEAM-VLA, VLA-IAP and ST-Merge
