@@ -603,6 +603,9 @@ python scripts/readiness_report.py --selection configs/evaluation/primary_select
 ```
 
 Repeat `--development-summary` for every referenced selection/coverage summary.
+For an authorized complete final campaign, append `--final-summary "$FINAL_SUMMARY"`.
+The ledger joins its exact final experiment ID, retains separate Dev/timing evidence,
+and excludes already measured configurations from the remaining final launch list.
 Historical or diagnostic rendering must use a separate ignored output, not the
 primary table. Neither rendering command executes a policy or schedules a campaign.
 

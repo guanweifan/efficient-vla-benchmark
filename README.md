@@ -165,7 +165,8 @@ corpus, not policy success or end-to-end VLA acceleration.
 Read [AGENTS.md](AGENTS.md) for the single development/Git contract.
 [Development](docs/development.md) covers interfaces and extension workflows.
 [Benchmark results](docs/benchmark_results.md) joins selected Dev-200 outcomes with
-separately measured compact-replay latency; final 2,000-episode success remains unmeasured.
+separately measured compact-replay latency and frozen 2,000-episode success where available.
+Missing final measurements remain explicitly unmeasured.
 The [selection workflow](docs/development.md#selection-and-final-measurement-workflow)
 targets one primary configuration per backend/method; poor faithful results remain
 reportable. Useful raw evidence stays local under `outputs/result_records/`, outside Git;
