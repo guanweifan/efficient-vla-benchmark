@@ -130,6 +130,37 @@ def test_negative_outcome_is_ready_but_final_is_unmeasured(reporter):
     assert "0.800×" in reporter.render(report)
 
 
+@pytest.mark.parametrize("measured_count", [0, 1, 2])
+def test_render_describes_actual_final_coverage(reporter, measured_count):
+    report = reporter.build(*fixture())
+    report["primary"].append(copy.deepcopy(report["primary"][0]))
+    for row in report["primary"][:measured_count]:
+        row["final"] = {
+            "experiment_id": "final-experiment",
+            "full_2000": {"episodes": 2000, "successes": 1800, "success_rate": 0.9},
+        }
+    text = reporter.render(report)
+    if measured_count:
+        assert f"Final success is measured for {measured_count}/2 primary configurations" in text
+        assert "Final success is unmeasured" not in text
+        assert "`final-experiment`" in text
+    else:
+        assert "Final success is unmeasured" in text
+
+
+def test_completed_final_is_not_scheduled_again(reporter, monkeypatch):
+    selection, summaries, records, quality, manifest = fixture()
+    selection["final_runtime_source_sha256"] = "final-runtime"
+    measured = copy.deepcopy(summaries["summary"]["configurations"][0])
+    measured["source"]["runtime_source_sha256"] = "final-runtime"
+    partition = {"full_2000": {"episodes": 2000, "successes": 1800, "success_rate": 0.9}}
+    monkeypatch.setattr(reporter, "final_partition", lambda result, development: partition)
+    report = reporter.build(selection, summaries, records, quality, manifest, [measured])
+    assert report["primary"][0]["final"] == partition
+    assert report["final_launch_candidates"] == []
+    assert not report["final_launched_by_this_command"]
+
+
 def test_compact_diagnostic_does_not_become_final_candidate(reporter):
     selection, summaries, records, quality, manifest = fixture()
     selection["timing_protocol"] = "libero_replay4x128_v1"

@@ -415,7 +415,7 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         if final is not None and not row["search"]["complete"]:
             raise ValueError("Final results cannot certify an unfinished parameter search")
         rows.append(row)
-        if not row["search"]["complete"]:
+        if not row["search"]["complete"] or final is not None:
             continue
         launch.append(
             {
@@ -479,13 +479,20 @@ def render(report):
         if report.get("timing_protocol") == "libero_replay4x128_v1"
         else "Historical timing uses the protocol and aggregation recorded in each source."
     )
+    final_count = sum(row["final"] is not None for row in report["primary"])
+    final_description = (
+        f"Final success is measured for {final_count}/{len(report['primary'])} primary "
+        "configurations, using one frozen 2,000-episode run per measured configuration."
+        if final_count
+        else "Final success is unmeasured until the owner schedules the frozen "
+        "2,000-episode campaign."
+    )
     lines = [
         "# Benchmark results",
         "",
         "One selected configuration per backend/method scope. Dev-200 is tuning evidence,",
         "not final accuracy. " + timing_description,
-        "Native pre/post checks must pass. Final success",
-        "is unmeasured until the owner schedules the frozen 2,000-episode campaign.",
+        "Native pre/post checks must pass. " + final_description,
         "Low success and slowdowns remain reportable. All native references use H8.",
         "Adaptive rows execute real method-selected prefixes; H8 is their reference/default,",
         "not their fixed execution length. The shown upper bound is native prediction length.",
@@ -577,18 +584,20 @@ def render(report):
         "Recorded revisions predating history cleanup can be resolved through the",
         "[history map](../scripts/history_commit_map.json); recorded source IDs are not rewritten.",
         "",
-        "| Backend / preset | Dev experiment | Timing record | "
+        "| Backend / preset | Dev experiment | Final experiment | Timing record | "
         "Dev / timing commit | Record digest |",
-        "|---|---|---|---|---|",
+        "|---|---|---|---|---|---|",
     ]
     for r in (
         report["primary"]
         + report.get("auxiliary", [])
         + [p for p in report["pending_core"] if p.get("timing")]
     ):
+        final_id = f"`{r['final']['experiment_id']}`" if r["final"] else "—"
         lines.append(
             f"| {r['backend']} / `{r['preset']}` | `{r['development']['experiment_id']}` | "
-            f"`{r['timing']['record']}` | `{r.get('development_commit') or 'unknown'}` / "
+            f"{final_id} | `{r['timing']['record']}` | "
+            f"`{r.get('development_commit') or 'unknown'}` / "
             f"`{r.get('timing_commit') or 'unknown'}` | `{r['timing']['record_sha256']}` |"
         )
     return "\n".join(lines) + "\n"
