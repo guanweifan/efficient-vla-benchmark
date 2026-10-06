@@ -43,3 +43,6 @@ tested settings cross the native-relative 3-percentage-point loss boundary.
 They are the fastest eligible measured candidates, not a global optimum.
 See `docs/benchmark_results.md` for paired full-cost timing and evidence identities.
 Old paper-v1 Final scores do not apply to this V2.0 implementation.
+Both selected configurations now have one frozen Final-2000 run. CogACT's
+full-set loss exceeds the Dev selection target; keep the measured outcome and
+the original Dev evidence rather than retuning from Final results.

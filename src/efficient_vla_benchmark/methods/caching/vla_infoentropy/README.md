@@ -85,4 +85,7 @@ search evidence, not a second primary configuration.
 OFT has no reliable end-to-end acceleration at the accuracy target. Report that
 negative result; do not omit entropy costs or transfer old eager-version Final
 scores. Current paired timing and evidence identities are in
-`docs/benchmark_results.md`; this revision has not undergone Final-2000.
+`docs/benchmark_results.md`. Both selected configurations now have one frozen
+Final-2000 run. CogACT's Final loss exceeds its 3-percentage-point Dev selection
+target; report the measured outcome without retuning or treating Dev eligibility
+as a guaranteed final-accuracy bound.
