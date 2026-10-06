@@ -15,3 +15,13 @@ The embodiment's 20 Hz label is preserved; no physical control-rate equivalence 
 claimed for the demonstration corpus. Report frames/tokens, not seconds of motion.
 These released weights explicitly include LIBERO, so reconstruction is in-domain,
 not unseen-data generalization and not the success rate of a new VLA policy.
+
+## Released RVQ-finetuned variant
+
+The same adapter supports [Base-RVQft](https://huggingface.co/ZibinDong/ActionCodec-Base-RVQft/tree/8d6d8a546498d340d62689e5dcd53436adae3af9),
+with 48 tokens across three residual quantizers, sixteen tokens per layer.
+The native layer-major decoder accepts one/two/three whole layer prefixes.
+All three predeclared depths are rate-distortion points of ONE method, not new papers.
+Encoding uses the complete official encoder/quantizer before retaining a prefix;
+all that work is timed. The native decoder alone uses the retained depth.
+No local RVQ fine-tuning is performed; these are the author's released weights.

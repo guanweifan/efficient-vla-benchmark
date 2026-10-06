@@ -9,10 +9,25 @@ from ...loading import verified_assets
 
 
 class ReleasedActionCodec:
-    def __init__(self, *, assets, calibration, corpus, sources=None, device="cpu"):
-        self.assets = verified_assets(
-            assets, "ZibinDong/ActionCodec-Base", "65b162110b48303fd409fa08ddb088648993b702"
-        )
+    def __init__(
+        self,
+        *,
+        assets,
+        calibration,
+        corpus,
+        sources=None,
+        device="cpu",
+        variant="base",
+        quantizers=None,
+    ):
+        releases = {
+            "base": ("ZibinDong/ActionCodec-Base", "65b162110b48303fd409fa08ddb088648993b702"),
+            "rvq": ("ZibinDong/ActionCodec-Base-RVQft", "8d6d8a546498d340d62689e5dcd53436adae3af9"),
+        }
+        if variant not in releases:
+            raise ValueError("Unknown released ActionCodec variant")
+        self.variant = variant
+        self.assets = verified_assets(assets, *releases[variant])
         self.device = torch.device(device)
         self.model, info = AutoModel.from_pretrained(
             str(assets), trust_remote_code=True, local_files_only=True, output_loading_info=True
@@ -28,8 +43,13 @@ class ReleasedActionCodec:
         cfg = self.model.config.embodiment_config[keys[self.embodiment]]
         if cfg["action_dim"] != 7 or cfg["freq"] * cfg["duration"] != 20:
             raise ValueError("Released LIBERO block differs from the audited twenty-frame entry")
-        if self.model.config.n_tokens != 16 or self.model.num_quantizers != 1:
-            raise ValueError("Expected the frozen Base VQ, not an RVQ-finetuned variant")
+        expected = (16, 1) if variant == "base" else (48, 3)
+        if (self.model.config.n_tokens, self.model.num_quantizers) != expected:
+            raise ValueError("Released ActionCodec token/quantizer architecture mismatch")
+        self.quantizers = expected[1] if quantizers is None else quantizers
+        if type(self.quantizers) is not int or not 1 <= self.quantizers <= expected[1]:
+            raise ValueError("Invalid released RVQ prefix depth")
+        self.token_count = self.quantizers * 16
         # Exact model-card normalizer, not affine q01/q99 scaling.
         self.scale = np.array(
             [0.9375, 0.91071427, 0.9375, 0.20357142, 0.26357144, 0.375], np.float32
@@ -49,10 +69,14 @@ class ReleasedActionCodec:
             self.model.encode(block[None], embodiment_ids=self.embodiment)[0]
             for block in np.split(value, len(value) // 20)
         ]
-        return Packet(np.array(tokens, dtype=np.int64), 2048, len(value))
+        return Packet(np.array(tokens, dtype=np.int64)[:, : self.token_count], 2048, len(value))
 
     def decode(self, packet, context):
-        if packet.horizon % 20 or packet.ids.shape != (packet.horizon // 20, 16):
+        if (
+            packet.vocabulary != 2048
+            or packet.horizon % 20
+            or packet.ids.shape != (packet.horizon // 20, self.token_count)
+        ):
             raise ValueError("ActionCodec native token/block shape mismatch")
         decoded = []
         for tokens in packet.ids:
@@ -73,13 +97,16 @@ class ReleasedActionCodec:
 
     def metadata(self):
         return {
-            "codec": "actioncodec",
+            "codec": "actioncodec" if self.variant == "base" else "actioncodec_rvq",
             "assets": self.assets,
             "precision": "float32",
             "device": self.device.type,
             "gpu": torch.cuda.get_device_name(self.device) if self.device.type == "cuda" else None,
             "native_horizon": 20,
-            "tokens_per_native_block": 16,
+            "tokens_per_native_block": self.token_count,
+            "quantizers": self.quantizers,
+            "encoded_quantizers": self.model.num_quantizers,
+            "prefix_scope": "native layer-major RVQ prefix; all released encode work included",
             "embodiment": "a_franka_libero_20hz",
             "physical_rate_conversion": "none",
             "normalization": "released model-card symmetric quantile maxima; signed open-gripper",

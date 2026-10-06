@@ -1,0 +1,4 @@
+factory: efficient_vla_benchmark.action_codecs.implementations.actioncodec.adapter:ReleasedActionCodec
+parameters:
+  variant: rvq
+  quantizers: 1
