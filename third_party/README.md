@@ -22,7 +22,10 @@ Optional standalone action codecs use pinned release assets and source subsets,
 never the policy application's dependency stack. Run
 `python -m efficient_vla_benchmark.action_codecs.fetch_sources --output
 third_party/runtimes/action_codecs` to fetch VQ-VLA/X-Tokenizer source and licenses
-without a separate checkout. This generated directory stays ignored. Every file's
+without a separate checkout. The same fetcher includes MINT, SpatialVLA and the
+MiniVLA RVQ reference dependency. SpatialVLA declares MIT in its pinned README
+but that revision has no LICENSE file; preserve the declaration and do not invent
+missing license text. This generated directory stays ignored. Every file's
 upstream and locally adapted checksum is recorded; VQ-VLA changes only package
 import prefixes. Pass the selected source directory via the codec runner's
 `--sources` argument. Released weights/processors remain external CLI resources.

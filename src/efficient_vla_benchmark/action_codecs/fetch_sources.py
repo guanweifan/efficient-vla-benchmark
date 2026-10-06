@@ -7,6 +7,40 @@ from pathlib import Path
 from urllib.request import urlopen
 
 specs = {
+    "spatialvla": (
+        "SpatialVLA/SpatialVLA",
+        "18fd74b2a633ec8d9ec7aadcd803969555cc9fbd",
+        ["README.md", "model/action_tokenizer.py"],
+    ),
+    "mint_sdat": (
+        "RenMing-Huang/MINT",
+        "bed9f0c0e2445a123814e89e4ba8c35a9578ce52",
+        [
+            "LICENSE",
+            "README.md",
+            "SDAT/model/__init__.py",
+            "SDAT/model/vqvae.py",
+            "SDAT/model/basic_vae.py",
+            "SDAT/model/quant.py",
+            "SDAT/utils/dist.py",
+            "SDAT/utils/normalizer.py",
+            "SDAT/core.py",
+            "SDAT/trainer.py",
+        ],
+    ),
+    "minivla_rvq": (
+        "jayLEE0301/vq_bet_official",
+        "09d4851288ca5deaaa1ab367a208e520f8ee9a84",
+        [
+            "LICENSE",
+            "vqvae/__init__.py",
+            "vqvae/vqvae.py",
+            "vqvae/vqvae_utils.py",
+            "vector_quantize_pytorch/__init__.py",
+            "vector_quantize_pytorch/residual_vq.py",
+            "vector_quantize_pytorch/vector_quantize_pytorch.py",
+        ],
+    ),
     "vq_vla": (
         "xiaoxiao0406/VQ-VLA",
         "7fb78e63f5c0f7baf6d340166ffea527c6514610",
@@ -68,8 +102,11 @@ specs = {
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--only", choices=sorted(specs), action="append")
     a = p.parse_args()
     for name, (repo, revision, files) in specs.items():
+        if a.only and name not in a.only:
+            continue
         directory = a.output / name
         directory.mkdir(parents=True, exist_ok=True)
         identities = []
