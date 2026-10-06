@@ -212,32 +212,41 @@ Recorded revisions predating history cleanup can be resolved through the
 
 ## Independent action codec reconstruction
 
+### Raw-command reconstruction — H40
+
 Frozen corpus `01a8ae346abe98d43ddc307e2ab3db08c99a0229b58074e7b199ec2cd4500762`; 40-frame windows, one per episode, disjoint calibration/evaluation episodes; 4 evaluated suites.
 This is in-domain demonstration reconstruction, not policy success or VLA speedup.
 Latency includes representation transforms and CPU/device transfers; native CPU and GPU implementations are labeled separately. Nominal bits are not entropy-coded size.
-BEAST basis variants are retained rate–distortion points, not extra policy defaults.
-X-Tokenizer uses a disclosed command-integrated pose representation and the initial observed state at decode; its conditional result is not an unconditional codec score.
+Rate variants are retained rate–distortion points, not extra methods. Representation transfers and state-conditioned results are separate groups.
 Pretraining overlap is not excluded; native block sizes/receptive fields differ.
 
 | Codec / preset | Device | Windows | Raw MSE | Raw MAE | Gripper sign | Tokens/frame | Bits/frame | Encode ms/window | Decode ms/window |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| fast_plus | AMD EPYC 7532 32-Core Processor | 128 | 0.0004145 | 0.01077 | 1.0000 | 1.661 | 18.266 | 0.375 | 0.185 |
-| beast / degree=4, gripper_zero_order=False, num_basis=5 | AMD EPYC 7532 32-Core Processor | 128 | 0.0110235 | 0.04374 | 0.9955 | 0.875 | 7.000 | 5.145 | 2.510 |
-| beast / degree=4, gripper_zero_order=False, num_basis=10 | AMD EPYC 7532 32-Core Processor | 128 | 0.0043754 | 0.02078 | 0.9990 | 1.750 | 14.000 | 15.913 | 7.933 |
-| beast / degree=4, gripper_zero_order=False, num_basis=20 | AMD EPYC 7532 32-Core Processor | 128 | 0.0018109 | 0.00951 | 0.9994 | 3.500 | 28.000 | 38.072 | 18.877 |
-| vq_vla | NVIDIA GeForce RTX 3090 | 128 | 0.0026424 | 0.02868 | 0.9996 | 0.800 | 6.400 | 101.025 | 84.979 |
-| actioncodec | NVIDIA GeForce RTX 3090 | 128 | 0.0010591 | 0.01865 | 1.0000 | 0.800 | 8.800 | 17.214 | 17.007 |
-| x_tokenizer | NVIDIA GeForce RTX 3090 | 128 | 0.4746804 | 0.33120 | 0.4721 | 1.000 | 11.000 | 7.747 | 9.015 |
+| uniform_binning | AMD EPYC 7532 32-Core Processor | 128 | 0.0002136 | 0.00302 | 1.0000 | 7.000 | 56.000 | 0.095 | 0.038 |
+| fast_plus | AMD EPYC 7532 32-Core Processor | 128 | 0.0004145 | 0.01077 | 1.0000 | 1.661 | 18.266 | 0.374 | 0.182 |
+| beast / degree=4, gripper_zero_order=False, num_basis=5 | AMD EPYC 7532 32-Core Processor | 128 | 0.0110235 | 0.04374 | 0.9955 | 0.875 | 7.000 | 5.469 | 2.674 |
+| beast / degree=4, gripper_zero_order=False, num_basis=10 | AMD EPYC 7532 32-Core Processor | 128 | 0.0043754 | 0.02078 | 0.9990 | 1.750 | 14.000 | 16.852 | 8.359 |
+| beast / degree=4, gripper_zero_order=False, num_basis=20 | AMD EPYC 7532 32-Core Processor | 128 | 0.0018109 | 0.00951 | 0.9994 | 3.500 | 28.000 | 40.405 | 20.032 |
+| vq_vla | NVIDIA GeForce RTX 3090 | 128 | 0.0026424 | 0.02868 | 0.9996 | 0.800 | 6.400 | 99.680 | 83.789 |
+| minivla_rvq | NVIDIA GeForce RTX 3090 | 128 | 0.0141198 | 0.03429 | 0.9795 | 0.875 | 6.125 | 7.831 | 1.107 |
+| actioncodec | NVIDIA GeForce RTX 3090 | 128 | 0.0010591 | 0.01865 | 1.0000 | 0.800 | 8.800 | 17.782 | 17.403 |
+| actioncodec_rvq / quantizers=1, variant=rvq | NVIDIA GeForce RTX 3090 | 128 | 0.0010912 | 0.01893 | 1.0000 | 0.800 | 8.800 | 20.151 | 17.612 |
+| actioncodec_rvq / quantizers=2, variant=rvq | NVIDIA GeForce RTX 3090 | 128 | 0.0005652 | 0.01364 | 1.0000 | 1.600 | 17.600 | 20.027 | 17.452 |
+| actioncodec_rvq / quantizers=3, variant=rvq | NVIDIA GeForce RTX 3090 | 128 | 0.0003758 | 0.01127 | 1.0000 | 2.400 | 26.400 | 20.054 | 17.751 |
 
 | Codec run | Measurement commit | Summary SHA256 |
 |---|---|---|
-| `codec-fast-plus-v2` | `e70caf8f8b9e7bc6d405012a433b3a49e2ae2c30` | `46540bca1f06d946a1c06ccf7fbeddf6b287eba6c6f5c0a30fc7432d1020d145` |
-| `codec-beast-basis5-cpu-v1` | `605176e8ebd79f155d88cf2c82899ae60adb16f4` | `9c0a0e9f21ae289414ea26f8a0f0d1984ec6b907eee99302866d3b7724e52d4b` |
-| `codec-beast-cpu-v1` | `605176e8ebd79f155d88cf2c82899ae60adb16f4` | `bb837a9657aa0e23d9c43153683338fabebd23398ef163657ee09ab69d45b429` |
-| `codec-beast-basis20-cpu-v1` | `605176e8ebd79f155d88cf2c82899ae60adb16f4` | `e45c502dcd85c6f6de87a66a11cc960c53982024538d5aeab29fd5a06b2c19d3` |
-| `codec-vq-vla-v2` | `e70caf8f8b9e7bc6d405012a433b3a49e2ae2c30` | `f7aed049337f6fd3af8f8a19c3c8f07c37f942b661a258c42127d25a93efb4ab` |
-| `codec-actioncodec-v2` | `e70caf8f8b9e7bc6d405012a433b3a49e2ae2c30` | `4f550c96c00a8cdb15d7ccb91d36101706646ced4dc726fd20b82818ea3f5f4a` |
-| `codec-x-tokenizer-v2` | `e70caf8f8b9e7bc6d405012a433b3a49e2ae2c30` | `48b67ed993ca192227e3a4fa247437d069a7cdbe4a8d02dfdfbc34ed5d822cec` |
+| `codec-uniform-binning-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `137753166fdecd3aa99e95b0f194fd71f31ad2d5055606ae42566791139a16f1` |
+| `codec-fast-plus-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `c209ad2e9da2d8e61b5856a43df20c61e012a59ffd09dc06527e0db56817ab32` |
+| `codec-beast-basis5-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `407ef7fba709921768fa66a6e6763f5bbaa6afeb3234448b6c402f7f0f9798ef` |
+| `codec-beast-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `145859a697d2cf996f41926482c94ed35e34a9df67e3f4d1211fcf9c099c8760` |
+| `codec-beast-basis20-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `9c7bd63a48a9c6759638685886f784469859945654cdee60c1448c22a1a068db` |
+| `codec-vq-vla-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `73add831e40a994cb85446df03bf833392c8a7c92314e9c61afc7b8519c6eef4` |
+| `codec-minivla-rvq-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `c209a591da39e8f2ba6df4d66cd3bfcfb695c69317a612e98492ea49f7608ef3` |
+| `codec-actioncodec-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `7d7ce48c63464ad33042b34437c783c2f80236d1f8d2b8c68c5ec73ba7ec53ad` |
+| `codec-actioncodec-rvq-q1-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `1a36dbc71e5929fcb4cd71e40d972decbc2e7187c5bc4a29a52bc877e8c1f020` |
+| `codec-actioncodec-rvq-q2-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `0fa8f0a4908b730a888a09ae5ea73075cee762c20dac775a6f802b5111a0396a` |
+| `codec-actioncodec-rvq-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `91cb50fe5c86214780f3e29b97cfadb6115ebc5d0bac9c3cacbbe0e5484846f3` |
 
 <details>
 <summary>Codec device checks (auxiliary, not default rows)</summary>
@@ -246,11 +255,67 @@ The small spline workload is faster on native CPU; both devices use four OpenMP 
 
 | Run | Device | Raw MSE | Encode / decode ms per window | Summary SHA256 |
 |---|---|---:|---:|---|
-| `codec-beast-basis5-v2` | NVIDIA GeForce RTX 3090 | 0.0110235 | 13.278 / 6.622 | `436c77b75ccdf01c1824675dce9e767066ab145d398e8fc7c23e26a97f2b46b8` |
 | `codec-beast-v2` | NVIDIA GeForce RTX 3090 | 0.0043754 | 45.569 / 22.683 | `b12c622bb6c26123c969eaaec6b41187f1ef829ee51cff00eb2d925e2325b575` |
+| `codec-beast-basis5-v2` | NVIDIA GeForce RTX 3090 | 0.0110235 | 13.278 / 6.622 | `436c77b75ccdf01c1824675dce9e767066ab145d398e8fc7c23e26a97f2b46b8` |
 | `codec-beast-basis20-v2` | NVIDIA GeForce RTX 3090 | 0.0018109 | 110.388 / 54.901 | `0785ce3eaa2bdc7a03aeb3bccb4cacd95ffb4f6da40eb880e63b507ad5bf4ad6` |
 
 </details>
+
+### Raw-command reconstruction — H16
+
+Frozen corpus `1d3d60da1098bbbb8bf7a248b12ccf566e1e97124535cb390fcb504c1223af58`; 16-frame windows, one per episode, disjoint calibration/evaluation episodes; 4 evaluated suites.
+This is in-domain demonstration reconstruction, not policy success or VLA speedup.
+Latency includes representation transforms and CPU/device transfers; native CPU and GPU implementations are labeled separately. Nominal bits are not entropy-coded size.
+Rate variants are retained rate–distortion points, not extra methods. Representation transfers and state-conditioned results are separate groups.
+Pretraining overlap is not excluded; native block sizes/receptive fields differ.
+
+| Codec / preset | Device | Windows | Raw MSE | Raw MAE | Gripper sign | Tokens/frame | Bits/frame | Encode ms/window | Decode ms/window |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| uniform_binning | AMD EPYC 7532 32-Core Processor | 128 | 0.0002101 | 0.00311 | 1.0000 | 7.000 | 56.000 | 0.083 | 0.035 |
+| fast_plus | AMD EPYC 7532 32-Core Processor | 128 | 0.0003643 | 0.00916 | 1.0000 | 1.562 | 17.188 | 0.255 | 0.137 |
+| minivla_rvq | NVIDIA GeForce RTX 3090 | 128 | 0.0115903 | 0.03269 | 0.9839 | 0.875 | 6.125 | 3.222 | 0.525 |
+| mint_sdat | NVIDIA GeForce RTX 3090 | 128 | 0.0017260 | 0.02497 | 1.0000 | 0.438 | 3.938 | 5.796 | 6.572 |
+
+| Codec run | Measurement commit | Summary SHA256 |
+|---|---|---|
+| `codec-uniform-binning-h16-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `6e83e6d9de31b2f5a7b4a8de76437f35ba8624845b992afc19b0ab0fff464d9e` |
+| `codec-fast-plus-h16-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `5b10e18760b0a6a3415999cf3494cb3fa59a827b31deb499c50eaf410fce6c3b` |
+| `codec-minivla-rvq-h16-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `c98a7af8389d8850237aa8daa7f2e3dea3a18d9f4d82d89cb78276f7d3ae96e6` |
+| `codec-mint-sdat-h16-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `ba4602d7b1154bc9397c2760b9905f25daba2f7115af251d2b1f27764e5d6288` |
+
+### Quantizer coordinate-transfer diagnostic — H40
+
+Frozen corpus `01a8ae346abe98d43ddc307e2ab3db08c99a0229b58074e7b199ec2cd4500762`; 40-frame windows, one per episode, disjoint calibration/evaluation episodes; 4 evaluated suites.
+This is in-domain demonstration reconstruction, not policy success or VLA speedup.
+Latency includes representation transforms and CPU/device transfers; native CPU and GPU implementations are labeled separately. Nominal bits are not entropy-coded size.
+Rate variants are retained rate–distortion points, not extra methods. Representation transfers and state-conditioned results are separate groups.
+Pretraining overlap is not excluded; native block sizes/receptive fields differ.
+
+| Codec / preset | Device | Windows | Raw MSE | Raw MAE | Gripper sign | Tokens/frame | Bits/frame | Encode ms/window | Decode ms/window |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| spatialvla | AMD EPYC 7532 32-Core Processor | 128 | 0.0015589 | 0.02027 | 1.0000 | 3.000 | 42.000 | 0.209 | 0.160 |
+
+| Codec run | Measurement commit | Summary SHA256 |
+|---|---|---|
+| `codec-spatialvla-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `8c003a762b336ee609b37ef36e162e1b31a6866644c7730ef4ce7a9c537892ce` |
+
+### State-conditioned representation-transfer diagnostic — H40
+
+Frozen corpus `01a8ae346abe98d43ddc307e2ab3db08c99a0229b58074e7b199ec2cd4500762`; 40-frame windows, one per episode, disjoint calibration/evaluation episodes; 4 evaluated suites.
+This is in-domain demonstration reconstruction, not policy success or VLA speedup.
+Latency includes representation transforms and CPU/device transfers; native CPU and GPU implementations are labeled separately. Nominal bits are not entropy-coded size.
+Rate variants are retained rate–distortion points, not extra methods. Representation transfers and state-conditioned results are separate groups.
+Pretraining overlap is not excluded; native block sizes/receptive fields differ.
+
+| Codec / preset | Device | Windows | Raw MSE | Raw MAE | Gripper sign | Tokens/frame | Bits/frame | Encode ms/window | Decode ms/window |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| x_tokenizer | NVIDIA GeForce RTX 3090 | 128 | 0.4746804 | 0.33120 | 0.4721 | 1.000 | 11.000 | 7.914 | 9.133 |
+
+| Codec run | Measurement commit | Summary SHA256 |
+|---|---|---|
+| `codec-x-tokenizer-h40-v3` | `1d128a49b70e30631ece3fd7aaf15c7458dc7bc1` | `d37d0e0f1397c0c5a4eb8d6e73e1ea76bea35043322d2c9c8b0746d41f02bc64` |
+
+Only compare rows within a group. H16 is a frozen prefix of H40 with the same episode identities, but its calibration statistics and workload differ. Conditional/context-transfer diagnostics are not a codec leaderboard.
 
 ## Scoped revalidation — 2026-10
 

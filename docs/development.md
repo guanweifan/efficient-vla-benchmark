@@ -23,8 +23,13 @@ Action codecs use the [independent codec contract](../src/efficient_vla_benchmar
 Only selected `implementations/<codec>/` modules import their optional tensor runtime;
 they never import backends or each other. Decoder input is discrete payload plus
 explicitly declared context, not saved encoder features or future observations.
-One common frozen corpus and calibrated-only statistics support rate–distortion
-comparison. This extension does not change the policy Dev/timing protocols.
+Each comparison group uses identical frozen windows and calibration-only statistics.
+H16 is a fixed prefix of H40, not a replacement episode sample; native block sizes
+are preserved without padding or resampling. Conditional and coordinate-transfer
+diagnostics must not enter the ordinary reconstruction table. This extension does
+not change policy Dev/timing protocols. The codec README owns the release/admission
+audit; generated results retain measured revision and asset hashes. Current data
+exports and audit are in ignored outputs/codec-survey-v3/, never docs/results/.
 
 Backend plugins depend on core. A selected method binding may depend on its backend,
 but shared method equations must not. Entry-point and method-metadata discovery is
