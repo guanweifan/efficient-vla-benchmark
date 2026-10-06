@@ -135,6 +135,7 @@ class XTokenizerCodec:
             raise ValueError("X-Tokenizer statistics changed after calibration")
         return {
             "codec": "x_tokenizer",
+            "comparison_scope": "state_conditioned",
             "assets": self.assets,
             "sources": self.sources,
             "precision": "float32",

@@ -4,7 +4,7 @@ import pytest
 
 from efficient_vla_benchmark.action_codecs.corpus import digest
 from efficient_vla_benchmark.action_codecs.evaluation import evaluate
-from efficient_vla_benchmark.action_codecs.report import load_result, render
+from efficient_vla_benchmark.action_codecs.report import load_result, render, render_groups
 from tests.test_action_codecs import DummyCodec, fixture_corpus
 
 
@@ -71,3 +71,23 @@ def test_codec_record_rejects_tampering(tmp_path, change):
         path.write_text(json.dumps(data))
     with pytest.raises(ValueError):
         load_result(run)
+
+
+def test_groups_never_merge_horizons_or_representation_scopes(tmp_path):
+    record = load_result(evidence(tmp_path))
+    short = dict(record, metadata=dict(record["metadata"], horizon=16, corpus_sha256="b" * 64))
+    conditional = dict(
+        record,
+        metadata=dict(
+            record["metadata"],
+            codec=dict(record["metadata"]["codec"], comparison_scope="state_conditioned"),
+        ),
+    )
+    table = render_groups([record, short, conditional])
+    assert table.count("## Independent action codec reconstruction") == 1
+    assert "H16" in table and "State-conditioned" in table
+    with pytest.raises(ValueError, match="shared corpus"):
+        render([record, short])
+    mismatch = dict(record, window_keys_sha256="different")
+    with pytest.raises(ValueError, match="ordered evaluation"):
+        render([record, mismatch])

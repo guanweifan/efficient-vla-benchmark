@@ -1,5 +1,7 @@
 """Validate codec evidence separately from policy success and speedup records."""
 
+import argparse
+import hashlib
 import json
 import math
 from collections import Counter
@@ -105,6 +107,9 @@ def load_result(directory):
         "provenance": provenance,
         "quality": quality,
         "suite_windows": dict(Counter(row["suite"] for row in rows)),
+        "window_keys_sha256": hashlib.sha256(
+            json.dumps([row["key"] for row in rows]).encode()
+        ).hexdigest(),
         "files_sha256": {name: digest(directory / name) for name in names},
     }
 
@@ -116,6 +121,10 @@ def render(records, auxiliary=()):
         raise ValueError("Codec table requires one shared corpus")
     if len({r["metadata"]["horizon"] for r in records}) != 1:
         raise ValueError("Codec table requires one shared horizon")
+    if len({r.get("window_keys_sha256") for r in records}) != 1:
+        raise ValueError("Codec table requires identical ordered evaluation windows")
+    if len({json.dumps(r["suite_windows"], sort_keys=True) for r in records}) != 1:
+        raise ValueError("Codec table requires identical suite coverage")
     first = records[0]["metadata"]
     lines = [
         "",
@@ -127,9 +136,8 @@ def render(records, auxiliary=()):
         "This is in-domain demonstration reconstruction, not policy success or VLA speedup.",
         "Latency includes representation transforms and CPU/device transfers; native CPU "
         "and GPU implementations are labeled separately. Nominal bits are not entropy-coded size.",
-        "BEAST basis variants are retained rate–distortion points, not extra policy defaults.",
-        "X-Tokenizer uses a disclosed command-integrated pose representation and the initial "
-        "observed state at decode; its conditional result is not an unconditional codec score.",
+        "Rate variants are retained rate–distortion points, not extra methods. "
+        "Representation transfers and state-conditioned results are separate groups.",
         "Pretraining overlap is not excluded; native block sizes/receptive fields differ.",
         "",
         "| Codec / preset | Device | Windows | Raw MSE | Raw MAE | Gripper sign | "
@@ -177,3 +185,75 @@ def render(records, auxiliary=()):
             )
         lines += ["", "</details>"]
     return "\n".join(lines) + "\n"
+
+
+SCOPES = {
+    "command_reconstruction": "Raw-command reconstruction",
+    "coordinate_transfer": "Quantizer coordinate-transfer diagnostic",
+    "state_conditioned": "State-conditioned representation-transfer diagnostic",
+}
+
+
+def render_groups(records, auxiliary=()):
+    """Never compare different horizons or conditional representations as one table."""
+    if not records:
+        if auxiliary:
+            raise ValueError("Auxiliary codec checks require primary evidence")
+        return ""
+    groups = {}
+    for record in records:
+        m = record["metadata"]
+        scope = m["codec"].get("comparison_scope", "command_reconstruction")
+        if scope not in SCOPES:
+            raise ValueError("Unknown codec comparison scope")
+        groups.setdefault((m["horizon"], m["corpus_sha256"], scope), []).append(record)
+    sections = ["", "## Independent action codec reconstruction", ""]
+    for (horizon, corpus, scope), members in groups.items():
+        checks = [
+            r
+            for r in auxiliary
+            if r["metadata"]["corpus_sha256"] == corpus
+            and r["metadata"]["codec"].get("comparison_scope", "command_reconstruction") == scope
+        ]
+        body = render(members, checks).split("## Independent action codec reconstruction\n", 1)[1]
+        sections += [f"### {SCOPES[scope]} — H{horizon}", body]
+    if any(not any(r["metadata"]["corpus_sha256"] == k[1] for k in groups) for r in auxiliary):
+        raise ValueError("Auxiliary codec checks use a different corpus")
+    sections += [
+        "Only compare rows within a group. H16 is a frozen prefix of H40 with the same "
+        "episode identities, but its calibration statistics and workload differ. "
+        "Conditional/context-transfer diagnostics are not a codec leaderboard.",
+        "",
+    ]
+    return "\n".join(sections)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Replace only the codec result section.")
+    parser.add_argument("--run", type=Path, action="append", required=True)
+    parser.add_argument("--auxiliary-run", type=Path, action="append", default=[])
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--evidence-output", type=Path, required=True)
+    args = parser.parse_args()
+    records = [load_result(path) for path in args.run]
+    auxiliary = [load_result(path) for path in args.auxiliary_run]
+    if len({r["run_id"] for r in records + auxiliary}) != len(records + auxiliary):
+        raise ValueError("Duplicate codec result")
+    section = render_groups(records, auxiliary)
+    marker = "## Independent action codec reconstruction"
+    original = args.output.read_text() if args.output.exists() else ""
+    if original.count(marker) > 1:
+        raise ValueError("Ambiguous existing codec section")
+    prefix = original.split(marker, 1)[0]
+    # Codec evidence is the final section; do not silently discard later top-level sections.
+    if marker in original and "\n## " in original.split(marker, 1)[1]:
+        raise ValueError("Codec section is not last; preserve the remaining document explicitly")
+    args.output.write_text(prefix + section.lstrip("\n"))
+    args.evidence_output.parent.mkdir(parents=True, exist_ok=True)
+    args.evidence_output.write_text(
+        json.dumps({"records": records, "auxiliary": auxiliary}, indent=2, sort_keys=True) + "\n"
+    )
+
+
+if __name__ == "__main__":
+    main()

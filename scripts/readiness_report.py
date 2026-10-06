@@ -644,7 +644,7 @@ def main():
         finals,
     )
     from efficient_vla_benchmark.action_codecs.report import load_result
-    from efficient_vla_benchmark.action_codecs.report import render as render_codecs
+    from efficient_vla_benchmark.action_codecs.report import render_groups as render_codecs
 
     if (
         not a.codec_run
