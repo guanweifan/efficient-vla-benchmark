@@ -1,38 +1,35 @@
-# SparseVLM
+# SparseVLM+ (V2.0)
 
-Paper-based implementation of the original [SparseVLM v1](https://arxiv.org/html/2410.04417v1),
-equations 6-11. This is **not** SparseVLM+ or the released v1.5 fixed-budget variant.
-The [author v1.5 reference](https://github.com/Gumpest/SparseVLMs/tree/734d9003879689713a132b83297dfad060a5c9af)
-uses predefined budgets; substituting those would omit the original rank-adaptive claim.
+This port follows the author's [V2.0 branch](https://github.com/Gumpest/SparseVLMs/tree/9e1f649ef6a78878e2b10d1d6f49ecd7f4d84094)
+and its `USE_VERSION=2_0` execution path. Both native backends use the same
+selection equations; this replaces the former paper-v1 rank/recycling port.
 
-Before the decoder, select text raters by mean visual-to-text softmax relevance
-at or above the mean. At configured layers, inspect rater-to-visual attention,
-compute its FP32 numerical rank and remove
-`floor(rank_scale * (N_visual - rank))` low-score patches. Recycle the most
-significant configured fraction of removed tokens, use kNN density-peak centers
-and cosine assignment, then reconstruct each cluster by **sum** (Eq. 11).
+Before the decoder, select prompt raters with strict above-mean visual-to-text
+softmax relevance. At layers 2/6/15, divide each head's rater-to-visual
+AFTER-softmax probabilities by the corresponding attention between all-ones
+queries/keys with native RoPE. Select the 14 heads with greatest corrected
+text-to-visual mass, average their scores and retain the highest-ranked patches.
+The attention denominator includes all native keys; the correction affects
+selection only. Native SDPA output is unchanged before pruning.
 
-Nonzero fractional recycle/cluster counts round down with a minimum of one.
-Density uses log space to avoid exponential underflow; no global RNG is touched.
-Ties follow native positional order. Every center owns itself to prevent empty
-clusters for coincident features. Sum reconstruction is intentional, not a silent
-switch to the averaging operation in some released implementations.
+Official V2.0 budgets for a 576-patch input are:
+192: [300, 200, 118]; 128: [238, 108, 60];
+96: [246, 54, 28]; 64: [66, 34, 20].
+Profile names are effective budgets, not final counts. Multiply each stage budget
+by original native visual count / 576 and the explicit `budget_scale`, then floor
+with minimum one. OFT's two views form one 512-token pool; CogACT uses 256.
+Cap each stage at current count minus one, matching the reference top-k rule.
 
-OFT raters exclude proprio/action placeholders; both cameras share the visual pool.
-All nonvisual rows and original positions are protected. A cluster is anchored
-at its latest member, preserving causal information order for the subsequent
-CogACT port. No contiguous renumbering of action slots is allowed.
+V2.0 disables recycling and preserves original positions. There is no matrix-rank
+calculation, cluster reconstruction or v1.5 position renumbering in this port.
+Native text/proprio/action or cognition rows remain protected. Raters exclude
+non-language placeholders and CogACT cognition EOS. Entirely tied rater relevance
+is rejected explicitly rather than inventing another scoring rule.
 
-The pruning layers, rank scale and rank tolerance are explicitly configured
-benchmark settings, not claimed author-tuned VLA settings. Default rank scale
-0.25, recycling 0.3 and clustering 0.1 define the reference preset. Dev-selected
-presets vary rank scale; the recycling/clustering equations and fractions stay fixed.
-All rank, probing and clustering overhead is included in timing.
-
-## CogACT binding
-
-CogACT raters exclude final cognition EOS and use native causal attention.
-Merged visual rows retain latest-member anchors; all language and cognition
-positions survive unchanged. Rank/clustering policy is shared with OFT, while
-selected rank scales are backend-specific and constant across suites. Each backend
-retains its native attention and action head.
+The native causal/padding or OFT bidirectional mask remains authoritative.
+Selected per-head rectangles are algebraically the same as the author's full
+correction matrix; their extraction avoids allocating unused full-query scores.
+Finite scores are required; no undocumented epsilon/clipping changes correction.
+The 14-head setting, profile and native-count mapping are disclosed migration
+parameters, not author-tuned LIBERO results. Every probe, selection and correction
+cost is included in full-cost timing. Reset/close release all transient probes.

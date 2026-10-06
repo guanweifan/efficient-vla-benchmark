@@ -1,7 +1,7 @@
 schema_version: 1
 name: sparsevlm
 category: token_reduction
-description: Original SparseVLM text raters, rank-adaptive pruning and token recycling.
+description: SparseVLM+ official V2.0 gravity correction, priority heads and fixed-budget pruning.
 config: efficient_vla_benchmark.methods.token_reduction.sparsevlm.config:SparseVLMConfig
 requires_artifact: false
 implementations:

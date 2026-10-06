@@ -3,68 +3,69 @@ import pytest
 import torch
 
 from ..config import SparseVLMConfig
-from ..recycling import density_clusters, prune_and_recycle, text_raters
+from ..selection import REFERENCE_BUDGETS, select_visual, stage_budget, text_raters
 
 
-def test_raters_match_independent_numpy_softmax():
-    visual = np.array([[1.0, 2.0], [2.0, -1.0]])
-    text = np.array([[0.1, 0.2], [0.3, 0.4], [-0.2, 0.5]])
+def test_raters_follow_author_strict_threshold():
+    visual = np.array([[1.0, 2.0], [2.0, -1.0]], np.float32)
+    text = np.array([[0.1, 0.2], [0.3, 0.4], [-0.2, 0.5]], np.float32)
     logits = visual @ text.T
     weights = np.exp(logits - logits.max(-1, keepdims=True))
     relevance = (weights / weights.sum(-1, keepdims=True)).mean(0)
     np.testing.assert_array_equal(
-        text_raters(torch.tensor(visual), torch.tensor(text)), relevance >= relevance.mean()
+        text_raters(torch.tensor(visual), torch.tensor(text)), relevance > relevance.mean()
+    )
+    with pytest.raises(ValueError, match="no text raters"):
+        text_raters(torch.zeros(8, 4), torch.zeros(3, 4))
+
+
+@pytest.mark.parametrize("profile", [192, 128, 96, 64])
+def test_official_budgets_and_native_patch_mapping(profile):
+    config = SparseVLMConfig(budget_profile=profile)
+    assert tuple(stage_budget(576, i, config) for i in range(3)) == REFERENCE_BUDGETS[profile]
+    assert tuple(stage_budget(256, i, config) for i in range(3)) == tuple(
+        max(1, int(value * 256 / 576)) for value in REFERENCE_BUDGETS[profile]
     )
 
 
-def test_rank_controls_budget_and_reconstruction_sums():
-    features = torch.arange(32.0).reshape(8, 4) + 1
-    p = torch.arange(1.0, 9.0)[None].repeat(2, 1)
-    config = SparseVLMConfig(rank_scale=1, recycle_ratio=1, cluster_ratio=0.2)
-    ids, values, stats = prune_and_recycle(features, p, torch.arange(8), config)
-    assert stats == {"rank": 1, "removed": 7, "recycled": 7, "clusters": 1}
-    # Most salient row survives; the other seven sum at their latest anchor.
-    assert ids.tolist() == [6, 7]
-    torch.testing.assert_close(values, torch.stack((features[:7].sum(0), features[7])))
-
-
-def test_full_rank_skips_sparsification_and_large_density_is_finite():
-    features = torch.randn(8, 16) * 100
-    ids, result, stats = prune_and_recycle(
-        features, torch.eye(8), torch.arange(8), SparseVLMConfig()
-    )
-    assert ids.tolist() == list(range(8)) and stats["removed"] == 0
-    torch.testing.assert_close(result, features)
-    assignment = density_clusters(features, 3, 3)
-    assert sorted(assignment.unique().tolist()) == [0, 1, 2]
-    assert torch.equal(assignment, density_clusters(features, 3, 3))
-
-
-def test_degenerate_clusters_preserve_centers_and_global_rng():
-    state = torch.get_rng_state()
-    assignment = density_clusters(torch.zeros(7, 8), 3, 3)
-    assert sorted(assignment.unique().tolist()) == [0, 1, 2]
-    assert torch.equal(torch.get_rng_state(), state)
+def test_priority_heads_and_topk_match_author_operations():
+    torch.manual_seed(65)
+    p = torch.rand(32, 7, 44)
+    visual = torch.zeros(44, dtype=torch.bool)
+    visual[1:33] = True
+    # Full reference sequence: author select_attn_head_by_sum, then head/rater means.
+    heads = p[:, :, 1:33].sum((1, 2)).topk(14).indices
+    score = p[heads].mean(0)[:, 1:33].mean(0)
+    expected = score.topk(12).indices.sort().values
+    ids, stats = select_visual(p, visual, 12, 14)
+    assert torch.equal(ids, expected)
+    assert stats == {"kept": 12, "removed": 20, "priority_heads": 14}
+    assert select_visual(p, visual, 100, 14)[1]["kept"] == 31
+    with pytest.raises(ValueError, match="Nonfinite"):
+        select_visual(p.fill_(float("nan")), visual, 12, 14)
 
 
 @pytest.mark.parametrize(
     "parameters",
     [
-        {"pruning_layers": [3, 2]},
+        {"pruning_layers": [3, 2, 6]},
         {"pruning_layers": []},
-        {"rank_scale": 0},
-        {"recycle_ratio": True},
-        {"neighbors": 0},
-        {"rank_rtol": float("nan")},
+        {"budget_profile": 100},
+        {"budget_scale": 0},
+        {"budget_scale": True},
+        {"priority_heads": 0},
+        {"rank_scale": 0.5},
+        {"recycle_ratio": 0.3},
     ],
 )
-def test_invalid_config(parameters):
+def test_invalid_or_retired_config(parameters):
     with pytest.raises(ValueError):
         SparseVLMConfig.parse(parameters)
 
 
 @pytest.mark.gpu
-def test_real_oft_recycling_reset_and_detach(model_path, trace_path, request):
+def test_real_oft_v2_selection_reset_and_detach(model_path, trace_path, request):
+    pytest.importorskip("efficient_vla_backend_openvla_oft")
     from efficient_vla_backend_openvla_oft.backend import OpenVLAOFTBackend
 
     from efficient_vla_benchmark.evaluation.traces import load_trace
@@ -86,7 +87,7 @@ def test_real_oft_recycling_reset_and_detach(model_path, trace_path, request):
     assert actual.shape == (8, 7) and np.isfinite(actual).all()
     assert 0 < backend.query_diagnostics["visual_tokens_final"] < 512
     stages = backend.query_diagnostics["sparsevlm_stages"]
-    assert len(stages) == 3 and all(stage["clusters"] > 0 for stage in stages)
+    assert len(stages) == 3 and all(stage["removed"] > 0 for stage in stages)
     assert backend.method.raters is None
     backend.reset(context)
     np.testing.assert_array_equal(backend.predict_chunk(observations[0]), actual)

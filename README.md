@@ -38,7 +38,7 @@ and verifier batch counts toward full cost; registration alone is not a result.
 
 OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,
 EfficientVLA token core, ST-Merge and FlashVLA ICS, plus FastV, DivPrune, DART,
-SparseVLM v1, DepthCache primary-view core, ASR deletion instrument, ToMe,
+SparseVLM+ v2, DepthCache primary-view core, ASR deletion instrument, ToMe,
 VisionZip, A-MMR current-frame core, ETA-VLA ILSA core and TIES.
 CogACT supports the same token scopes except VLA-Pruner, TEAM-VLA, VLA-IAP and
 EfficientVLA token core; its README explains those fidelity deferrals.

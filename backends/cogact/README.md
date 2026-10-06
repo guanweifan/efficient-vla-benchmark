@@ -114,9 +114,9 @@ These are scoped fidelity deferrals, not blanket claims of impossibility. Kernel
 directory or hook work alone is not a reason to defer; inventing a different core
 score is. The existing OFT bindings and historical measurements remain unchanged.
 
-FastV, DivPrune, DART, SparseVLM v1, DepthCache primary and ASR deletion have
+FastV, DivPrune, DART, SparseVLM+ v2, DepthCache primary and ASR deletion have
 separate native bindings. FastV uses final cognition attention; DART reads native
-post-RoPE keys; SparseVLM/DepthCache anchor merged features at the latest member.
+post-RoPE keys; SparseVLM+ v2 preserves positions, while DepthCache anchors merges.
 DepthCache consumes measured primary-camera depth without adding a model input.
 ASR uses a disclosed cognition-attention gate, not nonexistent DiT patch attention;
 its discarded dense pass retains the native sampler and restores RNG afterwards.
