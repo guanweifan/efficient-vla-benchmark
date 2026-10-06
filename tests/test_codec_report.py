@@ -4,7 +4,12 @@ import pytest
 
 from efficient_vla_benchmark.action_codecs.corpus import digest
 from efficient_vla_benchmark.action_codecs.evaluation import evaluate
-from efficient_vla_benchmark.action_codecs.report import load_result, render, render_groups
+from efficient_vla_benchmark.action_codecs.report import (
+    load_result,
+    render,
+    render_groups,
+    replace_section,
+)
 from tests.test_action_codecs import DummyCodec, fixture_corpus
 
 
@@ -91,3 +96,20 @@ def test_groups_never_merge_horizons_or_representation_scopes(tmp_path):
     mismatch = dict(record, window_keys_sha256="different")
     with pytest.raises(ValueError, match="ordered evaluation"):
         render([record, mismatch])
+    with pytest.raises(ValueError, match="representation scope"):
+        render([record, conditional])
+    with pytest.raises(ValueError, match="matching comparison group"):
+        render_groups([record], [conditional])
+
+
+def test_codec_only_update_preserves_following_policy_notes():
+    marker = "## Independent action codec reconstruction"
+    old = (
+        "# Results\n\nPolicy numbers\n\n" + marker + "\n\nOld rows\n\n## Policy notes\nUnchanged.\n"
+    )
+    new = replace_section(old, "\n" + marker + "\n\n### H16\nNew rows\n")
+    assert new.startswith("# Results\n\nPolicy numbers\n\n" + marker)
+    assert new.endswith("\n\n## Policy notes\nUnchanged.\n")
+    assert "Old rows" not in new and "New rows" in new
+    with pytest.raises(ValueError, match="Ambiguous"):
+        replace_section(old + "\n" + marker, marker)

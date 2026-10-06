@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import math
+import re
 from collections import Counter
 from pathlib import Path
 
@@ -121,6 +122,16 @@ def render(records, auxiliary=()):
         raise ValueError("Codec table requires one shared corpus")
     if len({r["metadata"]["horizon"] for r in records}) != 1:
         raise ValueError("Codec table requires one shared horizon")
+    if (
+        len(
+            {
+                r["metadata"]["codec"].get("comparison_scope", "command_reconstruction")
+                for r in records
+            }
+        )
+        != 1
+    ):
+        raise ValueError("Codec table requires one representation scope")
     if len({r.get("window_keys_sha256") for r in records}) != 1:
         raise ValueError("Codec table requires identical ordered evaluation windows")
     if len({json.dumps(r["suite_windows"], sort_keys=True) for r in records}) != 1:
@@ -217,8 +228,15 @@ def render_groups(records, auxiliary=()):
         ]
         body = render(members, checks).split("## Independent action codec reconstruction\n", 1)[1]
         sections += [f"### {SCOPES[scope]} — H{horizon}", body]
-    if any(not any(r["metadata"]["corpus_sha256"] == k[1] for k in groups) for r in auxiliary):
-        raise ValueError("Auxiliary codec checks use a different corpus")
+    for record in auxiliary:
+        m = record["metadata"]
+        key = (
+            m["horizon"],
+            m["corpus_sha256"],
+            m["codec"].get("comparison_scope", "command_reconstruction"),
+        )
+        if key not in groups:
+            raise ValueError("Auxiliary codec check has no matching comparison group")
     sections += [
         "Only compare rows within a group. H16 is a frozen prefix of H40 with the same "
         "episode identities, but its calibration statistics and workload differ. "
@@ -226,6 +244,19 @@ def render_groups(records, auxiliary=()):
         "",
     ]
     return "\n".join(sections)
+
+
+def replace_section(original, section):
+    """Preserve both policy sections around the standalone codec section."""
+    marker = "## Independent action codec reconstruction"
+    if original.count(marker) > 1:
+        raise ValueError("Ambiguous existing codec section")
+    if marker not in original:
+        return original.rstrip("\n") + "\n\n" + section.lstrip("\n")
+    prefix, old = original.split(marker, 1)
+    following = re.search(r"\n## [^#]", old)
+    suffix = old[following.start() :] if following else ""
+    return prefix + section.lstrip("\n").rstrip("\n") + "\n" + suffix
 
 
 def main():
@@ -240,15 +271,8 @@ def main():
     if len({r["run_id"] for r in records + auxiliary}) != len(records + auxiliary):
         raise ValueError("Duplicate codec result")
     section = render_groups(records, auxiliary)
-    marker = "## Independent action codec reconstruction"
     original = args.output.read_text() if args.output.exists() else ""
-    if original.count(marker) > 1:
-        raise ValueError("Ambiguous existing codec section")
-    prefix = original.split(marker, 1)[0]
-    # Codec evidence is the final section; do not silently discard later top-level sections.
-    if marker in original and "\n## " in original.split(marker, 1)[1]:
-        raise ValueError("Codec section is not last; preserve the remaining document explicitly")
-    args.output.write_text(prefix + section.lstrip("\n"))
+    args.output.write_text(replace_section(original, section))
     args.evidence_output.parent.mkdir(parents=True, exist_ok=True)
     args.evidence_output.write_text(
         json.dumps({"records": records, "auxiliary": auxiliary}, indent=2, sort_keys=True) + "\n"
