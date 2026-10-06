@@ -7,6 +7,7 @@ import numpy as np
 import torch
 
 from efficient_vla_benchmark.core.method import InferenceMethod
+from efficient_vla_benchmark.model_ops.attention_statistics import AttentionStatisticsRequest
 from efficient_vla_benchmark.model_ops.decoder import IndexedKVStore
 from efficient_vla_benchmark.model_ops.vision import patch_cosine_similarity
 
@@ -136,18 +137,18 @@ class InfoEntropyCore(InferenceMethod):
         return self.store.update(layer, keys, values, state.positions, state.layout.length)
 
     def probes(self, layer, state):
-        return {"all": state.positions}
+        text_start, text_end = self.text_bounds(state.layout)
+        removed = state.layout.length - state.positions.numel()
+        return {
+            "all": AttentionStatisticsRequest(
+                text_start - removed, text_end - removed, 1, state.layout.visual_end
+            )
+        }
 
     def after_layer(self, layer, state, attention):
-        averaged = attention["all"]
-        dtype = torch.float32 if self.dtype == torch.float16 else self.dtype
-        probability = averaged.to(dtype)
-        probability = probability / (probability.sum(-1, keepdim=True) + 1e-10)
-        probability = torch.nan_to_num(probability, nan=0.0)
-        self.entropies.append(-(probability * (probability + 1e-10).log()).sum(-1).mean())
-        text_start, text_end = self.text_bounds(state.layout)
-        text_mask = (state.positions >= text_start) & (state.positions < text_end)
-        selected = averaged[text_mask, 1 : state.layout.visual_end]
+        statistics = attention["all"]
+        self.entropies.append(statistics.entropy)
+        selected = statistics.text_attention
         self.text_sum = selected if self.text_sum is None else self.text_sum + selected
 
     def finish(self, state):
@@ -192,6 +193,8 @@ class InfoEntropyCore(InferenceMethod):
             "full_layer_entropy": True,
             "attention_source": "all-layer/head mean from PREVIOUS inference frame",
             "time_axis": "executed control steps, clamped at fixed T; not future episode length",
-            "entropy_precision": "FP64 for text-distribution entropy to avoid cancellation",
+            "entropy_precision": "FP32 layer entropy; FP64 text-distribution entropy",
+            "statistics": "compact complete-row entropy and complete text/visual rectangle",
+            "attention_output": self.attention_backend,
             "requires_training": False,
         }

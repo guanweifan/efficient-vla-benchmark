@@ -1,6 +1,6 @@
 method: vla_infoentropy
 parameters:
-  attention_backend: eager
+  attention_backend: sdpa
   static_budget_per_view: 150
   similarity_threshold: 0.996
   low_quota: 40

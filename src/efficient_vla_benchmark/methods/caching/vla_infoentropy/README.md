@@ -49,19 +49,24 @@ before cognition EOS. No action-token proxy is used. The native cognition row is
 always recomputed; original per-query causal visibility and all visual keys remain.
 The existing causal indexed-KV adapter owns execution, independently of VLA-Cache's
 method implementation. DDIM, checkpoint weights and native spatial preprocessing
-are unchanged. Eager probabilities are shared with the statistics; their precision
-and overhead are reported rather than claimed identical to native SDPA.
+are unchanged. Native SDPA produces the policy attention output. Separate complete
+probabilities supply the statistics; both computations remain in full-cost timing.
 Cold/reset/disabled/detach checks, full-key versus sparse-query tests and executed
 step quota tests accompany this independent paper-based port.
 
-Readiness candidate `cogact/vla_infoentropy_static100` changes only the maximum
-static reuse candidate count from 150 to 100. Complete histogram, text entropy,
-quota transition, task protection and layer schedule remain present. This is a
-selective accuracy-sensitivity test, not an already validated replacement default.
-## Readiness diagnostic (2026-09-25)
 
-CogACT static100 scored 174/200 on the frozen Dev subset, versus 175/200 for
-the original preset and native 183/200. Reducing the static candidate budget
-therefore did not recover accuracy in this test. No retuning conclusion may be
-inferred from its newer timestamp; retain the original candidate unless paired
-full-cost timing supplies a separate selection reason.
+## Engineering revision
+
+The default is native SDPA, removing eager-versus-SDPA output differences on
+cold or fully protected frames. Eager remains an explicitly selectable diagnostic.
+All layer/head statistics and the second softmax are retained. Compact per-layer
+requests return only complete-row entropy and the full prompt-to-visual rectangle,
+avoiding repeated CUDA boolean indexing and retaining no unnecessary full map
+after the layer. Layer schedule entropy is accumulated in FP32 instead of BF16;
+the much smaller semantic information signal still uses FP64.
+
+Static candidate order, original masks/positions, monotonic within-query reuse,
+per-view protection unions and bounded indexed KV storage are unchanged.
+There is no automatic cross-frame refresh or changed control cadence.
+This is an engineering revision of the same paper-based mechanism; previous
+eager-version accuracy/timing must not be relabeled as this implementation.

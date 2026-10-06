@@ -5,7 +5,7 @@ from dataclasses import dataclass, fields
 @dataclass(frozen=True)
 class InfoEntropyConfig:
     enabled: bool = True
-    attention_backend: str = "eager"
+    attention_backend: str = "sdpa"
     static_budget_per_view: int = 150
     similarity_threshold: float = 0.996
     low_quota: int = 40

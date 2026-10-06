@@ -78,6 +78,7 @@ def test_invalid_config(params):
 
 @pytest.mark.gpu
 def test_real_oft_disabled_and_sdpa_cold_parity_warm_cache(model_path, trace_path, request):
+    pytest.importorskip("efficient_vla_backend_openvla_oft")
     from efficient_vla_backend_openvla_oft.backend import OpenVLAOFTBackend
 
     from efficient_vla_benchmark.evaluation.traces import load_trace
@@ -113,3 +114,37 @@ def test_real_oft_disabled_and_sdpa_cold_parity_warm_cache(model_path, trace_pat
     np.testing.assert_allclose(backend.predict_chunk(samples[0]), expected, rtol=0, atol=1e-6)
     backend.detach_method()
     np.testing.assert_array_equal(backend.predict_chunk(samples[0]), expected)
+
+
+@pytest.mark.gpu
+def test_real_openvla_oft_fully_protected_active_statistics_match_native(
+    model_path, trace_path, request
+):
+    pytest.importorskip("efficient_vla_backend_openvla_oft")
+    from efficient_vla_backend_openvla_oft.backend import OpenVLAOFTBackend
+
+    from efficient_vla_benchmark.evaluation.traces import load_trace
+
+    from ..implementations.openvla_oft.method import VLAInfoEntropy
+
+    host = OpenVLAOFTBackend(model_path)
+    request.addfinalizer(host.close)
+    context, frames, _ = load_trace(trace_path)
+    samples = frames[::8][:4]
+    native = []
+    for sample in samples:
+        host.reset(context)
+        native.append(host.predict_chunk(sample))
+    method = VLAInfoEntropy(host, InfoEntropyConfig(low_quota=256, high_quota=256))
+    host.attach_method(method)
+    for sample, expected in zip(samples, native):
+        host.reset(context)
+        first = host.predict_chunk(sample)
+        np.testing.assert_array_equal(first, expected)
+        assert host.query_diagnostics["visual_query_tokens_final"] == 512
+        assert host.query_diagnostics["reused_tokens_last_layer"] == 0
+    assert method.previous_information is not None
+    assert method.attention_backend == "sdpa"
+    host.detach_method()
+    host.reset(context)
+    np.testing.assert_array_equal(host.predict_chunk(samples[0]), native[0])

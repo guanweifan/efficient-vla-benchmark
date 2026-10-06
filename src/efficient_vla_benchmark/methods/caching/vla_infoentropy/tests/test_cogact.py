@@ -106,3 +106,36 @@ def test_real_cogact_native_parity_warm_kv_and_reset(model_path, trace_path, req
     host.detach_method()
     host.reset(context)
     np.testing.assert_array_equal(host.predict_chunk(frames[0]), native)
+
+
+@pytest.mark.gpu
+def test_real_cogact_fully_protected_active_statistics_match_native(
+    model_path, trace_path, request
+):
+    from efficient_vla_backend_cogact.backend import CogACTBackend
+
+    from efficient_vla_benchmark.evaluation.traces import load_trace
+
+    from ..implementations.cogact.method import VLAInfoEntropy
+
+    host = CogACTBackend(model_path)
+    request.addfinalizer(host.close)
+    context, frames, _ = load_trace(trace_path)
+    samples = frames[::8][:4]
+    native = []
+    for sample in samples:
+        host.reset(context)
+        native.append(host.predict_chunk(sample))
+    method = VLAInfoEntropy(host, InfoEntropyConfig(low_quota=256, high_quota=256))
+    host.attach_method(method)
+    for sample, expected in zip(samples, native):
+        host.reset(context)
+        first = host.predict_chunk(sample)
+        np.testing.assert_array_equal(first, expected)
+        assert host.query_diagnostics["visual_query_tokens_final"] == 256
+        assert host.query_diagnostics["reused_tokens_last_layer"] == 0
+    assert method.previous_information is not None
+    assert method.attention_backend == "sdpa"
+    host.detach_method()
+    host.reset(context)
+    np.testing.assert_array_equal(host.predict_chunk(samples[0]), native[0])
