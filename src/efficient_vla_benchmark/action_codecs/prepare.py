@@ -8,7 +8,7 @@ import numpy as np
 from efficient_vla_benchmark.calibration.libero import stratified_episode_indices
 from efficient_vla_benchmark.evaluation.libero import SUITES
 
-from .corpus import digest, write_corpus
+from .corpus import derive_prefix, digest, write_corpus
 
 
 def extract(root, output, *, per_split=32, horizon=40, seed=814):
@@ -85,13 +85,18 @@ def extract(root, output, *, per_split=32, horizon=40, seed=814):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--dataset-root", type=Path, required=True)
+    inputs = p.add_mutually_exclusive_group(required=True)
+    inputs.add_argument("--dataset-root", type=Path)
+    inputs.add_argument("--source-corpus", type=Path, help="Derive a fixed shorter prefix group")
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--per-split", type=int, default=32)
     p.add_argument("--horizon", type=int, default=40)
     p.add_argument("--seed", type=int, default=814)
     a = p.parse_args()
-    extract(a.dataset_root, a.output, per_split=a.per_split, horizon=a.horizon, seed=a.seed)
+    if a.source_corpus:
+        derive_prefix(a.source_corpus, a.output, a.horizon)
+    else:
+        extract(a.dataset_root, a.output, per_split=a.per_split, horizon=a.horizon, seed=a.seed)
 
 
 if __name__ == "__main__":

@@ -91,3 +91,28 @@ class Corpus:
 
     def rows(self, split):
         return [row for row in self.manifest["windows"] if row["split"] == split]
+
+
+def derive_prefix(source, output, horizon):
+    """Freeze a matched shorter workload, never truncate inside a method adapter."""
+    corpus = Corpus(source)
+    if not 1 <= horizon < corpus.manifest["horizon"]:
+        raise ValueError("Derived horizon must be shorter than the frozen source")
+    rows = []
+    for row in corpus.manifest["windows"]:
+        actions, context = corpus.window(row)
+        rows.append(
+            {k: row[k] for k in ("suite", "episode_index", "offset", "split")}
+            | {"actions": actions[:horizon], "initial_state": context.initial_state}
+        )
+    return write_corpus(
+        output,
+        rows,
+        horizon=horizon,
+        provenance={
+            "source_corpus_sha256": corpus.sha256,
+            "source_horizon": corpus.manifest["horizon"],
+            "selection": "fixed prefix; identical episode IDs, offsets and split assignments",
+            "limit": "Compare only against methods rerun on this identical derived corpus",
+        },
+    )
