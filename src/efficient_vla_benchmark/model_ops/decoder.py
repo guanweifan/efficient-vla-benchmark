@@ -5,6 +5,8 @@ from torch import nn
 from torch.nn import functional as F
 from transformers.models.llama.modeling_llama import apply_rotary_pos_emb, repeat_kv
 
+from .attention_statistics import AttentionStatisticsRequest, attention_statistics
+
 
 class IndexedKVStore:
     """Overwrite current rows, retain skipped rows; never append across frames."""
@@ -102,6 +104,11 @@ class InspectableAttention(nn.Module):
             probabilities = F.softmax(logits, dim=-1, dtype=torch.float32).to(queries.dtype)
             output = torch.matmul(probabilities, values)
         for name, requested in probes.items():
+            statistics_request = (
+                requested if isinstance(requested, AttentionStatisticsRequest) else None
+            )
+            if statistics_request is not None:
+                requested = state.positions
             if requested.numel() == 0:
                 self.last_attention[name] = queries.new_empty(
                     (0, keys.shape[2]), dtype=torch.float32
@@ -135,7 +142,12 @@ class InspectableAttention(nn.Module):
                         else attention_mask.index_select(-2, row_indices)
                     )
                 selected = F.softmax(logits, dim=-1, dtype=torch.float32).to(queries.dtype)
-            self.last_attention[name] = selected.mean(dim=1, dtype=torch.float32)[0]
+            averaged = selected.mean(dim=1, dtype=torch.float32)[0]
+            self.last_attention[name] = (
+                attention_statistics(averaged, statistics_request)
+                if statistics_request is not None
+                else averaged
+            )
         if probabilities is None:
             output = F.scaled_dot_product_attention(
                 queries,

@@ -79,3 +79,49 @@ def test_idle_probe_and_exception_clear_transient_state():
         assert probe.q is None and probe.k is None
     finally:
         probe.close()
+
+
+@pytest.mark.parametrize("correction", [False, True])
+def test_per_head_probe_matches_full_author_rectangle(correction):
+    torch.manual_seed(34)
+    cfg = transformers.LlamaConfig(
+        hidden_size=32,
+        intermediate_size=64,
+        num_hidden_layers=1,
+        num_attention_heads=4,
+        num_key_value_heads=2,
+    )
+    cfg._attn_implementation = "sdpa"
+    model = transformers.LlamaForCausalLM(cfg).eval()
+    eager_cfg = deepcopy(cfg)
+    eager_cfg._attn_implementation = "eager"
+    eager = transformers.LlamaForCausalLM(eager_cfg).eval()
+    eager.load_state_dict(model.state_dict())
+    hidden = torch.randn(1, 9, 32)
+    positions = torch.tensor([0, 1, 3, 4, 7, 8, 9, 11, 12])
+    inputs = dict(inputs_embeds=hidden, position_ids=positions[None], use_cache=False)
+    with torch.inference_mode():
+        native = model(**inputs).logits
+        reference = eager(**inputs, output_attentions=True).attentions[0]
+    module = model.model.layers[0].self_attn
+    if correction:
+        from transformers.models.llama.modeling_llama import apply_rotary_pos_emb
+
+        ones = torch.ones(1, 4, 9, 8)
+        cos, sin = module.rotary_emb(ones, positions[None])
+        q, k = apply_rotary_pos_emb(ones, ones, cos, sin)
+        reference = reference / (q @ k.transpose(2, 3) / 8**0.5)
+    probe = NativeAttentionProbe(
+        module,
+        lambda: positions[[2, 8]],
+        lambda: positions,
+        per_head=True,
+        gravity_correction=correction,
+    )
+    try:
+        with torch.inference_mode():
+            actual = model(**inputs).logits
+        torch.testing.assert_close(actual, native, rtol=0, atol=0)
+        torch.testing.assert_close(probe.probabilities, reference[0, :, [2, 8]])
+    finally:
+        probe.close()

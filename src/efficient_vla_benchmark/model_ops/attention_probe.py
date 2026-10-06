@@ -14,8 +14,9 @@ class NativeAttentionProbe:
     No V projection, output kernel, cache or action readout is replaced.
     """
 
-    def __init__(self, attention, request, positions):
+    def __init__(self, attention, request, positions, *, per_head=False, gravity_correction=False):
         self.attention, self.request, self.positions = attention, request, positions
+        self.per_head, self.gravity_correction = per_head, gravity_correction
         self.handles = []
         self.clear()
         try:
@@ -77,7 +78,19 @@ class NativeAttentionProbe:
             else:
                 logits = logits + mask.index_select(-2, rows)
             probabilities = F.softmax(logits, dim=-1, dtype=torch.float32).to(q.dtype)
-            self.probabilities = probabilities.mean(1, dtype=torch.float32)[0]
+            if self.gravity_correction:
+                # Evaluate the requested rectangle of the author's full ones-RoPE
+                # correction. Normalization still includes ALL current keys.
+                from transformers.models.llama.modeling_llama import rotate_half
+
+                ones = torch.ones_like(q)
+                rotated = ones * cos.unsqueeze(1) + rotate_half(ones) * sin.unsqueeze(1)
+                gravity = rotated.index_select(2, rows) @ rotated.transpose(2, 3)
+                gravity = gravity / module.head_dim**0.5
+                probabilities = probabilities / gravity
+            self.probabilities = (
+                probabilities[0] if self.per_head else probabilities.mean(1, dtype=torch.float32)[0]
+            )
         finally:
             self.q = self.k = self.requested = None
 
