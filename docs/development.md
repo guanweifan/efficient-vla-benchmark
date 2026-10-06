@@ -606,6 +606,10 @@ Repeat `--development-summary` for every referenced selection/coverage summary.
 For an authorized complete final campaign, append `--final-summary "$FINAL_SUMMARY"`.
 The ledger joins its exact final experiment ID, retains separate Dev/timing evidence,
 and excludes already measured configurations from the remaining final launch list.
+When selected implementations advance after an earlier campaign, their primary
+rows may pin `final_runtime_source_sha256` separately from the retained global
+default. The override must match measured timing or an explicit source audit.
+Supply all retained final summaries; never relabel earlier outcomes to that override.
 Historical or diagnostic rendering must use a separate ignored output, not the
 primary table. Neither rendering command executes a policy or schedules a campaign.
 

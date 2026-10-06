@@ -310,6 +310,14 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         )
         if source_pair[0] != source_pair[1] and source_pair not in audited:
             raise ValueError("Unaudited development/timing runtime change")
+        final_runtime = selected.get(
+            "final_runtime_source_sha256", selection.get("final_runtime_source_sha256")
+        )
+        if "final_runtime_source_sha256" in selected and (
+            not final_runtime
+            or (final_runtime != source_pair[1] and (source_pair[0], final_runtime) not in audited)
+        ):
+            raise ValueError("Unaudited scoped final runtime override")
         if (
             timing["protocol"].get("workload_sha256")
             != selection["timing_workloads"][config["backend"]]
@@ -357,10 +365,7 @@ def build(selection, summaries, records, quality, development_manifest, final_re
                 measured = matches[0]
                 if measured["backend"]["checkpoint_sha256"] != dev["backend"]["checkpoint_sha256"]:
                     raise ValueError("Final checkpoint differs from selection")
-                if (
-                    measured["source"]["runtime_source_sha256"]
-                    != selection["final_runtime_source_sha256"]
-                ):
+                if measured["source"]["runtime_source_sha256"] != final_runtime:
                     raise ValueError("Final runtime differs from the frozen final selection")
                 final = final_partition(measured, development_manifest)
         compact = "control_workload" in record["run"]["summary"]

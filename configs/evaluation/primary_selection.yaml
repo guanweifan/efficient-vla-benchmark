@@ -429,6 +429,7 @@ configurations:
       development_experiment_id: 86f7898a3c323721cb7d9be47013a019276f51ff75e9f40511652de340901a4c
       timing_record: search-r1-45-6-cogact-1--safe_pruner_keep125
 - config: configs/experiments/cogact/sparsevlm_v2_128.yaml
+  final_runtime_source_sha256: fe6e13a3995cba0138156d8e5ecac0c515210894c5e166aabf784a839d660e08
   status: primary
   section: '5.1'
   reason: Profile 128 gives 181/200, the fastest measured eligible setting; profile 96 falls to 154/200.
@@ -938,6 +939,7 @@ configurations:
       development_experiment_id: cc588e44494703fbf11755837843c301ca1b1b8975b2119a934f50b7cabb3e31
       timing_record: search-r18-125-5-cogact--vla_cache_budget256_protect50
 - config: configs/experiments/cogact/vla_infoentropy_protect140.yaml
+  final_runtime_source_sha256: fe6e13a3995cba0138156d8e5ecac0c515210894c5e166aabf784a839d660e08
   status: primary
   section: '5.2'
   reason: Static budget 150 with 56/84 protection quotas gives 177/200, the fastest measured eligible
@@ -1838,6 +1840,7 @@ configurations:
       development_experiment_id: ca75ecc11fe121380ec814a04b3649bb223bfa3935d8eb4341bd3d3a8d66e4de
       timing_record: search-r1-45-6-openvla_oft-1--safe_pruner_keep125
 - config: configs/experiments/openvla_oft/sparsevlm_v2_scale0875.yaml
+  final_runtime_source_sha256: fe6e13a3995cba0138156d8e5ecac0c515210894c5e166aabf784a839d660e08
   status: primary
   section: '5.1'
   reason: Profile 192 / scale 0.875 gives 194/200 and 1.481x, the fastest measured eligible setting. Scales
@@ -2150,6 +2153,7 @@ configurations:
       development_experiment_id: 8929e53f6faafe9666aeb79b7771bf565593c0cfd1ed9905a820e0ee1eaac8d9
       timing_record: search-r24-125-6-openvla_oft--vla_cache_budget256_protect25
 - config: configs/experiments/openvla_oft/vla_infoentropy_sdpa192.yaml
+  final_runtime_source_sha256: fe6e13a3995cba0138156d8e5ecac0c515210894c5e166aabf784a839d660e08
   status: primary
   section: '5.2'
   reason: Native-SDPA budget 192 gives 195/200 and 0.996x, the fastest measured eligible setting. Budgets

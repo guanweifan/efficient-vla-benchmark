@@ -176,6 +176,34 @@ def test_compact_diagnostic_does_not_become_final_candidate(reporter):
     assert "0.800×" in reporter.render(report)
 
 
+@pytest.mark.parametrize("measured_runtime", ["new", "previous-final"])
+def test_scoped_final_runtime_overrides_global_without_relabeling(
+    reporter, monkeypatch, measured_runtime
+):
+    selection, summaries, records, quality, manifest = fixture()
+    selection["final_runtime_source_sha256"] = "previous-final"
+    selection["configurations"][0]["final_runtime_source_sha256"] = "new"
+    measured = copy.deepcopy(summaries["summary"]["configurations"][0])
+    measured["source"]["runtime_source_sha256"] = measured_runtime
+    partition = {"full_2000": {"episodes": 2000, "successes": 1800, "success_rate": 0.9}}
+    monkeypatch.setattr(reporter, "final_partition", lambda result, development: partition)
+    if measured_runtime == "new":
+        result = reporter.build(selection, summaries, records, quality, manifest, [measured])
+        assert result["primary"][0]["final"] == partition
+        assert not result["final_launch_candidates"]
+    else:
+        with pytest.raises(ValueError, match="Final runtime differs"):
+            reporter.build(selection, summaries, records, quality, manifest, [measured])
+
+
+@pytest.mark.parametrize("override", [None, "unreviewed-runtime"])
+def test_unaudited_scoped_final_override_is_rejected_before_launch(reporter, override):
+    selection, summaries, records, quality, manifest = fixture()
+    selection["configurations"][0]["final_runtime_source_sha256"] = override
+    with pytest.raises(ValueError, match="Unaudited scoped final"):
+        reporter.build(selection, summaries, records, quality, manifest)
+
+
 @pytest.mark.parametrize(
     "case",
     [

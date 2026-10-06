@@ -16,7 +16,7 @@ Each speedup uses its own same-GPU native pair; the displayed native row is
 not a universal denominator. Absolute latency across GPU pairs is descriptive.
 Measured GPU models: NVIDIA GeForce RTX 3090.
 
-Selection digest: `6bb197374072cc3824352b77b2d91b63858dda2fc99063aadc90ee1ac95a5698`.
+Selection digest: `e35f750c9dca74e0025f1a7f5e47df98600545520b355ee974b0eaabe884ea39`.
 
 ## cogact
 
@@ -254,8 +254,9 @@ The small spline workload is faster on native CPU; both devices use four OpenMP 
 
 ## Scoped revalidation — 2026-10
 
-SparseVLM now uses pinned official SparseVLM+ V2.0 (native-grid budget mapping);
+SparseVLM uses pinned official SparseVLM+ V2.0 with native-grid budget mapping.
 VLA-InfoEntropy uses native SDPA with complete compact statistics and FP32 layer entropy.
-Their new Dev/timing evidence replaces the previous primary rows; old Final success
-is not transferred to these revisions. This round stops before Final-2000.
-Current local readiness and summary index: `outputs/sparse-entropy-v2/`.
+New primary rows do not inherit old-version Final outcomes. Their separately
+authorized Final-2000 campaign uses individually pinned runtime identities.
+Local selection evidence: `outputs/sparse-entropy-v2/`; scoped Final evidence:
+`outputs/sparse-entropy-final2000-v2/`.
