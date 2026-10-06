@@ -1,0 +1,5 @@
+extends:
+- vla_infoentropy.yaml
+parameters:
+  high_quota: 84
+  low_quota: 56

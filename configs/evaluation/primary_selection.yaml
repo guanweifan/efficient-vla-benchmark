@@ -428,35 +428,36 @@ configurations:
     - development_summary_sha256: 00d2044694e1ae351e2ed4ceed0a79dfae5efad1ea4728ec6c5028e83ce9be68
       development_experiment_id: 86f7898a3c323721cb7d9be47013a019276f51ff75e9f40511652de340901a4c
       timing_record: search-r1-45-6-cogact-1--safe_pruner_keep125
-- config: configs/experiments/cogact/sparsevlm_rank625.yaml
+- config: configs/experiments/cogact/sparsevlm_v2_128.yaml
   status: primary
   section: '5.1'
-  reason: Rank scale0.625 gives183/200 and1.434x; stronger0.75 gives164/200 for little additional speed.
-    Keep task-related selection and recycling active.
-  scope: Task-related selection and token recycling.
-  development_summary_sha256: d8421aa1b4712e1848862df5566da903c8b7da15fa652ca1382c872f7e8bfb1d
-  development_experiment_id: a0d03b1c34f2357464e19f61ff9e670df3480f699f5e4978512b777c19bea8ba
+  reason: Profile 128 gives 181/200, the fastest measured eligible setting; profile 96 falls to 154/200.
+    Profile 192 and its scale 1.5 variant give 184/182 but are slower.
+  scope: Official SparseVLM+ V2.0 selection on native causal cognition; scaled 256-patch grid, unchanged
+    DDIM and H8.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Profile 128 gives 181/200, the fastest measured eligible setting; profile 96 falls to 154/200.
+      Profile 192 and its scale 1.5 variant give 184/182 but are slower.
+    evidence:
+    - development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+      development_experiment_id: bcf7adcaf806a3f66f2750eaed0ab7d2b5ba26bd4f9495e9b7f3642c6944e601
+      timing_record: se2-r1-repaired-cogact--sparsevlm_v2_128
+    - development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+      development_experiment_id: 5c9500faa82f2bd13de21dbf158d583f46eeb5be5b5a56551b040ae1c70bdc24
+      timing_record: se2-r1-repaired-cogact--sparsevlm_v2_192
+    - development_summary_sha256: e9fee3f5972cbb18120d1a9123482fd7c091c2f3a250ee4473aab77ef9414a37
+      development_experiment_id: 47fb8643752ada1213a73099f260bb35593ba137aa2ca0942c5fdb93a3d7c2f8
+      timing_record: se2-r1-repaired-cogact--sparsevlm_v2_96
+    - development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+      development_experiment_id: fc8b8b3afbd5b39363db446ba6a036e8c32fc5da8da7723d11197c35c9348b64
+      timing_record: se2-r1-repaired-cogact--sparsevlm_v2_scale150
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: search-r23-41-7-cogact--sparsevlm_rank625
-  search:
-    stop: accuracy_boundary
-    reason: Rank scale0.625 gives183/200 and1.434x; stronger0.75 gives164/200 for little additional speed.
-      Keep task-related selection and recycling active.
-    complete: true
-    evidence:
-    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-      development_experiment_id: 19e55b9daed5d94fe5e3c51402cfe296a0a1cb52a519fa5e24cc0025772342e2
-      timing_record: compact-43-0-cogact-1--sparsevlm
-    - development_summary_sha256: 376d21787388a77b023184cd3d67259ffbb235067f41572593fb4c0fb300a19b
-      development_experiment_id: be6096afc3be23bbe2d37061ba3ba8723bf13dda4084924373d94218c95a5999
-      timing_record: search-r1-45-6-cogact-1--sparsevlm_rank50
-    - development_summary_sha256: d8421aa1b4712e1848862df5566da903c8b7da15fa652ca1382c872f7e8bfb1d
-      development_experiment_id: a0d03b1c34f2357464e19f61ff9e670df3480f699f5e4978512b777c19bea8ba
-      timing_record: search-r23-41-7-cogact--sparsevlm_rank625
-    - development_summary_sha256: ec3f28a8db704271a5a7b4b784e9022093a496ab83ff34548763931436d5cc8e
-      development_experiment_id: 757f2b2447d4495add44fac68d3ede7150975588b654ba818f92732bb24e45d3
-      timing_record: search-r9-recheck-41-6-cogact--sparsevlm_rank75
+  development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+  development_experiment_id: bcf7adcaf806a3f66f2750eaed0ab7d2b5ba26bd4f9495e9b7f3642c6944e601
+  timing_record: se2-r1-repaired-cogact--sparsevlm_v2_128
 - config: configs/experiments/cogact/specprune_vla_static112.yaml
   status: primary
   section: '5.1'
@@ -936,42 +937,43 @@ configurations:
     - development_summary_sha256: a564d59e4b30373fe8b562e4435961c71c36ba498c185d6f14cee0f6cb313110
       development_experiment_id: cc588e44494703fbf11755837843c301ca1b1b8975b2119a934f50b7cabb3e31
       timing_record: search-r18-125-5-cogact--vla_cache_budget256_protect50
-- config: configs/experiments/cogact/vla_infoentropy.yaml
+- config: configs/experiments/cogact/vla_infoentropy_protect140.yaml
   status: primary
   section: '5.2'
-  reason: Native-output SDPA still gives173/200; stricter similarity thresholds give175/200 and a smaller
-    budget gives174/200. Keep the reference-close175/200 full-entropy port as an explicitly below-target
-    result.
-  scope: Entropy-guided query-row reuse; below Dev loss target.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 3e7f5140c644c221a9a02a45731cf1e949650a3564053c9d662f85e37b11cabb
+  reason: Static budget 150 with 56/84 protection quotas gives 177/200, the fastest measured eligible
+    setting. Default 100-token protection at budgets 100/150/224 gives 170/173/135. Budget 75 gives 184
+    with lower paired speedup; retain it only as search evidence. The selected result is exactly at the
+    3pp Dev loss boundary.
+  scope: Paper-based 140-quota protection variant; complete statistics, causal full-KV reuse, native SDPA,
+    unchanged DDIM and H8.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Static budget 150 with 56/84 protection quotas gives 177/200, the fastest measured eligible
+      setting. Default 100-token protection at budgets 100/150/224 gives 170/173/135. Budget 75 gives
+      184 with lower paired speedup; retain it only as search evidence. The selected result is exactly
+      at the 3pp Dev loss boundary.
+    evidence:
+    - development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+      development_experiment_id: 85f2b3711700b9ca9428932bba6ae435f7e40798274003e841e06ee2a93a7398
+      timing_record: se2-r1-repaired-cogact--vla_infoentropy_protect140
+    - development_summary_sha256: e9fee3f5972cbb18120d1a9123482fd7c091c2f3a250ee4473aab77ef9414a37
+      development_experiment_id: dc35f7c1b1dfbd4e3c4106c1e25598c8b1accb8fc78ea775fbb2fa000d06757f
+      timing_record: se2-r1-repaired-cogact--vla_infoentropy_sdpa100
+    - development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+      development_experiment_id: 953aa4e22c933b261ea65da9f0ffacff7290a0c94035a0d67883efe23a91f768
+      timing_record: se2-r1-repaired-cogact--vla_infoentropy_sdpa150
+    - development_summary_sha256: e9fee3f5972cbb18120d1a9123482fd7c091c2f3a250ee4473aab77ef9414a37
+      development_experiment_id: 6f42d0c6c0fe18415657a6ab367c2456738a8aaeddf420beaf0172ba81d45d34
+      timing_record: se2-r1-repaired-cogact--vla_infoentropy_sdpa224
+    - development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+      development_experiment_id: b28692d1f7ae50495dc06df7d40b91248fc32cfe3a1cd05b9444a502ffab7aee
+      timing_record: se2-r1-repaired-cogact--vla_infoentropy_sdpa75
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-2-cogact-inputs-retry--vla_infoentropy
-  search:
-    stop: no_feasible_configuration
-    reason: Native-output SDPA still gives173/200; stricter similarity thresholds give175/200 and a smaller
-      budget gives174/200. Keep the reference-close175/200 full-entropy port as an explicitly below-target
-      result.
-    limitation: No tested active full-entropy configuration meets177/200. All original complete-statistics
-      costs, native visibility, and H8 execution remain intact; do not infer failure of the published
-      checkpoint.
-    complete: true
-    evidence:
-    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-      development_experiment_id: 3e7f5140c644c221a9a02a45731cf1e949650a3564053c9d662f85e37b11cabb
-      timing_record: compact-43-2-cogact-inputs-retry--vla_infoentropy
-    - development_summary_sha256: c58408949929abe5b6d0e01da4f7268f5a861d8b6e8263c31ec679dd23808c21
-      development_experiment_id: 72863257387e829e4c5d102d961fddf2f81b16c5ee9f1ee0010cb5b4ae5638e5
-      timing_record: search-r1-recheck-41-7-cogact-5--vla_infoentropy_threshold999
-    - development_summary_sha256: eec0d5b13970a126d5f21e6e20d18abc2d6681d643cd32c97591a00978a5fd5b
-      development_experiment_id: 759ff2cbad8b2c008859811bee46475cc644192f47783d6b18e430ef1d23f237
-      timing_record: search-r15-41-6-cogact--vla_infoentropy_threshold9999
-    - development_summary_sha256: 0f6402d7a45190d73e87855a639c5487aed9af13c9e3033d22061cbbd40828b9
-      development_experiment_id: 3f611480a5792459dee430f086f93084b96cce8fe2d08308d5d268e1e7a7db3d
-      timing_record: search-r24-recheck-125-6-cogact--vla_infoentropy_sdpa150
-    - development_summary_sha256: b3e2d23a42b4b53526200a6218eb1ca80b27f57d9f8d7fc79344fd668abb435a
-      development_experiment_id: 9566b1fc8ecf0c99e00660d307fb2102619007b878aa103c81b470833a9abc89
+  development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+  development_experiment_id: 85f2b3711700b9ca9428932bba6ae435f7e40798274003e841e06ee2a93a7398
+  timing_record: se2-r1-repaired-cogact--vla_infoentropy_protect140
 - config: configs/experiments/cogact/eco_vla_keep60.yaml
   status: primary
   section: '5.3'
@@ -1835,35 +1837,42 @@ configurations:
     - development_summary_sha256: 063da1efb43c2dad9ab14a8b146723f39cdb525fd6f6e04cf211625518f07db8
       development_experiment_id: ca75ecc11fe121380ec814a04b3649bb223bfa3935d8eb4341bd3d3a8d66e4de
       timing_record: search-r1-45-6-openvla_oft-1--safe_pruner_keep125
-- config: configs/experiments/openvla_oft/sparsevlm_rank50.yaml
+- config: configs/experiments/openvla_oft/sparsevlm_v2_scale0875.yaml
   status: primary
   section: '5.1'
-  reason: Rank scale0.50 gives192/200; stronger0.625 and0.75 give190/200 and168/200. Recycling remains
-    active.
-  scope: Task-related selection and token recycling.
-  development_summary_sha256: 5a0500ebc96e060282d831e45ccbd182b5f9bac6c2fe8521aabd72a0238b1678
-  development_experiment_id: f20516d6ae83064a018e357944d7325885f1af3fbba0a8788ea76117ee0b48b1
+  reason: Profile 192 / scale 0.875 gives 194/200 and 1.481x, the fastest measured eligible setting. Scales
+    0.75/0.625 give 191/190, and profile 128 gives 189. Scales 1.0/1.5 give 195/198 but are slower.
+  scope: Official SparseVLM+ V2.0 priority-head/RoPE-corrected selection; native-grid budget mapping,
+    no recycling.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Profile 192 / scale 0.875 gives 194/200 and 1.481x, the fastest measured eligible setting.
+      Scales 0.75/0.625 give 191/190, and profile 128 gives 189. Scales 1.0/1.5 give 195/198 but are slower.
+    evidence:
+    - development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+      development_experiment_id: f0bbc0a5d4f21d15e41cf81d1f04fc29238063b897f97dd8eaad46d6e9be4d44
+      timing_record: se2-r1-openvla_oft--sparsevlm_v2_128
+    - development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+      development_experiment_id: 1798a436e9a8c086bc81949a89f6384f60fdba15c3be9ac5d5790e9244e7722c
+      timing_record: se2-r1-openvla_oft--sparsevlm_v2_192
+    - development_summary_sha256: e9fee3f5972cbb18120d1a9123482fd7c091c2f3a250ee4473aab77ef9414a37
+      development_experiment_id: ab5966a5d145cf8086d5b3389c1ffc2f7b436c4e351c6495127c823ba1ecc627
+      timing_record: se2-r2-openvla_oft--sparsevlm_v2_scale0625
+    - development_summary_sha256: e9fee3f5972cbb18120d1a9123482fd7c091c2f3a250ee4473aab77ef9414a37
+      development_experiment_id: 1d35adbb6673f3efbeae0169931b112cd98524a491fdc1433aa085e24560fc34
+      timing_record: se2-r2-openvla_oft--sparsevlm_v2_scale075
+    - development_summary_sha256: e9fee3f5972cbb18120d1a9123482fd7c091c2f3a250ee4473aab77ef9414a37
+      development_experiment_id: 03d079a435ae20348a6cdde1bc3d3a1a7ec36ea57dada24f84d7c4599e9c84d0
+      timing_record: se2-r2-openvla_oft--sparsevlm_v2_scale0875
+    - development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+      development_experiment_id: f401993e4ae2a606cc5b0ddb51ca0c17a36bdbb40ffe53ad7e7e98911355a73f
+      timing_record: se2-r1-openvla_oft--sparsevlm_v2_scale150
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: search-r1-45-6-openvla_oft-1--sparsevlm_rank50
-  search:
-    stop: accuracy_boundary
-    reason: Rank scale0.50 gives192/200; stronger0.625 and0.75 give190/200 and168/200. Recycling remains
-      active.
-    complete: true
-    evidence:
-    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-      development_experiment_id: 071e8857510d6e9ed29997e514942f2950f8af42284c5bba9ff50ba0b2c7f6ef
-      timing_record: compact-45-6-openvla_oft-1--sparsevlm
-    - development_summary_sha256: 5a0500ebc96e060282d831e45ccbd182b5f9bac6c2fe8521aabd72a0238b1678
-      development_experiment_id: f20516d6ae83064a018e357944d7325885f1af3fbba0a8788ea76117ee0b48b1
-      timing_record: search-r1-45-6-openvla_oft-1--sparsevlm_rank50
-    - development_summary_sha256: 02ef21ded1e2bcdef13b132c5ab4c5f6fa21b9b31268a1c4fb3bd1389070ebcf
-      development_experiment_id: 04998449d7ae614c99298a7127f91b65977f1f766b3bde70ce93569683b43d44
-      timing_record: search-r14-124-6-openvla_oft--sparsevlm_rank625
-    - development_summary_sha256: 0648cf58170118c570469d3eb80648f1c7fc61b50e864d077752ca8409302984
-      development_experiment_id: ea94c0abcdb88589cff25a5418406dd9fdac3b63601c846215a881e09dba383d
-      timing_record: search-r456-124-6-openvla_oft-0--sparsevlm_rank75
+  development_summary_sha256: e9fee3f5972cbb18120d1a9123482fd7c091c2f3a250ee4473aab77ef9414a37
+  development_experiment_id: 03d079a435ae20348a6cdde1bc3d3a1a7ec36ea57dada24f84d7c4599e9c84d0
+  timing_record: se2-r2-openvla_oft--sparsevlm_v2_scale0875
 - config: configs/experiments/openvla_oft/specprune_vla_dynamic80.yaml
   status: primary
   section: '5.1'
@@ -2140,35 +2149,36 @@ configurations:
     - development_summary_sha256: 2f4e0059819b9e9b6591ee8918b799d8cf338aa8f40ca9d1cc40d1f5a3f5d3c3
       development_experiment_id: 8929e53f6faafe9666aeb79b7771bf565593c0cfd1ed9905a820e0ee1eaac8d9
       timing_record: search-r24-125-6-openvla_oft--vla_cache_budget256_protect25
-- config: configs/experiments/openvla_oft/vla_infoentropy_budget224.yaml
+- config: configs/experiments/openvla_oft/vla_infoentropy_sdpa192.yaml
   status: primary
   section: '5.2'
-  reason: Budget224 meets192/200 and reduces full-cost overhead;256 falls to189/200 and reducing entropy
-    protection quotas gives179/200. No reliable acceleration over native is claimed.
-  scope: Entropy-guided query-row reuse with retained KV.
-  development_summary_sha256: 0b5e061326124128edb9a80b623f6f07cadb851f8437c4b367f34d721ecc6c67
-  development_experiment_id: 84aa0e0fe7b5e53c2b930e0a2b6cfdefaecd2fe9632e8e5b60d683594fb9d11f
+  reason: Native-SDPA budget 192 gives 195/200 and 0.996x, the fastest measured eligible setting. Budgets
+    224/256 give 188/191; budget 150 gives 196 but is slower. No reliable acceleration is claimed.
+  scope: Paper-based complete entropy protection and full indexed-KV reuse; FP32 layer entropy, compact
+    complete statistics and native SDPA.
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: Native-SDPA budget 192 gives 195/200 and 0.996x, the fastest measured eligible setting. Budgets
+      224/256 give 188/191; budget 150 gives 196 but is slower. No reliable acceleration is claimed.
+    evidence:
+    - development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+      development_experiment_id: 5c33537f0ae76531ea9ef9c29ce866b525a1519a1e48bfd04126498e984a3936
+      timing_record: se2-r1-openvla_oft--vla_infoentropy_sdpa150
+    - development_summary_sha256: e9fee3f5972cbb18120d1a9123482fd7c091c2f3a250ee4473aab77ef9414a37
+      development_experiment_id: 079a455f6d895e8890c4f6a38e259960b313394edd4847c536c38e3278996825
+      timing_record: se2-r2-openvla_oft--vla_infoentropy_sdpa192
+    - development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+      development_experiment_id: 04228feb9a6352d610b62f328d79812fd7a14427bc7e0dc14ae9a1f6646f64b8
+      timing_record: se2-r1-recheck-openvla_oft--vla_infoentropy_sdpa224
+    - development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
+      development_experiment_id: 00388932c697679a5bae23c799a2fe0c3632684961d95e87245781ff356961cc
+      timing_record: se2-r1-recheck-openvla_oft--vla_infoentropy_sdpa256
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: search-r1-45-7-openvla_oft-5--vla_infoentropy_budget224
-  search:
-    stop: accuracy_boundary
-    reason: Budget224 meets192/200 and reduces full-cost overhead;256 falls to189/200 and reducing entropy
-      protection quotas gives179/200. No reliable acceleration over native is claimed.
-    complete: true
-    evidence:
-    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-      development_experiment_id: fc132144e01cbf7c6a681a8b9f59e0010c7cb55a4742809365070e9632b55733
-      timing_record: compact-45-7-openvla_oft-1--vla_infoentropy
-    - development_summary_sha256: 0b5e061326124128edb9a80b623f6f07cadb851f8437c4b367f34d721ecc6c67
-      development_experiment_id: 84aa0e0fe7b5e53c2b930e0a2b6cfdefaecd2fe9632e8e5b60d683594fb9d11f
-      timing_record: search-r1-45-7-openvla_oft-5--vla_infoentropy_budget224
-    - development_summary_sha256: 732dfb3584158e9b073d0f1e01af551e9ac8f658c3b0bebe25941f0e2c299a65
-      development_experiment_id: 4a0dbae39850e5cd1ee459740cbcf938bc11634a459d843f286a062743007122
-      timing_record: search-r13-124-6-openvla_oft--vla_infoentropy_budget256
-    - development_summary_sha256: 7b1fed0defbff39987fe1c1cfaee540ac1c442b7c5782b4a94d3500582537dc8
-      development_experiment_id: f7246f5cd6687d505114d743907a738470b99b7ec46abffbc4df44249e1d3e04
-      timing_record: search-recovery-125-6-openvla_oft-0--vla_infoentropy_budget256_quotas20_30
+  development_summary_sha256: e9fee3f5972cbb18120d1a9123482fd7c091c2f3a250ee4473aab77ef9414a37
+  development_experiment_id: 079a455f6d895e8890c4f6a38e259960b313394edd4847c536c38e3278996825
+  timing_record: se2-r2-openvla_oft--vla_infoentropy_sdpa192
 - config: configs/experiments/openvla_oft/eco_vla_keep625.yaml
   status: primary
   section: '5.3'

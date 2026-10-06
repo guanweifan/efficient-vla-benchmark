@@ -70,3 +70,19 @@ per-view protection unions and bounded indexed KV storage are unchanged.
 There is no automatic cross-frame refresh or changed control cadence.
 This is an engineering revision of the same paper-based mechanism; previous
 eager-version accuracy/timing must not be relabeled as this implementation.
+
+## Selected Dev configurations
+
+Use `configs/experiments/openvla_oft/vla_infoentropy_sdpa192.yaml` or
+`configs/experiments/cogact/vla_infoentropy_protect140.yaml`. OFT uses a static
+candidate budget of 192 per view and the reference 40/60 protection quotas;
+CogACT uses 150 candidates and 56/84 quotas. Frozen Dev-200 gives 195/200 and
+177/200, respectively, at the fastest eligible measured settings. CogACT is
+exactly at the native-relative 3-percentage-point loss boundary. The 75-candidate
+CogACT alternative gives 184/200 with slightly lower measured speed and remains
+search evidence, not a second primary configuration.
+
+OFT has no reliable end-to-end acceleration at the accuracy target. Report that
+negative result; do not omit entropy costs or transfer old eager-version Final
+scores. Current paired timing and evidence identities are in
+`docs/benchmark_results.md`; this revision has not undergone Final-2000.

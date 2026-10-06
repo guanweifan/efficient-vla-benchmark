@@ -1,0 +1,4 @@
+extends:
+- sparsevlm.yaml
+parameters:
+  budget_scale: 0.875
