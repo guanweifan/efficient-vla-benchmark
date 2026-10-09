@@ -134,6 +134,27 @@ def test_rejects_incomparable_baseline(tmp_path, recorder):
         recorder.make_record(run, baseline, "5.3 Routing", "Example", "configs/example.yaml")
 
 
+def test_native_control_preserves_explicit_reference_and_sampler_difference(tmp_path, recorder):
+    run, baseline = tmp_path / "control", tmp_path / "native"
+    write_run(run)
+    write_run(baseline)
+    for path, steps, horizon in ((run, 4, 16), (baseline, 10, 8)):
+        meta = json.loads((path / "metadata.json").read_text())
+        meta["config"].update(
+            method="none",
+            execution_horizon=horizon,
+            backend_parameters={"num_ddim_steps": steps, "cfg_scale": 1.5},
+        )
+        (path / "metadata.json").write_text(json.dumps(meta))
+    record = recorder.make_record(run, baseline, "7", "Native control", "configs/control.yaml")
+    assert record["comparison_differences"]["execution_horizon"] == {"method": 16, "baseline": 8}
+    assert record["comparison_differences"]["backend_parameters"]["method"]["num_ddim_steps"] == 4
+    assert (
+        record["comparison_differences"]["backend_parameters"]["baseline"]["num_ddim_steps"] == 10
+    )
+    assert record["baseline"]["metadata"]["config"]["execution_horizon"] == 8
+
+
 def test_token_diagnostics_only_count_queries(recorder):
     rows = [
         {"queried": True, "diagnostics": {"visual_tokens_final": 512, "keyframe": True}},

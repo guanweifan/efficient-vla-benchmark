@@ -244,6 +244,12 @@ def make_record(run_dir, baseline_dir, section, label, preset, smoke_dir=None):
     a, b = left["config"]["execution_horizon"], right["config"]["execution_horizon"]
     if a != b:
         differences["execution_horizon"] = {"method": a, "baseline": b}
+    a, b = (
+        left["config"].get("backend_parameters", {}),
+        right["config"].get("backend_parameters", {}),
+    )
+    if a != b:
+        differences["backend_parameters"] = {"method": a, "baseline": b}
     a = left["backend"].get("method_details", {}).get("execution_horizon_policy", "native")
     b = right["backend"].get("method_details", {}).get("execution_horizon_policy", "native")
     if a != b:
@@ -276,8 +282,8 @@ def make_record(run_dir, baseline_dir, section, label, preset, smoke_dir=None):
         for key in ("backend", "model_variant", "method", "checkpoint_sha256", "precision"):
             if meta["backend"][key] != left["backend"][key]:
                 raise ValueError(f"Smoke identity differs: {key}")
-        for key in ("execution_horizon", "parameters"):
-            if meta["config"][key] != left["config"][key]:
+        for key in ("execution_horizon", "parameters", "backend_parameters"):
+            if meta["config"].get(key, {}) != left["config"].get(key, {}):
                 raise ValueError(f"Smoke configuration differs: {key}")
         record["smoke"] = {
             "run_id": smoke_dir.name,
