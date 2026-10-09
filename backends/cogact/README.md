@@ -31,6 +31,12 @@ versus [90, 80, ..., 0] for DDIM10. Thus these are native-budget controls, not
 endpoint-matched solver ablations. CFG remains 1.5; one paired CFG batch counts
 as one denoiser evaluation. No methods, training or cached history are added.
 
+Upstream DDIM still consumes one discarded noise draw per step when eta is zero.
+The native 4/5-step controls preserve those 4/5 draws; existing solver ports
+preserve the DDIM10 reference's ten draws. Identical episode seeds therefore do
+not couple subsequent-query noise across these controls. Together with different
+grids/starts, this prevents attributing every outcome difference to solver order.
+
 These three owner-specified supplementary controls are not new method scopes
 or candidates for primary selection. Dev-200 validates each fixed configuration;
 it does not choose among them or enforce the 3 pp selection target. All three

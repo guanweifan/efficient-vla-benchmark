@@ -423,6 +423,12 @@ Keep these results separately indexed; never relax primary-method readiness rule
 or replace an existing native H8 reference with a faster control. See the
 [CogACT native controls](../backends/cogact/README.md#fixed-native-controls).
 
+The result ledger marks independently audited native-control supplements.
+`readiness_report.py` refuses to overwrite that ledger in place: generate primary
+results to a separate ignored output, then reconcile and retain the supplementary
+evidence and its measured identities. Do not relabel controls as primary methods
+merely to make a primary-only exporter include them.
+
 1. Establish fidelity: identify the paper's core, compare executable reference or
    explicit equations, test active behavior and native/reset boundaries, and label
    independent cores and unverified conventions. Run the common smoke; runtime

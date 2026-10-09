@@ -327,3 +327,89 @@ CogACT Final losses versus native are 3.55 pp for SparseVLM and 4.20 pp for
 InfoEntropy; the 3 pp Dev target is not a guaranteed full-set accuracy bound.
 Local selection evidence: `outputs/sparse-entropy-v2/`; current complete readiness,
 primary CSV and scoped Final evidence: `outputs/sparse-entropy-final2000-v2/`.
+
+<!-- supplementary-native-controls -->
+## Supplementary native controls — 2026-10-09
+
+These are three owner-fixed native CogACT controls, not new methods or primary-selection candidates.
+All use the same joint-suite checkpoint and prediction horizon 16. Dev-200 validates each fixed
+configuration without tuning; DDIM4 is retained despite missing the primary-method Dev target.
+All three have a fresh, complete Final-2000 run. The existing 71 primary rows and codec evidence
+are unchanged; seven compatible retained references were audited, not rerun.
+
+### Fixed execution horizon
+
+| Configuration | Dev n/200 | Final SR (n/2000) | ms/control | Speedup | Replay queries | ms/query |
+|---|---:|---:|---:|---:|---:|---:|
+| Native DDIM10/H8 | 183 | 90.60% (1812) | 23.399 | 1.000× | 63 | 185.189 |
+| Native DDIM10/H16 | 180 | 89.95% (1799) | 11.988 | 1.961× | 32 | 186.617 |
+| PACE | 180 | 89.95% (1799) | 12.062 | 1.946× | 32 | 187.690 |
+| DVAC | 179 | 90.85% (1817) | 13.080 | 1.795× | 35 | 186.177 |
+| AutoHorizon | 182 | 90.75% (1815) | 13.632 | 1.716× | 36 | 188.655 |
+
+PACE and H16 have identical success/failure outcomes on all 2,000 paired episode identities.
+Only two episode query counts differ (21,805 versus 21,803 total); one episode step count differs.
+Thus this selected PACE configuration is close to fixed-H16 query behavior on this workload;
+the approximately 2× gain cannot be credited solely to adaptive selection. This does not assert
+identical actions or disprove PACE in general. DVAC/AutoHorizon trade more queries for
+observed success gains of 0.90/0.80 pp over fixed H16.
+
+### Native sampling budgets
+
+| Configuration | Dev n/200 | Final SR (n/2000) | ms/control | Speedup |
+|---|---:|---:|---:|---:|
+| Native DDIM10/H8 | 183 | 90.60% (1812) | 23.399 | 1.000× |
+| Native DDIM4/H8 | 176 | 87.40% (1748) | 19.760 | 1.189× |
+| DEIS (4 NFE) | 181 | 87.45% (1749) | 19.396 | 1.210× |
+| Native DDIM5/H8 | 184 | 89.65% (1793) | 20.165 | 1.170× |
+| DPM-Solver++ (5 NFE) | 186 | 90.50% (1810) | 19.486 | 1.201× |
+| UniPC (5 NFE) | 183 | 90.50% (1810) | 20.275 | 1.162× |
+
+DEIS4 and native DDIM4 differ by only one successful episode overall. The two 5-NFE solvers
+each exceed DDIM5 by 17 episodes (0.85 pp); this is a descriptive operating-point comparison,
+not statistical significance or an isolated solver-formula effect.
+
+Actual descending prediction grids are DDIM10 [90,80,70,60,50,40,30,20,10,0],
+DDIM4 [75,50,25,0], DDIM5 [80,60,40,20,0], DEIS4 [90,51,9,0], and
+DPM-Solver++5/UniPC5 [90,65,24,5,0]. One paired CFG batch counts as one NFE.
+Native eta-zero DDIM still consumes discarded random draws: 4/5 for the new reduced-step
+controls, versus ten retained by the existing solver ports. Episode seeds are the same,
+but subsequent-query noise paths are not forcibly coupled. Grids, starts, RNG consumption
+and previously selected solver settings therefore limit causal attribution.
+
+### Measurement scope and provenance
+
+All ten configurations round to 14.73 GiB peak allocated memory. Query counts/means above
+refer to the same 499-control replay, not closed-loop totals. Speedups use each row's own
+same-GPU native DDIM10/H8 pair, not division by the displayed retained native latency.
+Small timing differences are not reliable rankings; there is no repeated-run significance claim.
+
+| preset | Spatial /500 | Object /500 | Goal /500 | Long /500 | Untuned /1800 |
+|---|---:|---:|---:|---:|---:|
+| `native_h16` | 454 | 479 | 451 | 415 | 1619 (89.94%) |
+| `native_ddim4` | 458 | 484 | 438 | 368 | 1572 (87.33%) |
+| `native_ddim5` | 464 | 482 | 458 | 389 | 1609 (89.39%) |
+
+| preset | Final experiment ID | Timing record |
+|---|---|---|
+| `native_h16` | `44339df2aaaa2bd350f62ba8271ce35e6daac16c535b7346b4899f56bbce9d20` | `chapter7-native_h16-v2--native_h16` |
+| `native_ddim4` | `9a5d88a1c61591bd93df3a17e62d350df184abe14368f493549ea0484454ef4e` | `chapter7-native_ddim4-v1--native_ddim4` |
+| `native_ddim5` | `4d3e31d7d29d67b12e936462ce3a27fe7cbed7b04f932a1baede0aa92e456e3b` | `chapter7-native_ddim5-v1--native_ddim5` |
+
+New measurement commit: `0c9b8ae16fa0a839aab36bb94f743faf0eeb181d`.
+Canonical evidence: `outputs/chapter7-controls-v1/`; `results.csv` contains the three
+new controls, `comparison.csv` the ten distinct new/reference rows, `evidence.json`
+the Dev/Final/timing joins, and `audit.json` the strict acceptance checks.
+`reference-audit.json` records old-result compatibility; `horizon-comparison-audit.json`
+records the paired PACE/H16 check. Existing reference measurement identities remain unchanged.
+
+CSV SHA256: `d0e47d343bfc86b135f35b8e75231bbad0f0df6bf7fc284ed64d10ea44a8ba3e`.
+Comparison CSV SHA256: `2568e3c022f9b2690863da890b30eb93555969ffca32a3b0208c84f14b550690`.
+Evidence SHA256: `f12ade5e1b92cf4384d132e6cc0d06ec9fa69c73a445931913eab4a1f33d3e8e`.
+
+Integrity checks cover 600 Dev and 6,000 Final episodes, exact frozen identities/seeds,
+four suites per configuration, clean measured sources, and zero episode runtime errors.
+Two external-memory collisions occurred before any episode and were rescheduled without
+discarding outcomes. One thermally invalid H16 timing cohort was rejected; the first valid
+replacement was retained, not the fastest repeat. Its obsolete raw runs/logs were removed;
+compact retirement evidence and all valid failures remain.
