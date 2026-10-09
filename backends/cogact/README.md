@@ -21,6 +21,23 @@ read-only. The upstream `predict_action` implementation is retained unchanged.
 Training diffusion repeats are not inference denoising steps. Each is recorded
 separately; do not infer the sampler settings from the training repeat count.
 
+### Fixed native controls
+
+`native_h16` executes all sixteen already-predicted actions, retaining DDIM10.
+`native_ddim4` and `native_ddim5` retain H8 and use upstream `ddim4`/`ddim5`
+respacing without solver replacement. With the native 100-step training schedule,
+their descending prediction grids are [75, 50, 25, 0] and [80, 60, 40, 20, 0],
+versus [90, 80, ..., 0] for DDIM10. Thus these are native-budget controls, not
+endpoint-matched solver ablations. CFG remains 1.5; one paired CFG batch counts
+as one denoiser evaluation. No methods, training or cached history are added.
+
+These three owner-specified supplementary controls are not new method scopes
+or candidates for primary selection. Dev-200 validates each fixed configuration;
+it does not choose among them or enforce the 3 pp selection target. All three
+receive one Final-2000 run regardless of outcome after correctness checks.
+Speed references stay explicitly native DDIM10/H8. Report actual execution
+horizons, denoiser grids, query counts and full-control costs separately.
+
 ## Integration boundary
 
 The plugin owns model assembly, preprocessing and action conversion. The common

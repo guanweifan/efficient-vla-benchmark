@@ -1,0 +1,4 @@
+extends:
+  - baseline.yaml
+backend_parameters:
+  num_ddim_steps: 4

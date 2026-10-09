@@ -414,6 +414,15 @@ four smoke episodes never establish formal accuracy.
 
 ### Selection and final-measurement workflow
 
+Owner-specified fixed native controls are a separate supplementary population,
+not additional primary methods or a hyperparameter search. Freeze their declared
+contrasts before Dev-200, verify correctness, then retain every scheduled control
+for Final-2000 regardless of accuracy or speed. Explicitly pin the common native
+reference even when the control changes its executed horizon or sampler budget.
+Keep these results separately indexed; never relax primary-method readiness rules
+or replace an existing native H8 reference with a faster control. See the
+[CogACT native controls](../backends/cogact/README.md#fixed-native-controls).
+
 1. Establish fidelity: identify the paper's core, compare executable reference or
    explicit equations, test active behavior and native/reset boundaries, and label
    independent cores and unverified conventions. Run the common smoke; runtime
