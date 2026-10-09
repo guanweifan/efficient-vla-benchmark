@@ -17,6 +17,23 @@ def reporter():
     return module
 
 
+@pytest.mark.parametrize("content", [None, "# Primary results\n", "## Action codecs\n"])
+def test_primary_report_without_supplement_is_writable(reporter, tmp_path, content):
+    path = tmp_path / "report.md"
+    if content is not None:
+        path.write_text(content)
+    reporter.protect_supplementary_output(path)
+
+
+def test_independent_supplement_cannot_be_silently_erased(reporter, tmp_path):
+    path = tmp_path / "report.md"
+    content = "# Results\n<!-- supplementary-native-controls -->\nFrozen evidence\n"
+    path.write_text(content)
+    with pytest.raises(ValueError, match="independently audited native controls"):
+        reporter.protect_supplementary_output(path)
+    assert path.read_text() == content
+
+
 def fixture():
     config = asdict(ExperimentConfig.load(Path("configs/experiments/openvla_oft/fastv.yaml")))
     native = asdict(ExperimentConfig.load(Path("configs/experiments/openvla_oft/baseline.yaml")))

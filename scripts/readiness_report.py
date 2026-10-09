@@ -608,6 +608,15 @@ def render(report):
     return "\n".join(lines) + "\n"
 
 
+def protect_supplementary_output(path):
+    """Primary regeneration must not silently erase separately audited controls."""
+    if path.exists() and "<!-- supplementary-native-controls -->" in path.read_text():
+        raise ValueError(
+            "Output contains independently audited native controls; generate the primary "
+            "report to a different ignored output and reconcile the supplementary evidence"
+        )
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--selection", type=Path, required=True)
@@ -621,6 +630,7 @@ def main():
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--evidence-output", type=Path, required=True)
     a = p.parse_args()
+    protect_supplementary_output(a.output)
     selection = yaml.safe_load(a.selection.read_text())
     summaries = {digest_file(f): json.loads(f.read_text()) for f in a.development_summary}
     selected = selection["configurations"] + selection.get("auxiliary_configurations", [])
