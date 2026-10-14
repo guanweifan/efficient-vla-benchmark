@@ -699,6 +699,11 @@ The default records directory is `outputs/result_records/`; `--records-dir` may
 select another ignored local directory. Export verifies counts, sums and compatible
 checkpoint/source/runtime/hardware/traces/protocol. Omit `--smoke-dir` if unavailable.
 Each summary row retains a run ID, paired reference and record digest. Records are
+strict by default. If only nonruntime files changed, export may explicitly use
+`--allow-nonruntime-source-change`; it still requires identical runtime-source
+fingerprints, dependencies, hardware and protocol, and discloses both original
+source IDs. This cannot authorize any changed inference code.
+Records are
 immutable while retained: do not rewrite earlier evidence or manually edit generated
 metrics. Immutability does not require indefinite retention of retired experiments.
 

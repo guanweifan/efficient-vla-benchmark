@@ -110,6 +110,40 @@ def test_external_runtime_opt_in_requires_engine_identity(tmp_path, recorder):
         )
 
 
+@pytest.mark.parametrize(
+    "invalid", [None, "missing_source", "missing_runtime", "changed_runtime", "packages"]
+)
+def test_nonruntime_source_change_is_explicit_and_narrow(tmp_path, recorder, invalid):
+    run, baseline = tmp_path / "method", tmp_path / "baseline"
+    write_run(run)
+    write_run(baseline)
+    for directory, source in ((run, "a" * 64), (baseline, "b" * 64)):
+        meta = json.loads((directory / "metadata.json").read_text())
+        meta["source"].update(source_sha256=source, runtime_source_sha256="c" * 64)
+        if directory == run:
+            if invalid == "missing_source":
+                meta["source"].pop("source_sha256")
+            elif invalid == "missing_runtime":
+                meta["source"].pop("runtime_source_sha256")
+            elif invalid == "changed_runtime":
+                meta["source"]["runtime_source_sha256"] = "d" * 64
+            elif invalid == "packages":
+                meta["source"]["packages"] = {"torch": "different"}
+        (directory / "metadata.json").write_text(json.dumps(meta))
+    with pytest.raises(ValueError, match="software"):
+        recorder.make_record(run, baseline, "3.3", "Example", "configs/example.yaml")
+    kwargs = dict(allow_nonruntime_source_change=True)
+    if invalid:
+        with pytest.raises(ValueError, match="software"):
+            recorder.make_record(run, baseline, "3.3", "Example", "configs/example.yaml", **kwargs)
+    else:
+        result = recorder.make_record(
+            run, baseline, "3.3", "Example", "configs/example.yaml", **kwargs
+        )
+        assert result["comparison_differences"]["nonruntime_source"]["method"] == "a" * 64
+        assert result["run"]["metadata"]["source"]["source_sha256"] == "a" * 64
+
+
 def test_dated_review_survives_regeneration_without_becoming_evidence(tmp_path, recorder):
     run = tmp_path / "example-run"
     write_run(run)

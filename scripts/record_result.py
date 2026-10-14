@@ -226,6 +226,7 @@ def make_record(
     preset,
     smoke_dir=None,
     allow_execution_runtime_change=False,
+    allow_nonruntime_source_change=False,
 ):
     run, baseline = timing_evidence(run_dir), timing_evidence(baseline_dir)
     left, right = run["metadata"], baseline["metadata"]
@@ -246,7 +247,28 @@ def make_record(
         right_hardware = {k: v for k, v in right_hardware.items() if k not in excluded}
     if left_hardware != right_hardware:
         raise ValueError("Incomparable baseline hardware")
-    for key in ("source_sha256", "submodules", "packages", "cuda_extension_sha256"):
+    source_difference = None
+    if left["source"].get("source_sha256") != right["source"].get("source_sha256"):
+        runtime = left["source"].get("runtime_source_sha256")
+        if (
+            not allow_nonruntime_source_change
+            or any(
+                not isinstance(s.get("source_sha256"), str)
+                or not re.fullmatch(r"[0-9a-f]{64}", s["source_sha256"])
+                for s in (left["source"], right["source"])
+            )
+            or not isinstance(runtime, str)
+            or not re.fullmatch(r"[0-9a-f]{64}", runtime)
+            or runtime != right["source"].get("runtime_source_sha256")
+        ):
+            raise ValueError("Incomparable baseline software: source_sha256")
+        source_difference = {
+            "method": left["source"]["source_sha256"],
+            "baseline": right["source"]["source_sha256"],
+            "identical_runtime_source_sha256": runtime,
+            "scope": "nonruntime_files_only_original_source_ids_preserved",
+        }
+    for key in ("submodules", "packages", "cuda_extension_sha256"):
         if left["source"].get(key) != right["source"].get(key):
             raise ValueError(f"Incomparable baseline software: {key}")
     if (
@@ -255,6 +277,8 @@ def make_record(
     ):
         raise ValueError("Incomparable baseline control-step count")
     differences = {}
+    if source_difference is not None:
+        differences["nonruntime_source"] = source_difference
     if allow_execution_runtime_change:
         differences["execution_runtime"] = {
             "method": left["backend"]["execution_runtime"],
@@ -861,6 +885,11 @@ def main():
         help="Disclose a checksummed external engine against native execution",
     )
     export.add_argument("--supersedes", action="append", default=[], metavar="RUN_ID")
+    export.add_argument(
+        "--allow-nonruntime-source-change",
+        action="store_true",
+        help="Disclose changed nonruntime files; require identical runtime code and dependencies",
+    )
     for name in ("section", "label", "preset"):
         export.add_argument(f"--{name}", required=True)
     table = commands.add_parser("render")
@@ -880,6 +909,7 @@ def main():
             args.preset,
             args.smoke_dir,
             allow_execution_runtime_change=args.allow_execution_runtime_change,
+            allow_nonruntime_source_change=args.allow_nonruntime_source_change,
         )
         annotate_supersedes(record, args.supersedes, args.records_dir)
         args.records_dir.mkdir(parents=True, exist_ok=True)
