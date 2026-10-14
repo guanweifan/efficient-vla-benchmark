@@ -1,0 +1,10 @@
+method: motion_vq
+parameters:
+  threshold: 0.8
+  calibration_samples: 40
+  calibration_seed: 0
+  calibration_tokens: 256
+  kmeans_iterations: 20
+  block_batch_size: 4
+  hessian_damping: 0.01
+  kmeans_seed: 42
