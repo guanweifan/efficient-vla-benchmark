@@ -15,16 +15,16 @@ multiplication/accumulation precision, target coverage and all cast/reorder cost
 Tile-dequantized floating GEMM is real packed execution, not integer-MMA speed.
 
 The [shared packed operations](../src/efficient_vla_benchmark/model_ops/quantization/README.md)
-and [QVLA](../src/efficient_vla_benchmark/methods/quantization/qvla/README.md)/
-[QuantVLA](../src/efficient_vla_benchmark/methods/quantization/quantvla/README.md)
-components are feasibility-only and deliberately absent from method discovery.
-Their successful smoke does not add algorithms to the primary result table.
+support registered [QVLA](../src/efficient_vla_benchmark/methods/quantization/qvla/README.md)
+and [QuantVLA](../src/efficient_vla_benchmark/methods/quantization/quantvla/README.md)
+candidates. Registration and successful kernel/smoke checks do not add algorithms
+to the primary result table; Dev selection and valid timing are separate gates.
 
-| Scope | Admission work still required |
+| Scope | Artifact and fidelity contract |
 |---|---|
-| QVLA | Recompute training-only sensitivities and use the verified official absolute-cost allocation; old gates are runtime fixtures only. |
-| QuantVLA | Integrate calibrated DuQuant and ATM/OHB into a validated artifact/method lifecycle, then time the complete packed path. |
-| ActQuant | Floating-runtime and packed-kernel feasibility passed; training-only HSIC/AMF calibration and portable artifact/lifecycle integration are still required. Dense handover weights are not the author's GGUF calibration/output chain. |
+| QVLA | Schema 4: training-only batch-normalized Hessian proxy and official absolute-cost channel allocation. This is the public-code proxy, not action-space intervention; old gates are rejected. |
+| QuantVLA | Schema 3: native-dtype DuQuant, five-point MSE weight scaling, frozen A8 percentiles and calibrated ATM/OHB. All transformations are timed; handover schema 2 is rejected. |
+| ActQuant | Complete training-only HSIC/AMF and checksummed mixed-GGUF artifacts; exact registered/direct-author runtime and lifecycle checks. Dense handover weights are not the author's GGUF calibration/output chain. Dev selection, timing and final results remain separate admission gates. |
 
 ActQuant's [author runtime](https://github.com/arashakb/ActQuant/tree/b64791125070652fe6b554e244fe809c79ef5246)
 was built in ignored project-local storage with Rust/Cargo 1.90.0, pybind11 2.13.6,
@@ -47,8 +47,10 @@ The author's default F16 export had one gate failure and is not the selected con
 An uncalibrated Q4_0 probe confirmed 224 packed LLM projections and 224 Q4 CUDA
 matrix-multiply calls, with internal Q8_1 activation quantization. This is kernel
 feasibility, not W4A16 or a calibrated ActQuant result. Neither this probe nor the
-floating smoke establishes ActQuant success rate or speedup. Do not register the
-method or add a formal row before calibration and lifecycle admission. Existing
+floating smoke establishes ActQuant success rate or speedup. Calibrated admission
+requires both HSIC and AMF, actual tensor-type/kernel verification, exact
+registered/direct-author outputs and reset/reload checks. A formal result row
+additionally needs complete selection and measurement evidence. Existing
 AWQ admission, timing protocol and selected formal results remain unchanged.
 
 ## Architecture

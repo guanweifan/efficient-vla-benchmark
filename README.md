@@ -9,8 +9,8 @@ weights, datasets or raw experiment artifacts.
 
 | Backend / variant | Token reduction | Caching | Model routing | Action chunking | Quantization |
 |---|---|---|---|---|---|
-| OpenVLA-OFT / libero_joint | See token methods below | VLA-Cache, VLA-InfoEntropy, Temporal Redundancy visual core, ASR KV reuse | SP-VLA, EcoVLA | PACE Cartesian core | AWQ W4A16 |
-| CogACT / libero_joint | See token methods below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache, BAC, V-AEFusion, EVO, TeaCache | SP-VLA, EcoVLA | VOTE H8 two-vote adaptation, PACE Cartesian core, AutoHorizon, DVAC, AAC, A³ official-code version | AWQ W4A16 |
+| OpenVLA-OFT / libero_joint | See token methods below | VLA-Cache, VLA-InfoEntropy, Temporal Redundancy visual core, ASR KV reuse | SP-VLA, EcoVLA | PACE Cartesian core | AWQ W4A16, QVLA official-code proxy, ActQuant mixed-GGUF |
+| CogACT / libero_joint | See token methods below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache, BAC, V-AEFusion, EVO, TeaCache | SP-VLA, EcoVLA | VOTE H8 two-vote adaptation, PACE Cartesian core, AutoHorizon, DVAC, AAC, A³ official-code version | AWQ W4A16, QuantVLA packed W4A8 |
 | starVLA | Source pinned only; runtime not implemented | — | — | — | — |
 
 Action generation additionally exposes KeyStone (batched native candidates and
@@ -22,6 +22,15 @@ that CogACT was flow-matching trained. Fixed-Euler presets are diagnostic contro
 Registration is not a measured acceleration claim; consult the result ledger for
 completed measurements. Diffusion-sampler replacements and stochastic-candidate
 methods do not support OFT's deterministic L1 head.
+
+QVLA follows the released input-Hessian proxy, not the paper's action-space
+intervention formulation. QuantVLA includes calibrated rotations and ATM/OHB.
+Both require checksummed training-only artifacts. Their packed kernels locally
+dequantize tiles for floating GEMM; they are not integer-MMA implementations or
+measured speedup claims. Read the method scope before using any result.
+ActQuant additionally requires the pinned author engine through `--runtime-path`
+and complete HSIC/AMF artifacts. Its floating-runtime control is an auxiliary,
+not a second quantization algorithm or a substitute native reference.
 
 PACE, AutoHorizon, DVAC and AAC select a real prefix of the unchanged native
 prediction; no padding or longer learned action head is introduced. Native H8
