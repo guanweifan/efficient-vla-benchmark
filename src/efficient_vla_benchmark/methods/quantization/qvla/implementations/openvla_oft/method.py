@@ -58,6 +58,9 @@ class QVLA(InferenceMethod):
         return {
             "artifact_sha256": self.identity,
             "scope": "vision_and_language_active_linear_conv",
+            "allocation_scope": "joint_zero_bit_and_quantization"
+            if 0 in self.config.candidate_bits
+            else "quantization_only_no_zero_bit",
             "calibration": self.config.calibration_parameters(),
             "packed_target_modules": self.count,
             "channel_counts_by_bit": self.histogram,

@@ -26,6 +26,13 @@ Runtime scale estimation, division and rounding use the checkpoint's native dtyp
 matching the official injector; sensitivity estimation remains FP32 as in its
 separate calibration script. The previous FP32 runtime rounding is superseded,
 not numerically equivalent, and requires fresh Dev/timing evidence.
+
+Explicit `quant_only` diagnostic presets exclude zero-bit pruning and 2-bit rows
+while retaining the same frozen sensitivity and channel-wise allocation rule.
+They isolate whether aggressive pruning drives collapse; they are NOT evidence
+for the full joint pruning/quantization setting. Candidate restrictions and the
+channel-weighted budget remain in the artifact/config identity. Reallocation may
+only select bits already present in the frozen sensitivity measurements.
 Uniform nonzero groups bypass redundant output allocation/scatter. After complete
 validation and CPU preparation, conversion offloads each original target before
 installing its packed replacement, avoiding simultaneous residency of two models.

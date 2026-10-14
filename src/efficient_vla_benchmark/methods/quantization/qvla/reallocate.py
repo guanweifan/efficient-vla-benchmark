@@ -13,17 +13,23 @@ from .artifact import read_manifest
 from .config import QVLAConfig
 
 
-def reallocate(root, output, target_avg_bits):
+def reallocate(root, output, target_avg_bits, candidate_bits=None):
     import torch
 
     previous = json.loads((root / "manifest.json").read_text())
     config = QVLAConfig.parse(previous["config"])
     previous = read_manifest(root, config)
-    updated = replace(config, target_avg_bits=target_avg_bits)
+    updated = replace(
+        config,
+        target_avg_bits=target_avg_bits,
+        candidate_bits=config.candidate_bits if candidate_bits is None else tuple(candidate_bits),
+    )
     QVLAConfig.parse(updated.calibration_parameters())
     if output.exists() or output.resolve().is_relative_to(root.resolve()):
         raise ValueError("Use a new artifact outside the calibration directory")
     proxies = torch.load(root / "sensitivity.pt", map_location="cpu", weights_only=True)
+    if any(not set(updated.candidate_bits).issubset(scores) for scores in proxies.values()):
+        raise ValueError("Requested candidate has no frozen sensitivity evidence")
     gates, stats = greedy_allocate(proxies, updated.candidate_bits, updated.target_avg_bits)
     if set(proxies) != set(previous["target_modules"]):
         raise ValueError("Sensitivity target coverage mismatch")
@@ -49,8 +55,15 @@ def main():
     parser.add_argument("--artifact-path", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--target-avg-bits", type=float, required=True)
+    parser.add_argument("--candidate-bits", type=int, nargs="+")
     args = parser.parse_args()
-    print(json.dumps(reallocate(args.artifact_path, args.output, args.target_avg_bits)["stats"]))
+    print(
+        json.dumps(
+            reallocate(args.artifact_path, args.output, args.target_avg_bits, args.candidate_bits)[
+                "stats"
+            ]
+        )
+    )
 
 
 if __name__ == "__main__":
