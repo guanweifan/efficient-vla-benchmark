@@ -13,10 +13,12 @@ from efficient_vla_benchmark.methods.quantization.motion_vq.router import Motion
 
 
 @pytest.mark.parametrize("bits", [6, 8])
-def test_unsigned_index_packing_roundtrip(bits):
+@pytest.mark.parametrize("dtype", [torch.int64, torch.int32, torch.uint8])
+def test_unsigned_index_packing_roundtrip(bits, dtype):
     torch.manual_seed(9)
     x = torch.randint(1 << bits, (128, 256))
-    packed = pack_indices(x, bits)
+    x[0, :2] = torch.tensor([0, (1 << bits) - 1])
+    packed = pack_indices(x.to(dtype), bits)
     assert packed.numel() == x.numel() * bits // 8
     torch.testing.assert_close(unpack_indices(packed, bits), x, atol=0, rtol=0)
 
@@ -72,3 +74,23 @@ def test_centroid_kernel_matches_reconstructed_oracle(block, centers, bits):
     x = torch.randn(35, k, device="cuda", dtype=torch.bfloat16)
     torch.testing.assert_close(op(x), F.linear(x, weight), atol=0.01, rtol=0.01)
     assert op.kernel_invocations == 1
+
+
+@pytest.mark.gpu
+@pytest.mark.parametrize("block,centers,bits", [(128, 64, 6), (256, 256, 8)])
+@torch.inference_mode()
+def test_calibration_uint8_storage_reaches_packed_kernel(block, centers, bits):
+    from efficient_vla_benchmark.methods.quantization.motion_vq.codebook import quantize_weight
+    from efficient_vla_benchmark.methods.quantization.motion_vq.packed import PackedCodebookLinear
+
+    torch.manual_seed(41)
+    weight = (torch.randn(block, block, device="cuda") * 0.02).bfloat16()
+    config = MotionVQConfig(kmeans_iterations=2, block_batch_size=1)
+    entry = quantize_weight(weight, torch.ones(block, device="cuda"), block, centers, config)
+    assert entry["indices"].dtype == torch.uint8
+    indices = unpack_indices(entry["indices"], bits).T.repeat_interleave(2, dim=1)
+    cols = torch.arange(block)[None, :] % 2
+    dense = entry["codebooks"][0, indices, cols].cuda()
+    op = PackedCodebookLinear(entry).cuda()
+    x = torch.randn(35, block, device="cuda", dtype=torch.bfloat16)
+    torch.testing.assert_close(op(x), F.linear(x, dense), atol=0.01, rtol=0.01)

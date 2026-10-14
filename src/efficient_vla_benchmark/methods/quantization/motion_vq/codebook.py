@@ -45,7 +45,8 @@ def weighted_kmeans(vectors, weights, centers, iterations):
 def pack_indices(values, bits):
     if bits not in (6, 8) or values.dtype not in (torch.int64, torch.int32, torch.uint8):
         raise ValueError("Invalid centroid index representation")
-    if values.ndim != 2 or not bool(((values >= 0) & (values < (1 << bits))).all()):
+    bounds = values.to(torch.int32)
+    if values.ndim != 2 or not bool(((bounds >= 0) & (bounds < (1 << bits))).all()):
         raise ValueError("Invalid centroid indices")
     if bits == 8:
         return values.to(torch.uint8).contiguous()
