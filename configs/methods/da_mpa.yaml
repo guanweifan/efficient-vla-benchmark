@@ -1,0 +1,11 @@
+method: da_mpa
+parameters:
+  calibration_samples: 512
+  calibration_seed: 0
+  probe_steps: 16
+  damping: 0.0003
+  translation_weight: 1.8
+  rotation_weight: 0.15
+  retention_ratio: 0.3
+  exclude_final_blocks: 2
+  activation_percentile: 99.9

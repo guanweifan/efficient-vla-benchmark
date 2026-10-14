@@ -1,0 +1,3 @@
+extends:
+  - baseline.yaml
+  - ../../methods/da_mpa.yaml

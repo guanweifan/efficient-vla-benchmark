@@ -1,0 +1,13 @@
+schema_version: 1
+name: da_mpa
+category: quantization
+description: DA-PTQ drift-aware mixed-precision component, explicitly excluding unresolved CSRC.
+config: efficient_vla_benchmark.methods.quantization.da_mpa.config:DAMPAConfig
+requires_artifact: true
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [llama_decoder]
+    factory: efficient_vla_benchmark.methods.quantization.da_mpa.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.quantization.da_mpa.implementations.cogact.api:preflight
+    calibrate: efficient_vla_benchmark.methods.quantization.da_mpa.implementations.cogact.api:calibrate
