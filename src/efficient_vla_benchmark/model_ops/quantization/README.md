@@ -1,0 +1,38 @@
+# Packed quantization operations
+
+Optional Torch/Triton operations, independent of methods, backends and calibration.
+These are feasibility primitives, not a selectable quantization algorithm.
+
+- `packed.py`: signed two's-complement 2/4/8-bit row packing into uint8.
+  `unpack_signed` is a diagnostic oracle, never the production forward path.
+- `linear.py`: converts integer codes once, owns packed buffers/scales and exposes
+  `execution_metadata()`. Same-topology `state_dict` reload is supported. Constructor
+  geometry, bit width and activation-scale policy are part of the caller's artifact
+  identity, not inferred from raw tensor names.
+- `kernel.py`: tile-local unpack/dequantization inside GEMM; no persistent or
+  per-query full floating weight reconstruction. Floating products accumulate in
+  FP32; this is **not** an integer-MMA W4A8 kernel. No silent CPU fallback.
+
+Weights have per-row or per-row/K-group scales. Optional activations are stored
+as INT8, with per-input-channel scales **inside** the K reduction. Replacing these
+scales with a group maximum changes the quantizer and is not allowed. Bias is
+added before output rounding; methods with output transforms own their later bias.
+FP16/BF16/FP32 output precision is retained. The explicit scale-rounding flag
+distinguishes float-scale weight-only quantization from the calibrated A8 path.
+
+Callers own target selection, calibration, checkpoint/artifact verification,
+conversion lifetime and native precision. They must supply colocated tensors and
+use a fresh native model to undo irreversible conversion. Do not compose this
+implementation with AWQ or silently replace its author kernel.
+
+Tests cover packing tails, signed extremes, group tails, real GPU execution,
+activation scales, bias, all three precisions, reload, empty batches and rejection
+of CPU execution. Run explicitly in an authorized backend runtime:
+
+```bash
+python -m pytest src/efficient_vla_benchmark/model_ops/quantization/tests
+```
+
+Full method admission additionally requires checkpoint-matched calibration,
+whole-policy reference checks, native protocol smoke and full-cost replay timing.
+Packing efficiency alone is neither a latency claim nor evidence of task accuracy.
