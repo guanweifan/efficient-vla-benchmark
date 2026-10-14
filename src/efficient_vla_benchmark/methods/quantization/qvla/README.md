@@ -1,33 +1,32 @@
-# QVLA runtime feasibility components
+# QVLA — official-code Hessian proxy, OFT packed runtime
 
-Status: **not registered, not a completed reproduction, not a formal result row**.
-These components establish mixed-channel packed execution before calibration and
-backend admission. No experiment YAML or catalog metadata is intentionally exposed.
+Reference: [pinned official source](https://github.com/AutoLab-SAI-SJTU/QVLA/tree/26cc4821a3be4c003d09d3c7997b38db2a347982).
+The supported port is OFT LIBERO joint BF16 H8. Registration does not certify
+Dev/final results; the central ledger owns measurement status.
 
-Reference: [official allocation source](https://github.com/AutoLab-SAI-SJTU/QVLA/blob/26cc4821a3be4c003d09d3c7997b38db2a347982/openvla-oft/qvla/assign_gates_from_sensitivity.py).
-`allocation.py` implements the absolute lower-bit sensitivity cost per saved bit,
-with stable candidate insertion order. It is not marginal-error demotion. The
-budget is channel-average bit width, not parameter-weighted model bits/weight.
+Training-only calibration gathers native vision/language Linear and non-grouped
+Conv2d input covariance. The released recurrence normalizes by batch examples,
+**not token count**. Dead columns, 1% mean-diagonal damping, inverse-Cholesky
+diagonal weighting and per-output-channel candidate quantization errors follow
+the public code. This is explicitly the **official-code input-Hessian proxy**,
+not a claim to reproduce the paper's action-space intervention formulation.
 
-`packed.py` groups output rows by 0/2/4/8/16-bit assignment and restores their original
-order. Zero-bit rows retain bias, 16-bit rows retain native floating weights, and
-2/4/8-bit rows use shared packed kernels. Bias is included before output rounding.
-Non-grouped zero-padded Conv2d uses unfold plus the same row execution; unfold,
-scattering and all precision conversion must be included in future timing.
+`allocation.py` uses absolute lower-bit sensitivity cost per saved bit, stable
+candidate insertion order and a global channel-average budget. It is not
+marginal-error demotion or parameter-weighted model bits/weight. All active native
+target modules are covered; dormant modules are recorded and retained unchanged.
+Projectors, action head, LM head, normalizations and biases retain native precision.
 
-The initial OFT diagnostic uses a checkpoint-matched handover allocation across
-430 vision/language modules and verifies packed outputs against an independently
-constructed dense quantization oracle. That allocation used a different greedy
-cost; it is retained **only as a runtime layout fixture**. Scores were not saved,
-so the official allocator needs fresh training-only calibration before admission.
-Do not relabel these gates as official-code allocation or report this smoke as
-formal QVLA accuracy. The oracle is not a speed competitor or production fallback.
+Runtime groups output channels by 0/2/4/8/16 bits and restores original order.
+Zero-bit rows retain bias; 16-bit rows retain native floating weights. Quantized
+rows use physically packed kernels with tile-local floating dequantization, not
+integer MMA or a persistent full floating-weight reconstruction. Conv2d unfolding,
+row scatter and conversion are included in timing; compression need not accelerate.
 
-Tests cover absolute-versus-marginal allocation, mixed and zero-only precision,
-all-native exact identity, bias, output order, convolution and same-topology reload.
-The GPU model probe/episodes remain ignored diagnostic evidence. CogACT artifact
-availability does not establish tested CogACT runtime support.
-
-Remaining gates: calibration/provenance, supported target validation, irreversible
-method lifecycle, backend bindings/configuration, fresh reload, compact replay,
-then the owner's Dev/final schedule. Do not infer paper-wide support from primitives.
+Use `evb calibrate` with `openvla_oft/qvla.yaml`, explicit model/dataset/artifact
+locations. The result contains schema-4 manifest, sensitivity scores and gates;
+`--artifact-path` validates source/config/checkpoint, checksums and full coverage.
+Legacy handover gates used a different allocator/covariance normalization and
+are rejected for formal evaluation. Conversion is irreversible and native reload
+is mandatory before another method. Saved sensitivities can support new channel
+budgets without recollecting observations, with a new immutable artifact identity.

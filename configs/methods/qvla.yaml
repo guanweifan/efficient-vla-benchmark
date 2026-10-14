@@ -1,0 +1,7 @@
+method: qvla
+parameters:
+  target_avg_bits: 4.0
+  candidate_bits: [0, 2, 4, 8, 16]
+  calibration_samples: 32
+  calibration_seed: 0
+  percdamp: 0.01

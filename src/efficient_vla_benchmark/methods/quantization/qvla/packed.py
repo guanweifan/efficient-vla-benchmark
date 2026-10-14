@@ -41,7 +41,7 @@ class MixedBitLinear(nn.Module):
                 self.groups[str(bit)] = dense
             else:
                 maximum = (1 << (bit - 1)) - 1
-                scale = selected.float().abs().amax(1).clamp_min(1e-8) / maximum
+                scale = selected.float().abs().amax(1).clamp_min(1e-6) / maximum
                 codes = (
                     (selected.float() / scale[:, None])
                     .round()

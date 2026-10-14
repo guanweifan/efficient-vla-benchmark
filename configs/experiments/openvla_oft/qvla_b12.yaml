@@ -1,0 +1,4 @@
+extends:
+  - qvla.yaml
+parameters:
+  target_avg_bits: 12.0
