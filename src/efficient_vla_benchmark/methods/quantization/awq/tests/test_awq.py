@@ -58,7 +58,13 @@ def test_calibration_padding_preserves_independent_observations():
     actual = layer(inputs, **layer_arguments(valid, inputs.dtype))[0]
     for index, sample in enumerate(samples):
         positions = torch.arange(sample.shape[1]).unsqueeze(0)
-        expected = layer(sample, position_ids=positions, use_cache=False)[0]
+        # This fixture checks OFT's full visibility. Stock CogACT Transformers
+        # defaults to causal SDPA when the mask is omitted, unlike OFT's fork.
+        # Use an independent explicit zero mask, not the helper being tested.
+        full_visibility = torch.zeros(1, 1, sample.shape[1], sample.shape[1])
+        expected = layer(
+            sample, attention_mask=full_visibility, position_ids=positions, use_cache=False
+        )[0]
         torch.testing.assert_close(actual[index, : sample.shape[1]], expected[0], atol=1e-6, rtol=0)
 
 
