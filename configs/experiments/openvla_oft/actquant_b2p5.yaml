@@ -1,0 +1,4 @@
+extends:
+  - actquant.yaml
+parameters:
+  target_bpw: 2.5

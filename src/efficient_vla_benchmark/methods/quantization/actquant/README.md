@@ -64,3 +64,6 @@ checks actual GGUF tensor types, and produces an immutable runtime artifact.
 All paths are CLI-only. Each runtime artifact binds checkpoint, calibration,
 allocation, weight files and compiled binary checksums. Uncalibrated Q4 diagnostic
 exports cannot satisfy this contract and are never formal ActQuant results.
+Launch offline GGUF packing with `CUDA_VISIBLE_DEVICES=""`: the author CPU
+quantizer otherwise initializes idle CUDA contexts on all visible devices.
+This setting is for packing only, not CUDA policy evaluation.
