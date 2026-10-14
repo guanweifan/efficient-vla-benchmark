@@ -14,6 +14,7 @@ class RuntimeResources:
     artifact_path: Path | None = None
     dataset_path: Path | None = None
     artifact_dir: Path | None = None
+    runtime_path: Path | None = None
 
 
 @dataclass(frozen=True)

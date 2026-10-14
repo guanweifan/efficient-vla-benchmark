@@ -44,6 +44,7 @@ def parser():
         command.add_argument("--config", type=Path, required=True)
         command.add_argument("--model-path", type=Path, required=True)
         command.add_argument("--device", default="cuda:0")
+        command.add_argument("--runtime-path", type=Path)
     for command in (check, evaluate, timing):
         command.add_argument("--artifact-path", type=Path)
     calibration.add_argument("--dataset-path", type=Path, required=True)
@@ -112,6 +113,7 @@ def protect_resources(args):
             "libero_root",
             "dataset_path",
             "artifact_path",
+            "runtime_path",
         )
     ]
     if any(
@@ -250,10 +252,13 @@ def main(argv=None):
                 args.device,
                 dataset_path=args.dataset_path,
                 artifact_dir=args.artifact_dir,
+                runtime_path=args.runtime_path,
             ),
         )
         return
-    backend = build_backend(config, args.model_path, args.device, args.artifact_path)
+    backend = build_backend(
+        config, args.model_path, args.device, args.artifact_path, args.runtime_path
+    )
     try:
         if args.command == "check-model":
             print(json.dumps(backend.metadata(), indent=2))

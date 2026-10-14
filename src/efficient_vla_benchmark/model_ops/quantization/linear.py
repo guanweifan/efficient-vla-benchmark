@@ -16,6 +16,8 @@ class PackedLinear(nn.Module):
         group_size=None,
         bias=None,
         activation_amax=None,
+        activation_step=None,
+        activation_qmin=-127,
         round_weight_scale=False,
     ):
         super().__init__()
@@ -34,6 +36,18 @@ class PackedLinear(nn.Module):
         self.register_buffer("packed_weight", pack_signed(codes, bits))
         self.register_buffer("weight_scale", scales.detach().float().contiguous())
         self.register_buffer("activation_amax", None)
+        self.register_buffer("activation_step", None)
+        if activation_amax is not None and activation_step is not None:
+            raise ValueError("Supply an activation maximum OR a frozen step, not both")
+        if type(activation_qmin) is not int or activation_qmin not in (-128, -127):
+            raise ValueError("Unsupported signed A8 range")
+        self.activation_qmin = activation_qmin
+        if activation_step is not None:
+            if activation_step.shape != (self.in_features,) or not bool(
+                torch.isfinite(activation_step).all() & (activation_step > 0).all()
+            ):
+                raise ValueError("Activation step must be finite positive input-channel scales")
+            self.activation_step = activation_step.detach().float().contiguous()
         if activation_amax is not None:
             if activation_amax.shape != (self.in_features,):
                 raise ValueError("Activation scale must be per input channel")
@@ -64,11 +78,15 @@ class PackedLinear(nn.Module):
 
         shape = inputs.shape[:-1]
         flat = inputs.reshape(-1, self.in_features).contiguous()
-        quant_a = self.activation_amax is not None
+        quant_a = self.activation_amax is not None or self.activation_step is not None
         step = self.weight_scale  # valid unused pointer for weight-only specialization
         if quant_a:
-            step = (self.activation_amax.to(inputs.dtype) / 127.0).clamp_min(1e-8)
-            flat = (flat / step).round().clamp(-127, 127).to(torch.int8)
+            step = (
+                self.activation_step.to(inputs.dtype)
+                if self.activation_step is not None
+                else (self.activation_amax.to(inputs.dtype) / 127.0).clamp_min(1e-8)
+            )
+            flat = (flat / step).round().clamp(self.activation_qmin, 127).to(torch.int8)
         output = torch.empty(
             (flat.shape[0], self.out_features), device=inputs.device, dtype=inputs.dtype
         )
@@ -102,8 +120,14 @@ class PackedLinear(nn.Module):
         return {
             "storage": "signed_twos_complement_low_bits_first_uint8",
             "weight_bits": self.bits,
-            "activation_bits": 8 if self.activation_amax is not None else None,
-            "activation_scale_axis": "input_channel" if self.activation_amax is not None else None,
+            "activation_bits": 8
+            if self.activation_amax is not None or self.activation_step is not None
+            else None,
+            "activation_scale_axis": "input_channel"
+            if self.activation_amax is not None or self.activation_step is not None
+            else None,
+            "activation_qmin": self.activation_qmin,
+            "frozen_activation_step": self.activation_step is not None,
             "kernel": "triton_tile_dequant_float_gemm",
             "accumulation": "float32",
             "integer_mma": False,

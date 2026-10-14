@@ -635,6 +635,16 @@ source identity and explicitly audit cross-revision Dev/timing joins.
 
 ## Record results
 
+An optional backend may expose `install_execution_runtime` for a complete external
+engine. A method binding supplies `prepare`, `forward`, `reset`, `close`, `metadata`
+and a compatible `monitor`; common evaluation/profiling stays algorithm-agnostic.
+Installation is fresh-instance-only and irreversible. Native preprocessing,
+readout, normalization and action conventions require explicit parity tests.
+Pass the isolated engine location through `--runtime-path`, never through presets.
+External allocations invisible to Torch must be reported as unavailable, not zero.
+Keep a native reference and, when arithmetic changes, an explicitly auxiliary
+same-engine floating control. Export/calibration evidence is not a success result.
+
 Keep canonical JSON records in ignored `outputs/result_records/`, raw runs under
 their run IDs, and only the summary in the current Git tree. The primary table is
 rendered by `scripts/readiness_report.py` from

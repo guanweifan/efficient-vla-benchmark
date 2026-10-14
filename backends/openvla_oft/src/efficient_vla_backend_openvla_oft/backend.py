@@ -47,6 +47,7 @@ class OpenVLAOFTBackend(MethodHost):
         self.dtype = getattr(torch, precision)
         self.precision = precision
         self.context = None
+        self.execution_runtime = None
         self.model_path = model_path
         self._model_manifest = model_manifest(model_path)
         self.runtime = TorchCUDAMonitor(self.device, self.drain_auxiliary)
@@ -103,12 +104,16 @@ class OpenVLAOFTBackend(MethodHost):
         self.context = context
         self.unnorm_key = key
         self.query_diagnostics = {}
+        if self.execution_runtime is not None:
+            self.execution_runtime.reset(context)
         if self.method is not None:
             self.method.reset(context)
 
     def prepare(self, observation):
         self._ensure_open()
         self.drain_auxiliary()
+        if self.execution_runtime is not None:
+            return self.execution_runtime.prepare(observation)
         return prepare_observation(self, observation)
 
     @torch.inference_mode()
@@ -122,6 +127,8 @@ class OpenVLAOFTBackend(MethodHost):
         return AuxiliaryCUDARunner(self.device)
 
     def _native_forward(self, prepared):
+        if self.execution_runtime is not None:
+            return self.execution_runtime.forward(prepared)
         actions, _ = self.model.predict_action(
             **prepared["inputs"],
             unnorm_key=self.unnorm_key,
@@ -137,21 +144,56 @@ class OpenVLAOFTBackend(MethodHost):
     def predict_chunk(self, observation):
         return self.forward(self.prepare(observation))
 
+    def install_execution_runtime(self, runtime):
+        """Select an irreversible external engine without changing the harness.
+
+        The selected binding owns engine construction and preprocessing parity.
+        Native modules remain CPU-only for immutable metadata, not GPU execution.
+        No runtime is selected by an algorithm-name branch in this backend.
+        """
+        self._ensure_open()
+        if (
+            self.method is not None
+            or self.execution_runtime is not None
+            or self.context is not None
+        ):
+            raise ValueError("Install an execution runtime only on a fresh backend")
+        for name in ("prepare", "forward", "reset", "close", "metadata"):
+            if not callable(getattr(runtime, name, None)):
+                raise ValueError("Incomplete external execution-runtime contract")
+        monitor = getattr(runtime, "monitor", None)
+        for name in ("synchronize", "reset_peak_memory", "peak_memory", "hardware"):
+            if not callable(getattr(monitor, name, None)):
+                raise ValueError("Incomplete external execution-runtime monitor contract")
+        self.model.cpu()
+        self.action_head.cpu()
+        self.proprio_projector.cpu()
+        gc.collect()
+        with torch.cuda.device(self.device):
+            torch.cuda.empty_cache()
+        self.execution_runtime = runtime
+        self.runtime = runtime.monitor
+
     def close(self):
         if self._closed:
             return
         try:
             super().close()
         finally:
-            self._closed = True
-            self.method = None
-            self.model = None
-            self.action_head = None
-            self.proprio_projector = None
-            self.processor = None
-            gc.collect()
-            with torch.cuda.device(self.device):
-                torch.cuda.empty_cache()
+            try:
+                if self.execution_runtime is not None:
+                    self.execution_runtime.close()
+            finally:
+                self.execution_runtime = None
+                self._closed = True
+                self.method = None
+                self.model = None
+                self.action_head = None
+                self.proprio_projector = None
+                self.processor = None
+                gc.collect()
+                with torch.cuda.device(self.device):
+                    torch.cuda.empty_cache()
 
     def metadata(self):
         adapter = getattr(self.model.language_model.model, "_evb_adapter", None)
@@ -160,7 +202,7 @@ class OpenVLAOFTBackend(MethodHost):
             if adapter is not None
             else self.model.config._attn_implementation
         )
-        return {
+        result = {
             "backend": "openvla_oft",
             "model_variant": "libero_joint",
             "method": self.method_name,
@@ -175,3 +217,7 @@ class OpenVLAOFTBackend(MethodHost):
             "requires_control_history": bool(self.method and self.method.requires_control_history),
             "method_details": self.method.metadata() if self.method else {},
         }
+        if self.execution_runtime is not None:
+            result["execution_runtime"] = self.execution_runtime.metadata()
+            result["attention_implementation"] = "external_noncausal_runtime"
+        return result

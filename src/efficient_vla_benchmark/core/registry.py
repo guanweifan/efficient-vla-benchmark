@@ -187,10 +187,14 @@ def validate_selection(config: ExperimentConfig):
 
 
 def build_backend(
-    config: ExperimentConfig, model_path: Path, device: str, artifact_path: Path | None = None
+    config: ExperimentConfig,
+    model_path: Path,
+    device: str,
+    artifact_path: Path | None = None,
+    runtime_path: Path | None = None,
 ):
     spec, method, implementation, method_config = validate_selection(config)
-    resources = RuntimeResources(model_path, device, artifact_path)
+    resources = RuntimeResources(model_path, device, artifact_path, runtime_path=runtime_path)
     if artifact_path is not None and not (method and method.requires_artifact):
         raise ValueError("This method does not consume an artifact")
     if method and method.requires_artifact and artifact_path is None:

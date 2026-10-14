@@ -17,6 +17,7 @@ def register():
                 "l1_action_head",
                 "control_hooks",
                 "libero_cartesian_delta_actions",
+                "external_execution_runtime",
             }
         ),
     )
