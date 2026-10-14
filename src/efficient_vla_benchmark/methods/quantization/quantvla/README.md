@@ -1,5 +1,9 @@
 # QuantVLA — CogACT packed runtime
 
+Identity smoothing/permutation are skipped, and static rotation buffers are cast
+once to each native layer's dtype. GPU tests require exact equivalence to the
+unoptimized path; calibration, precision and quantization equations are unchanged.
+
 Reference: [pinned official source](https://github.com/AIoT-MLSys-Lab/QuantVLA/tree/9e435e56aac4e743526557e5d9ba6e4fddd6ccca).
 The supported port is CogACT LIBERO joint, native BF16 VLM, FP32 DiT and DDIM10 H8.
 Registration is not evidence of completed Dev/final evaluation; see the result ledger.

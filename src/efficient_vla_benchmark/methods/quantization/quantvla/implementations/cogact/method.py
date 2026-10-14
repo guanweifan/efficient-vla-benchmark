@@ -51,6 +51,11 @@ class QuantVLA(InferenceMethod):
                 SimpleNamespace(**e["transform"]),
                 frozen_step=True,
             )
+            # Static rotations use each native layer's dtype. Do not recast
+            # their full block stacks on every language/denoising forward.
+            prepared[name].input_rotation.to(dtype=m.weight.dtype)
+            if prepared[name].output_rotation is not None:
+                prepared[name].output_rotation.to(dtype=m.weight.dtype)
         prepared_attention = {
             name: BalancedAttention(m, scales[name]) for name, m in attention.items()
         }

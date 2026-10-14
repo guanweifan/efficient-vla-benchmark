@@ -16,6 +16,33 @@ def test_block_rotation_rejects_geometry():
 
 
 @pytest.mark.gpu
+@torch.inference_mode()
+def test_identity_input_operations_and_precast_rotations_are_exact():
+    torch.manual_seed(113)
+    k, n = 128, 64
+    t = SimpleNamespace(
+        smoothing=torch.ones(k, device="cuda"),
+        permutation=torch.arange(k, device="cuda"),
+        input_rotations=[torch.linalg.qr(torch.randn(32, 32, device="cuda")).Q for _ in range(4)],
+        output_rotations=[torch.linalg.qr(torch.randn(32, 32, device="cuda")).Q for _ in range(2)],
+        row_restore=True,
+    )
+    op = PackedDuQuantLinear(
+        torch.randint(-8, 8, (n, k), device="cuda", dtype=torch.int8),
+        torch.rand(n, device="cuda") * 0.01 + 0.001,
+        torch.ones(k, device="cuda"),
+        None,
+        t,
+    ).cuda()
+    x = torch.randn(33, k, device="cuda", dtype=torch.bfloat16)
+    expected = op(x)
+    op.input_rotation.bfloat16()
+    op.output_rotation.bfloat16()
+    assert op.identity_smoothing and op.identity_permutation
+    torch.testing.assert_close(op(x), expected, atol=0, rtol=0)
+
+
+@pytest.mark.gpu
 @pytest.mark.parametrize("dtype", [torch.bfloat16, torch.float32])
 @torch.inference_mode()
 def test_duquant_complete_transform_and_packed_equivalence(dtype):

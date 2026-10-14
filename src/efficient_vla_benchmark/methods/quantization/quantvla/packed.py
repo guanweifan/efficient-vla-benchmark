@@ -65,6 +65,8 @@ class PackedDuQuantLinear(nn.Module):
             raise ValueError("Invalid smoothing")
         self.register_buffer("smoothing", transform.smoothing.detach().clone())
         self.register_buffer("permutation", permutation.detach().clone())
+        self.identity_smoothing = bool((transform.smoothing == 1).all())
+        self.identity_permutation = torch.equal(permutation.cpu(), torch.arange(k))
         self.input_rotation = BlockRotation(transform.input_rotations)
         self.output_rotation = (
             BlockRotation(transform.output_rotations) if transform.row_restore else None
@@ -86,8 +88,9 @@ class PackedDuQuantLinear(nn.Module):
         self.in_features, self.out_features = k, n
 
     def forward(self, inputs):
-        x = inputs * self.smoothing.to(inputs.dtype)
-        x = x.index_select(-1, self.permutation)
+        x = inputs if self.identity_smoothing else inputs * self.smoothing.to(inputs.dtype)
+        if not self.identity_permutation:
+            x = x.index_select(-1, self.permutation)
         x = self.input_rotation(x)
         output = self.linear(x)
         if self.output_rotation is not None:
