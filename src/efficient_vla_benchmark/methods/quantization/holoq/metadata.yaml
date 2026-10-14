@@ -1,0 +1,13 @@
+schema_version: 1
+name: holoq
+category: quantization
+description: HoloQ official-code composite rotation, GPTQ and per-step W4A4 on CogACT.
+config: efficient_vla_benchmark.methods.quantization.holoq.config:HoloQConfig
+requires_artifact: true
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [llama_decoder]
+    factory: efficient_vla_benchmark.methods.quantization.holoq.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.quantization.holoq.implementations.cogact.api:preflight
+    calibrate: efficient_vla_benchmark.methods.quantization.holoq.implementations.cogact.api:calibrate

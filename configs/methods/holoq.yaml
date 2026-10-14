@@ -1,0 +1,9 @@
+method: holoq
+parameters:
+  block_size: 64
+  gptq_block_size: 128
+  gptq_damp_percent: 0.01
+  activation_percentile: 99.9
+  calibration_samples: 40
+  calibration_tokens: 256
+  calibration_seed: 0
