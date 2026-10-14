@@ -35,6 +35,9 @@ class QVLA(InferenceMethod):
                 else MixedBitLinear(module, torch.tensor(row))
             ).cpu()
         for name, module in prepared.items():
+            # Validation/packing is complete. Drop the original GPU storage before
+            # installation; the native dict otherwise keeps a second model resident.
+            native[name].cpu()
             replace(backend.model, name, module.to(backend.device))
         self.config = config
         self.count = len(prepared)

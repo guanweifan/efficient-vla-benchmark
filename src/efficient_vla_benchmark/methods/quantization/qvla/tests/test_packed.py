@@ -70,3 +70,20 @@ def test_extreme_uniform_scopes_and_reload(bits, dtype):
     expected = native(x) if bits == 16 else native.bias.expand(3, 32)
     torch.testing.assert_close(actual, expected, atol=0, rtol=0)
     torch.testing.assert_close(second(x), actual, atol=0, rtol=0)
+
+
+@pytest.mark.gpu
+@pytest.mark.parametrize("bits", [2, 4, 8, 16])
+@torch.inference_mode()
+def test_uniform_groups_bypass_scatter_without_changing_results(bits):
+    from efficient_vla_benchmark.methods.quantization.qvla.packed import MixedBitLinear
+
+    torch.manual_seed(11)
+    native = nn.Linear(97, 65).cuda().bfloat16()
+    runtime = MixedBitLinear(native, torch.full((65,), bits))
+    x = torch.randn(33, 97, device="cuda", dtype=torch.bfloat16)
+    assert runtime.uniform_group == str(bits)
+    torch.testing.assert_close(runtime(x), runtime.groups[str(bits)](x), atol=0, rtol=0)
+    mixed = MixedBitLinear(native, torch.tensor([0] + [bits] * 64))
+    assert mixed.uniform_group is None
+    torch.testing.assert_close(mixed(x)[..., 0], native.bias[0].expand(33), atol=0, rtol=0)

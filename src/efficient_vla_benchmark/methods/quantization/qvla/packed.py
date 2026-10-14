@@ -54,11 +54,19 @@ class MixedBitLinear(nn.Module):
         )
         self.register_buffer("gates", gates.detach().to(weight.device))
         self.native_dtype = weight.dtype
+        self.uniform_group = (
+            str(self.active_bits[0])
+            if len(self.active_bits) == 1
+            and getattr(self, f"rows_{self.active_bits[0]}").numel() == self.out_features
+            else None
+        )
 
     @torch.no_grad()
     def forward(self, inputs):
         if not inputs.is_cuda or inputs.device != self.gates.device:
             raise ValueError("MixedBitLinear needs colocated CUDA inputs")
+        if self.uniform_group is not None:
+            return self.groups[self.uniform_group](inputs)
         output = inputs.new_zeros(*inputs.shape[:-1], self.out_features)
         if self.bias is not None:
             # Zero-bit rows retain bias. Active groups include bias before rounding.
