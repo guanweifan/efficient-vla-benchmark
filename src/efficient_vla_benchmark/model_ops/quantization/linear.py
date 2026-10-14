@@ -33,7 +33,9 @@ class PackedLinear(nn.Module):
             raise ValueError("Weight scale geometry mismatch")
         if not bool(torch.isfinite(scales).all()) or not bool((scales > 0).all()):
             raise ValueError("Weight scales must be finite and positive")
-        self.register_buffer("packed_weight", pack_signed(codes, bits))
+        # Keep the logical (output, packed-input) shape, but make output rows
+        # contiguous for the GEMM's N lanes. No second packed or dense cache.
+        self.register_buffer("packed_weight", pack_signed(codes, bits).T.contiguous().T)
         self.register_buffer("weight_scale", scales.detach().float().contiguous())
         self.register_buffer("activation_amax", None)
         self.register_buffer("activation_step", None)
@@ -122,6 +124,7 @@ class PackedLinear(nn.Module):
                 block_m,
                 block_n,
                 32,
+                TRANSPOSED_STORAGE=True,
                 num_warps=4,
             )
             self.kernel_invocations += 1
@@ -130,6 +133,7 @@ class PackedLinear(nn.Module):
     def execution_metadata(self):
         return {
             "storage": "signed_twos_complement_low_bits_first_uint8",
+            "packed_layout": "output_contiguous_transposed_strides_v2",
             "weight_bits": self.bits,
             "activation_bits": 8
             if self.activation_amax is not None or self.activation_step is not None

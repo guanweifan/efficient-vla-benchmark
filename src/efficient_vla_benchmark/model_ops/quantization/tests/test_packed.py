@@ -77,6 +77,9 @@ def test_packed_reload_empty_and_no_dense_cache():
     torch.testing.assert_close(first(x), second(x), atol=0, rtol=0)
     assert first(x[:0]).shape == (0, 17)
     assert first.packed_weight.dtype == torch.uint8
+    assert first.packed_weight.stride(0) == 1
+    assert first.packed_weight.stride(1) == first.out_features
+    torch.testing.assert_close(unpack_signed(first.packed_weight, 4, 33), codes.cuda())
     assert not list(first.parameters())
     assert not any(t.is_floating_point() and t.shape == codes.shape for t in first.buffers())
     with pytest.raises(ValueError, match="no CPU fallback"):

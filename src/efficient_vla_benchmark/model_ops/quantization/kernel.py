@@ -28,6 +28,7 @@ def packed_gemm(
     BM: tl.constexpr,
     BN: tl.constexpr,
     BK: tl.constexpr,
+    TRANSPOSED_STORAGE: tl.constexpr = False,
 ):
     m = tl.program_id(0) * BM + tl.arange(0, BM)
     n = tl.program_id(1) * BN + tl.arange(0, BN)
@@ -40,8 +41,12 @@ def packed_gemm(
         if QUANT_A:
             a_scale = tl.load(AS + k, k < K, other=0).to(dtype)
             x = (x.to(dtype).to(tl.float32) * a_scale[None, :].to(tl.float32)).to(dtype)
+        if TRANSPOSED_STORAGE:
+            weight_ptr = W + n[None, :] + (k[:, None] // (8 // BITS)) * N
+        else:
+            weight_ptr = W + n[None, :] * stride + k[:, None] // (8 // BITS)
         packed = tl.load(
-            W + n[None, :] * stride + k[:, None] // (8 // BITS),
+            weight_ptr,
             (n[None, :] < N) & (k[:, None] < K),
             other=0,
         ).to(tl.int32)

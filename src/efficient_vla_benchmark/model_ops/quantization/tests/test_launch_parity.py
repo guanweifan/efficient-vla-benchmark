@@ -40,7 +40,7 @@ def test_sequence_tiles_match_original_reduction(bits, dtype, activation):
         reference = torch.empty(rows, n, device="cuda", dtype=dtype)
         packed_gemm[(triton.cdiv(rows, 16), triton.cdiv(n, 32))](
             qinputs,
-            op.packed_weight,
+            op.packed_weight.contiguous(),
             op.weight_scale,
             astep,
             bias,

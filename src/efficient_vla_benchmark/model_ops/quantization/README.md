@@ -13,6 +13,13 @@ These are feasibility primitives, not a selectable quantization algorithm.
   per-query full floating weight reconstruction. Floating products accumulate in
   FP32; this is **not** an integer-MMA W4A8 kernel. No silent CPU fallback.
 
+The logical packed-weight shape is `(output, packed_input)`, with output-contiguous
+transposed strides for coalesced N-lane loads. This is one physical packed buffer,
+not a second copy. Packing codes, scale rounding, K reduction and native precision
+are unchanged; GPU tests compare the previous row-major path exactly. Old ad-hoc
+assumptions of contiguous packed storage are invalid; use tensor strides or the
+diagnostic `unpack_signed` function.
+
 Weights have per-row or per-row/K-group scales. Optional activations are stored
 as INT8, with per-input-channel scales **inside** the K reduction. Replacing these
 scales with a group maximum changes the quantizer and is not allowed. Bias is
