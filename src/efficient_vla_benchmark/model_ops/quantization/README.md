@@ -20,8 +20,10 @@ are unchanged; GPU tests compare the previous row-major path exactly. Old ad-hoc
 assumptions of contiguous packed storage are invalid; use tensor strides or the
 diagnostic `unpack_signed` function.
 
-Weights have per-row or per-row/K-group scales. Optional activations are stored
-as INT8, with per-input-channel scales **inside** the K reduction. Replacing these
+Weights have per-row or per-row/K-group scales. Optional A2/A4/A8 activations are
+stored as INT8 codes; A16 bypasses activation quantization without changing the
+native floating dtype. The caller declares symmetric or two's-complement bounds.
+Per-input-channel scales remain **inside** the K reduction. Replacing these
 scales with a group maximum changes the quantizer and is not allowed. Bias is
 added before output rounding; methods with output transforms own their later bias.
 FP16/BF16/FP32 output precision is retained. The explicit scale-rounding flag
