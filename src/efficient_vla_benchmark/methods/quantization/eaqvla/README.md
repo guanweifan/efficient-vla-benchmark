@@ -4,6 +4,9 @@
 language W8 and an unquantized projector. Both bindings preserve that independent
 module policy. Vision Linear/patch-Conv2d and Llama decoder projections are packed;
 embedding, vocabulary readout, projector and native action head remain unchanged.
+Unused vision pooling/classification heads are excluded; native patch embedding
+and every executed transformer block are covered. Multiple camera invocations
+are counted as inputs from the same calibration observation, not extra samples.
 This transfers the OpenVLA proposal to OFT and CogACT, not their original numbers.
 
 The paper provides no released implementation or reproducible activation quantizer,

@@ -13,13 +13,15 @@ def test_config_and_modality_boundaries():
     with pytest.raises(ValueError):
         EaqVLAConfig.parse({"calibration_samples": 5})
     model = nn.Module()
-    model.vision = nn.Linear(8, 8)
+    model.vision = nn.Module()
+    model.vision.blocks = nn.Sequential(nn.Linear(8, 8))
+    model.vision.head = nn.Linear(8, 8)
     model.language = nn.Sequential(nn.Linear(8, 8))
     model.projector = nn.Linear(8, 8)
     model.action = nn.Linear(8, 7)
     found = targets(model, "vision", "language")
-    assert set(found) == {"vision", "language.0"}
-    assert found["vision"][1] == "vision"
+    assert set(found) == {"vision.blocks.0", "language.0"}
+    assert found["vision.blocks.0"][1] == "vision"
 
 
 @pytest.mark.gpu

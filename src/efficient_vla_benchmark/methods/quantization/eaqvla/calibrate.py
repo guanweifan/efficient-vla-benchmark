@@ -40,14 +40,18 @@ def calibrate(backend, config, dataset_root, output, vision_prefix, language_pre
         for context, observation, identity in training_observations(
             dataset_root, config.calibration_samples, config.calibration_seed
         ):
+            previous = {name: len(values) for name, values in captured.items()}
             backend.reset(context)
             backend.predict_chunk(observation)
+            missing = [name for name in captured if len(captured[name]) == previous[name]]
+            if missing:
+                raise ValueError(f"Native modular targets did not execute: {missing}")
             identities.append(identity)
     finally:
         for h in handles:
             h.remove()
     if len(identities) != config.calibration_samples or any(
-        len(v) != len(identities) for v in captured.values()
+        len(v) < len(identities) for v in captured.values()
     ):
         raise ValueError("Incomplete modular calibration capture")
     entries = {}

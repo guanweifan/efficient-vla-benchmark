@@ -18,6 +18,10 @@ def targets(model, vision_prefix, language_prefix):
         )
         if side is None:
             continue
+        # Native Prismatic uses intermediate patch/block features, bypassing
+        # the optional timm pooling/classification heads.
+        if side == "vision" and not any(part in name for part in (".blocks.", ".patch_embed.")):
+            continue
         if isinstance(module, nn.Conv2d) and (
             module.groups != 1 or module.padding_mode != "zeros" or isinstance(module.padding, str)
         ):
