@@ -21,11 +21,20 @@ SVD uses FP32 reduced matrices with the same left singular basis; the author's
 NumPy intermediates can still change finite-precision calibration codes. We verify
 the equations and pinned solver, not identical author packs.
 
-W4 is physically packed, A4 codes occupy INT8 storage, and the common kernel
-dequantizes tiles for floating GEMM/FP32 accumulation. No full floating weight
-cache, integer INT4-MMA claim, extra low-rank branch or hidden dense fallback.
+W4 is physically packed and A4 codes occupy INT8 storage. The LLM dequantizes
+tiles for native BF16 GEMM; DiT explicitly decodes each weight into a temporary
+FP32 workspace before native FP32 cuBLAS GEMM. Both decode cost and temporary
+memory are measured. No reconstructed weight survives the call or is reused.
+This is not integer INT4 MMA or a hidden dense fallback.
 Every transform, activation conversion and step-dispatch synchronization is timed.
 The shared Dev/timing gate, not successful calibration, decides result readiness.
+
+The DiT execution choice preserves the native reduction order: tiny tile-GEMM
+differences crossed A4 rounding thresholds and amplified through denoising.
+Teacher-forced activation-code agreement alone was insufficient admission;
+ordinary whole-policy reference, reset and fresh-reload checks are required.
+Rotation-block 16 is an explicit speedward candidate against the reference 64;
+both retain fixed W4A4 and the complete composite rotation.
 
 Use the portable CogACT preset and explicit model/dataset/artifact CLI paths.
 A fresh native backend is mandatory; hooks are instance-local and detachable,

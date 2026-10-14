@@ -4,6 +4,7 @@ import torch
 from torch import nn
 
 from efficient_vla_benchmark.model_ops.quantization.linear import PackedLinear
+from efficient_vla_benchmark.model_ops.quantization.native_fp32 import PackedFP32Linear
 
 from .rotation import InputRotation, rotate
 
@@ -23,7 +24,8 @@ class HoloQLinear(nn.Module):
         self.register_buffer("bias", None if entry["bias"] is None else entry["bias"].to(dtype))
         self.step_provider = step_provider
         self.is_dit = entry["side"] != "language"
-        self.linear = PackedLinear(
+        linear_type = PackedFP32Linear if self.is_dit and dtype == torch.float32 else PackedLinear
+        self.linear = linear_type(
             entry["codes"],
             entry["weight_scales"],
             bits=4,
