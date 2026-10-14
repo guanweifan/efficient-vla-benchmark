@@ -12,6 +12,10 @@ These are feasibility primitives, not a selectable quantization algorithm.
 - `kernel.py`: tile-local unpack/dequantization inside GEMM; no persistent or
   per-query full floating weight reconstruction. Floating products accumulate in
   FP32; this is **not** an integer-MMA W4A8 kernel. No silent CPU fallback.
+- `native_fp32.py`: explicit packed storage with per-call temporary FP32 decode
+  followed by native GEMM. Use only when native reduction order is required;
+  count the decode time and full temporary workspace. No persistent weight cache
+  or automatic fallback is allowed. Existing tile execution is unchanged.
 
 The logical packed-weight shape is `(output, packed_input)`, with output-contiguous
 transposed strides for coalesced N-lane loads. This is one physical packed buffer,
