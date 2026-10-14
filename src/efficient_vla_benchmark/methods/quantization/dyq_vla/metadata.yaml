@@ -1,0 +1,19 @@
+schema_version: 1
+name: dyq_vla
+category: quantization
+description: DyQ temporal dynamic activation core with frozen independent-trajectory thresholds.
+config: efficient_vla_benchmark.methods.quantization.dyq_vla.config:DyQConfig
+requires_artifact: true
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, l1_action_head]
+    factory: efficient_vla_benchmark.methods.quantization.dyq_vla.implementations.openvla_oft.api:build
+    preflight: efficient_vla_benchmark.methods.quantization.dyq_vla.implementations.openvla_oft.api:preflight
+    calibrate: efficient_vla_benchmark.methods.quantization.dyq_vla.implementations.openvla_oft.api:calibrate
+  cogact:
+    variants: [libero_joint]
+    requires: [llama_decoder]
+    factory: efficient_vla_benchmark.methods.quantization.dyq_vla.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.quantization.dyq_vla.implementations.cogact.api:preflight
+    calibrate: efficient_vla_benchmark.methods.quantization.dyq_vla.implementations.cogact.api:calibrate

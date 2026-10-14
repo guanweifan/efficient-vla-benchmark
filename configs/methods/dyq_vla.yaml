@@ -1,0 +1,13 @@
+method: dyq_vla
+parameters:
+  frames_per_trajectory: 8
+  activation_percentile: 99.9
+  activation_tokens: 256
+  motion_window: 10
+  jerk_window: 5
+  sensitivity_lambda: 0.5
+  theta_fp: 0.5
+  hysteresis_window: 3
+  accuracy_budget: 0.02
+  sensitivity_bins: 10
+  eta: 0.000001
