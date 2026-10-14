@@ -24,13 +24,32 @@ Their successful smoke does not add algorithms to the primary result table.
 |---|---|
 | QVLA | Recompute training-only sensitivities and use the verified official absolute-cost allocation; old gates are runtime fixtures only. |
 | QuantVLA | Integrate calibrated DuQuant and ATM/OHB into a validated artifact/method lifecycle, then time the complete packed path. |
-| ActQuant | Build the pinned author GGUF runtime in isolation, verify OFT native input/action parity first, and export compatible calibration; dense handover weights are not GGUF execution. |
+| ActQuant | Floating-runtime and packed-kernel feasibility passed; training-only HSIC/AMF calibration and portable artifact/lifecycle integration are still required. Dense handover weights are not the author's GGUF calibration/output chain. |
 
-ActQuant's author runtime has two-view/proprio OFT support; its image preprocessing,
-normalization, tokenizer and action conventions still require parity checks.
-Its additional build toolchain must not modify shared Python/system installations.
-Do not declare it supported, faster, or fundamentally incompatible before those
-checks. Existing AWQ admission and selected formal results remain unchanged.
+ActQuant's [author runtime](https://github.com/arashakb/ActQuant/tree/b64791125070652fe6b554e244fe809c79ef5246)
+was built in ignored project-local storage with Rust/Cargo 1.90.0, pybind11 2.13.6,
+CUDA 12.1 and a hashed Cargo lockfile. Keep dependencies, compiler caches and
+process-local library paths isolated; never modify shared Python/system installs.
+Disable parent Git discovery for archive builds and retain the archive/binary hashes.
+The embedded GGML Git label is not the author's source revision.
+
+The OFT floating control uses BF16 matrix weights, F32 vectors/patch-convolution
+weights, FP16 KV storage and GGML mixed-precision arithmetic. CUDA im2col rejects
+BF16 patch tensors in this revision.
+The patch conversion preserves their numerical values; it is not pure-BF16 execution.
+Use native center-cropped images, tokenizer and suite statistics; pass raw proprio
+to the author pipeline and apply the native gripper conversion exactly once.
+With these explicit boundaries, 12 frozen observations across four suites passed
+the fixed 0.01 action-error gate (maximum 0.007705), exact gripper and repeat checks;
+the common H8 LIBERO harness completed four smoke episodes successfully.
+The author's default F16 export had one gate failure and is not the selected control.
+
+An uncalibrated Q4_0 probe confirmed 224 packed LLM projections and 224 Q4 CUDA
+matrix-multiply calls, with internal Q8_1 activation quantization. This is kernel
+feasibility, not W4A16 or a calibrated ActQuant result. Neither this probe nor the
+floating smoke establishes ActQuant success rate or speedup. Do not register the
+method or add a formal row before calibration and lifecycle admission. Existing
+AWQ admission, timing protocol and selected formal results remain unchanged.
 
 ## Architecture
 
