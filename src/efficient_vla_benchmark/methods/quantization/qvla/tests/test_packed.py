@@ -33,7 +33,7 @@ def test_mixed_all_bits_preserves_rows_and_bias(dtype, convolution):
     runtime = MixedBitConv2d(native, gates) if convolution else MixedBitLinear(native, gates)
     assert torch.equal(native.weight, original)
     for i, bit in enumerate(gates.tolist()):
-        w = native.weight[i].float()
+        w = native.weight[i]
         if bit == 0:
             native.weight[i].zero_()
         elif bit < 16:
@@ -87,3 +87,26 @@ def test_uniform_groups_bypass_scatter_without_changing_results(bits):
     mixed = MixedBitLinear(native, torch.tensor([0] + [bits] * 64))
     assert mixed.uniform_group is None
     torch.testing.assert_close(mixed(x)[..., 0], native.bias[0].expand(33), atol=0, rtol=0)
+
+
+@pytest.mark.gpu
+@pytest.mark.parametrize("bits", [2, 4, 8])
+@pytest.mark.parametrize("dtype", [torch.float16, torch.bfloat16])
+@torch.inference_mode()
+def test_quantized_weights_exactly_match_official_native_dtype(bits, dtype):
+    from efficient_vla_benchmark.methods.quantization.qvla.packed import MixedBitLinear
+    from efficient_vla_benchmark.model_ops.quantization.packed import unpack_signed
+
+    torch.manual_seed(109)
+    native = nn.Linear(4096, 65, bias=False).cuda().to(dtype)
+    runtime = MixedBitLinear(native, torch.full((65,), bits))
+    group = runtime.groups[str(bits)]
+    maximum = (1 << (bits - 1)) - 1
+    # Independent per-row implementation of the pinned author's injector.
+    expected = []
+    for row in native.weight:
+        scale = row.abs().max().clamp_min(1e-8) / maximum
+        expected.append((row / scale).round().clamp(-maximum - 1, maximum) * scale)
+    codes = unpack_signed(group.packed_weight, bits, native.in_features)
+    decoded = codes.to(dtype) * group.weight_scale.to(dtype)
+    torch.testing.assert_close(decoded, torch.stack(expected), atol=0, rtol=0)

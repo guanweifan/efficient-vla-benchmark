@@ -41,14 +41,15 @@ class MixedBitLinear(nn.Module):
                 self.groups[str(bit)] = dense
             else:
                 maximum = (1 << (bit - 1)) - 1
-                scale = selected.float().abs().amax(1).clamp_min(1e-6) / maximum
+                # inject_fake_w.py quantizes in the checkpoint's native dtype.
+                # FP32 is used by sensitivity_hessian_proxy.py, NOT this step.
+                scale = selected.abs().amax(1).clamp_min(1e-8) / maximum
                 codes = (
-                    (selected.float() / scale[:, None])
-                    .round()
-                    .clamp(-maximum - 1, maximum)
-                    .to(torch.int8)
+                    (selected / scale[:, None]).round().clamp(-maximum - 1, maximum).to(torch.int8)
                 )
-                self.groups[str(bit)] = PackedLinear(codes, scale, bits=bit, bias=bias)
+                self.groups[str(bit)] = PackedLinear(
+                    codes, scale, bits=bit, bias=bias, round_weight_scale=True
+                )
         self.register_buffer(
             "bias", None if original.bias is None else original.bias.detach().clone()
         )

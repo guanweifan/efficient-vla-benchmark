@@ -67,6 +67,7 @@ class QVLA(InferenceMethod):
             "integer_mma": False,
             "packed_weight_bytes": self.storage,
             "activation_precision": "native_bfloat16",
+            "weight_quantizer": "official_native_dtype_rounding_v2",
             "retained_precision_scope": "projectors_action_head_lm_head_and_16bit_rows",
             "budget_definition": "channel_average_not_parameter_weighted",
         }

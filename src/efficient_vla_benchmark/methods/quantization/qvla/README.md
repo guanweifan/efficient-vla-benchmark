@@ -22,6 +22,10 @@ Zero-bit rows retain bias; 16-bit rows retain native floating weights. Quantized
 rows use physically packed kernels with tile-local floating dequantization, not
 integer MMA or a persistent full floating-weight reconstruction. Conv2d unfolding,
 row scatter and conversion are included in timing; compression need not accelerate.
+Runtime scale estimation, division and rounding use the checkpoint's native dtype,
+matching the official injector; sensitivity estimation remains FP32 as in its
+separate calibration script. The previous FP32 runtime rounding is superseded,
+not numerically equivalent, and requires fresh Dev/timing evidence.
 Uniform nonzero groups bypass redundant output allocation/scatter. After complete
 validation and CPU preparation, conversion offloads each original target before
 installing its packed replacement, avoiding simultaneous residency of two models.
