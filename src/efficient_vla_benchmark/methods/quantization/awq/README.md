@@ -73,9 +73,10 @@ The OFT BF16-kernel measurements reduced peak allocated runtime memory substanti
 but did not improve query latency. Packed weight size does not guarantee speedup
 at OFT's multimodal sequence length. Do not replace the real result with a
 fake-quantization or synthetic GEMV claim. The ledger now includes complete Dev-200
-selection evidence for both kernel precisions. Final 2,000-episode success and
-broad calibration-quality comparisons remain unmeasured; smoke alone is not an
-accuracy estimate.
+selection evidence for both kernel precisions and Final-2000 results for the
+selected FP16-kernel presets. BF16 remains an auxiliary precision comparison;
+broad calibration-quality comparisons remain unmeasured. Smoke alone is not an
+accuracy estimate; consult the generated ledger for measured revisions/counts.
 
 ## Explicit kernel precision
 
@@ -103,7 +104,19 @@ inside an AWQ-versus-native speedup.
 The selected FP16-kernel preset and useful BF16-kernel auxiliary are retained for
 each backend in `docs/benchmark_results.md`, with the common native BF16 reference.
 OFT's BF16 kernel remained slower in its recorded cohort; CogACT's was faster.
-Dev-200 selection does not establish final task accuracy.
+Dev-200 selection does not establish final task accuracy; the selected presets
+have separately recorded final campaigns.
+
+A later runtime audit reconfirmed actual BF16/FP16 author CUDA GEMM dispatch,
+not a dense/fake fallback. At OFT's real 593-row prefill, the BF16 GEMM itself
+dominated the slowdown; the FP16 option also introduced 448 boundary casts across
+224 linears. These casts were included in the measured gain, not omitted.
+The audit's valid same-device FP16 repeats were about 1.162x on OFT and 1.362x on
+CogACT versus each run's native-pre reference (native pre/post drift 0.11% and
+1.29%, respectively), consistent with the retained primary results. This did not change the
+runtime, precision choice, calibration or formal ledger. Thermal flags and native
+drift over 3% invalidate diagnostic timings; shared-GPU allocation failures do
+not establish algorithm failure. Do not cherry-pick invalid repeats for speed.
 
 ## CogACT binding
 

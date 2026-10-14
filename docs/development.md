@@ -5,6 +5,33 @@ installation and usage. Backend-native geometry and numerical conventions live
 with the [OFT](../backends/openvla_oft/README.md) and
 [CogACT](../backends/cogact/README.md) plugins; paper adaptations live with methods.
 
+## Quantization runtime admission
+
+Formal quantization comparisons require the measured packed execution, not dense
+fake-quantization latency. A dense mathematical oracle may be used privately for
+correctness, but it is never a runtime result or an unmarked fallback. Record
+physical packing, scale axes, floating/quantized activation storage, actual
+multiplication/accumulation precision, target coverage and all cast/reorder costs.
+Tile-dequantized floating GEMM is real packed execution, not integer-MMA speed.
+
+The [shared packed operations](../src/efficient_vla_benchmark/model_ops/quantization/README.md)
+and [QVLA](../src/efficient_vla_benchmark/methods/quantization/qvla/README.md)/
+[QuantVLA](../src/efficient_vla_benchmark/methods/quantization/quantvla/README.md)
+components are feasibility-only and deliberately absent from method discovery.
+Their successful smoke does not add algorithms to the primary result table.
+
+| Scope | Admission work still required |
+|---|---|
+| QVLA | Recompute training-only sensitivities and use the verified official absolute-cost allocation; old gates are runtime fixtures only. |
+| QuantVLA | Integrate calibrated DuQuant and ATM/OHB into a validated artifact/method lifecycle, then time the complete packed path. |
+| ActQuant | Build the pinned author GGUF runtime in isolation, verify OFT native input/action parity first, and export compatible calibration; dense handover weights are not GGUF execution. |
+
+ActQuant's author runtime has two-view/proprio OFT support; its image preprocessing,
+normalization, tokenizer and action conventions still require parity checks.
+Its additional build toolchain must not modify shared Python/system installations.
+Do not declare it supported, faster, or fundamentally incompatible before those
+checks. Existing AWQ admission and selected formal results remain unchanged.
+
 ## Architecture
 
 | Component | Owns | Must not own |
