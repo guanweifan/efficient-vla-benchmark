@@ -218,7 +218,15 @@ def timing_evidence(directory):
     }
 
 
-def make_record(run_dir, baseline_dir, section, label, preset, smoke_dir=None):
+def make_record(
+    run_dir,
+    baseline_dir,
+    section,
+    label,
+    preset,
+    smoke_dir=None,
+    allow_execution_runtime_change=False,
+):
     run, baseline = timing_evidence(run_dir), timing_evidence(baseline_dir)
     left, right = run["metadata"], baseline["metadata"]
     for key in ("backend", "model_variant", "checkpoint_sha256"):
@@ -226,7 +234,17 @@ def make_record(run_dir, baseline_dir, section, label, preset, smoke_dir=None):
             raise ValueError(f"Incomparable baseline: {key}")
     if left["traces"] != right["traces"] or left["protocol"] != right["protocol"]:
         raise ValueError("Incomparable baseline trace or timing protocol")
-    if left["hardware"] != right["hardware"]:
+    left_hardware, right_hardware = left["hardware"], right["hardware"]
+    if allow_execution_runtime_change:
+        runtime = left["backend"].get("execution_runtime")
+        if not isinstance(runtime, dict) or any(
+            not runtime.get(k) for k in ("engine", "runtime_binary_sha256", "precision")
+        ):
+            raise ValueError("Cross-runtime comparison requires explicit engine provenance")
+        excluded = {"runtime", "memory_accounting"}
+        left_hardware = {k: v for k, v in left_hardware.items() if k not in excluded}
+        right_hardware = {k: v for k, v in right_hardware.items() if k not in excluded}
+    if left_hardware != right_hardware:
         raise ValueError("Incomparable baseline hardware")
     for key in ("source_sha256", "submodules", "packages", "cuda_extension_sha256"):
         if left["source"].get(key) != right["source"].get(key):
@@ -237,6 +255,18 @@ def make_record(run_dir, baseline_dir, section, label, preset, smoke_dir=None):
     ):
         raise ValueError("Incomparable baseline control-step count")
     differences = {}
+    if allow_execution_runtime_change:
+        differences["execution_runtime"] = {
+            "method": left["backend"]["execution_runtime"],
+            "baseline": right["backend"].get(
+                "execution_runtime",
+                {
+                    "engine": right["hardware"].get("runtime"),
+                    "precision": right["backend"].get("precision"),
+                },
+            ),
+            "scope": "same_checkpoint_cross_runtime_not_quantization_only_speedup",
+        }
     for key in ("precision", "attention_implementation"):
         a, b = left["backend"].get(key), right["backend"].get(key)
         if a != b:
@@ -825,6 +855,11 @@ def main():
         export.add_argument(f"--{name}", type=Path, required=True)
     export.add_argument("--records-dir", type=Path, default=Path("outputs/result_records"))
     export.add_argument("--smoke-dir", type=Path)
+    export.add_argument(
+        "--allow-execution-runtime-change",
+        action="store_true",
+        help="Disclose a checksummed external engine against native execution",
+    )
     export.add_argument("--supersedes", action="append", default=[], metavar="RUN_ID")
     for name in ("section", "label", "preset"):
         export.add_argument(f"--{name}", required=True)
@@ -838,7 +873,13 @@ def main():
         if Path(args.preset).is_absolute() or ".." in Path(args.preset).parts:
             raise ValueError("Preset links must be repository-relative")
         record = make_record(
-            args.run_dir, args.baseline_dir, args.section, args.label, args.preset, args.smoke_dir
+            args.run_dir,
+            args.baseline_dir,
+            args.section,
+            args.label,
+            args.preset,
+            args.smoke_dir,
+            allow_execution_runtime_change=args.allow_execution_runtime_change,
         )
         annotate_supersedes(record, args.supersedes, args.records_dir)
         args.records_dir.mkdir(parents=True, exist_ok=True)

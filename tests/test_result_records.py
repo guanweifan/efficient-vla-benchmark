@@ -70,6 +70,46 @@ def test_evidence_export_and_render_without_private_locations(tmp_path, recorder
     assert "5.3 Routing" in table and "1.000×" in table and "Not run" in table
 
 
+def test_external_engine_comparison_is_explicit_and_still_requires_same_hardware(
+    tmp_path, recorder
+):
+    run, baseline = tmp_path / "external", tmp_path / "native"
+    write_run(run)
+    write_run(baseline)
+    meta = json.loads((run / "metadata.json").read_text())
+    meta["hardware"].update(runtime="external", memory_accounting="unavailable")
+    meta["backend"]["execution_runtime"] = dict(
+        engine="external", runtime_binary_sha256="a" * 64, precision="mixed"
+    )
+    (run / "metadata.json").write_text(json.dumps(meta))
+    with pytest.raises(ValueError, match="hardware"):
+        recorder.make_record(run, baseline, "3", "External", "configs/example.yaml")
+    result = recorder.make_record(
+        run, baseline, "3", "External", "configs/example.yaml", allow_execution_runtime_change=True
+    )
+    assert result["comparison_differences"]["execution_runtime"]["method"]["precision"] == "mixed"
+    meta["hardware"]["gpu"] = "different physical model"
+    (run / "metadata.json").write_text(json.dumps(meta))
+    with pytest.raises(ValueError, match="hardware"):
+        recorder.make_record(
+            run,
+            baseline,
+            "3",
+            "External",
+            "configs/example.yaml",
+            allow_execution_runtime_change=True,
+        )
+
+
+def test_external_runtime_opt_in_requires_engine_identity(tmp_path, recorder):
+    run = tmp_path / "test"
+    write_run(run)
+    with pytest.raises(ValueError, match="provenance"):
+        recorder.make_record(
+            run, run, "3", "Missing", "configs/example.yaml", allow_execution_runtime_change=True
+        )
+
+
 def test_dated_review_survives_regeneration_without_becoming_evidence(tmp_path, recorder):
     run = tmp_path / "example-run"
     write_run(run)

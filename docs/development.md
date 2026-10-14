@@ -644,6 +644,10 @@ Pass the isolated engine location through `--runtime-path`, never through preset
 External allocations invisible to Torch must be reported as unavailable, not zero.
 Keep a native reference and, when arithmetic changes, an explicitly auxiliary
 same-engine floating control. Export/calibration evidence is not a success result.
+Result export requires explicit `--allow-execution-runtime-change` for a
+checksummed external engine. Only engine/accounting fields may differ; physical
+hardware, checkpoint, inputs, protocol and software-source checks remain strict.
+The record labels this as cross-runtime speedup, not quantization-only speedup.
 
 Keep canonical JSON records in ignored `outputs/result_records/`, raw runs under
 their run IDs, and only the summary in the current Git tree. The primary table is
