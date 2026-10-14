@@ -1,0 +1,14 @@
+method: quantvla
+parameters:
+  block_size: 64
+  enable_permutation: false
+  energy_smoothing: 0.15
+  activation_percentile: 99.9
+  calibration_samples: 32
+  attention_calibration_samples: 128
+  calibration_seed: 0
+  alpha_min: 0.7
+  alpha_max: 1.4
+  alpha_neutral: 0.02
+  beta_log_clip: 0.3
+  beta_neutral: 0.03

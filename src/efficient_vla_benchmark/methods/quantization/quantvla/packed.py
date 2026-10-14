@@ -45,7 +45,9 @@ class PackedDuQuantLinear(nn.Module):
     This preserves the input-channel scales, not a claimed INT8/INT4 MMA kernel.
     """
 
-    def __init__(self, qweight, weight_scale, activation_scale, bias, transform):
+    def __init__(
+        self, qweight, weight_scale, activation_scale, bias, transform, *, frozen_step=False
+    ):
         super().__init__()
         if qweight.ndim != 2 or weight_scale.ndim != 1:
             raise ValueError("Paper path expects per-output-row weight scales")
@@ -72,7 +74,13 @@ class PackedDuQuantLinear(nn.Module):
         ):
             raise ValueError("Rotation geometry mismatch")
         self.linear = PackedLinear(
-            qweight, weight_scale, bits=4, activation_amax=activation_scale, round_weight_scale=True
+            qweight,
+            weight_scale,
+            bits=4,
+            activation_amax=None if frozen_step else activation_scale,
+            activation_step=activation_scale if frozen_step else None,
+            activation_qmin=-128 if frozen_step else -127,
+            round_weight_scale=True,
         )
         self.register_buffer("bias", None if bias is None else bias.detach().clone())
         self.in_features, self.out_features = k, n

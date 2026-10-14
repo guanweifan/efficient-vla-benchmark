@@ -1,0 +1,13 @@
+schema_version: 1
+name: quantvla
+category: quantization
+description: Author-calibrated DuQuant W4A8 with ATM and OHB on CogACT.
+config: efficient_vla_benchmark.methods.quantization.quantvla.config:QuantVLAConfig
+requires_artifact: true
+implementations:
+  cogact:
+    variants: [libero_joint]
+    requires: [llama_decoder]
+    factory: efficient_vla_benchmark.methods.quantization.quantvla.implementations.cogact.api:build
+    preflight: efficient_vla_benchmark.methods.quantization.quantvla.implementations.cogact.api:preflight
+    calibrate: efficient_vla_benchmark.methods.quantization.quantvla.implementations.cogact.api:calibrate

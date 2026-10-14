@@ -1,31 +1,36 @@
-# QuantVLA runtime feasibility components
+# QuantVLA — CogACT packed runtime
 
-Status: **not registered, not a completed reproduction, not a formal result row**.
-Reference: [official implementation](https://github.com/AIoT-MLSys-Lab/QuantVLA/tree/9e435e56aac4e743526557e5d9ba6e4fddd6ccca).
+Reference: [pinned official source](https://github.com/AIoT-MLSys-Lab/QuantVLA/tree/9e435e56aac4e743526557e5d9ba6e4fddd6ccca).
+The supported port is CogACT LIBERO joint, native BF16 VLM, FP32 DiT and DDIM10 H8.
+Registration is not evidence of completed Dev/final evaluation; see the result ledger.
 
-`PackedDuQuantLinear` executes calibrated smoothing, input permutation, block
-rotation, packed W4/A8 linear, output rotation and post-rotation bias. Uniform
-rotation blocks use batched matrix multiplication; ragged blocks remain explicit.
-All transformations are online work and must remain inside timing boundaries.
-The shared kernel retains each input channel's activation scale inside reduction.
-W4 is physically packed and A8 is physically stored as INT8, but multiplication
-uses tile-local dequantized floating operands and FP32 accumulation: **not integer
-W4A8 MMA**, and no claim of native INT4/INT8 Tensor Core acceleration.
+The complete selected mechanism is block-SVD input/output rotations, optional
+energy-smoothed zigzag permutation, per-row five-point MSE W4 scaling, frozen
+per-input-channel A8 percentile scales, per-head ATM and post-projection OHB.
+There are 224 language and 24 DiT-MLP quantized linears and 12 native FP32 attention
+modules. Vision, projectors, DiT attention weights and sampler precision are unchanged.
 
-The CogACT model diagnostic verifies a checksummed 248-linear calibration artifact:
-224 language linears and 24 DiT MLP linears. It keeps the artifact's 12 FP32
-DiT-attention ATM/OHB transformations. Dense reconstruction exists only in the
-private correctness oracle; production primitives retain no full floating weight
-cache. The original artifact's fake-runtime label is not rewritten or passed off
-as proof of real execution; the derived probe records its actual packed kernel.
+`energy_smoothing` smooths the column-energy statistic used for the optional
+permutation. It is **not** SmoothQuant activation/weight rescaling. ATM uses the
+author's clipped ratio and neutral band; OHB uses a separate log-clipped ratio.
+W4 codes are -8..7; A8 codes are -128..127. Scales use the native module dtype.
 
-Tests establish full-precision transform identity and packed/reference agreement
-for BF16 and FP32, including input/output rotations, smoothing, permutation and
-bias. Whole-model parity is approximate floating arithmetic, not bitwise equality
-to the dense oracle; reset reproducibility is checked separately and exactly.
+Calibration uses only the fixed four-suite RLDS training pool. Per-channel
+activation percentiles are maximized across 32 observed calls per module, then
+frozen. DiT calls include diffusion steps, not 32 distinct episodes. Attention
+statistics use 128 balanced training observations for both native and packed
+student inference. The released wrapper can freeze its first-call fallback;
+this port explicitly completes its intended percentile-calibrator window offline.
+That engineering adaptation is disclosed, not called bitwise application parity.
 
-Before admission, move the validated attention binding and artifact checks into
-the method interface, expose typed configuration, verify complete reload/identity,
-and run the shared compact replay. The prototype does not register a policy,
-expose a selectable preset, or establish formal success/speed. Preserve native
-CogACT FP32 DiT and sampler; neither OFT support nor a faster runtime is implied.
+Runtime weights are physically packed W4 and activations are INT8. The Triton
+kernel locally dequantizes tiles for floating GEMM with FP32 accumulation:
+**not integer W4A8 MMA**, not a full floating-weight cache, and not guaranteed faster.
+Rotations, A8 conversion, ATM/OHB and transfers remain inside common timing.
+
+Use `evb calibrate` with the portable `cogact/quantvla.yaml` preset, explicit model,
+dataset and artifact destinations. Evaluation requires the resulting schema-3
+artifact through `--artifact-path`. Changing any calibration parameter requires
+a matching artifact. Legacy handover schema-2 artifacts are diagnostic-only and
+rejected: their scale/permutation/attention formulas differed from the author code.
+Conversion is irreversible; returning to native requires a fresh backend.

@@ -1,0 +1,4 @@
+extends:
+  - quantvla.yaml
+parameters:
+  block_size: 16
