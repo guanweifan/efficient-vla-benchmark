@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: 2c6322c9408fa3e09ac03a45d75f791ce8c017466609b12ff41a32efe81fc848
+coverage_summary_sha256: 3fbef82a9a33705ac605200a89fa2b3ca52844d2a9395805c43b30473557b175
 source_compatibility:
 - development_runtime: 6a29dd2884a1266499a0b507088dc4efeb100b12e821dbaca4ffa9c9f5f492e7
   timing_runtime: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
@@ -104,6 +104,86 @@ source_compatibility:
   reason: Only isolated ETA-VLA ILSA, ActionCache clean-bank, or TIES files changed. Shared backends/controller/harness
     and retained comparison methods are byte-identical. Join only unchanged method scopes with identical
     effective config, calibration metadata and active dependencies. Original hashes remain unchanged.
+- development_runtime: 8372b0fff477b19578174ccc5e60a20b74034adf955222e367aee9da532b0031
+  timing_runtime: 21b78018579c07e481d6235bb381bb0a54b7f8f78a1f38df92b14a3f95d49b4f
+  reason: 'Quantization repair scoped audit: only ActQuant retains previously certified historical Dev
+    via the unchanged-policy audit from the pre-repair ledger; native backends, controller and its method
+    equations are unchanged. AWQ and other fresh scopes join only additive unrelated methods, the exact
+    MotionVQ launch-geometry change, and the independently verified AWQ test-fixture-only mask clarification.
+    HoloQ uses only the repaired native-FP32 cohort; QVLA uses only the corrected native-rounding cohort.
+    Dependencies/config/artifact/backend metadata are strictly rechecked; actual measured hashes are retained.'
+- development_runtime: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
+  timing_runtime: 21b78018579c07e481d6235bb381bb0a54b7f8f78a1f38df92b14a3f95d49b4f
+  reason: 'Quantization repair scoped audit: only ActQuant retains previously certified historical Dev
+    via the unchanged-policy audit from the pre-repair ledger; native backends, controller and its method
+    equations are unchanged. AWQ and other fresh scopes join only additive unrelated methods, the exact
+    MotionVQ launch-geometry change, and the independently verified AWQ test-fixture-only mask clarification.
+    HoloQ uses only the repaired native-FP32 cohort; QVLA uses only the corrected native-rounding cohort.
+    Dependencies/config/artifact/backend metadata are strictly rechecked; actual measured hashes are retained.'
+- development_runtime: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
+  timing_runtime: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  reason: 'Quantization repair scoped audit: only ActQuant retains previously certified historical Dev
+    via the unchanged-policy audit from the pre-repair ledger; native backends, controller and its method
+    equations are unchanged. AWQ and other fresh scopes join only additive unrelated methods, the exact
+    MotionVQ launch-geometry change, and the independently verified AWQ test-fixture-only mask clarification.
+    HoloQ uses only the repaired native-FP32 cohort; QVLA uses only the corrected native-rounding cohort.
+    Dependencies/config/artifact/backend metadata are strictly rechecked; actual measured hashes are retained.'
+- development_runtime: e49c3e1f8c0dfd378e8a84e2733c94dab154efc662f0f6e2f61ad87697245b6e
+  timing_runtime: 21b78018579c07e481d6235bb381bb0a54b7f8f78a1f38df92b14a3f95d49b4f
+  reason: 'Quantization repair scoped audit: only ActQuant retains previously certified historical Dev
+    via the unchanged-policy audit from the pre-repair ledger; native backends, controller and its method
+    equations are unchanged. AWQ and other fresh scopes join only additive unrelated methods, the exact
+    MotionVQ launch-geometry change, and the independently verified AWQ test-fixture-only mask clarification.
+    HoloQ uses only the repaired native-FP32 cohort; QVLA uses only the corrected native-rounding cohort.
+    Dependencies/config/artifact/backend metadata are strictly rechecked; actual measured hashes are retained.'
+- development_runtime: e49c3e1f8c0dfd378e8a84e2733c94dab154efc662f0f6e2f61ad87697245b6e
+  timing_runtime: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  reason: 'Quantization repair scoped audit: only ActQuant retains previously certified historical Dev
+    via the unchanged-policy audit from the pre-repair ledger; native backends, controller and its method
+    equations are unchanged. AWQ and other fresh scopes join only additive unrelated methods, the exact
+    MotionVQ launch-geometry change, and the independently verified AWQ test-fixture-only mask clarification.
+    HoloQ uses only the repaired native-FP32 cohort; QVLA uses only the corrected native-rounding cohort.
+    Dependencies/config/artifact/backend metadata are strictly rechecked; actual measured hashes are retained.'
+- development_runtime: 8372b0fff477b19578174ccc5e60a20b74034adf955222e367aee9da532b0031
+  timing_runtime: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  reason: 'Quantization repair scoped audit: only ActQuant retains previously certified historical Dev
+    via the unchanged-policy audit from the pre-repair ledger; native backends, controller and its method
+    equations are unchanged. AWQ and other fresh scopes join only additive unrelated methods, the exact
+    MotionVQ launch-geometry change, and the independently verified AWQ test-fixture-only mask clarification.
+    HoloQ uses only the repaired native-FP32 cohort; QVLA uses only the corrected native-rounding cohort.
+    Dependencies/config/artifact/backend metadata are strictly rechecked; actual measured hashes are retained.'
+- development_runtime: 21257ada6c7d549ab0e19e78a9ad4b9ae424e05cc33ba19bfcc55bcf78ba1ca4
+  timing_runtime: 21b78018579c07e481d6235bb381bb0a54b7f8f78a1f38df92b14a3f95d49b4f
+  reason: 'Quantization repair scoped audit: only ActQuant retains previously certified historical Dev
+    via the unchanged-policy audit from the pre-repair ledger; native backends, controller and its method
+    equations are unchanged. AWQ and other fresh scopes join only additive unrelated methods, the exact
+    MotionVQ launch-geometry change, and the independently verified AWQ test-fixture-only mask clarification.
+    HoloQ uses only the repaired native-FP32 cohort; QVLA uses only the corrected native-rounding cohort.
+    Dependencies/config/artifact/backend metadata are strictly rechecked; actual measured hashes are retained.'
+- development_runtime: 21257ada6c7d549ab0e19e78a9ad4b9ae424e05cc33ba19bfcc55bcf78ba1ca4
+  timing_runtime: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  reason: 'Quantization repair scoped audit: only ActQuant retains previously certified historical Dev
+    via the unchanged-policy audit from the pre-repair ledger; native backends, controller and its method
+    equations are unchanged. AWQ and other fresh scopes join only additive unrelated methods, the exact
+    MotionVQ launch-geometry change, and the independently verified AWQ test-fixture-only mask clarification.
+    HoloQ uses only the repaired native-FP32 cohort; QVLA uses only the corrected native-rounding cohort.
+    Dependencies/config/artifact/backend metadata are strictly rechecked; actual measured hashes are retained.'
+- development_runtime: 21b78018579c07e481d6235bb381bb0a54b7f8f78a1f38df92b14a3f95d49b4f
+  timing_runtime: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  reason: 'Quantization repair scoped audit: only ActQuant retains previously certified historical Dev
+    via the unchanged-policy audit from the pre-repair ledger; native backends, controller and its method
+    equations are unchanged. AWQ and other fresh scopes join only additive unrelated methods, the exact
+    MotionVQ launch-geometry change, and the independently verified AWQ test-fixture-only mask clarification.
+    HoloQ uses only the repaired native-FP32 cohort; QVLA uses only the corrected native-rounding cohort.
+    Dependencies/config/artifact/backend metadata are strictly rechecked; actual measured hashes are retained.'
+- development_runtime: f762e64c1503261110e43749c5c7b02006f7804a92305dacaab66aa1b12fc824
+  timing_runtime: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  reason: 'Quantization repair scoped audit: only ActQuant retains previously certified historical Dev
+    via the unchanged-policy audit from the pre-repair ledger; native backends, controller and its method
+    equations are unchanged. AWQ and other fresh scopes join only additive unrelated methods, the exact
+    MotionVQ launch-geometry change, and the independently verified AWQ test-fixture-only mask clarification.
+    HoloQ uses only the repaired native-FP32 cohort; QVLA uses only the corrected native-rounding cohort.
+    Dependencies/config/artifact/backend metadata are strictly rechecked; actual measured hashes are retained.'
 timing_workloads:
   openvla_oft: 01f8a93fc0bd522be3ef1d2dbee981ad1bb53ed9c1bf76b404808060bdedbefe
   cogact: 6c0e509fe062fdc393d7edbf668d29450250b99e9b163a5bad5597796e7420bc
@@ -119,37 +199,209 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-41-4-cogact-1--native-pre
-- config: configs/experiments/cogact/quantvla.yaml
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  config: configs/experiments/cogact/awq_fp16_kernel.yaml
   status: primary
   section: '3.3'
-  reason: Block64/16 give 181/178 of 200. Their valid latencies differ by 0.81%, a one-pass tie; retain
-    the reference block64 with higher Dev success. Neither accelerates.
-  scope: Calibrated DuQuant plus ATM/OHB; physical W4/A8 storage with tile-local floating GEMM, not integer
-    MMA.
-  development_summary_sha256: 0a4c4e64b2d4c33c94ffb62f2be75b5dc2b159d5d00142f9e28e6a8833187115
-  development_experiment_id: d43d502b3eb64d4175b45d554dcae02d2142e2937ec25443361866afe27c8c0b
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  scope: W4A16 with explicitly cast FP16 author kernel; training-only AWQ calibration.
+  timing_record: quant-p3-runtime-cogact-existing-r1-awq_fp16_kernel
+  development_summary_sha256: e2fccdf01f219fd92aaefa728bf83ab71757a71e5c9dceda1abc531587d6d0a4
+  development_experiment_id: 978a97ceb9fd46195050bc3e255705b459588d46a052b699f0b753903e579108
+  reason: Both supported kernel precisions received fresh Dev-200 and timing; FP16 is the faster eligible
+    option. Historical Final outcomes remain unchanged, not retuned.
+  search:
+    complete: true
+    stop: mechanism_limit
+    reason: Both supported kernel precisions received fresh Dev-200 and timing; FP16 is the faster eligible
+      option. Historical Final outcomes remain unchanged, not retuned.
+    evidence:
+    - development_summary_sha256: e2fccdf01f219fd92aaefa728bf83ab71757a71e5c9dceda1abc531587d6d0a4
+      development_experiment_id: 978a97ceb9fd46195050bc3e255705b459588d46a052b699f0b753903e579108
+      timing_record: quant-p3-runtime-cogact-existing-r1-awq_fp16_kernel
+    - development_summary_sha256: e2fccdf01f219fd92aaefa728bf83ab71757a71e5c9dceda1abc531587d6d0a4
+      development_experiment_id: 8b7c5bc06c3d722d3e21ce1bfc625a6990773624ffd88a6bf5157a5099028a29
+      timing_record: quant-p3-runtime-cogact-existing-r1-awq
+    tie_reason: Both supported kernel precisions received fresh Dev-200 and timing; FP16 is the faster
+      eligible option. Historical Final outcomes remain unchanged, not retuned.
+    limitation: Pinned W4/group128 author kernels; calibration tuning does not shrink online operator
+      geometry.
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: quant-p2-optimized-cogact-r2-quantvla
-  final_runtime_source_sha256: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
+  config: configs/experiments/cogact/da_mpa.yaml
+  status: primary
+  section: '3.3'
+  scope: DA-PTQ Table4 DA-MPA drift-allocation core only; CSRC excluded. Native FP32 retained DiT blocks;
+    real W4/A8 packed floating GEMM.
+  timing_record: quant-p3-runtime-cogact-modular-r1-da_mpa
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: b4f0b2e364c74b137287ca17887fce1487051f76aa8f8c62aab9478170fcadce
+  development_experiment_id: 237a0364cd1571e18528961afe00fca0028809cd61926b59035fe4ea9ffef217
+  reason: Retain30/15 give 187/181 of 200, both eligible; more quantized blocks slow execution (26.532
+    to 27.288 ms/control). Keep the reference 30% allocation.
   search:
     complete: true
     stop: latency_plateau
-    reason: 'Both rotation budgets meet the fixed Dev target: block64=181/200 and block16=178/200. Their
-      valid full-cost latencies differ by only 0.81%; one replay pass cannot establish a robust sub-percent
-      ranking. Retain block64, the original rotation budget with higher Dev success; retain block16 as
-      explicit search evidence. Both are slower than native.'
-    tie_reason: 'Both rotation budgets meet the fixed Dev target: block64=181/200 and block16=178/200.
-      Their valid full-cost latencies differ by only 0.81%; one replay pass cannot establish a robust
-      sub-percent ranking. Retain block64, the original rotation budget with higher Dev success; retain
-      block16 as explicit search evidence. Both are slower than native.'
+    reason: Retain30/15 give 187/181 of 200, both eligible; more quantized blocks slow execution (26.532
+      to 27.288 ms/control). Keep the reference 30% allocation.
     evidence:
-    - development_summary_sha256: 0a4c4e64b2d4c33c94ffb62f2be75b5dc2b159d5d00142f9e28e6a8833187115
-      development_experiment_id: d43d502b3eb64d4175b45d554dcae02d2142e2937ec25443361866afe27c8c0b
-      timing_record: quant-p2-optimized-cogact-r2-quantvla
-    - development_summary_sha256: 0a4c4e64b2d4c33c94ffb62f2be75b5dc2b159d5d00142f9e28e6a8833187115
-      development_experiment_id: 6c8b3e4f5c79488974907caa9cd6b2f662298481ef588f82a61868160581c03d
-      timing_record: quant-p2-optimized-cogact-r2-quantvla_b16
+    - development_summary_sha256: b4f0b2e364c74b137287ca17887fce1487051f76aa8f8c62aab9478170fcadce
+      development_experiment_id: 237a0364cd1571e18528961afe00fca0028809cd61926b59035fe4ea9ffef217
+      timing_record: quant-p3-runtime-cogact-modular-r1-da_mpa
+    - development_summary_sha256: fe651aa4c5619b3cc806546c1d34cc02faadcf0e930b280cf2eed7435ba7a6c9
+      development_experiment_id: c702960d271373fb721066e2a51ee39940bf2ee03f4165940d652a5014b37885
+      timing_record: quant-p3-runtime-cogact-modular-r1-da_mpa_r15
+    tie_reason: Retain30/15 give 187/181 of 200, both eligible; more quantized blocks slow execution (26.532
+      to 27.288 ms/control). Keep the reference 30% allocation.
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  config: configs/experiments/cogact/dyq_vla.yaml
+  status: primary
+  section: '3.3'
+  scope: Paper temporal W4/dynamic-A core; independent successful native trajectories. Disclosed quantizer/threshold
+    estimator; INT8 activation carrier with floating tile GEMM, not unavailable author integer/async runtime.
+  timing_record: quant-p3-runtime-cogact-dynamic-r1-dyq_vla
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: 4b2a38cefa39e90f119c5a3295b7f0c6bc4b5f6c677d4a127851448782e117fa
+  development_experiment_id: ec437d962ea1ca4c4f4ef7e180a55c2cac205744da1856f040ce067bebecb5b2
+  reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or Dev-data
+    calibration. Report the measured backend-specific outcome.
+  search:
+    complete: true
+    stop: mechanism_limit
+    reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or Dev-data
+      calibration. Report the measured backend-specific outcome.
+    evidence:
+    - development_summary_sha256: 4b2a38cefa39e90f119c5a3295b7f0c6bc4b5f6c677d4a127851448782e117fa
+      development_experiment_id: ec437d962ea1ca4c4f4ef7e180a55c2cac205744da1856f040ce067bebecb5b2
+      timing_record: quant-p3-runtime-cogact-dynamic-r1-dyq_vla
+    tie_reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or
+      Dev-data calibration. Report the measured backend-specific outcome.
+    limitation: Logical A2/A4/A8 share INT8 storage and the same floating GEMM geometry. Threshold changes
+      cannot produce the absent lower-bit integer/async engine; unsupported intervals remain disabled
+      by calibration.
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  config: configs/experiments/cogact/eaqvla.yaml
+  status: primary
+  section: '3.3'
+  scope: 'Independent modular weight-GPTQ core: vision W4/language W8, native projector/action head. Unspecified
+    activation quantizer excluded; packed floating GEMM.'
+  timing_record: quant-p3-runtime-cogact-modular-r1-eaqvla
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: d7626e43fa7ed9794db1becce9114f1901d6e44e2399d1051f5db30cb8169b8b
+  development_experiment_id: 92ecfbe513af045670c25d6475ffa724114b7707176276c4e526090da434cd1e
+  reason: Fixed paper module precision policy is active and numerically checked; retain measured success
+    and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
+  search:
+    complete: true
+    stop: mechanism_limit
+    reason: Fixed paper module precision policy is active and numerically checked; retain measured success
+      and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
+    evidence:
+    - development_summary_sha256: d7626e43fa7ed9794db1becce9114f1901d6e44e2399d1051f5db30cb8169b8b
+      development_experiment_id: 92ecfbe513af045670c25d6475ffa724114b7707176276c4e526090da434cd1e
+      timing_record: quant-p3-runtime-cogact-modular-r1-eaqvla
+    tie_reason: Fixed paper module precision policy is active and numerically checked; retain measured
+      success and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
+    limitation: Changing the fixed vision-W4/language-W8 allocation removes the retained core; kernel
+      layout was optimized without changing scale axes or precision.
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  config: configs/experiments/cogact/holoq_b16.yaml
+  status: primary
+  section: '3.3'
+  scope: 'Official-code W4A4 variant: LLM block GPTQ and DiT RTN with composite rotations. Packed BF16
+    LLM tiles; explicit per-call FP32 DiT decode/native GEMM, no persistent reconstructed weights. Not
+    the differing paper-v3 activation-axis variant.'
+  timing_record: quant-p3-runtime-cogact-holoq-b16-native-fp32-r1-holoq_b16
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: 40223500d1f3df9a9a58bbdbf9ccc625b5af7e36dcf065cc25efffe835ae160f
+  development_experiment_id: 6d9c2e73ffcd0f4bcdbedd8b5aeea40417ba7cc5a0e79fccde67dea22a13a7d9
+  reason: 'Block64/16 give 172/187 of 200. Select block16: it meets the 177/200 target while block64 does
+    not; valid full-cost latencies are similar and both slower than native. Ordinary policy arithmetic,
+    reset and fresh reload match the quantized reference exactly.'
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: 'Block64/16 give 172/187 of 200. Select block16: it meets the 177/200 target while block64
+      does not; valid full-cost latencies are similar and both slower than native. Ordinary policy arithmetic,
+      reset and fresh reload match the quantized reference exactly.'
+    evidence:
+    - development_summary_sha256: cd2f793014c7bcc8e35b084a2ae54c028da24862557e97421a46f6baaee69009
+      development_experiment_id: c62edad0a72daba619ebc1d7660db296bde3bce44b118ddb4e212d245f4d90bf
+      timing_record: quant-p3-runtime-cogact-holoq-native-fp32-r1-holoq
+    - development_summary_sha256: 40223500d1f3df9a9a58bbdbf9ccc625b5af7e36dcf065cc25efffe835ae160f
+      development_experiment_id: 6d9c2e73ffcd0f4bcdbedd8b5aeea40417ba7cc5a0e79fccde67dea22a13a7d9
+      timing_record: quant-p3-runtime-cogact-holoq-b16-native-fp32-r1-holoq_b16
+    tie_reason: 'Block64/16 give 172/187 of 200. Select block16: it meets the 177/200 target while block64
+      does not; valid full-cost latencies are similar and both slower than native. Ordinary policy arithmetic,
+      reset and fresh reload match the quantized reference exactly.'
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  config: configs/experiments/cogact/motion_vq_t1.yaml
+  status: primary
+  section: '3.3'
+  scope: VQVLA independent LLM dual-codebook/motion-router core, both resident banks and packed centroid-gather
+    GPU costs included. Native FP32 diffusion head unchanged; excludes full-model export and ASIC-specific
+    reuse.
+  timing_record: quant-p3-runtime-cogact-motion-vq-r1-motion_vq_t1
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
+  development_experiment_id: fd1874d63b12e55628dfec7e77f5b1ae545a64e42b9183ddb135e8f2744d7cf4
+  reason: Thresholds 0.8/1.0 both give 182 of 200, with 26.139/25.347 ms/control; select the faster eligible
+    1.0. Both banks remain active (13 of 63 measured queries use the low bank at 1.0). Kernel tile reuse
+    was optimized and independently checked. Report a negative GPU outcome, not an optimality or paper-failure
+    claim.
+  search:
+    complete: true
+    stop: mechanism_limit
+    reason: Thresholds 0.8/1.0 both give 182 of 200, with 26.139/25.347 ms/control; select the faster
+      eligible 1.0. Both banks remain active (13 of 63 measured queries use the low bank at 1.0). Kernel
+      tile reuse was optimized and independently checked. Report a negative GPU outcome, not an optimality
+      or paper-failure claim.
+    evidence:
+    - development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
+      development_experiment_id: aed0a15d75d70f5e27c427f703f7851fc14f94b5c353fa04889cbc26e9d0ea7a
+      timing_record: quant-p3-runtime-cogact-motion-vq-r1-motion_vq
+    - development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
+      development_experiment_id: fd1874d63b12e55628dfec7e77f5b1ae545a64e42b9183ddb135e8f2744d7cf4
+      timing_record: quant-p3-runtime-cogact-motion-vq-r1-motion_vq_t1
+    tie_reason: Thresholds 0.8/1.0 both give 182 of 200, with 26.139/25.347 ms/control; select the faster
+      eligible 1.0. Both banks remain active (13 of 63 measured queries use the low bank at 1.0). Kernel
+      tile reuse was optimized and independently checked. Report a negative GPU outcome, not an optimality
+      or paper-failure claim.
+    limitation: The fixed author codebook shapes retain centroid-gather overhead; changing a routing threshold
+      does not replace that engine. Do not promote an all-high disabled-router control or arbitrary codebook
+      sizes to the method. Search closure is scoped to this active two-bank GPU core, not exhaustive threshold
+      optimization.
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  config: configs/experiments/cogact/quantvla.yaml
+  status: primary
+  section: '3.3'
+  scope: Calibrated DuQuant plus ATM/OHB, W4/A8 storage and tile floating GEMM; native FP32 DiT and all
+    transforms retained.
+  timing_record: quant-p3-runtime-cogact-existing-r1-quantvla
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: b68cc529598d4c4652c93df33b1b87269ed7fd124d7864e67eeb957cc87f5e48
+  development_experiment_id: 75209ba4c175a17b43068bdb982dd01d7117cbb74c002db95090b3c6305f1de3
+  reason: Block64/16 give 181/178 of 200 with 34.632/34.880 ms/control, a latency plateau; retain reference
+    block64 with higher success. DiT profiling and native-GEMM diagnostic found no speed recovery.
+  search:
+    complete: true
+    stop: latency_plateau
+    reason: Block64/16 give 181/178 of 200 with 34.632/34.880 ms/control, a latency plateau; retain reference
+      block64 with higher success. DiT profiling and native-GEMM diagnostic found no speed recovery.
+    evidence:
+    - development_summary_sha256: b68cc529598d4c4652c93df33b1b87269ed7fd124d7864e67eeb957cc87f5e48
+      development_experiment_id: 75209ba4c175a17b43068bdb982dd01d7117cbb74c002db95090b3c6305f1de3
+      timing_record: quant-p3-runtime-cogact-existing-r1-quantvla
+    - development_summary_sha256: b68cc529598d4c4652c93df33b1b87269ed7fd124d7864e67eeb957cc87f5e48
+      development_experiment_id: 1572d5750b6001fddfc1327f3a6fe91c041b544aaf3c52ef8e902b969e97ac40
+      timing_record: quant-p3-runtime-cogact-existing-r1-quantvla_b16
+    tie_reason: Block64/16 give 181/178 of 200 with 34.632/34.880 ms/control, a latency plateau; retain
+      reference block64 with higher success. DiT profiling and native-GEMM diagnostic found no speed recovery.
 - config: configs/experiments/cogact/efficient_vla_layer_prune04.yaml
   status: primary
   section: '3.3'
@@ -1518,29 +1770,6 @@ configurations:
     - development_summary_sha256: 53b0882c6647f039c44e32b6e8d9464fef316c4bc723e5f6babbd700fac2e64d
       development_experiment_id: 33c7619175d6c0660aff06ad13616dbbddbd657a78195b65049e91b30ebd973e
       timing_record: search-r15-41-6-cogact--vote_ensemble_h8_threshold75
-- config: configs/experiments/cogact/awq_fp16_kernel.yaml
-  status: primary
-  section: '6.1'
-  reason: FP16 is the faster eligible option among both measured supported kernel precisions.
-  scope: Explicit FP16 cast boundary; training-only calibration.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: be03b017c6a40862b3ebc5afa78a0ce2cf31111d49e8763c1fe5d0650391c117
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-42-0-cogact-quant--awq_fp16_kernel
-  search:
-    stop: mechanism_limit
-    reason: FP16 is the faster eligible option among both measured supported kernel precisions.
-    limitation: The pinned packed W4 kernel fixes bits=4 and group_size=128; changing calibration search
-      does not reduce online operator geometry.
-    complete: true
-    evidence:
-    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-      development_experiment_id: be03b017c6a40862b3ebc5afa78a0ce2cf31111d49e8763c1fe5d0650391c117
-      timing_record: compact-42-0-cogact-quant--awq_fp16_kernel
-    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-      development_experiment_id: a223cf526c859a8a6071ba21da16d2be890c981c5048f52ab863fda22eace8dc
-      timing_record: compact-42-0-cogact-quant--awq
 - config: configs/experiments/openvla_oft/baseline.yaml
   status: primary
   section: Reference
@@ -1551,75 +1780,183 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-124-7-openvla_oft-quant--native-pre
-- config: configs/experiments/openvla_oft/actquant.yaml
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  config: configs/experiments/openvla_oft/actquant.yaml
   status: primary
   section: '3.3'
-  reason: Projection budgets 4.5/3.5/2.5 give 198/195/185 of 200. The first two latencies tie at 23.451/23.483
-    ms/control; 2.5 is slower at 26.044. Select 4.5 for higher Dev success, not the larger ratio from
-    a slower native pair.
-  scope: Author GGUF runtime with training-only HSIC/AMF, 200 balanced H8 chunks; projection-bit budget
-    only, internal Q8_1 activations. Cross-runtime comparison, not quantization-only speedup; Torch GPU
-    memory unavailable.
+  scope: Author GGUF HSIC/AMF runtime; projection-bit budget 4.5, internal Q8_1 activations. Cross-runtime,
+    not quantization-only speedup.
+  timing_record: quant-p3-runtime-openvla_oft-existing-r1-actquant
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
   development_summary_sha256: a68d4b3da9bc81c166afab120c0fe761e0d3d5c6ea3f12f06bcecd7b383fdded
   development_experiment_id: c71d808134c35b6e3b6c8d20ed967f21926e6fcd509958df5e7a71baefa822b2
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: quant-p2-short-actquant-isolated-method
-  final_runtime_source_sha256: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
+  reason: 'Budgets 4.5/3.5/2.5 retain Dev 198/195/185; new same-cohort timings are 23.115/23.465/25.863
+    ms/control. Select 4.5: no faster eligible lower-bit candidate.'
   search:
     complete: true
     stop: latency_plateau
-    reason: Calibrated 4.5/3.5/2.5 projection-bit budgets give 198/195/185 of 200. The first two measured
-      full-cost latencies are 23.4509/23.4832 ms/control (0.14% apart), a plateau rather than evidence
-      that 3.5 is faster; its larger speed ratio comes from its paired native reference. Budget 2.5 is
-      slower at 26.0444 ms/control. Retain 4.5 for higher Dev success under the existing timing-tie rule,
-      not a best-of-repeat choice.
+    reason: 'Budgets 4.5/3.5/2.5 retain Dev 198/195/185; new same-cohort timings are 23.115/23.465/25.863
+      ms/control. Select 4.5: no faster eligible lower-bit candidate.'
     evidence:
     - development_summary_sha256: a68d4b3da9bc81c166afab120c0fe761e0d3d5c6ea3f12f06bcecd7b383fdded
       development_experiment_id: c71d808134c35b6e3b6c8d20ed967f21926e6fcd509958df5e7a71baefa822b2
-      timing_record: quant-p2-short-actquant-isolated-method
+      timing_record: quant-p3-runtime-openvla_oft-existing-r1-actquant
     - development_summary_sha256: a68d4b3da9bc81c166afab120c0fe761e0d3d5c6ea3f12f06bcecd7b383fdded
       development_experiment_id: fc5ba13d769173abfeae1b30aedb83fdf6f91aac94638b9fdc5751499d45c6e1
-      timing_record: quant-p2-short-actquant_b3p5-isolated-method
+      timing_record: quant-p3-runtime-openvla_oft-existing-r1-actquant_b3p5
     - development_summary_sha256: 2f351f8ceaea3ec5fe41b577cecf1e9acfcf952083f56da083cc4483db1cabb9
       development_experiment_id: 06244fe88b530a5daf841d0ec02a8435f39ae3d118c5ee4086e1dc475f9505bf
-      timing_record: quant-p2-isolated-low-budget-method
-    tie_reason: Calibrated 4.5/3.5/2.5 projection-bit budgets give 198/195/185 of 200. The first two measured
-      full-cost latencies are 23.4509/23.4832 ms/control (0.14% apart), a plateau rather than evidence
-      that 3.5 is faster; its larger speed ratio comes from its paired native reference. Budget 2.5 is
-      slower at 26.0444 ms/control. Retain 4.5 for higher Dev success under the existing timing-tie rule,
-      not a best-of-repeat choice.
-- config: configs/experiments/openvla_oft/qvla_b15p5.yaml
+      timing_record: quant-p3-runtime-openvla_oft-existing-r1-actquant_b2p5
+    tie_reason: 'Budgets 4.5/3.5/2.5 retain Dev 198/195/185; new same-cohort timings are 23.115/23.465/25.863
+      ms/control. Select 4.5: no faster eligible lower-bit candidate.'
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  config: configs/experiments/openvla_oft/awq_fp16_kernel.yaml
   status: primary
   section: '3.3'
-  reason: Channel budgets 4/8/12 give 0/0/3 of 200; 15.5 recovers 199/200. Valid 12/15.5 timings are both
-    slower than native. Retain the active accuracy-recovered 15.5 allocation.
-  scope: Official-code input-Hessian proxy, not paper action intervention; 15.5 is channel-average allocation,
-    not full-model bits/weight. Packed tile-local floating GEMM, not integer MMA.
-  development_summary_sha256: 217c0b2382280db07c1df8ccb9739069455b2e9303f6a94c37cc997353c72842
-  development_experiment_id: cd77a61b32450d514848081c08e1c852693eda7ce5d2abaedf7afe6f115696a6
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: quant-p2-short-qvla_b15p5-isolated-method
-  final_runtime_source_sha256: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
+  scope: W4A16 with explicitly cast FP16 author kernel; training-only AWQ calibration.
+  timing_record: quant-p3-runtime-openvla_oft-existing-r1-awq_fp16_kernel
+  development_summary_sha256: e2fccdf01f219fd92aaefa728bf83ab71757a71e5c9dceda1abc531587d6d0a4
+  development_experiment_id: 016d66ce289606cda23e5832ccb72e53d1b7429f261bd3af5531013eee702b90
+  reason: Both supported kernel precisions received fresh Dev-200 and timing; FP16 is the faster eligible
+    option. Historical Final outcomes remain unchanged, not retuned.
   search:
     complete: true
-    stop: accuracy_boundary
-    reason: 'Official Hessian allocation: channel budgets 4 and 8 each give 0/200, 12 gives 3/200, while
-      15.5 gives 199/200 and meets the fixed 192/200 target. Retain the active accuracy-recovered 15.5
-      budget; lower tested budgets fail the accuracy target; the valid 12-bit timing is also slower than
-      native. Do not exempt layers or alter the allocator to recover performance.'
+    stop: mechanism_limit
+    reason: Both supported kernel precisions received fresh Dev-200 and timing; FP16 is the faster eligible
+      option. Historical Final outcomes remain unchanged, not retuned.
     evidence:
-    - development_summary_sha256: 0a4c4e64b2d4c33c94ffb62f2be75b5dc2b159d5d00142f9e28e6a8833187115
-      development_experiment_id: 0cfd155dc060a560647ceb57e8ff8e3ed9e928a3666fd3da679da65fc419f11e
-    - development_summary_sha256: 0a4c4e64b2d4c33c94ffb62f2be75b5dc2b159d5d00142f9e28e6a8833187115
-      development_experiment_id: 0698305fb650bd972797b9e4fc9e6da7dba95cb83f6b9c12f777565b032dae87
-    - development_summary_sha256: 217c0b2382280db07c1df8ccb9739069455b2e9303f6a94c37cc997353c72842
-      development_experiment_id: cd77a61b32450d514848081c08e1c852693eda7ce5d2abaedf7afe6f115696a6
-      timing_record: quant-p2-short-qvla_b15p5-isolated-method
-    - development_summary_sha256: b0cc6945c951a9e2ccbb73eb51de3d76a480957fd0a4cd2f14cb0b7fb01b84ce
-      development_experiment_id: c7cc1f16f019cb5b6fdae07987d6cc243a12a77857a31c4c926640bcee001d3b
-      timing_record: quant-p2-short-qvla_b12-isolated-method
+    - development_summary_sha256: e2fccdf01f219fd92aaefa728bf83ab71757a71e5c9dceda1abc531587d6d0a4
+      development_experiment_id: 016d66ce289606cda23e5832ccb72e53d1b7429f261bd3af5531013eee702b90
+      timing_record: quant-p3-runtime-openvla_oft-existing-r1-awq_fp16_kernel
+    - development_summary_sha256: e2fccdf01f219fd92aaefa728bf83ab71757a71e5c9dceda1abc531587d6d0a4
+      development_experiment_id: 60497c718cb9e9afa95e3804a9f1a156caf2647272f2f90544471328e04e74e4
+      timing_record: quant-p3-runtime-openvla_oft-existing-r1-awq
+    tie_reason: Both supported kernel precisions received fresh Dev-200 and timing; FP16 is the faster
+      eligible option. Historical Final outcomes remain unchanged, not retuned.
+    limitation: Pinned W4/group128 author kernels; calibration tuning does not shrink online operator
+      geometry.
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  config: configs/experiments/openvla_oft/dyq_vla.yaml
+  status: primary
+  section: '3.3'
+  scope: Paper temporal W4/dynamic-A core; independent successful native trajectories. Disclosed quantizer/threshold
+    estimator; INT8 activation carrier with floating tile GEMM, not unavailable author integer/async runtime.
+  timing_record: quant-p3-runtime-openvla_oft-new-r1-dyq_vla
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: 74b5b41b243e202c87830809dd64a783ee60bd9086e0d70eaf0770e1a8cb8f9c
+  development_experiment_id: 6bf3386916925538aecc4e458f1cf081db436489dde88d50fea2d37db7b8a4bf
+  reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or Dev-data
+    calibration. Report the measured backend-specific outcome.
+  search:
+    complete: true
+    stop: mechanism_limit
+    reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or Dev-data
+      calibration. Report the measured backend-specific outcome.
+    evidence:
+    - development_summary_sha256: 74b5b41b243e202c87830809dd64a783ee60bd9086e0d70eaf0770e1a8cb8f9c
+      development_experiment_id: 6bf3386916925538aecc4e458f1cf081db436489dde88d50fea2d37db7b8a4bf
+      timing_record: quant-p3-runtime-openvla_oft-new-r1-dyq_vla
+    tie_reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or
+      Dev-data calibration. Report the measured backend-specific outcome.
+    limitation: Logical A2/A4/A8 share INT8 storage and the same floating GEMM geometry. Threshold changes
+      cannot produce the absent lower-bit integer/async engine; unsupported intervals remain disabled
+      by calibration.
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  config: configs/experiments/openvla_oft/eaqvla.yaml
+  status: primary
+  section: '3.3'
+  scope: 'Independent modular weight-GPTQ core: vision W4/language W8, native projector/action head. Unspecified
+    activation quantizer excluded; packed floating GEMM.'
+  timing_record: quant-p3-runtime-openvla_oft-new-r1-eaqvla
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: 853756359389223c757ae492f6dbf801d0012e01afc0d3118f463396ffcd8d50
+  development_experiment_id: 21d44e48ffdc9ebff83b03bf72fc07f735d16aa78944359a008776a15d42b352
+  reason: Fixed paper module precision policy is active and numerically checked; retain measured success
+    and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
+  search:
+    complete: true
+    stop: mechanism_limit
+    reason: Fixed paper module precision policy is active and numerically checked; retain measured success
+      and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
+    evidence:
+    - development_summary_sha256: 853756359389223c757ae492f6dbf801d0012e01afc0d3118f463396ffcd8d50
+      development_experiment_id: 21d44e48ffdc9ebff83b03bf72fc07f735d16aa78944359a008776a15d42b352
+      timing_record: quant-p3-runtime-openvla_oft-new-r1-eaqvla
+    tie_reason: Fixed paper module precision policy is active and numerically checked; retain measured
+      success and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
+    limitation: Changing the fixed vision-W4/language-W8 allocation removes the retained core; kernel
+      layout was optimized without changing scale axes or precision.
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  config: configs/experiments/openvla_oft/motion_vq_t1.yaml
+  status: primary
+  section: '3.3'
+  scope: VQVLA independent LLM dual-codebook/motion-router core, both resident banks and packed centroid-gather
+    GPU costs included. Excludes full-model export and ASIC-specific reuse.
+  timing_record: quant-p3-runtime-openvla_oft-motion-vq-r1-motion_vq_t1
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
+  development_experiment_id: 7e83bf47cee1a48e915570707ed91d7b815b0d6af3edc083169570a157bd2c6e
+  reason: Thresholds 0.8/1.0 give 196/198 of 200 and 30.878/29.857 ms/control; select the faster eligible
+    1.0. Both banks remain active (6 of 57 measured queries use the low bank at 1.0). Kernel tile reuse
+    was optimized and independently checked. Report a negative GPU outcome, not an optimality or paper-failure
+    claim.
+  search:
+    complete: true
+    stop: mechanism_limit
+    reason: Thresholds 0.8/1.0 give 196/198 of 200 and 30.878/29.857 ms/control; select the faster eligible
+      1.0. Both banks remain active (6 of 57 measured queries use the low bank at 1.0). Kernel tile reuse
+      was optimized and independently checked. Report a negative GPU outcome, not an optimality or paper-failure
+      claim.
+    evidence:
+    - development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
+      development_experiment_id: 74fb5f84ee77acebd1dc913783a14b1d39a4f4990c44ad63e5f0b137dc2fbfdd
+      timing_record: quant-p3-runtime-openvla_oft-motion-vq-r1-motion_vq
+    - development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
+      development_experiment_id: 7e83bf47cee1a48e915570707ed91d7b815b0d6af3edc083169570a157bd2c6e
+      timing_record: quant-p3-runtime-openvla_oft-motion-vq-r1-motion_vq_t1
+    tie_reason: Thresholds 0.8/1.0 give 196/198 of 200 and 30.878/29.857 ms/control; select the faster
+      eligible 1.0. Both banks remain active (6 of 57 measured queries use the low bank at 1.0). Kernel
+      tile reuse was optimized and independently checked. Report a negative GPU outcome, not an optimality
+      or paper-failure claim.
+    limitation: The fixed author codebook shapes retain centroid-gather overhead; changing a routing threshold
+      does not replace that engine. Do not promote an all-high disabled-router control or arbitrary codebook
+      sizes to the method. Search closure is scoped to this active two-bank GPU core, not exhaustive threshold
+      optimization.
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  config: configs/experiments/openvla_oft/qvla_b15p5.yaml
+  status: primary
+  section: '3.3'
+  scope: Official-code input-Hessian joint allocation, not paper action intervention. Channel-average
+    budget is not model bits/weight; packed floating GEMM.
+  timing_record: quant-p3-runtime-openvla_oft-new-r1-qvla_b15p5
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: b68cc529598d4c4652c93df33b1b87269ed7fd124d7864e67eeb957cc87f5e48
+  development_experiment_id: 1d33b5877ec541a97ba19a9444537d5cb7b0345b02832e23e7b616ed29bc58e9
+  reason: 'Repaired native-dtype QVLA: budgets 15.5/15 give 196/197 of 200, but 15 is slower (33.523 versus
+    30.781 ms/control). Retain active joint 15.5; lower-budget smoke collapse is diagnostic, not reused
+    old Dev evidence.'
+  search:
+    complete: true
+    stop: latency_plateau
+    reason: 'Repaired native-dtype QVLA: budgets 15.5/15 give 196/197 of 200, but 15 is slower (33.523
+      versus 30.781 ms/control). Retain active joint 15.5; lower-budget smoke collapse is diagnostic,
+      not reused old Dev evidence.'
+    evidence:
+    - development_summary_sha256: b68cc529598d4c4652c93df33b1b87269ed7fd124d7864e67eeb957cc87f5e48
+      development_experiment_id: 1d33b5877ec541a97ba19a9444537d5cb7b0345b02832e23e7b616ed29bc58e9
+      timing_record: quant-p3-runtime-openvla_oft-new-r1-qvla_b15p5
+    - development_summary_sha256: b0e23c42450db14a17a10313f7bae18522f371ca89b727b653438b5e3da32746
+      development_experiment_id: 71087af486237e850de2b6eb5ad827e197b441e47f626e7d14fc422913c07391
+      timing_record: quant-p3-runtime-openvla_oft-qvla-b15-r1-qvla_b15
+    tie_reason: 'Repaired native-dtype QVLA: budgets 15.5/15 give 196/197 of 200, but 15 is slower (33.523
+      versus 30.781 ms/control). Retain active joint 15.5; lower-budget smoke collapse is diagnostic,
+      not reused old Dev evidence.'
 - config: configs/experiments/openvla_oft/efficient_vla_layer_prune03.yaml
   status: primary
   section: '3.3'
@@ -2381,51 +2718,30 @@ configurations:
   development_summary_sha256: 8b7333e7b2b148be045ebf79b905399c1dd33c8ef8abfc94653fd2befe2498ea
   development_experiment_id: 2e34e92ba91fbe225e913e7cd5341acf71609375e3f7ed860e05437c00266be9
   timing_record: pace-p75-infra-recheck-v1-124-3-openvla_oft--pace_p75
-- config: configs/experiments/openvla_oft/awq_fp16_kernel.yaml
-  status: primary
-  section: '6.1'
-  reason: FP16 is the faster eligible option among both measured supported kernel precisions.
-  scope: Explicit FP16 cast boundary; training-only calibration.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 566ed69c9ce2db872ba40344f9123dac0ba1db2f05ef3c240c7f156406fe6d66
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-124-7-openvla_oft-quant--awq_fp16_kernel
-  search:
-    stop: mechanism_limit
-    reason: FP16 is the faster eligible option among both measured supported kernel precisions.
-    limitation: The pinned packed W4 kernel fixes bits=4 and group_size=128; changing calibration search
-      does not reduce online operator geometry.
-    complete: true
-    evidence:
-    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-      development_experiment_id: 566ed69c9ce2db872ba40344f9123dac0ba1db2f05ef3c240c7f156406fe6d66
-      timing_record: compact-124-7-openvla_oft-quant--awq_fp16_kernel
-    - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-      development_experiment_id: 5d64703c2acfcfe4a33ed22f76215b16457c1d61cc0be948e134f97124f509cf
-      timing_record: compact-124-7-openvla_oft-quant--awq
 timing_protocol: libero_replay4x128_v1
 auxiliary_configurations:
-- config: configs/experiments/openvla_oft/awq.yaml
-  status: auxiliary
-  section: '6.1'
-  reason: Retained accuracy/precision alternative; not a second primary.
-  scope: BF16-kernel W4A16.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 5d64703c2acfcfe4a33ed22f76215b16457c1d61cc0be948e134f97124f509cf
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-124-7-openvla_oft-quant--awq
-- config: configs/experiments/cogact/awq.yaml
+  config: configs/experiments/openvla_oft/awq.yaml
   status: auxiliary
-  section: '6.1'
-  reason: Retained accuracy/precision alternative; not a second primary.
-  scope: BF16-kernel W4A16.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: a223cf526c859a8a6071ba21da16d2be890c981c5048f52ab863fda22eace8dc
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  section: '3.3'
+  scope: BF16-kernel W4A16 accuracy/precision alternative, not a second primary.
+  timing_record: quant-p3-runtime-openvla_oft-existing-r1-awq
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: e2fccdf01f219fd92aaefa728bf83ab71757a71e5c9dceda1abc531587d6d0a4
+  development_experiment_id: 60497c718cb9e9afa95e3804a9f1a156caf2647272f2f90544471328e04e74e4
+  reason: Retained alternative; fresh same-environment Dev-200 and timing.
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-42-0-cogact-quant--awq
+  config: configs/experiments/cogact/awq.yaml
+  status: auxiliary
+  section: '3.3'
+  scope: BF16-kernel W4A16 accuracy/precision alternative, not a second primary.
+  timing_record: quant-p3-runtime-cogact-existing-r1-awq
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: e2fccdf01f219fd92aaefa728bf83ab71757a71e5c9dceda1abc531587d6d0a4
+  development_experiment_id: 8b7c5bc06c3d722d3e21ce1bfc625a6990773624ffd88a6bf5157a5099028a29
+  reason: Retained alternative; fresh same-environment Dev-200 and timing.
 - config: configs/experiments/cogact/actuation_slack_refresh_keep50.yaml
   status: auxiliary
   section: '5.1'
@@ -2448,3 +2764,27 @@ auxiliary_configurations:
   development_summary_sha256: 5759fbb67384510a99adda4c2c13265b2fe2a9bb6656fabf3a01bf4c8138538e
   development_experiment_id: cafc1f861659729e267488d2e62539245572e80056ea6a4ae0a1c5bc6f17ad79
   timing_record: scoped-action-zero90-thermal-replacement-r1-40-g1-cogact--action_zero_t090
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  config: configs/experiments/openvla_oft/qvla_quant_only_b8.yaml
+  status: auxiliary
+  section: '3.3'
+  scope: 'Quantization-only diagnostic: excludes pruning and 2-bit choices; NOT the full QVLA joint core.'
+  timing_record: quant-p3-runtime-openvla_oft-new-r1-qvla_quant_only_b8
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: fd9ccc3069c14f810939dfcdd0f345137362e5e1d61b1b849146ab78a2133292
+  development_experiment_id: f6317b675e16d290bdb93c0e9c9bba8fcf0e007b3563c9f22ff4093d1623b879
+  reason: Useful isolation of joint pruning/low-bit degradation; never a second primary or an automatic
+    Final candidate.
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  config: configs/experiments/openvla_oft/qvla_quant_only_b4.yaml
+  status: auxiliary
+  section: '3.3'
+  scope: 'Quantization-only diagnostic: excludes pruning and 2-bit choices; NOT the full QVLA joint core.'
+  timing_record: quant-p3-runtime-openvla_oft-new-r1-qvla_quant_only_b4
+  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  development_summary_sha256: b59f1427810276c668dfd8ca3a1661ea68cb3d8a871d5a4d2d68b5c5a4895115
+  development_experiment_id: 729c0f06d1c037ebddada2a282a3a2a0eed799e6caa39b72bacea824409755f7
+  reason: Useful isolation of joint pruning/low-bit degradation; never a second primary or an automatic
+    Final candidate.

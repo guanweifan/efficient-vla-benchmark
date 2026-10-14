@@ -25,6 +25,35 @@ to the primary result table; Dev selection and valid timing are separate gates.
 | QVLA | Schema 4: training-only batch-normalized Hessian proxy and official absolute-cost channel allocation. This is the public-code proxy, not action-space intervention; old gates are rejected. |
 | QuantVLA | Schema 3: native-dtype DuQuant, five-point MSE weight scaling, frozen A8 percentiles and calibrated ATM/OHB. All transformations are timed; handover schema 2 is rejected. |
 | ActQuant | Complete training-only HSIC/AMF and checksummed mixed-GGUF artifacts; exact registered/direct-author runtime and lifecycle checks. Dense handover weights are not the author's GGUF calibration/output chain. Dev selection, timing and final results remain separate admission gates. |
+| HoloQ | Pinned official-code variant: block-local LLM GPTQ, composite rotations and per-step DiT scales. Native-FP32 DiT uses explicitly timed transient decoding; the v3 paper's differing activation axes are not silently mixed in. |
+| DyQ-VLA | Independently frozen native successful trajectories, error-bound fitting and temporal precision counter. Quantizer axes/threshold estimator are disclosed engineering choices; the unavailable integer/async engine is excluded. |
+| EaqVLA | Independent modular weight-GPTQ core: vision W4, language W8, native projector/action head. The unspecified activation quantizer is excluded, not invented. |
+| DA-MPA | DA-PTQ's separately evaluated drift-allocation core. Real demonstration chunks and gradient probes; no optimizer updates. CSRC is excluded because the published objective does not define a reproducible weighting recipe. |
+| MotionVQ | Independent dual-codebook/motion-router LLM core, packed centroid-gather GPU execution. Both banks and all routing costs count; full-model export and ASIC-specific reuse are excluded. |
+
+Read each method README for its exact contribution boundary. A registered scoped
+core is not a full-paper reproduction. Artifact calibration and kernel feasibility
+do not certify measured speed or success; the generated result ledger is authoritative.
+DyQ's authorized independent population contains 80 attempts (40 per backend),
+79 successful trajectories and one retained failure, with no replacements or
+Dev/Final initial states. No policy training is performed.
+
+Deferred quantization scopes must not be replaced with convenient proxies:
+
+| Scope | Concrete missing condition |
+|---|---|
+| HBVLA | Verifiable bootstrap/binarization and local reconstruction details for its gradient-guided binary-frequency allocation; a Haar transform alone is not the core. |
+| Full DA-PTQ | CSRC's weighted covariance objective lacks the required weight/regularization recipe; whitening/coloring is not Eq. 7. DA-MPA is separately scoped above. |
+| Mix-QVLA | Its defining teacher-forced action-token likelihood is absent from native OFT L1 and CogACT diffusion heads; an L1/epsilon proxy changes that objective. |
+| SQAP-VLA | Unresolved tensorwise versus channelwise activation quantization; owner-requested deferral remains in force. |
+| SQIL / BitVLA | Quantization-aware policy training, outside this no-training batch. |
+| QuantWAM and new compact backbones | Require an additional baseline or trained policy, outside the two-backend scope. |
+
+Negative GPU latency is valid evidence only after numerical and engineering checks.
+Packed tile-dequantized floating GEMM, integer-MMA execution and a separate GGUF
+engine are different runtime contracts: label them explicitly. Reduced storage
+does not establish faster execution. Report the tested port/hardware limitation,
+not a universal failure of the original method or an unimplemented author engine.
 
 ActQuant's [author runtime](https://github.com/arashakb/ActQuant/tree/b64791125070652fe6b554e244fe809c79ef5246)
 was built in ignored project-local storage with Rust/Cargo 1.90.0, pybind11 2.13.6,
