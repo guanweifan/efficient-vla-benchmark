@@ -462,6 +462,12 @@ four smoke episodes never establish formal accuracy.
 
 ### Selection and final-measurement workflow
 
+Final-2000 needs separate, explicit owner approval of the frozen candidates.
+Dev/timing completion or permission to use more GPUs does not grant that approval;
+operational launchers must not automatically enqueue a final campaign. The current
+quantization repair campaign ends at audited Dev-200 and timing. Earlier premature
+quantization finals remain quarantined evidence, excluded from selection/publication.
+
 Owner-specified fixed native controls are a separate supplementary population,
 not additional primary methods or a hyperparameter search. Freeze their declared
 contrasts before Dev-200, verify correctness, then retain every scheduled control

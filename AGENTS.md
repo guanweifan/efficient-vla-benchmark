@@ -77,6 +77,11 @@ of development and Git rules; upstream submodules retain their own instructions.
 - Freeze configuration/checkpoint/runtime/protocol identities before the owner's
   scheduled final 2,000-episode run. Run it once; do not retune or select the best
   final repeat. Infrastructure resume must preserve episode identity and failures.
+- Final-2000 is a separate approval gate after the owner reviews the frozen Dev
+  and timing results. General permission to continue, use idle GPUs, or complete
+  integration is NOT final-run authorization. Never auto-chain Dev into Final.
+  This quantization repair batch is Dev/timing-only; prior prematurely launched
+  quantization Final outcomes are withdrawn from publication, not tuning evidence.
 - Keep one clean primary result row, with Dev selection evidence, final success
   and separately measured speed. Valuable auxiliary configurations are explicitly
   secondary, never additional default report rows. Missing measurements stay missing.
