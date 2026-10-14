@@ -1,0 +1,12 @@
+schema_version: 1
+name: actquant_floating
+category: quantization
+description: Auxiliary unquantized GGUF runtime control, not an acceleration algorithm.
+config: efficient_vla_benchmark.methods.quantization.actquant.config:ActQuantFloatingConfig
+requires_artifact: true
+implementations:
+  openvla_oft:
+    variants: [libero_joint]
+    requires: [llama_decoder, l1_action_head, external_execution_runtime]
+    factory: efficient_vla_benchmark.methods.quantization.actquant.implementations.openvla_oft.api:build
+    preflight: efficient_vla_benchmark.methods.quantization.actquant.implementations.openvla_oft.api:preflight

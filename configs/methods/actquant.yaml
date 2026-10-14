@@ -1,0 +1,8 @@
+method: actquant
+parameters:
+  calibration_samples: 200
+  calibration_seed: 0
+  alpha: 0.5
+  target_bpw: 4.5
+  base_type: IQ2_XS
+  max_type: Q8_0
