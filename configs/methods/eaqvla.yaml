@@ -1,0 +1,9 @@
+method: eaqvla
+parameters:
+  vision_bits: 4
+  language_bits: 8
+  calibration_samples: 40
+  calibration_tokens: 256
+  calibration_seed: 0
+  gptq_block_size: 128
+  damp_percent: 0.01
