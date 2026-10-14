@@ -19,6 +19,9 @@ scales with a group maximum changes the quantizer and is not allowed. Bias is
 added before output rounding; methods with output transforms own their later bias.
 FP16/BF16/FP32 output precision is retained. The explicit scale-rounding flag
 distinguishes float-scale weight-only quantization from the calibrated A8 path.
+Long half-precision inputs use wider M/N tiles while retaining the same K=32
+reduction. Short inputs and FP32 keep compact tiles; kernel/reference checks must
+establish parity before reusing success evidence across an execution-only change.
 
 Callers own target selection, calibration, checkpoint/artifact verification,
 conversion lifetime and native precision. They must supply colocated tensors and

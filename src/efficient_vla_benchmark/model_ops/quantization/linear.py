@@ -91,7 +91,18 @@ class PackedLinear(nn.Module):
             (flat.shape[0], self.out_features), device=inputs.device, dtype=inputs.dtype
         )
         if flat.shape[0]:
-            grid = (triton.cdiv(flat.shape[0], 16), triton.cdiv(self.out_features, 32))
+            # Keep the K reduction unchanged; wider M/N tiles reuse decoded weights.
+            wide = (
+                inputs.dtype in (torch.float16, torch.bfloat16)
+                and flat.shape[0] >= 32
+                and self.out_features >= 64
+            )
+            block_m = (64 if flat.shape[0] >= 64 else 32) if wide else 16
+            block_n = 64 if wide else 32
+            grid = (
+                triton.cdiv(flat.shape[0], block_m),
+                triton.cdiv(self.out_features, block_n),
+            )
             packed_gemm[grid](
                 flat,
                 self.packed_weight,
@@ -108,8 +119,8 @@ class PackedLinear(nn.Module):
                 quant_a,
                 self.round_weight_scale,
                 self.bias is not None,
-                16,
-                32,
+                block_m,
+                block_n,
                 32,
                 num_warps=4,
             )
