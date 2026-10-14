@@ -49,8 +49,12 @@ def test_weighted_kmeans_keeps_public_update_order():
 
 @pytest.mark.gpu
 @pytest.mark.parametrize("block,centers,bits", [(128, 64, 6), (256, 256, 8)])
+@pytest.mark.parametrize("m", [35, 280, 600, 985])
 @torch.inference_mode()
-def test_centroid_kernel_matches_reconstructed_oracle(block, centers, bits):
+def test_centroid_kernel_matches_reconstructed_oracle(block, centers, bits, m):
+    import triton
+
+    from efficient_vla_benchmark.methods.quantization.motion_vq.kernel import centroid_gemm
     from efficient_vla_benchmark.methods.quantization.motion_vq.packed import PackedCodebookLinear
 
     torch.manual_seed(13)
@@ -71,8 +75,29 @@ def test_centroid_kernel_matches_reconstructed_oracle(block, centers, bits):
     cols = torch.arange(k)[None, :]
     tile = (rows // block) * (k // block) + cols // block
     weight = books[tile, indices.T[:, cols[0] // 2], cols % 2].cuda()
-    x = torch.randn(35, k, device="cuda", dtype=torch.bfloat16)
-    torch.testing.assert_close(op(x), F.linear(x, weight), atol=0.01, rtol=0.01)
+    x = torch.randn(m, k, device="cuda", dtype=torch.bfloat16)
+    actual = op(x)
+    torch.testing.assert_close(actual, F.linear(x, weight), atol=0.01, rtol=0.01)
+    previous = torch.empty_like(actual)
+    centroid_gemm[(triton.cdiv(m, 32), triton.cdiv(n, 64))](
+        x,
+        op.indices,
+        op.codebooks,
+        op.codebooks,
+        previous,
+        m,
+        n,
+        k,
+        bits,
+        block,
+        centers,
+        False,
+        32,
+        64,
+        32,
+        num_warps=4,
+    )
+    torch.testing.assert_close(actual, previous, atol=0, rtol=0)
     assert op.kernel_invocations == 1
 
 

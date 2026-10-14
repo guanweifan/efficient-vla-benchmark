@@ -25,6 +25,12 @@ The kernel uses native floating matrix multiplication; it does not claim the
 ASIC's spatial centroid merging or temporal centroid multiplication reuse.
 Its speed is therefore a GPU MotionVQ-core measurement, not VQVLA hardware speed.
 
+Prefill-size-dependent launch tiles preserve the original K=32 reduction and
+match the compact kernel exactly in GPU regression tests. Six-bit packed indices
+need cross-byte gathers; fewer stored bits do not guarantee faster GPU execution.
+Threshold 0.8 remains the public-code reference. The 1.0 candidate retains dynamic
+switching while reducing low-bank use; both require their own Dev and timing data.
+
 The public full-model exporter also quantizes vision, action, embeddings and
 normalization tensors. Those are explicitly excluded here, following the paper's
 stated transformer-backbone bottleneck scope. Training-only balanced RLDS captures

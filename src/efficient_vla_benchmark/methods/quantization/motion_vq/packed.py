@@ -46,7 +46,18 @@ class PackedCodebookLinear(nn.Module):
 
         flat = x.reshape(-1, self.in_features).contiguous()
         y = torch.empty((len(flat), self.out_features), device=x.device, dtype=x.dtype)
-        centroid_gemm[(triton.cdiv(len(flat), 32), triton.cdiv(self.out_features, 64))](
+        # Larger prefill tiles reuse gathered centroids across more input rows.
+        # K=32 and its reduction order stay fixed; this changes launch geometry,
+        # not codebooks, arithmetic, routing, or the quantization policy.
+        if len(flat) >= 768:
+            bm, bn, warps = 256, 32, 8
+        elif len(flat) >= 384:
+            bm, bn, warps = 128, 32, 4
+        elif len(flat) >= 128:
+            bm, bn, warps = 64, 64, 4
+        else:
+            bm, bn, warps = 32, 64, 4
+        centroid_gemm[(triton.cdiv(len(flat), bm), triton.cdiv(self.out_features, bn))](
             flat,
             self.indices,
             self.codebooks,
@@ -59,10 +70,10 @@ class PackedCodebookLinear(nn.Module):
             self.block,
             self.centers,
             self.bias is not None,
+            bm,
+            bn,
             32,
-            64,
-            32,
-            num_warps=4,
+            num_warps=warps,
         )
         self.kernel_invocations += 1
         return y.reshape(*x.shape[:-1], self.out_features)
