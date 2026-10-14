@@ -1,7 +1,13 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: 7f7cc5d9c24fc25d556ac8bd8f0116c4fbe56a18c5eb72fb4912cbe72d13d03f
+coverage_summary_sha256: 2c6322c9408fa3e09ac03a45d75f791ce8c017466609b12ff41a32efe81fc848
 source_compatibility:
+- development_runtime: 6a29dd2884a1266499a0b507088dc4efeb100b12e821dbaca4ffa9c9f5f492e7
+  timing_runtime: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
+  reason: K reduction and quantization equations unchanged; only M/N tile geometry, QVLA CPU residency
+    and uniform-group scatter bypass change. Shared native inference, harness and all nonquant methods
+    are byte-identical. Synthetic and registered GPU tests plus twelve four-suite observations per backend
+    verify exact tile-output equivalence. Raw measurement identities are preserved.
 - development_runtime: 0dd68a00d775d3a36a95e949eb2e0fe708456ae4c6fd03fde045ccd5695cc8f2
   timing_runtime: b30a41d426f30c6f8e7731d6ab35fe56ea52ac691f601faf83c2daff72e9c099
   reason: Audited unchanged backend/core/control/model-ops/method Python sources; only timing, evaluation
@@ -113,6 +119,37 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-41-4-cogact-1--native-pre
+- config: configs/experiments/cogact/quantvla.yaml
+  status: primary
+  section: '3.3'
+  reason: Block64/16 give 181/178 of 200. Their valid latencies differ by 0.81%, a one-pass tie; retain
+    the reference block64 with higher Dev success. Neither accelerates.
+  scope: Calibrated DuQuant plus ATM/OHB; physical W4/A8 storage with tile-local floating GEMM, not integer
+    MMA.
+  development_summary_sha256: 0a4c4e64b2d4c33c94ffb62f2be75b5dc2b159d5d00142f9e28e6a8833187115
+  development_experiment_id: d43d502b3eb64d4175b45d554dcae02d2142e2937ec25443361866afe27c8c0b
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  timing_record: quant-p2-optimized-cogact-r2-quantvla
+  final_runtime_source_sha256: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
+  search:
+    complete: true
+    stop: latency_plateau
+    reason: 'Both rotation budgets meet the fixed Dev target: block64=181/200 and block16=178/200. Their
+      valid full-cost latencies differ by only 0.81%; one replay pass cannot establish a robust sub-percent
+      ranking. Retain block64, the original rotation budget with higher Dev success; retain block16 as
+      explicit search evidence. Both are slower than native.'
+    tie_reason: 'Both rotation budgets meet the fixed Dev target: block64=181/200 and block16=178/200.
+      Their valid full-cost latencies differ by only 0.81%; one replay pass cannot establish a robust
+      sub-percent ranking. Retain block64, the original rotation budget with higher Dev success; retain
+      block16 as explicit search evidence. Both are slower than native.'
+    evidence:
+    - development_summary_sha256: 0a4c4e64b2d4c33c94ffb62f2be75b5dc2b159d5d00142f9e28e6a8833187115
+      development_experiment_id: d43d502b3eb64d4175b45d554dcae02d2142e2937ec25443361866afe27c8c0b
+      timing_record: quant-p2-optimized-cogact-r2-quantvla
+    - development_summary_sha256: 0a4c4e64b2d4c33c94ffb62f2be75b5dc2b159d5d00142f9e28e6a8833187115
+      development_experiment_id: 6c8b3e4f5c79488974907caa9cd6b2f662298481ef588f82a61868160581c03d
+      timing_record: quant-p2-optimized-cogact-r2-quantvla_b16
 - config: configs/experiments/cogact/efficient_vla_layer_prune04.yaml
   status: primary
   section: '3.3'
@@ -1514,6 +1551,75 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-124-7-openvla_oft-quant--native-pre
+- config: configs/experiments/openvla_oft/actquant.yaml
+  status: primary
+  section: '3.3'
+  reason: Projection budgets 4.5/3.5/2.5 give 198/195/185 of 200. The first two latencies tie at 23.451/23.483
+    ms/control; 2.5 is slower at 26.044. Select 4.5 for higher Dev success, not the larger ratio from
+    a slower native pair.
+  scope: Author GGUF runtime with training-only HSIC/AMF, 200 balanced H8 chunks; projection-bit budget
+    only, internal Q8_1 activations. Cross-runtime comparison, not quantization-only speedup; Torch GPU
+    memory unavailable.
+  development_summary_sha256: a68d4b3da9bc81c166afab120c0fe761e0d3d5c6ea3f12f06bcecd7b383fdded
+  development_experiment_id: c71d808134c35b6e3b6c8d20ed967f21926e6fcd509958df5e7a71baefa822b2
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  timing_record: quant-p2-short-actquant-isolated-method
+  final_runtime_source_sha256: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
+  search:
+    complete: true
+    stop: latency_plateau
+    reason: Calibrated 4.5/3.5/2.5 projection-bit budgets give 198/195/185 of 200. The first two measured
+      full-cost latencies are 23.4509/23.4832 ms/control (0.14% apart), a plateau rather than evidence
+      that 3.5 is faster; its larger speed ratio comes from its paired native reference. Budget 2.5 is
+      slower at 26.0444 ms/control. Retain 4.5 for higher Dev success under the existing timing-tie rule,
+      not a best-of-repeat choice.
+    evidence:
+    - development_summary_sha256: a68d4b3da9bc81c166afab120c0fe761e0d3d5c6ea3f12f06bcecd7b383fdded
+      development_experiment_id: c71d808134c35b6e3b6c8d20ed967f21926e6fcd509958df5e7a71baefa822b2
+      timing_record: quant-p2-short-actquant-isolated-method
+    - development_summary_sha256: a68d4b3da9bc81c166afab120c0fe761e0d3d5c6ea3f12f06bcecd7b383fdded
+      development_experiment_id: fc5ba13d769173abfeae1b30aedb83fdf6f91aac94638b9fdc5751499d45c6e1
+      timing_record: quant-p2-short-actquant_b3p5-isolated-method
+    - development_summary_sha256: 2f351f8ceaea3ec5fe41b577cecf1e9acfcf952083f56da083cc4483db1cabb9
+      development_experiment_id: 06244fe88b530a5daf841d0ec02a8435f39ae3d118c5ee4086e1dc475f9505bf
+      timing_record: quant-p2-isolated-low-budget-method
+    tie_reason: Calibrated 4.5/3.5/2.5 projection-bit budgets give 198/195/185 of 200. The first two measured
+      full-cost latencies are 23.4509/23.4832 ms/control (0.14% apart), a plateau rather than evidence
+      that 3.5 is faster; its larger speed ratio comes from its paired native reference. Budget 2.5 is
+      slower at 26.0444 ms/control. Retain 4.5 for higher Dev success under the existing timing-tie rule,
+      not a best-of-repeat choice.
+- config: configs/experiments/openvla_oft/qvla_b15p5.yaml
+  status: primary
+  section: '3.3'
+  reason: Channel budgets 4/8/12 give 0/0/3 of 200; 15.5 recovers 199/200. Valid 12/15.5 timings are both
+    slower than native. Retain the active accuracy-recovered 15.5 allocation.
+  scope: Official-code input-Hessian proxy, not paper action intervention; 15.5 is channel-average allocation,
+    not full-model bits/weight. Packed tile-local floating GEMM, not integer MMA.
+  development_summary_sha256: 217c0b2382280db07c1df8ccb9739069455b2e9303f6a94c37cc997353c72842
+  development_experiment_id: cd77a61b32450d514848081c08e1c852693eda7ce5d2abaedf7afe6f115696a6
+  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  timing_record: quant-p2-short-qvla_b15p5-isolated-method
+  final_runtime_source_sha256: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
+  search:
+    complete: true
+    stop: accuracy_boundary
+    reason: 'Official Hessian allocation: channel budgets 4 and 8 each give 0/200, 12 gives 3/200, while
+      15.5 gives 199/200 and meets the fixed 192/200 target. Retain the active accuracy-recovered 15.5
+      budget; lower tested budgets fail the accuracy target; the valid 12-bit timing is also slower than
+      native. Do not exempt layers or alter the allocator to recover performance.'
+    evidence:
+    - development_summary_sha256: 0a4c4e64b2d4c33c94ffb62f2be75b5dc2b159d5d00142f9e28e6a8833187115
+      development_experiment_id: 0cfd155dc060a560647ceb57e8ff8e3ed9e928a3666fd3da679da65fc419f11e
+    - development_summary_sha256: 0a4c4e64b2d4c33c94ffb62f2be75b5dc2b159d5d00142f9e28e6a8833187115
+      development_experiment_id: 0698305fb650bd972797b9e4fc9e6da7dba95cb83f6b9c12f777565b032dae87
+    - development_summary_sha256: 217c0b2382280db07c1df8ccb9739069455b2e9303f6a94c37cc997353c72842
+      development_experiment_id: cd77a61b32450d514848081c08e1c852693eda7ce5d2abaedf7afe6f115696a6
+      timing_record: quant-p2-short-qvla_b15p5-isolated-method
+    - development_summary_sha256: b0cc6945c951a9e2ccbb73eb51de3d76a480957fd0a4cd2f14cb0b7fb01b84ce
+      development_experiment_id: c7cc1f16f019cb5b6fdae07987d6cc243a12a77857a31c4c926640bcee001d3b
+      timing_record: quant-p2-short-qvla_b12-isolated-method
 - config: configs/experiments/openvla_oft/efficient_vla_layer_prune03.yaml
   status: primary
   section: '3.3'

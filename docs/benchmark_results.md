@@ -2,7 +2,7 @@
 
 One selected configuration per backend/method scope. Dev-200 is tuning evidence,
 not final accuracy. Timing uses frozen four-suite prefixes (at most 128 controls each), ten warmup queries, one pass and the mean over all measured controls.
-Native pre/post checks must pass. Final success is measured for 71/71 primary configurations, using one frozen 2,000-episode run per measured configuration.
+Native pre/post checks must pass. Final success is measured for 74/74 primary configurations, using one frozen 2,000-episode run per measured configuration.
 Low success and slowdowns remain reportable. All native references use H8.
 Adaptive rows execute real method-selected prefixes; H8 is their reference/default,
 not their fixed execution length. The shown upper bound is native prediction length.
@@ -16,13 +16,14 @@ Each speedup uses its own same-GPU native pair; the displayed native row is
 not a universal denominator. Absolute latency across GPU pairs is descriptive.
 Measured GPU models: NVIDIA GeForce RTX 3090.
 
-Selection digest: `e35f750c9dca74e0025f1a7f5e47df98600545520b355ee974b0eaabe884ea39`.
+Selection digest: `727548c9b2fa51174d86634775b929b2ce2247a5cf10da045dbd5e92421e64e7`.
 
 ## cogact
 
 | Section | Preset | Execution H | Dev SR (n/200) | Δ pp | ms/control | Speedup | Peak GiB | Final SR (n/2000) | Selection / scope |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
 | Reference | `baseline` | 8 | 91.5% (183) | +0.0 | 23.399 | 1.000× | 14.73 | 90.60% (1812) | Native H8 reference. Native model. Search: native_reference. |
+| 3.3 | `quantvla` | 8 | 90.5% (181) | -1.0 | 44.352 | 0.531× | 6.20 | 88.35% (1767) | Block64/16 give 181/178 of 200. Their valid latencies differ by 0.81%, a one-pass tie; retain the reference block64 with higher Dev success. Neither accelerates. Calibrated DuQuant plus ATM/OHB; physical W4/A8 storage with tile-local floating GEMM, not integer MMA. Search: latency_plateau. |
 | 3.3 | `efficient_vla_layer_prune04` | 8 | 93.0% (186) | +1.5 | 21.797 | 1.071× | 13.19 | 90.15% (1803) | layer_prune04 gives 186/200, fastest valid timing among tested configurations meeting >= 177/200. Measured below-target boundary: layer_prune08=114/200, layer_prune06=156/200, layer_prune05=165/200. EfficientVLA calibrated static non-contiguous layer core, not dynamic routing or the full pipeline. Search: accuracy_boundary. |
 | 5.1 | `a_mmr_current_frame_keep4375` | 8 | 89.5% (179) | -2.0 | 17.543 | 1.306× | 14.62 | 89.25% (1785) | Keep43.75% gives 179/200; keep37.5% falls to 175. Keep50% gives 177 with only about 2% higher paired speed, treated as a practical tie. Independent current-frame A-MMR core; native causal anchors and FP32 selection. Search: accuracy_boundary. |
 | 5.1 | `actuation_slack_refresh_keep25` | 8 | 89.0% (178) | -2.5 | 41.122 | 0.569× | 14.74 | 87.90% (1758) | Keep25% gives178/200; stronger keep17.5% gives169/200. Retain the faithful full-cost slowdown. Deletion core with full auxiliary refresh cost. Search: accuracy_boundary. |
@@ -72,6 +73,8 @@ Selection digest: `e35f750c9dca74e0025f1a7f5e47df98600545520b355ee974b0eaabe884e
 | Section | Preset | Execution H | Dev SR (n/200) | Δ pp | ms/control | Speedup | Peak GiB | Final SR (n/2000) | Selection / scope |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
 | Reference | `baseline` | 8 | 99.0% (198) | +0.0 | 24.793 | 1.000× | 14.98 | 96.60% (1932) | Native H8 reference. Native model. Search: native_reference. |
+| 3.3 | `actquant` | 8 | 99.0% (198) | +0.0 | 23.451 | 1.056× | — | 97.15% (1943) | Projection budgets 4.5/3.5/2.5 give 198/195/185 of 200. The first two latencies tie at 23.451/23.483 ms/control; 2.5 is slower at 26.044. Select 4.5 for higher Dev success, not the larger ratio from a slower native pair. Author GGUF runtime with training-only HSIC/AMF, 200 balanced H8 chunks; projection-bit budget only, internal Q8_1 activations. Cross-runtime comparison, not quantization-only speedup; Torch GPU memory unavailable. Search: latency_plateau. |
+| 3.3 | `qvla_b15p5` | 8 | 99.5% (199) | +0.5 | 30.717 | 0.805× | 14.48 | 96.35% (1927) | Channel budgets 4/8/12 give 0/0/3 of 200; 15.5 recovers 199/200. Valid 12/15.5 timings are both slower than native. Retain the active accuracy-recovered 15.5 allocation. Official-code input-Hessian proxy, not paper action intervention; 15.5 is channel-average allocation, not full-model bits/weight. Packed tile-local floating GEMM, not integer MMA. Search: accuracy_boundary. |
 | 3.3 | `efficient_vla_layer_prune03` | 8 | 96.5% (193) | -2.5 | 22.970 | 1.072× | 13.80 | 93.95% (1879) | layer_prune03 gives 193/200, fastest valid timing among tested configurations meeting >= 192/200. Measured below-target boundary: layer_prune04=181/200, layer_prune08=135/200. EfficientVLA calibrated static non-contiguous layer core, not dynamic routing or the full pipeline. Search: accuracy_boundary. |
 | 5.1 | `a_mmr_current_frame_keep4375` | 8 | 98.0% (196) | -1.0 | 22.801 | 1.052× | 14.61 | 95.70% (1914) | Keep43.75% gives 196/200 and improves over keep50%; keep37.5% falls to 191 and keep25% to 181. Independent current-frame A-MMR core only; historical-memory/full-system claims excluded. Search: accuracy_boundary. |
 | 5.1 | `actuation_slack_refresh_deletion` | 8 | 97.5% (195) | -1.5 | 44.000 | 0.563× | 14.69 | 95.75% (1915) | Halving retention to5% lowers success without improving full-cost timing; dense auxiliary refresh remains included. Deletion core; not real-robot overlap. Search: latency_plateau. |
@@ -131,6 +134,7 @@ Recorded revisions predating history cleanup can be resolved through the
 | Backend / preset | Dev experiment | Final experiment | Timing record | Dev / timing commit | Record digest |
 |---|---|---|---|---|---|
 | cogact / `baseline` | `a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358` | `9c717076b91643a09d4c8826b56aeb4de1abf54684601c093388a19ce69ba0c0` | `compact-41-4-cogact-1--native-pre` | `e86cbe2edc52d3bc69122a66dc727a8aa1109d93` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `c3be4cb17862b40f8519c7c2a4a52805b268f4e547991a93fae666ee733fb862` |
+| cogact / `quantvla` | `d43d502b3eb64d4175b45d554dcae02d2142e2937ec25443361866afe27c8c0b` | `8d6f9b6191e053b5724d923ac24d4e19acac83a1dc96f24ed5ad7000f93173f2` | `quant-p2-optimized-cogact-r2-quantvla` | `df77fd603b4d74da8696a9f4a1c9ea0abbaa3a75` / `39b5443ce96f387694ef77a64982990e85e74df2` | `d074a3a2e46ce6860ee7b8f95cb5f396e2fde2fd8247eeb50eccdf06fa1f66fc` |
 | cogact / `efficient_vla_layer_prune04` | `2c4f114dbefc70fd9001735c927d158cfb17bd28fee9d21786a3676ebed679fd` | `76b777e78321e1a8034a8ba887934874b5eb62a6fd5b9121634a2a7a01d7b3eb` | `routing-layers-v1-124-7-cogact--layer_prune04` | `0281aa8f0f59a2ef08380f36ea95362b27748d90` / `0281aa8f0f59a2ef08380f36ea95362b27748d90` | `46a1ecab3fb1b69ae5b614c6cd22c0afc3d625fa338d906ee0c9bcb2a2fcbd21` |
 | cogact / `a_mmr_current_frame_keep4375` | `49d963de78d72de16e8800148ab541df1654c905c5d74eaf5e8525d416921764` | `e5453aed86afe9a1df175b7ad92087e0b36b8af8bc4920a5d4fc13e6d2952fde` | `scoped-retained-r3-r1-41-g1-cogact--a_mmr_keep4375` | `f5bd8e8379633253bf85cfa8d19799c7af1565a6` / `bb7a27cc53544214055dcaacb5fd6435396f7641` | `8404057c726543c4c0498f2736342be5bb30043e0a232aa59d68383ebee4ef8d` |
 | cogact / `actuation_slack_refresh_keep25` | `1745acc6a866125188a9997d38d3a193bf3f2238f71a72e8522ed6a2933d2115` | `64c0acc7f982a2d55ca87d1e362fe53e35b45f2041f5b1c437e0ec3b95d22f3b` | `compact-41-4-cogact-1--actuation_slack_refresh_keep25` | `1dc47be1a1e7d1cd8623a50e329d3a72e5daa8ef` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `ba45d59001f53064891ce78afc87457c6fcfb42d74aae8f49bd7b9ed91127717` |
@@ -175,6 +179,8 @@ Recorded revisions predating history cleanup can be resolved through the
 | cogact / `vote_ensemble_h8` | `9ebbbb6d52e6b5e4131af9d6bc14a493375a387d02bb298bceedb70680ac660c` | `4e1dce6a092568ef27c705b559b97b5a4ad41b49dfcd794d379ab1561a7c1b97` | `search-vote-124-6-cogact--vote_ensemble_h8` | `faabaa5959b49364a808c7327559087f3cf1c892` / `faabaa5959b49364a808c7327559087f3cf1c892` | `8f775c6f832ad620cd65450fa517502a6cd0c29bc684c904f4710b310e2a0baa` |
 | cogact / `awq_fp16_kernel` | `be03b017c6a40862b3ebc5afa78a0ce2cf31111d49e8763c1fe5d0650391c117` | `8bba1c63b720f89a924e839d7a2915f9c6c3b5787872b3751f62add28636ac07` | `compact-42-0-cogact-quant--awq_fp16_kernel` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `465838d6af15428eace0f168b48392ce6886137b` | `cb173d2eb42c17ac8ae3398af5f884071e082d7e3ed7db8ac15db2f40bfa4a61` |
 | openvla_oft / `baseline` | `83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e` | `762c07b567785f8bb98fe4c60d0f3edba3e577eed1a17eddc06bdcfb7e7b1143` | `compact-124-7-openvla_oft-quant--native-pre` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `77575dfbcb36ed385377a886f994a3d21e6cb2eb1de5d620f896aea2f9f493cd` |
+| openvla_oft / `actquant` | `c71d808134c35b6e3b6c8d20ed967f21926e6fcd509958df5e7a71baefa822b2` | `a1cdf4d13bcd8eaec04e5e89f30e150a859e3e31fe22e70d19cef2836a67dd88` | `quant-p2-short-actquant-isolated-method` | `39b5443ce96f387694ef77a64982990e85e74df2` / `168a3c3ac01867125a92c3297048023e03aff529` | `fc41fe9219a96cc9fba570f3d6521eb26cf722e03fc927fe7edf2da5af2b4cd3` |
+| openvla_oft / `qvla_b15p5` | `cd77a61b32450d514848081c08e1c852693eda7ce5d2abaedf7afe6f115696a6` | `586bbea87b3a831a46ecd5ed08c567ffcf9da7006a22319f1f122687d88b4904` | `quant-p2-short-qvla_b15p5-isolated-method` | `168a3c3ac01867125a92c3297048023e03aff529` / `298178facf2d8fb125507604e14d0de411172981` | `ebb3ce369c9d8716cd48bf035a54d6f30f24c15f2693255fee42208ee5e4d2d1` |
 | openvla_oft / `efficient_vla_layer_prune03` | `4d5841c74fa9f501a353b8e29e29afb085d26b3b1af36d17906060b696e5c792` | `0666df6171bafac15ffb2ddd3dc68096cbcb4170da384484da506266f081021e` | `routing-layers-v3-45-5-openvla_oft--layer_prune03` | `0281aa8f0f59a2ef08380f36ea95362b27748d90` / `a7c6b45a939067ff2dd25b438068333659391ed2` | `2de43370c80511d8e1c3f3be88da768559dfa66708f3ef0c17638717831fcde6` |
 | openvla_oft / `a_mmr_current_frame_keep4375` | `66a171af08f81a0606d70a2d11896f249e8f7bb72659d192c72d7ebdb2aece2e` | `960f94b9ec9a7a3538b363ee144888ac6e88c50be8001d244cea3a9655be2c04` | `scoped-r1-41-g0-openvla_oft--a_mmr_keep4375` | `f5bd8e8379633253bf85cfa8d19799c7af1565a6` / `f5bd8e8379633253bf85cfa8d19799c7af1565a6` | `467d569453b59d2945b5edf55550b9d16f51b037fd4e43fd6b720d5437f9213f` |
 | openvla_oft / `actuation_slack_refresh_deletion` | `2e2b75988b34636d5fa39e24e573aa4a159c179d48954e47203a23897921b39c` | `70b5d25d688d38a6df2abe347976d6f813a3e544a610b85264ea1509fe9252d6` | `compact-45-5-openvla_oft-recheck--actuation_slack_refresh_deletion` | `f63c95a6f22a8fd2c1fcdc9fed2441ecb376379d` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `515f46e72adb7e0bd549ce44c0e3716db4d7b3573c3fdf3ad56c826d9df12c2d` |
@@ -413,3 +419,42 @@ Two external-memory collisions occurred before any episode and were rescheduled 
 discarding outcomes. One thermally invalid H16 timing cohort was rejected; the first valid
 replacement was retained, not the fastest repeat. Its obsolete raw runs/logs were removed;
 compact retirement evidence and all valid failures remain.
+
+<!-- supplementary-quantization-runtime -->
+## Quantization runtime scope — 2026-10-15
+
+The three new primary rows are real packed execution, not fake-quantization
+latencies. Existing AWQ results remain unchanged; separate regression timing found
+no unexplained speed discrepancy. Calibration is training-only; Dev-200 selects
+one configuration and Final-2000 is run once after freezing it.
+
+- QVLA follows the released input-Hessian proxy, not the paper's action-space
+  intervention. The selected 15.5 budget averages output channels, not full-model
+  bits/weight; 1,741,383 of 1,854,960 target channels remain 16-bit. Low-budget
+  failure and the selected slowdown describe this scoped port, not the paper's
+  original checkpoint results.
+- QuantVLA stores packed W4 weights and A8 activations, with tile-local floating
+  GEMM. It is real packed runtime but not integer-MMA execution. Rotations,
+  activation conversion and ATM/OHB overhead are included, including the slowdown.
+- ActQuant uses the author's GGUF engine and mixed projection types (achieved
+  4.4998 bits/weight), with internal Q8_1 activations. HSIC/AMF uses 200 balanced
+  training episodes, one H8 chunk each, with zero optimizer updates. This bounded
+  calibration/readout adaptation is disclosed, not original-data-budget parity.
+  Vision, projectors and action head remain unquantized. Cross-runtime speedup
+  includes engine changes; missing Torch memory cannot be read as zero memory.
+
+### Fixed floating-engine control
+
+Auxiliary only, not another algorithm or an additional Final-2000 campaign.
+The control uses BF16 matrix weights, F32 vectors/patch convolution and FP16 KV;
+it is not pure-BF16 arithmetic. It retains native inputs, checkpoint and H8.
+
+| Control | Dev SR (n/200) | ms/control | Native-paired speedup | Final SR |
+|---|---:|---:|---:|---|
+| ActQuant floating GGUF runtime | 97.0% (194) | 27.898 | 0.886× | Not scheduled |
+
+Timing record: `quant-p2-isolated-floating-control-method`; digest: `b880d195c5925126a513d072755682002fef1ebb07dc14bafa3d871b34c69d53`.
+Dev experiment: `028f521b21ef337c36171e4577c8101a46b4b0059eb88697588ae00d92a61e76`. The control's independent native pair
+passes the same timing-quality checks; it does not replace the native reference.
+Its raw and aggregate evidence is indexed by `floating-control-audit.json` in the
+ignored quantization phase evidence, separate from the primary selection manifest.
