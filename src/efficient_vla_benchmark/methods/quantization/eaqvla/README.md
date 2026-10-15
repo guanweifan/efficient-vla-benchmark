@@ -1,5 +1,10 @@
 # EaqVLA — modular weight-GPTQ core
 
+**Not admitted for formal survey comparison.** The authors
+[withdrew version 2](https://arxiv.org/abs/2505.21567) on 2025-07-31, citing an
+error in the paper. The implementation below is retained as historical diagnostic
+evidence, not an endorsed published method or a formal acceleration result.
+
 [Paper](https://arxiv.org/abs/2505.21567v1), section 4.3, specifies vision W4,
 language W8 and an unquantized projector. Both bindings preserve that independent
 module policy. Vision Linear/patch-Conv2d and Llama decoder projections are packed;

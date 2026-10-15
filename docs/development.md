@@ -7,6 +7,15 @@ with the [OFT](../backends/openvla_oft/README.md) and
 
 ## Quantization runtime admission
 
+Engineering re-audit: registration and measurement completion are not survey
+readiness. `pending_engineering` retains validated diagnostic measurements while
+excluding unresolved implementations from the primary comparison/final queue;
+`excluded` records a concrete scope/source reason, never merely an unfavorable
+outcome. Auxiliary configurations inherit an engineering hold. Existing valid
+negative results are not excluded merely because they are slow. After a substantive
+repair, redo affected parity/smoke, original timing and Dev selection before
+re-admission; unchanged evidence retains its actual measured identity.
+
 Formal quantization comparisons require the measured packed execution, not dense
 fake-quantization latency. A dense mathematical oracle may be used privately for
 correctness, but it is never a runtime result or an unmarked fallback. Record
@@ -630,7 +639,8 @@ dependency/extension identities and coverage of the frozen reviewed campaign.
 Its launch list is descriptive only; it never launches final evaluations.
 Useful precision/accuracy alternatives belong in `auxiliary_configurations` and
 undergo the same evidence checks, but never enter the default final launch list.
-They must differ from the primary and belong to an already certified method scope.
+They must differ from the primary. An alternative belonging to an engineering-held
+scope is retained only as held diagnostic evidence, never a certified auxiliary.
 `final_partition()` accepts only one complete final-2000 aggregate and derives the
 untuned 1800 from those same episode outcomes, not an older Dev run.
 

@@ -136,6 +136,34 @@ def fixture():
     )
 
 
+@pytest.mark.parametrize("status", ["pending_engineering", "excluded"])
+def test_engineering_hold_never_certifies_existing_measurements(reporter, status):
+    inputs = fixture()
+    inputs[0]["configurations"][0]["status"] = status
+    inputs[0]["configurations"][0].pop("search")
+    report = reporter.build(*inputs)
+    assert report["primary"] == []
+    assert report["final_launch_candidates"] == []
+    assert report[status][0]["development"]["successes"] == 180
+    assert report[status][0]["timing"]["mean_ms"] == 12.5
+    assert status in reporter.render(report)
+    # A hold does not waive the evidence integrity checks.
+    metadata = inputs[2]["method"]["run"]["metadata"]
+    metadata["backend"] = dict(metadata["backend"], checkpoint_sha256="other")
+    with pytest.raises(ValueError, match="checkpoints differ"):
+        reporter.build(*inputs)
+
+
+def test_unmeasured_engineering_hold_is_explicit(reporter):
+    inputs = fixture()
+    selected = inputs[0]["configurations"][0]
+    selected["status"] = "pending_engineering"
+    selected.pop("timing_record")
+    report = reporter.build(*inputs)
+    assert not report["primary"] and not report["final_launch_candidates"]
+    assert report["pending_engineering"][0]["status"] == "pending_engineering"
+
+
 def test_negative_outcome_is_ready_but_final_is_unmeasured(reporter):
     report = reporter.build(*fixture())
     row = report["primary"][0]
@@ -311,6 +339,12 @@ def test_auxiliary_is_validated_without_entering_final_queue(reporter, monkeypat
     assert len(result["final_launch_candidates"]) == 1
     assert result["final_launch_candidates"][0]["timing_record"] == "method"
     assert "Useful auxiliary configurations" in reporter.render(result)
+    primary["status"] = "pending_engineering"
+    held = reporter.build(selection, summaries, records, quality, manifest)
+    assert not held["primary"] and not held["auxiliary"]
+    assert not held["final_launch_candidates"]
+    assert len(held["pending_engineering"]) == 2
+    assert held["pending_engineering"][1]["auxiliary"] is True
     selection["auxiliary_configurations"] *= 2
     with pytest.raises(ValueError, match="distinct alternative"):
         reporter.build(selection, summaries, records, quality, manifest)

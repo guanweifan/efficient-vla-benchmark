@@ -1,12 +1,12 @@
-> Quantization results below are Dev-200 and real-runtime timing evidence only.
-> No new quantization Final-2000 run is authorized; withdrawn premature outcomes
-> are excluded from selection and publication.
+> Quantization engineering review is in progress. Held/excluded rows are diagnostic
+> evidence, not survey-ready algorithm comparisons. No new quantization Final-2000
+> run is authorized; withdrawn premature outcomes remain excluded.
 
 # Benchmark results
 
 One selected configuration per backend/method scope. Dev-200 is tuning evidence,
 not final accuracy. Timing uses frozen four-suite prefixes (at most 128 controls each), ten warmup queries, one pass and the mean over all measured controls.
-Native pre/post checks must pass. Final success is measured for 71/82 primary configurations, using one frozen 2,000-episode run per measured configuration.
+Native pre/post checks must pass. Final success is measured for 71/72 primary configurations, using one frozen 2,000-episode run per measured configuration.
 Low success and slowdowns remain reportable. All native references use H8.
 Adaptive rows execute real method-selected prefixes; H8 is their reference/default,
 not their fixed execution length. The shown upper bound is native prediction length.
@@ -20,7 +20,7 @@ Each speedup uses its own same-GPU native pair; the displayed native row is
 not a universal denominator. Absolute latency across GPU pairs is descriptive.
 Measured GPU models: NVIDIA GeForce RTX 3090.
 
-Selection digest: `82ded0115317f29337d206734834e40f7bece1349d0893b68b7e3e002fb2e335`.
+Selection digest: `9b82f8e276ba1f521b862ebfff8c06fc372fb7f2e5e76da2482078dd588ead76`.
 
 ## cogact
 
@@ -28,12 +28,6 @@ Selection digest: `82ded0115317f29337d206734834e40f7bece1349d0893b68b7e3e002fb2e
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
 | Reference | `baseline` | 8 | 91.5% (183) | +0.0 | 23.399 | 1.000× | 14.73 | 90.60% (1812) | Native H8 reference. Native model. Search: native_reference. |
 | 3.3 | `awq_fp16_kernel` | 8 | 91.0% (182) | -0.5 | 17.214 | 1.369× | 5.90 | 90.20% (1804) | Both supported kernel precisions received fresh Dev-200 and timing; FP16 is the faster eligible option. Historical Final outcomes remain unchanged, not retuned. W4A16 with explicitly cast FP16 author kernel; training-only AWQ calibration. Search: mechanism_limit. |
-| 3.3 | `da_mpa` | 8 | 93.5% (187) | +2.0 | 26.531 | 0.867× | 5.62 | — | Retain30/15 give 187/181 of 200, both eligible; more quantized blocks slow execution (26.532 to 27.288 ms/control). Keep the reference 30% allocation. DA-PTQ Table4 DA-MPA drift-allocation core only; CSRC excluded. Native FP32 retained DiT blocks; real W4/A8 packed floating GEMM. Search: latency_plateau. |
-| 3.3 | `dyq_vla` | 8 | 91.5% (183) | +0.0 | 22.713 | 1.021× | 5.72 | — | Frozen error-bound thresholds retain the stateful temporal core; no policy training or Dev-data calibration. Report the measured backend-specific outcome. Paper temporal W4/dynamic-A core; independent successful native trajectories. Disclosed quantizer/threshold estimator; INT8 activation carrier with floating tile GEMM, not unavailable author integer/async runtime. Search: mechanism_limit. |
-| 3.3 | `eaqvla` | 8 | 89.5% (179) | -2.0 | 25.480 | 0.903× | 7.71 | — | Fixed paper module precision policy is active and numerically checked; retain measured success and negative latency without replacing W4/W8 with an unrelated uniform-bit method. Independent modular weight-GPTQ core: vision W4/language W8, native projector/action head. Unspecified activation quantizer excluded; packed floating GEMM. Search: mechanism_limit. |
-| 3.3 | `holoq_b16` | 8 | 93.5% (187) | +2.0 | 55.356 | 0.424× | 5.68 | — | Block64/16 give 172/187 of 200. Select block16: it meets the 177/200 target while block64 does not; valid full-cost latencies are similar and both slower than native. Ordinary policy arithmetic, reset and fresh reload match the quantized reference exactly. Official-code W4A4 variant: LLM block GPTQ and DiT RTN with composite rotations. Packed BF16 LLM tiles; explicit per-call FP32 DiT decode/native GEMM, no persistent reconstructed weights. Not the differing paper-v3 activation-axis variant. Search: accuracy_boundary. |
-| 3.3 | `motion_vq_t1` | 8 | 91.0% (182) | -0.5 | 25.347 | 0.927× | 8.15 | — | Thresholds 0.8/1.0 both give 182 of 200, with 26.139/25.347 ms/control; select the faster eligible 1.0. Both banks remain active (13 of 63 measured queries use the low bank at 1.0). Kernel tile reuse was optimized and independently checked. Report a negative GPU outcome, not an optimality or paper-failure claim. VQVLA independent LLM dual-codebook/motion-router core, both resident banks and packed centroid-gather GPU costs included. Native FP32 diffusion head unchanged; excludes full-model export and ASIC-specific reuse. Search: mechanism_limit. |
-| 3.3 | `quantvla` | 8 | 90.5% (181) | -1.0 | 34.632 | 0.680× | 5.91 | — | Block64/16 give 181/178 of 200 with 34.632/34.880 ms/control, a latency plateau; retain reference block64 with higher success. DiT profiling and native-GEMM diagnostic found no speed recovery. Calibrated DuQuant plus ATM/OHB, W4/A8 storage and tile floating GEMM; native FP32 DiT and all transforms retained. Search: latency_plateau. |
 | 3.3 | `efficient_vla_layer_prune04` | 8 | 93.0% (186) | +1.5 | 21.797 | 1.071× | 13.19 | 90.15% (1803) | layer_prune04 gives 186/200, fastest valid timing among tested configurations meeting >= 177/200. Measured below-target boundary: layer_prune08=114/200, layer_prune06=156/200, layer_prune05=165/200. EfficientVLA calibrated static non-contiguous layer core, not dynamic routing or the full pipeline. Search: accuracy_boundary. |
 | 5.1 | `a_mmr_current_frame_keep4375` | 8 | 89.5% (179) | -2.0 | 17.543 | 1.306× | 14.62 | 89.25% (1785) | Keep43.75% gives 179/200; keep37.5% falls to 175. Keep50% gives 177 with only about 2% higher paired speed, treated as a practical tie. Independent current-frame A-MMR core; native causal anchors and FP32 selection. Search: accuracy_boundary. |
 | 5.1 | `actuation_slack_refresh_keep25` | 8 | 89.0% (178) | -2.5 | 41.122 | 0.569× | 14.74 | 87.90% (1758) | Keep25% gives178/200; stronger keep17.5% gives169/200. Retain the faithful full-cost slowdown. Deletion core with full auxiliary refresh cost. Search: accuracy_boundary. |
@@ -84,10 +78,6 @@ Selection digest: `82ded0115317f29337d206734834e40f7bece1349d0893b68b7e3e002fb2e
 | Reference | `baseline` | 8 | 99.0% (198) | +0.0 | 24.793 | 1.000× | 14.98 | 96.60% (1932) | Native H8 reference. Native model. Search: native_reference. |
 | 3.3 | `actquant` | 8 | 99.0% (198) | +0.0 | 23.115 | 1.060× | — | — | Budgets 4.5/3.5/2.5 retain Dev 198/195/185; new same-cohort timings are 23.115/23.465/25.863 ms/control. Select 4.5: no faster eligible lower-bit candidate. Author GGUF HSIC/AMF runtime; projection-bit budget 4.5, internal Q8_1 activations. Cross-runtime, not quantization-only speedup. Search: latency_plateau. |
 | 3.3 | `awq_fp16_kernel` | 8 | 97.5% (195) | -1.5 | 21.321 | 1.150× | 6.12 | 96.55% (1931) | Both supported kernel precisions received fresh Dev-200 and timing; FP16 is the faster eligible option. Historical Final outcomes remain unchanged, not retuned. W4A16 with explicitly cast FP16 author kernel; training-only AWQ calibration. Search: mechanism_limit. |
-| 3.3 | `dyq_vla` | 8 | 98.0% (196) | -1.0 | 31.226 | 0.794× | 5.94 | — | Frozen error-bound thresholds retain the stateful temporal core; no policy training or Dev-data calibration. Report the measured backend-specific outcome. Paper temporal W4/dynamic-A core; independent successful native trajectories. Disclosed quantizer/threshold estimator; INT8 activation carrier with floating tile GEMM, not unavailable author integer/async runtime. Search: mechanism_limit. |
-| 3.3 | `eaqvla` | 8 | 99.5% (199) | +0.5 | 36.067 | 0.687× | 7.94 | — | Fixed paper module precision policy is active and numerically checked; retain measured success and negative latency without replacing W4/W8 with an unrelated uniform-bit method. Independent modular weight-GPTQ core: vision W4/language W8, native projector/action head. Unspecified activation quantizer excluded; packed floating GEMM. Search: mechanism_limit. |
-| 3.3 | `motion_vq_t1` | 8 | 99.0% (198) | +0.0 | 29.857 | 0.832× | 8.38 | — | Thresholds 0.8/1.0 give 196/198 of 200 and 30.878/29.857 ms/control; select the faster eligible 1.0. Both banks remain active (6 of 57 measured queries use the low bank at 1.0). Kernel tile reuse was optimized and independently checked. Report a negative GPU outcome, not an optimality or paper-failure claim. VQVLA independent LLM dual-codebook/motion-router core, both resident banks and packed centroid-gather GPU costs included. Excludes full-model export and ASIC-specific reuse. Search: mechanism_limit. |
-| 3.3 | `qvla_b15p5` | 8 | 98.0% (196) | -1.0 | 30.781 | 0.805× | 14.48 | — | Repaired native-dtype QVLA: budgets 15.5/15 give 196/197 of 200, but 15 is slower (33.523 versus 30.781 ms/control). Retain active joint 15.5; lower-budget smoke collapse is diagnostic, not reused old Dev evidence. Official-code input-Hessian joint allocation, not paper action intervention. Channel-average budget is not model bits/weight; packed floating GEMM. Search: latency_plateau. |
 | 3.3 | `efficient_vla_layer_prune03` | 8 | 96.5% (193) | -2.5 | 22.970 | 1.072× | 13.80 | 93.95% (1879) | layer_prune03 gives 193/200, fastest valid timing among tested configurations meeting >= 192/200. Measured below-target boundary: layer_prune04=181/200, layer_prune08=135/200. EfficientVLA calibrated static non-contiguous layer core, not dynamic routing or the full pipeline. Search: accuracy_boundary. |
 | 5.1 | `a_mmr_current_frame_keep4375` | 8 | 98.0% (196) | -1.0 | 22.801 | 1.052× | 14.61 | 95.70% (1914) | Keep43.75% gives 196/200 and improves over keep50%; keep37.5% falls to 191 and keep25% to 181. Independent current-frame A-MMR core only; historical-memory/full-system claims excluded. Search: accuracy_boundary. |
 | 5.1 | `actuation_slack_refresh_deletion` | 8 | 97.5% (195) | -1.5 | 44.000 | 0.563× | 14.69 | 95.75% (1915) | Halving retention to5% lowers success without improving full-cost timing; dense auxiliary refresh remains included. Deletion core; not real-robot overlap. Search: latency_plateau. |
@@ -124,19 +114,29 @@ Secondary evidence only; these do not enter the default final-evaluation queue.
 | cogact / `awq` | 8 | 91.5% (183) | 19.658 | 1.199× | Retained alternative; fresh same-environment Dev-200 and timing. BF16-kernel W4A16 accuracy/precision alternative, not a second primary. |
 | cogact / `actuation_slack_refresh_keep50` | 8 | 91.0% (182) | 45.692 | 0.512× | 182/200 at higher full refresh cost than keep25. Deletion core; full auxiliary cost. |
 | cogact / `action_cache_zero_threshold90` | 8 | 89.5% (179) | 21.877 | 1.040× | Verified zero-denoiser-call cache-hit endpoint; 179/200 with less speed than the two-step primary. A distinct useful core endpoint, not a second default final run. Native DDIM refinement/clean-endpoint transfer; 1412 pairs from 77/80 independent episodes, no online population. |
-| openvla_oft / `qvla_quant_only_b8` | 8 | 99.0% (198) | 47.003 | 0.527× | Useful isolation of joint pruning/low-bit degradation; never a second primary or an automatic Final candidate. Quantization-only diagnostic: excludes pruning and 2-bit choices; NOT the full QVLA joint core. |
-| openvla_oft / `qvla_quant_only_b4` | 8 | 97.0% (194) | 36.322 | 0.683× | Useful isolation of joint pruning/low-bit degradation; never a second primary or an automatic Final candidate. Quantization-only diagnostic: excludes pruning and 2-bit choices; NOT the full QVLA joint core. |
 
 ## Not certified for final evaluation
 
-Diagnostic measurements below do NOT certify the unresolved core or authorize final runs.
+Diagnostic measurements below do NOT certify core fidelity or engineering readiness, and never authorize final runs. Exclusion reasons are independent of measured outcomes.
 
-| Backend / method | Dev SR (n/200) | ms/control | Speedup | Reason |
-|---|---:|---:|---:|---|
-| cogact / `st_merge` | 81.0% (162) | 19.809 | 1.177× | Eq. 4 consumes source into target, unlike the provisional anchor-survival convention; one-to-many collision/mass rules remain unspecified. |
-| openvla_oft / `st_merge` | 98.5% (197) | 23.994 | 1.033× | Eq. 4 consumes source into target, unlike the provisional anchor-survival convention; one-to-many collision/mass rules remain unspecified. |
-| openvla_oft / `team_vla` | 83.5% (167) | 19.226 | 1.279× | Joint text/action top-M aggregation, Eq. 5-9 direction and normalization remain unverified; author source has no executable resolution. |
-| openvla_oft / `vla_iap` | 94.5% (189) | 24.090 | 1.021× | The semantic encoder/pooling remains unspecified. The post-cutoff IAprune v2 changes core equations, so it cannot silently repair the in-scope v1. |
+| Backend / method | Status | Dev SR (n/200) | ms/control | Speedup | Reason |
+|---|---|---:|---:|---:|---|
+| cogact / `st_merge_keep192` | pending_core | 81.0% (162) | 19.809 | 1.177× | Eq. 4 consumes source into target, unlike the provisional anchor-survival convention; one-to-many collision/mass rules remain unspecified. |
+| openvla_oft / `st_merge_keep192` | pending_core | 98.5% (197) | 23.994 | 1.033× | Eq. 4 consumes source into target, unlike the provisional anchor-survival convention; one-to-many collision/mass rules remain unspecified. |
+| openvla_oft / `team_vla_merge160` | pending_core | 83.5% (167) | 19.226 | 1.279× | Joint text/action top-M aggregation, Eq. 5-9 direction and normalization remain unverified; author source has no executable resolution. |
+| openvla_oft / `vla_iap` | pending_core | 94.5% (189) | 24.090 | 1.021× | The semantic encoder/pooling remains unspecified. The post-cutoff IAprune v2 changes core equations, so it cannot silently repair the in-scope v1. |
+| cogact / `da_mpa` | pending_engineering | 93.5% (187) | 26.531 | 0.867× | Re-audit required: validate drift-allocation fidelity and a performant W4A8 runtime; the separately scoped DA-MPA component does not implement full DA-PTQ CSRC. |
+| cogact / `dyq_vla` | pending_engineering | 91.5% (183) | 22.713 | 1.021× | Re-audit required: dynamic bit decisions are active, but all quantized activations use INT8 storage followed by floating products; bit-specific integer execution/overlap feasibility is not yet established. |
+| cogact / `holoq_b16` | pending_engineering | 93.5% (187) | 55.356 | 0.424× | Re-audit required: transient full FP32 weight decoding at every DiT call is a parity workaround, not a mature acceleration implementation; preserve official-code versus paper scope. |
+| cogact / `quantvla` | pending_engineering | 90.5% (181) | 34.632 | 0.680× | Re-audit required: published and released-code activation axes differ; current packed floating GEMM and repeated online transforms need a viable optimized runtime, especially on the native FP32 DiT. |
+| openvla_oft / `dyq_vla` | pending_engineering | 98.0% (196) | 31.226 | 0.794× | Re-audit required: dynamic bit decisions are active, but all quantized activations use INT8 storage followed by floating products; bit-specific integer execution/overlap feasibility is not yet established. |
+| openvla_oft / `qvla_b15p5` | pending_engineering | 98.0% (196) | 30.781 | 0.805× | Re-audit required: current public-code Hessian/absolute-cost allocator differs from the paper action-intervention/marginal allocator; near-native channel budget and fragmented runtime do not close the engineering search. |
+| openvla_oft / `qvla_quant_only_b8` | pending_engineering | 99.0% (198) | 47.003 | 0.527× | Useful isolation of joint pruning/low-bit degradation; never a second primary or an automatic Final candidate. |
+| openvla_oft / `qvla_quant_only_b4` | pending_engineering | 97.0% (194) | 36.322 | 0.683× | Useful isolation of joint pruning/low-bit degradation; never a second primary or an automatic Final candidate. |
+| cogact / `eaqvla` | excluded | 89.5% (179) | 25.480 | 0.903× | Not a formal survey experiment: the authors withdrew arXiv:2505.21567v2 on 2025-07-31 citing a paper error. Existing measurements remain diagnostic, not a reason to exclude an unfavorable outcome. |
+| cogact / `motion_vq_t1` | excluded | 91.0% (182) | 25.347 | 0.927× | Not a full VQVLA GPU acceleration comparison: this component includes dual codebooks/router but omits the defining spatial/temporal multiplication reuse. Preserve diagnostic evidence; do not attribute its speed to the complete paper. |
+| openvla_oft / `eaqvla` | excluded | 99.5% (199) | 36.067 | 0.687× | Not a formal survey experiment: the authors withdrew arXiv:2505.21567v2 on 2025-07-31 citing a paper error. Existing measurements remain diagnostic, not a reason to exclude an unfavorable outcome. |
+| openvla_oft / `motion_vq_t1` | excluded | 99.0% (198) | 29.857 | 0.832× | Not a full VQVLA GPU acceleration comparison: this component includes dual codebooks/router but omits the defining spatial/temporal multiplication reuse. Preserve diagnostic evidence; do not attribute its speed to the complete paper. |
 
 ## Evidence index
 
@@ -149,12 +149,6 @@ Recorded revisions predating history cleanup can be resolved through the
 |---|---|---|---|---|---|
 | cogact / `baseline` | `a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358` | `9c717076b91643a09d4c8826b56aeb4de1abf54684601c093388a19ce69ba0c0` | `compact-41-4-cogact-1--native-pre` | `e86cbe2edc52d3bc69122a66dc727a8aa1109d93` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `c3be4cb17862b40f8519c7c2a4a52805b268f4e547991a93fae666ee733fb862` |
 | cogact / `awq_fp16_kernel` | `978a97ceb9fd46195050bc3e255705b459588d46a052b699f0b753903e579108` | `8bba1c63b720f89a924e839d7a2915f9c6c3b5787872b3751f62add28636ac07` | `quant-p3-runtime-cogact-existing-r1-awq_fp16_kernel` | `e3dc770ef6ee3336559ad4850bc2ad9490c0a0ad` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `81f583602ee9c5766f2f46cb495b50ea88d19acd94f98c4333f600f4484e9fd0` |
-| cogact / `da_mpa` | `237a0364cd1571e18528961afe00fca0028809cd61926b59035fe4ea9ffef217` | — | `quant-p3-runtime-cogact-modular-r1-da_mpa` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `f52b6b3e9be5d55a564f784cd8bce9911d92a7d7c2098b04cfa826ce12f86d17` |
-| cogact / `dyq_vla` | `ec437d962ea1ca4c4f4ef7e180a55c2cac205744da1856f040ce067bebecb5b2` | — | `quant-p3-runtime-cogact-dynamic-r1-dyq_vla` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `5c8b2b3b4327f2b089d902c9d8917c8a912cb1940256b0562f6986a1d636649b` |
-| cogact / `eaqvla` | `92ecfbe513af045670c25d6475ffa724114b7707176276c4e526090da434cd1e` | — | `quant-p3-runtime-cogact-modular-r1-eaqvla` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `9282dc3c72e9736be8bb5020a70fc40bacffe57961ff484f6262a8d3ce3edeed` |
-| cogact / `holoq_b16` | `6d9c2e73ffcd0f4bcdbedd8b5aeea40417ba7cc5a0e79fccde67dea22a13a7d9` | — | `quant-p3-runtime-cogact-holoq-b16-native-fp32-r1-holoq_b16` | `e3dc770ef6ee3336559ad4850bc2ad9490c0a0ad` / `e3dc770ef6ee3336559ad4850bc2ad9490c0a0ad` | `bc3b372b5d39afb4066ad25e2f44dfa634b3e46c70ec6af7cb9f3254d59947cf` |
-| cogact / `motion_vq_t1` | `fd1874d63b12e55628dfec7e77f5b1ae545a64e42b9183ddb135e8f2744d7cf4` | — | `quant-p3-runtime-cogact-motion-vq-r1-motion_vq_t1` | `581caee8b8da22d34223cbb00804000a734b51c6` / `581caee8b8da22d34223cbb00804000a734b51c6` | `f974a60a0073a30cb796d322cee082788619d31340e0aac04738fc34f708129c` |
-| cogact / `quantvla` | `75209ba4c175a17b43068bdb982dd01d7117cbb74c002db95090b3c6305f1de3` | — | `quant-p3-runtime-cogact-existing-r1-quantvla` | `f31c7f8e86226ff2be0dbe850dab23042c0e880f` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `c203acd5739e1b7a2bee0019abdae615aba81ff7d05cde3ddc8a2bd39861473c` |
 | cogact / `efficient_vla_layer_prune04` | `2c4f114dbefc70fd9001735c927d158cfb17bd28fee9d21786a3676ebed679fd` | `76b777e78321e1a8034a8ba887934874b5eb62a6fd5b9121634a2a7a01d7b3eb` | `routing-layers-v1-124-7-cogact--layer_prune04` | `0281aa8f0f59a2ef08380f36ea95362b27748d90` / `0281aa8f0f59a2ef08380f36ea95362b27748d90` | `46a1ecab3fb1b69ae5b614c6cd22c0afc3d625fa338d906ee0c9bcb2a2fcbd21` |
 | cogact / `a_mmr_current_frame_keep4375` | `49d963de78d72de16e8800148ab541df1654c905c5d74eaf5e8525d416921764` | `e5453aed86afe9a1df175b7ad92087e0b36b8af8bc4920a5d4fc13e6d2952fde` | `scoped-retained-r3-r1-41-g1-cogact--a_mmr_keep4375` | `f5bd8e8379633253bf85cfa8d19799c7af1565a6` / `bb7a27cc53544214055dcaacb5fd6435396f7641` | `8404057c726543c4c0498f2736342be5bb30043e0a232aa59d68383ebee4ef8d` |
 | cogact / `actuation_slack_refresh_keep25` | `1745acc6a866125188a9997d38d3a193bf3f2238f71a72e8522ed6a2933d2115` | `64c0acc7f982a2d55ca87d1e362fe53e35b45f2041f5b1c437e0ec3b95d22f3b` | `compact-41-4-cogact-1--actuation_slack_refresh_keep25` | `1dc47be1a1e7d1cd8623a50e329d3a72e5daa8ef` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `ba45d59001f53064891ce78afc87457c6fcfb42d74aae8f49bd7b9ed91127717` |
@@ -200,10 +194,6 @@ Recorded revisions predating history cleanup can be resolved through the
 | openvla_oft / `baseline` | `83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e` | `762c07b567785f8bb98fe4c60d0f3edba3e577eed1a17eddc06bdcfb7e7b1143` | `compact-124-7-openvla_oft-quant--native-pre` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `2a49223fe7b558d8ca59b6ceab6557f06fc354b9` | `77575dfbcb36ed385377a886f994a3d21e6cb2eb1de5d620f896aea2f9f493cd` |
 | openvla_oft / `actquant` | `c71d808134c35b6e3b6c8d20ed967f21926e6fcd509958df5e7a71baefa822b2` | — | `quant-p3-runtime-openvla_oft-existing-r1-actquant` | `39b5443ce96f387694ef77a64982990e85e74df2` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `4da5f0e8f41bfb3568bf629be2b9d91d164a58e27a416a5c04433b97ef84d0ad` |
 | openvla_oft / `awq_fp16_kernel` | `016d66ce289606cda23e5832ccb72e53d1b7429f261bd3af5531013eee702b90` | `0e7e0f7f0e16adf681d21762a8a8226467693774fbe211d80959e75378d08c43` | `quant-p3-runtime-openvla_oft-existing-r1-awq_fp16_kernel` | `e3dc770ef6ee3336559ad4850bc2ad9490c0a0ad` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `9b1c6bf71f28c844c3184a944bfc851611c877b697b192bf7c55cbbb235f0db5` |
-| openvla_oft / `dyq_vla` | `6bf3386916925538aecc4e458f1cf081db436489dde88d50fea2d37db7b8a4bf` | — | `quant-p3-runtime-openvla_oft-new-r1-dyq_vla` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `49855d2617cb23721572d0aae658d16eedcf855575960f1ecbf75acbdbe035f6` |
-| openvla_oft / `eaqvla` | `21d44e48ffdc9ebff83b03bf72fc07f735d16aa78944359a008776a15d42b352` | — | `quant-p3-runtime-openvla_oft-new-r1-eaqvla` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `dcd8a2251b39435642a0715e10d53c0beb01514aef1b3a64e786c971b38e7412` |
-| openvla_oft / `motion_vq_t1` | `7e83bf47cee1a48e915570707ed91d7b815b0d6af3edc083169570a157bd2c6e` | — | `quant-p3-runtime-openvla_oft-motion-vq-r1-motion_vq_t1` | `581caee8b8da22d34223cbb00804000a734b51c6` / `581caee8b8da22d34223cbb00804000a734b51c6` | `5862fe15c2b315d134c85934e4de55928ca8f39e7292efb98aa264a570eeb032` |
-| openvla_oft / `qvla_b15p5` | `1d33b5877ec541a97ba19a9444537d5cb7b0345b02832e23e7b616ed29bc58e9` | — | `quant-p3-runtime-openvla_oft-new-r1-qvla_b15p5` | `b81783b8eab57bfe22cdcde1056f11fe4da4138d` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `e598cabde9a7be3c0eed70d3d0fa7c110f8e7af2d1f2d3cc02cec964443e2f29` |
 | openvla_oft / `efficient_vla_layer_prune03` | `4d5841c74fa9f501a353b8e29e29afb085d26b3b1af36d17906060b696e5c792` | `0666df6171bafac15ffb2ddd3dc68096cbcb4170da384484da506266f081021e` | `routing-layers-v3-45-5-openvla_oft--layer_prune03` | `0281aa8f0f59a2ef08380f36ea95362b27748d90` / `a7c6b45a939067ff2dd25b438068333659391ed2` | `2de43370c80511d8e1c3f3be88da768559dfa66708f3ef0c17638717831fcde6` |
 | openvla_oft / `a_mmr_current_frame_keep4375` | `66a171af08f81a0606d70a2d11896f249e8f7bb72659d192c72d7ebdb2aece2e` | `960f94b9ec9a7a3538b363ee144888ac6e88c50be8001d244cea3a9655be2c04` | `scoped-r1-41-g0-openvla_oft--a_mmr_keep4375` | `f5bd8e8379633253bf85cfa8d19799c7af1565a6` / `f5bd8e8379633253bf85cfa8d19799c7af1565a6` | `467d569453b59d2945b5edf55550b9d16f51b037fd4e43fd6b720d5437f9213f` |
 | openvla_oft / `actuation_slack_refresh_deletion` | `2e2b75988b34636d5fa39e24e573aa4a159c179d48954e47203a23897921b39c` | `70b5d25d688d38a6df2abe347976d6f813a3e544a610b85264ea1509fe9252d6` | `compact-45-5-openvla_oft-recheck--actuation_slack_refresh_deletion` | `f63c95a6f22a8fd2c1fcdc9fed2441ecb376379d` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `515f46e72adb7e0bd549ce44c0e3716db4d7b3573c3fdf3ad56c826d9df12c2d` |
@@ -233,12 +223,22 @@ Recorded revisions predating history cleanup can be resolved through the
 | cogact / `awq` | `8b7c5bc06c3d722d3e21ce1bfc625a6990773624ffd88a6bf5157a5099028a29` | — | `quant-p3-runtime-cogact-existing-r1-awq` | `e3dc770ef6ee3336559ad4850bc2ad9490c0a0ad` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `67d089d500cfb6bcabc0948dce787b2f8ca59358921cf038ce8fcaff6fc4391e` |
 | cogact / `actuation_slack_refresh_keep50` | `3e9ab07826e30785e609207a39c4c964aadc37185ff424e01b3643cfb527bd3c` | — | `compact-41-4-cogact-1--actuation_slack_refresh_keep50` | `1dc47be1a1e7d1cd8623a50e329d3a72e5daa8ef` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `c688748fc315d380b58c73462d81222c806f6ed88f9cf027c16ad63c3ca73762` |
 | cogact / `action_cache_zero_threshold90` | `cafc1f861659729e267488d2e62539245572e80056ea6a4ae0a1c5bc6f17ad79` | — | `scoped-action-zero90-thermal-replacement-r1-40-g1-cogact--action_zero_t090` | `bb7a27cc53544214055dcaacb5fd6435396f7641` / `bb7a27cc53544214055dcaacb5fd6435396f7641` | `02416cb58dd00bb5b5794ef07c1e376eda396f7a9568bd261d3b807a6f131672` |
-| openvla_oft / `qvla_quant_only_b8` | `f6317b675e16d290bdb93c0e9c9bba8fcf0e007b3563c9f22ff4093d1623b879` | — | `quant-p3-runtime-openvla_oft-new-r1-qvla_quant_only_b8` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `2bd0b4dcc5b5478dac1430b41ade287758f9a6b350e3fe0dbadced1ba1efd139` |
-| openvla_oft / `qvla_quant_only_b4` | `729c0f06d1c037ebddada2a282a3a2a0eed799e6caa39b72bacea824409755f7` | — | `quant-p3-runtime-openvla_oft-new-r1-qvla_quant_only_b4` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `12cd0000a237684365aa34513974871bcd666d506b7fe52a2fc56deb4c33843a` |
 | cogact / `st_merge_keep192` | `2715131409b114d95dc8dc1349d3ea4da8b4baa5ab6f0e78127aff0d3dc431eb` | — | `compact-43-2-cogact-3--st_merge_keep192` | `1dc47be1a1e7d1cd8623a50e329d3a72e5daa8ef` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `c67baa5ef382b3aa4fbdce5a312500f136981ba4179eb5163cb4f29398bb594f` |
 | openvla_oft / `st_merge_keep192` | `d6e8965949d65ac92a7079a13bbe478bc63fd38ef9d9657f513d8051b75f9a46` | — | `compact-45-5-openvla_oft-recheck--st_merge_keep192` | `1dc47be1a1e7d1cd8623a50e329d3a72e5daa8ef` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `945d70c1affb3d3c243e7eed3a688112f005fbf591f8e87be257572bd16dc62a` |
 | openvla_oft / `team_vla_merge160` | `02fc7c9f038ee76b07c85196460993479de227eba74c4343cca09310552f327c` | — | `compact-45-7-openvla_oft-3--team_vla_merge160` | `1dc47be1a1e7d1cd8623a50e329d3a72e5daa8ef` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `5f45fec789ab8a8b09723be9fa5fcb66ebf42d78ee443fa28c56b7be88d7a7bd` |
 | openvla_oft / `vla_iap` | `0a6a2c9c71aefa83b1f9ce71ac8d7813d3bb4ed9c4494769d977fdf123756ae0` | — | `compact-45-7-openvla_oft-3--vla_iap` | `bf60e9ff70b38b989df57982bf1f92ea51fd08c9` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `c51e783e5187bfc02f9c44dd8c91c8309d4a26383cb18a190dfa3dd0378a862b` |
+| cogact / `da_mpa` | `237a0364cd1571e18528961afe00fca0028809cd61926b59035fe4ea9ffef217` | — | `quant-p3-runtime-cogact-modular-r1-da_mpa` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `f52b6b3e9be5d55a564f784cd8bce9911d92a7d7c2098b04cfa826ce12f86d17` |
+| cogact / `dyq_vla` | `ec437d962ea1ca4c4f4ef7e180a55c2cac205744da1856f040ce067bebecb5b2` | — | `quant-p3-runtime-cogact-dynamic-r1-dyq_vla` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `5c8b2b3b4327f2b089d902c9d8917c8a912cb1940256b0562f6986a1d636649b` |
+| cogact / `holoq_b16` | `6d9c2e73ffcd0f4bcdbedd8b5aeea40417ba7cc5a0e79fccde67dea22a13a7d9` | — | `quant-p3-runtime-cogact-holoq-b16-native-fp32-r1-holoq_b16` | `e3dc770ef6ee3336559ad4850bc2ad9490c0a0ad` / `e3dc770ef6ee3336559ad4850bc2ad9490c0a0ad` | `bc3b372b5d39afb4066ad25e2f44dfa634b3e46c70ec6af7cb9f3254d59947cf` |
+| cogact / `quantvla` | `75209ba4c175a17b43068bdb982dd01d7117cbb74c002db95090b3c6305f1de3` | — | `quant-p3-runtime-cogact-existing-r1-quantvla` | `f31c7f8e86226ff2be0dbe850dab23042c0e880f` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `c203acd5739e1b7a2bee0019abdae615aba81ff7d05cde3ddc8a2bd39861473c` |
+| openvla_oft / `dyq_vla` | `6bf3386916925538aecc4e458f1cf081db436489dde88d50fea2d37db7b8a4bf` | — | `quant-p3-runtime-openvla_oft-new-r1-dyq_vla` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `49855d2617cb23721572d0aae658d16eedcf855575960f1ecbf75acbdbe035f6` |
+| openvla_oft / `qvla_b15p5` | `1d33b5877ec541a97ba19a9444537d5cb7b0345b02832e23e7b616ed29bc58e9` | — | `quant-p3-runtime-openvla_oft-new-r1-qvla_b15p5` | `b81783b8eab57bfe22cdcde1056f11fe4da4138d` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `e598cabde9a7be3c0eed70d3d0fa7c110f8e7af2d1f2d3cc02cec964443e2f29` |
+| openvla_oft / `qvla_quant_only_b8` | `f6317b675e16d290bdb93c0e9c9bba8fcf0e007b3563c9f22ff4093d1623b879` | — | `quant-p3-runtime-openvla_oft-new-r1-qvla_quant_only_b8` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `2bd0b4dcc5b5478dac1430b41ade287758f9a6b350e3fe0dbadced1ba1efd139` |
+| openvla_oft / `qvla_quant_only_b4` | `729c0f06d1c037ebddada2a282a3a2a0eed799e6caa39b72bacea824409755f7` | — | `quant-p3-runtime-openvla_oft-new-r1-qvla_quant_only_b4` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `12cd0000a237684365aa34513974871bcd666d506b7fe52a2fc56deb4c33843a` |
+| cogact / `eaqvla` | `92ecfbe513af045670c25d6475ffa724114b7707176276c4e526090da434cd1e` | — | `quant-p3-runtime-cogact-modular-r1-eaqvla` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `9282dc3c72e9736be8bb5020a70fc40bacffe57961ff484f6262a8d3ce3edeed` |
+| cogact / `motion_vq_t1` | `fd1874d63b12e55628dfec7e77f5b1ae545a64e42b9183ddb135e8f2744d7cf4` | — | `quant-p3-runtime-cogact-motion-vq-r1-motion_vq_t1` | `581caee8b8da22d34223cbb00804000a734b51c6` / `581caee8b8da22d34223cbb00804000a734b51c6` | `f974a60a0073a30cb796d322cee082788619d31340e0aac04738fc34f708129c` |
+| openvla_oft / `eaqvla` | `21d44e48ffdc9ebff83b03bf72fc07f735d16aa78944359a008776a15d42b352` | — | `quant-p3-runtime-openvla_oft-new-r1-eaqvla` | `ef922100b927df6ca750d33206f9be1e2bd297d9` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `dcd8a2251b39435642a0715e10d53c0beb01514aef1b3a64e786c971b38e7412` |
+| openvla_oft / `motion_vq_t1` | `7e83bf47cee1a48e915570707ed91d7b815b0d6af3edc083169570a157bd2c6e` | — | `quant-p3-runtime-openvla_oft-motion-vq-r1-motion_vq_t1` | `581caee8b8da22d34223cbb00804000a734b51c6` / `581caee8b8da22d34223cbb00804000a734b51c6` | `5862fe15c2b315d134c85934e4de55928ca8f39e7292efb98aa264a570eeb032` |
 
 ## Independent action codec reconstruction
 
@@ -445,67 +445,27 @@ replacement was retained, not the fastest repeat. Its obsolete raw runs/logs wer
 compact retirement evidence and all valid failures remain.
 
 <!-- supplementary-quantization-runtime -->
-## Quantization runtime repair and scoped completion
+## Quantization engineering re-audit — in progress
 
-This batch reports **9 method families / 13 backend scopes**, with one selected
-configuration per scope. All use real packed execution or the explicitly named
-author GGUF engine; dense quantized references are correctness oracles only.
-Packing does not imply integer-MMA execution or speedup. Rates below are Dev-200,
-not newly authorized Final-2000 evidence.
+Measured does not mean survey-ready. AWQ (both backends) and ActQuant (OFT)
+retain their existing primary evidence; QVLA, QuantVLA, HoloQ, DyQ-VLA and
+DA-MPA are explicitly held for engineering/fidelity review, including QVLA's
+quantization-only auxiliary controls. Their measurements remain in the diagnostic
+table and evidence index, not the primary comparison or final queue.
 
-- **AWQ:** verified both author CUDA kernel paths; FP16 remains the faster eligible
-  choice. Both backends received fresh Dev-200 for both precisions because the
-  current dependency fingerprint includes a package absent from the older runs.
-  No environment mismatch was silently waived. Historical authorized Finals remain
-  separate and unchanged.
-- **QVLA / QuantVLA:** repaired QVLA native-dtype rounding; optimized packed memory
-  access and QuantVLA identity transforms. Rechecked whole-policy outputs and
-  stronger candidates. QVLA is the official-code input-Hessian allocation, not the
-  paper's action-intervention objective; its channel budget is not model bits/weight.
-  QuantVLA retains native FP32 DiT, all rotations and activation quantization.
-  Profiling attributes substantial overhead to these small DiT operations;
-  an explicitly timed native-GEMM probe did not recover speed.
-- **ActQuant:** unchanged HSIC/AMF author runtime and dependency-compatible Dev
-  evidence; all three budgets received fresh timing. Its speed includes an engine
-  change, so the retained floating-engine control remains necessary.
-- **HoloQ:** the released-code variant differs from the paper's activation axes.
-  Small pre-quantization FP32 errors crossed rounding thresholds; fixed per-call
-  native-FP32 decoding restores exact whole-policy quantized-reference parity.
-  All decoding/workspace costs count. Block16 restores the Dev target; its negative
-  GPU speed is not a claim about an unimplemented hardware engine.
-- **DyQ-VLA:** frozen independent native population: 80 attempts, 79 successes,
-  one retained failure, no replacement sampling or Dev/Final calibration. Temporal
-  thresholds and precision state are active. Quantizer axes/error-bound fitting
-  are disclosed engineering choices; INT8 activation carriers and floating GEMM
-  are not the unavailable author's low-bit integer/asynchronous runtime.
-- **EaqVLA / DA-MPA:** independently scoped weight-GPTQ module allocation and
-  drift-aware precision allocation, respectively. EaqVLA excludes an unspecified
-  activation quantizer; DA-MPA excludes unresolved CSRC weighting. Calibration
-  uses training observations/chunks and gradient probes, never optimizer updates.
-- **MotionVQ:** dual-codebook/motion-router LLM core only. Fixed the 256-centroid
-  uint8 range-check overflow and improved centroid-tile reuse. Both banks match
-  independent whole-policy references exactly, including reload/reset, and routing
-  is active in measured prefixes. Both resident banks and routing/gather costs count;
-  this is neither full-model 3-bit storage nor reproduction of ASIC-specific reuse.
+EaqVLA is excluded from formal comparison because the
+[authors withdrew the paper](https://arxiv.org/abs/2505.21567), not because of its
+measured outcome. The MotionVQ component is also excluded from a full VQVLA GPU
+acceleration comparison: its implementation does not include the defining
+spatial/temporal multiplication reuse. Neither decision deletes measurements,
+historical source or existing calibration evidence.
 
-The primary table and selection manifest contain the selected parameters and
-candidate evidence. Fixed-allocation methods retain their defining precision policy;
-methods with meaningful knobs include boundary/plateau checks. A negative result
-describes this tested implementation, precision and GPU, not a universal failure
-of the paper. These GPU ports do not replace unavailable custom hardware kernels.
-
-**Deferred, not disguised as implemented:** HBVLA's unverified binary bootstrap/
-local reconstruction; full DA-PTQ CSRC; Mix-QVLA's absent native action-token
-likelihood objective; owner-deferred SQAP-VLA activation granularity; QAT-dependent
-SQIL/BitVLA and additional-baseline QuantWAM. See the development guide and method
-READMEs for exact boundaries. Unimplemented backend bindings are not declarations
-of fundamental incompatibility.
-
-The unchanged compact four-prefix/H8 timing protocol includes conversions,
-routing and reconstruction, with same-device native pre/post drift at most 3%
-and no accepted measured thermal flags. Search, calibration and validity evidence
-remain traceable in ignored outputs. Withdrawn premature quantization Finals are
-excluded. **New Final-2000 requires explicit owner approval; no automatic launch.**
+Repair priorities are quantizer/allocator fidelity, actual packed/integer execution,
+elimination of transient full-weight reconstruction, and all online transform costs.
+GPTQ W4A16 and SmoothQuant W8A8 are planned classic controls, not implemented
+results. HBVLA and the deferred VLA-specific scopes still require mechanism and
+runtime admission checks. A standalone kernel passing is not algorithm admission.
+No new Final-2000 evaluation is authorized or launched.
 
 ### Fixed floating-engine control
 

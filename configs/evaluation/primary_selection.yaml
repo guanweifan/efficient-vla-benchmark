@@ -229,7 +229,7 @@ configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   config: configs/experiments/cogact/da_mpa.yaml
-  status: primary
+  status: pending_engineering
   section: '3.3'
   scope: DA-PTQ Table4 DA-MPA drift-allocation core only; CSRC excluded. Native FP32 retained DiT blocks;
     real W4/A8 packed floating GEMM.
@@ -237,10 +237,10 @@ configurations:
   final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
   development_summary_sha256: b4f0b2e364c74b137287ca17887fce1487051f76aa8f8c62aab9478170fcadce
   development_experiment_id: 237a0364cd1571e18528961afe00fca0028809cd61926b59035fe4ea9ffef217
-  reason: Retain30/15 give 187/181 of 200, both eligible; more quantized blocks slow execution (26.532
-    to 27.288 ms/control). Keep the reference 30% allocation.
+  reason: 'Re-audit required: validate drift-allocation fidelity and a performant W4A8 runtime; the separately
+    scoped DA-MPA component does not implement full DA-PTQ CSRC.'
   search:
-    complete: true
+    complete: false
     stop: latency_plateau
     reason: Retain30/15 give 187/181 of 200, both eligible; more quantized blocks slow execution (26.532
       to 27.288 ms/control). Keep the reference 30% allocation.
@@ -256,7 +256,7 @@ configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   config: configs/experiments/cogact/dyq_vla.yaml
-  status: primary
+  status: pending_engineering
   section: '3.3'
   scope: Paper temporal W4/dynamic-A core; independent successful native trajectories. Disclosed quantizer/threshold
     estimator; INT8 activation carrier with floating tile GEMM, not unavailable author integer/async runtime.
@@ -264,10 +264,11 @@ configurations:
   final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
   development_summary_sha256: 4b2a38cefa39e90f119c5a3295b7f0c6bc4b5f6c677d4a127851448782e117fa
   development_experiment_id: ec437d962ea1ca4c4f4ef7e180a55c2cac205744da1856f040ce067bebecb5b2
-  reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or Dev-data
-    calibration. Report the measured backend-specific outcome.
+  reason: 'Re-audit required: dynamic bit decisions are active, but all quantized activations use INT8
+    storage followed by floating products; bit-specific integer execution/overlap feasibility is not yet
+    established.'
   search:
-    complete: true
+    complete: false
     stop: mechanism_limit
     reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or Dev-data
       calibration. Report the measured backend-specific outcome.
@@ -283,7 +284,7 @@ configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   config: configs/experiments/cogact/eaqvla.yaml
-  status: primary
+  status: excluded
   section: '3.3'
   scope: 'Independent modular weight-GPTQ core: vision W4/language W8, native projector/action head. Unspecified
     activation quantizer excluded; packed floating GEMM.'
@@ -291,10 +292,10 @@ configurations:
   final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
   development_summary_sha256: d7626e43fa7ed9794db1becce9114f1901d6e44e2399d1051f5db30cb8169b8b
   development_experiment_id: 92ecfbe513af045670c25d6475ffa724114b7707176276c4e526090da434cd1e
-  reason: Fixed paper module precision policy is active and numerically checked; retain measured success
-    and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
+  reason: 'Not a formal survey experiment: the authors withdrew arXiv:2505.21567v2 on 2025-07-31 citing
+    a paper error. Existing measurements remain diagnostic, not a reason to exclude an unfavorable outcome.'
   search:
-    complete: true
+    complete: false
     stop: mechanism_limit
     reason: Fixed paper module precision policy is active and numerically checked; retain measured success
       and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
@@ -309,7 +310,7 @@ configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   config: configs/experiments/cogact/holoq_b16.yaml
-  status: primary
+  status: pending_engineering
   section: '3.3'
   scope: 'Official-code W4A4 variant: LLM block GPTQ and DiT RTN with composite rotations. Packed BF16
     LLM tiles; explicit per-call FP32 DiT decode/native GEMM, no persistent reconstructed weights. Not
@@ -318,11 +319,10 @@ configurations:
   final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
   development_summary_sha256: 40223500d1f3df9a9a58bbdbf9ccc625b5af7e36dcf065cc25efffe835ae160f
   development_experiment_id: 6d9c2e73ffcd0f4bcdbedd8b5aeea40417ba7cc5a0e79fccde67dea22a13a7d9
-  reason: 'Block64/16 give 172/187 of 200. Select block16: it meets the 177/200 target while block64 does
-    not; valid full-cost latencies are similar and both slower than native. Ordinary policy arithmetic,
-    reset and fresh reload match the quantized reference exactly.'
+  reason: 'Re-audit required: transient full FP32 weight decoding at every DiT call is a parity workaround,
+    not a mature acceleration implementation; preserve official-code versus paper scope.'
   search:
-    complete: true
+    complete: false
     stop: accuracy_boundary
     reason: 'Block64/16 give 172/187 of 200. Select block16: it meets the 177/200 target while block64
       does not; valid full-cost latencies are similar and both slower than native. Ordinary policy arithmetic,
@@ -340,7 +340,7 @@ configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   config: configs/experiments/cogact/motion_vq_t1.yaml
-  status: primary
+  status: excluded
   section: '3.3'
   scope: VQVLA independent LLM dual-codebook/motion-router core, both resident banks and packed centroid-gather
     GPU costs included. Native FP32 diffusion head unchanged; excludes full-model export and ASIC-specific
@@ -349,12 +349,11 @@ configurations:
   final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
   development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
   development_experiment_id: fd1874d63b12e55628dfec7e77f5b1ae545a64e42b9183ddb135e8f2744d7cf4
-  reason: Thresholds 0.8/1.0 both give 182 of 200, with 26.139/25.347 ms/control; select the faster eligible
-    1.0. Both banks remain active (13 of 63 measured queries use the low bank at 1.0). Kernel tile reuse
-    was optimized and independently checked. Report a negative GPU outcome, not an optimality or paper-failure
-    claim.
+  reason: 'Not a full VQVLA GPU acceleration comparison: this component includes dual codebooks/router
+    but omits the defining spatial/temporal multiplication reuse. Preserve diagnostic evidence; do not
+    attribute its speed to the complete paper.'
   search:
-    complete: true
+    complete: false
     stop: mechanism_limit
     reason: Thresholds 0.8/1.0 both give 182 of 200, with 26.139/25.347 ms/control; select the faster
       eligible 1.0. Both banks remain active (13 of 63 measured queries use the low bank at 1.0). Kernel
@@ -378,7 +377,7 @@ configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   config: configs/experiments/cogact/quantvla.yaml
-  status: primary
+  status: pending_engineering
   section: '3.3'
   scope: Calibrated DuQuant plus ATM/OHB, W4/A8 storage and tile floating GEMM; native FP32 DiT and all
     transforms retained.
@@ -386,10 +385,11 @@ configurations:
   final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
   development_summary_sha256: b68cc529598d4c4652c93df33b1b87269ed7fd124d7864e67eeb957cc87f5e48
   development_experiment_id: 75209ba4c175a17b43068bdb982dd01d7117cbb74c002db95090b3c6305f1de3
-  reason: Block64/16 give 181/178 of 200 with 34.632/34.880 ms/control, a latency plateau; retain reference
-    block64 with higher success. DiT profiling and native-GEMM diagnostic found no speed recovery.
+  reason: 'Re-audit required: published and released-code activation axes differ; current packed floating
+    GEMM and repeated online transforms need a viable optimized runtime, especially on the native FP32
+    DiT.'
   search:
-    complete: true
+    complete: false
     stop: latency_plateau
     reason: Block64/16 give 181/178 of 200 with 34.632/34.880 ms/control, a latency plateau; retain reference
       block64 with higher success. DiT profiling and native-GEMM diagnostic found no speed recovery.
@@ -1840,7 +1840,7 @@ configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   config: configs/experiments/openvla_oft/dyq_vla.yaml
-  status: primary
+  status: pending_engineering
   section: '3.3'
   scope: Paper temporal W4/dynamic-A core; independent successful native trajectories. Disclosed quantizer/threshold
     estimator; INT8 activation carrier with floating tile GEMM, not unavailable author integer/async runtime.
@@ -1848,10 +1848,11 @@ configurations:
   final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
   development_summary_sha256: 74b5b41b243e202c87830809dd64a783ee60bd9086e0d70eaf0770e1a8cb8f9c
   development_experiment_id: 6bf3386916925538aecc4e458f1cf081db436489dde88d50fea2d37db7b8a4bf
-  reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or Dev-data
-    calibration. Report the measured backend-specific outcome.
+  reason: 'Re-audit required: dynamic bit decisions are active, but all quantized activations use INT8
+    storage followed by floating products; bit-specific integer execution/overlap feasibility is not yet
+    established.'
   search:
-    complete: true
+    complete: false
     stop: mechanism_limit
     reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or Dev-data
       calibration. Report the measured backend-specific outcome.
@@ -1867,7 +1868,7 @@ configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   config: configs/experiments/openvla_oft/eaqvla.yaml
-  status: primary
+  status: excluded
   section: '3.3'
   scope: 'Independent modular weight-GPTQ core: vision W4/language W8, native projector/action head. Unspecified
     activation quantizer excluded; packed floating GEMM.'
@@ -1875,10 +1876,10 @@ configurations:
   final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
   development_summary_sha256: 853756359389223c757ae492f6dbf801d0012e01afc0d3118f463396ffcd8d50
   development_experiment_id: 21d44e48ffdc9ebff83b03bf72fc07f735d16aa78944359a008776a15d42b352
-  reason: Fixed paper module precision policy is active and numerically checked; retain measured success
-    and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
+  reason: 'Not a formal survey experiment: the authors withdrew arXiv:2505.21567v2 on 2025-07-31 citing
+    a paper error. Existing measurements remain diagnostic, not a reason to exclude an unfavorable outcome.'
   search:
-    complete: true
+    complete: false
     stop: mechanism_limit
     reason: Fixed paper module precision policy is active and numerically checked; retain measured success
       and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
@@ -1893,7 +1894,7 @@ configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   config: configs/experiments/openvla_oft/motion_vq_t1.yaml
-  status: primary
+  status: excluded
   section: '3.3'
   scope: VQVLA independent LLM dual-codebook/motion-router core, both resident banks and packed centroid-gather
     GPU costs included. Excludes full-model export and ASIC-specific reuse.
@@ -1901,12 +1902,11 @@ configurations:
   final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
   development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
   development_experiment_id: 7e83bf47cee1a48e915570707ed91d7b815b0d6af3edc083169570a157bd2c6e
-  reason: Thresholds 0.8/1.0 give 196/198 of 200 and 30.878/29.857 ms/control; select the faster eligible
-    1.0. Both banks remain active (6 of 57 measured queries use the low bank at 1.0). Kernel tile reuse
-    was optimized and independently checked. Report a negative GPU outcome, not an optimality or paper-failure
-    claim.
+  reason: 'Not a full VQVLA GPU acceleration comparison: this component includes dual codebooks/router
+    but omits the defining spatial/temporal multiplication reuse. Preserve diagnostic evidence; do not
+    attribute its speed to the complete paper.'
   search:
-    complete: true
+    complete: false
     stop: mechanism_limit
     reason: Thresholds 0.8/1.0 give 196/198 of 200 and 30.878/29.857 ms/control; select the faster eligible
       1.0. Both banks remain active (6 of 57 measured queries use the low bank at 1.0). Kernel tile reuse
@@ -1930,7 +1930,7 @@ configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   config: configs/experiments/openvla_oft/qvla_b15p5.yaml
-  status: primary
+  status: pending_engineering
   section: '3.3'
   scope: Official-code input-Hessian joint allocation, not paper action intervention. Channel-average
     budget is not model bits/weight; packed floating GEMM.
@@ -1938,11 +1938,11 @@ configurations:
   final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
   development_summary_sha256: b68cc529598d4c4652c93df33b1b87269ed7fd124d7864e67eeb957cc87f5e48
   development_experiment_id: 1d33b5877ec541a97ba19a9444537d5cb7b0345b02832e23e7b616ed29bc58e9
-  reason: 'Repaired native-dtype QVLA: budgets 15.5/15 give 196/197 of 200, but 15 is slower (33.523 versus
-    30.781 ms/control). Retain active joint 15.5; lower-budget smoke collapse is diagnostic, not reused
-    old Dev evidence.'
+  reason: 'Re-audit required: current public-code Hessian/absolute-cost allocator differs from the paper
+    action-intervention/marginal allocator; near-native channel budget and fragmented runtime do not close
+    the engineering search.'
   search:
-    complete: true
+    complete: false
     stop: latency_plateau
     reason: 'Repaired native-dtype QVLA: budgets 15.5/15 give 196/197 of 200, but 15 is slower (33.523
       versus 30.781 ms/control). Retain active joint 15.5; lower-budget smoke collapse is diagnostic,

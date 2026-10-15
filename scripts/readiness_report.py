@@ -255,6 +255,8 @@ def build(selection, summaries, records, quality, development_manifest, final_re
                 raise ValueError("Timing run belongs to multiple cohorts")
             quality_by_run[run_id] = group
     seen, rows, pending, launch = set(), [], [], []
+    held = {"pending_core": pending, "pending_engineering": [], "excluded": []}
+    scope_status = {}
     for selected in selection["configurations"]:
         config = asdict(ExperimentConfig.load(Path(selected["config"])))
         if config["execution_horizon"] != 8:
@@ -263,21 +265,25 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         if key in seen:
             raise ValueError("Multiple primary configurations for one backend/method scope")
         seen.add(key)
+        status = selected["status"]
+        if status not in {"primary", *held}:
+            raise ValueError("Unknown readiness status")
+        scope_status[(config["backend"], config["method"])] = status
         if not all(selected.get(k) for k in ("reason", "scope", "section")):
             raise ValueError("Every selection needs a reason, core scope and section")
-        if selected["status"] == "pending_core" and not selected.get("timing_record"):
-            pending.append(
+        if status in held and not selected.get("timing_record"):
+            held[status].append(
                 {
                     "backend": config["backend"],
                     "method": config["method"],
                     "config": selected["config"],
                     "section": selected["section"],
                     "reason": selected["reason"],
+                    "status": status,
+                    "scope": selected["scope"],
                 }
             )
             continue
-        if selected["status"] not in {"primary", "pending_core"}:
-            raise ValueError("Unknown readiness status")
         summary = summaries[selected["development_summary_sha256"]]
         devs = [
             r
@@ -402,9 +408,10 @@ def build(selection, summaries, records, quality, development_manifest, final_re
             },
             "final": final,
         }
-        if selected["status"] == "pending_core":
+        if status in held:
             row["config"] = selected["config"]
-            pending.append(row)
+            row["status"] = status
+            held[status].append(row)
             continue
         row["search"] = check_search(
             selected,
@@ -443,24 +450,27 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         stable_hash(policy_identity(asdict(ExperimentConfig.load(Path(r["config"])))))
         for r in selection["configurations"]
     }
-    primary_scopes = {(r["backend"], r["method"]) for r in rows}
     for selected in selection.get("auxiliary_configurations", []):
         config = asdict(ExperimentConfig.load(Path(selected["config"])))
         identity = stable_hash(policy_identity(config))
+        parent_status = scope_status.get((config["backend"], config["method"]))
         if (
             selected.get("status") != "auxiliary"
-            or (config["backend"], config["method"]) not in primary_scopes
+            or parent_status not in {"primary", "pending_engineering"}
             or identity in primary_identities | auxiliary_seen
         ):
             raise ValueError(
-                "Auxiliary must be a distinct alternative to a certified primary scope"
+                "Auxiliary must be a distinct alternative to a certified primary scope "
+                "or an explicitly engineering-held scope"
             )
         auxiliary_seen.add(identity)
-        scoped = dict(selection, configurations=[dict(selected, status="primary")])
+        scoped = dict(selection, configurations=[dict(selected, status=parent_status)])
         scoped.pop("auxiliary_configurations", None)
         scoped.pop("coverage_summary_sha256", None)
         checked = build(scoped, summaries, records, quality, development_manifest)
         auxiliary.extend(checked["primary"])
+        for row in checked["pending_engineering"]:
+            held["pending_engineering"].append(dict(row, auxiliary=True))
     return {
         "schema_version": 1,
         "kind": "primary_readiness",
@@ -469,6 +479,8 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         "development_manifest_sha256": manifest,
         "primary": rows,
         "pending_core": pending,
+        "pending_engineering": held["pending_engineering"],
+        "excluded": held["excluded"],
         "auxiliary": auxiliary,
         "final_launch_candidates": launch,
         "final_launched_by_this_command": False,
@@ -476,7 +488,10 @@ def build(selection, summaries, records, quality, development_manifest, final_re
 
 
 def render(report):
-    measured = report["primary"] + report.get("auxiliary", []) + report["pending_core"]
+    uncertified = (
+        report["pending_core"] + report.get("pending_engineering", []) + report.get("excluded", [])
+    )
+    measured = report["primary"] + report.get("auxiliary", []) + uncertified
     devices = sorted({r["hardware"]["gpu"] for r in measured if r.get("hardware", {}).get("gpu")})
     timing_description = (
         "Timing uses frozen four-suite prefixes (at most 128 controls each), ten warmup "
@@ -566,18 +581,20 @@ def render(report):
     lines += [
         "## Not certified for final evaluation",
         "",
-        "Diagnostic measurements below do NOT certify the unresolved core or authorize final runs.",
+        "Diagnostic measurements below do NOT certify core fidelity or engineering readiness, "
+        "and never authorize final runs. Exclusion reasons are independent of measured outcomes.",
         "",
-        "| Backend / method | Dev SR (n/200) | ms/control | Speedup | Reason |",
-        "|---|---:|---:|---:|---|",
+        "| Backend / method | Status | Dev SR (n/200) | ms/control | Speedup | Reason |",
+        "|---|---|---:|---:|---:|---|",
     ]
-    for r in report["pending_core"]:
+    for r in uncertified:
         d, t = r.get("development"), r.get("timing")
         success = f"{d['successes'] / 2:.1f}% ({d['successes']})" if d else "—"
         latency = f"{t['mean_ms']:.3f}" if t else "—"
         speedup = f"{t['speedup']:.3f}×" if t else "—"
         lines.append(
-            f"| {r['backend']} / `{r['method']}` | {success} | {latency} | "
+            f"| {r['backend']} / `{r.get('preset', r['method'])}` | "
+            f"{r.get('status', 'pending_core')} | {success} | {latency} | "
             f"{speedup} | {r['reason']} |"
         )
     lines += [
@@ -596,7 +613,7 @@ def render(report):
     for r in (
         report["primary"]
         + report.get("auxiliary", [])
-        + [p for p in report["pending_core"] if p.get("timing")]
+        + [p for p in uncertified if p.get("timing")]
     ):
         final_id = f"`{r['final']['experiment_id']}`" if r["final"] else "—"
         lines.append(
