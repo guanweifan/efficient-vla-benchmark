@@ -57,14 +57,21 @@ class DAMPA(InferenceMethod):
                 raise ValueError("DA-MPA bias mismatch")
             if side == "dit_mlp" and block in retained:
                 continue
-            prepared[name] = PackedLinear(
-                e["codes"],
-                e["scales"],
-                bits=4,
-                bias=e["bias"],
-                activation_amax=e["activation_amax"],
-                activation_bits=8,
-            )
+            if config.runtime == "tinychat_fp16":
+                from ...packed import DAMPALinear
+
+                prepared[name] = DAMPALinear(
+                    e["codes"], e["scales"], e["activation_amax"], e["bias"]
+                )
+            else:
+                prepared[name] = PackedLinear(
+                    e["codes"],
+                    e["scales"],
+                    bits=4,
+                    bias=e["bias"],
+                    activation_amax=e["activation_amax"],
+                    activation_bits=8,
+                )
         for name, op in prepared.items():
             selected[name][0].cpu()
             replace(backend.model, name, op.to(backend.device))
@@ -86,7 +93,16 @@ class DAMPA(InferenceMethod):
             retained_native_dit_blocks=self.retained,
             retention_ratio=self.config.retention_ratio,
             quantized_targets=self.count,
-            runtime="packed_W4A8_tile_dequant_float_gemm",
+            runtime=(
+                "packed_W4A8_tinychat_fp16_native_channel_quantizer"
+                if self.config.runtime == "tinychat_fp16"
+                else "packed_W4A8_tile_dequant_float_gemm"
+            ),
+            quantized_gemm_precision=(
+                "float16_scales_products_accumulation_native_boundary_and_bias"
+                if self.config.runtime == "tinychat_fp16"
+                else "native_products_float32_accumulation"
+            ),
             integer_mma=False,
             exclusions="CSRC and associated SVD preconditioning; not full DA-PTQ",
             retained_dit_precision="native_float32_not_silently_BF16",

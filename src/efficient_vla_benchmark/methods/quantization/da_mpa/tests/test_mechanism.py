@@ -84,3 +84,41 @@ def test_epsilon_probe_restores_grad_flags_without_weight_updates():
     assert scores["p"] > 0 and len(steps) == 4
     assert not d.net.proj.weight.requires_grad and d.net.proj.weight.grad is None
     torch.testing.assert_close(d.net.proj.weight, before, atol=0, rtol=0)
+
+
+def test_runtime_is_explicit_but_does_not_change_native_calibration_identity():
+    native = DAMPAConfig()
+    packed = DAMPAConfig.parse({"runtime": "tinychat_fp16"})
+    assert packed.calibration_parameters() == native.calibration_parameters()
+    assert "runtime" not in packed.calibration_parameters()
+    assert native.runtime == "tile_float"
+    with pytest.raises(ValueError, match="runtime"):
+        DAMPAConfig.parse({"runtime": "auto"})
+
+
+@pytest.mark.gpu
+@pytest.mark.parametrize("dtype", [torch.float16, torch.bfloat16, torch.float32])
+@pytest.mark.parametrize("rows", [1, 17, 280])
+def test_fp16_packed_matches_explicit_channel_quantizer_and_native_bias(dtype, rows):
+    from efficient_vla_benchmark.methods.quantization.da_mpa.packed import DAMPALinear
+
+    if not torch.cuda.is_available():
+        pytest.skip("CUDA required")
+    generator = torch.Generator(device="cuda").manual_seed(17)
+    codes = torch.randint(-8, 8, (128, 256), generator=generator, device="cuda", dtype=torch.int8)
+    scales = torch.linspace(0.005, 0.02, 128, device="cuda")
+    amax = torch.linspace(0.5, 3.0, 256, device="cuda")
+    bias = torch.linspace(-0.03, 0.03, 128, device="cuda", dtype=dtype)
+    module = DAMPALinear(codes, scales, amax, bias)
+    x = torch.randn(rows, 256, generator=generator, device="cuda", dtype=dtype)
+    step = (amax.to(dtype) / 127).clamp_min(1e-8)
+    quantized = (x / step).round().clamp(-127, 127).to(torch.int8)
+    expected = module.linear.kernel((quantized.to(dtype) * step).half()).to(dtype) + bias
+    actual = module(x)
+    torch.testing.assert_close(actual, expected, atol=0, rtol=0)
+    assert actual.dtype == dtype and module.linear.kernel_invocations == 1
+    assert torch.equal(module.bias, bias)
+    reloaded = DAMPALinear(codes, scales, amax, bias)
+    reloaded.load_state_dict(module.state_dict())
+    torch.testing.assert_close(reloaded(x), actual, atol=0, rtol=0)
+    assert module(x[:0]).shape == (0, 128)

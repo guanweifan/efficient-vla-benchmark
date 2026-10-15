@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass, fields
 
 @dataclass(frozen=True)
 class DAMPAConfig:
+    runtime: str = "tile_float"
     calibration_samples: int = 512
     calibration_seed: int = 0
     probe_steps: int = 16
@@ -19,6 +20,8 @@ class DAMPAConfig:
         if set(parameters) - {f.name for f in fields(cls)}:
             raise ValueError("Unknown DA-MPA parameter")
         c = cls(**parameters)
+        if c.runtime not in ("tile_float", "tinychat_fp16"):
+            raise ValueError("Unsupported DA-MPA runtime")
         for name in (
             "calibration_samples",
             "calibration_seed",
@@ -54,4 +57,7 @@ class DAMPAConfig:
         d = asdict(self)
         # Allocation may select another retention from the SAME frozen scores.
         d.pop("retention_ratio")
+        # Native-only calibration does not execute the selected packed engine.
+        # Preserve its schema-1 identity; every engine still needs fresh Dev/timing.
+        d.pop("runtime")
         return d

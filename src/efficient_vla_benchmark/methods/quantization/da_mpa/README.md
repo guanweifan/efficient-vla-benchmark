@@ -33,3 +33,12 @@ Neither calibration nor this optional port authorizes Final evaluation.
 The runtime is tile-dequantized floating GEMM, not INT8 MMA. All conversions are
 timed; there is no floating reconstructed weight cache. Report the scoped component
 and exclusions in every table, never infer the full paper fails from this ablation.
+
+`da_mpa_fp16_kernel` explicitly selects TinyChat packed W4 execution after fused
+native-rounded channel A8 preparation. GEMM scale storage, products and accumulation
+use FP16; outputs and biases use the native layer dtype, and retained DiT blocks
+remain FP32. This is not integer MMA or bitwise FP32 execution. Weight codes,
+activation grids, sensitivity scores and allocation do not change. The schema-1
+artifact is reusable because its calibration runs only the native model, never
+the selected packed engine. New whole-policy checks, Dev-200 and full-cost timing
+are compulsory; no old success or speed result is inherited by this preset.
