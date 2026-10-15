@@ -26,7 +26,7 @@ def test_block_products_dynamic_lengths_and_cache(dtype, width, permuted):
     )
     permutation = torch.randperm(k, device="cuda") if permuted else None
     op = BlockRotation()
-    for m in (1, 34, 279, 280, 593, 597):
+    for m in (1, 15, 16, 17, 34, 279, 280, 593, 597):
         x = torch.randn(1, m, k, device="cuda", dtype=dtype)
         selected = x.index_select(-1, permutation) if permuted else x
         expected = (
@@ -36,7 +36,7 @@ def test_block_products_dynamic_lengths_and_cache(dtype, width, permuted):
         )
         actual = op(x, blocks, permutation)
         torch.testing.assert_close(actual, expected, rtol=0, atol=0)
-        assert len(op._compiled) == int(m >= 16)
+        assert len(op._compiled) == int(m > 16)
     assert op(x[:, :0], blocks, permutation).shape == (1, 0, k)
     with pytest.raises(ValueError):
         op(x, blocks.double(), permutation)

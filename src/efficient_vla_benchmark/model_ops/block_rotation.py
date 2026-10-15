@@ -41,7 +41,7 @@ class BlockRotation:
     Blocks must have input dtype; no hidden precision conversion or CPU fallback.
     A permutation, when supplied, must be a valid bijection over input columns.
     Construction/value validation belongs outside the timed inference call.
-    Fewer than sixteen rows use native CUDA BMM: its vector-sized reduction can
+    At most sixteen rows use native CUDA BMM: its vector-sized reduction can
     differ from tiled dot even in FP32. This explicit dispatch preserves that path.
     """
 
@@ -76,7 +76,7 @@ class BlockRotation:
         m = inputs.numel() // k
         if not m:
             return output
-        if m < 16:
+        if m <= 16:
             selected = inputs if permutation is None else inputs.index_select(-1, indices)
             grouped = selected.reshape(-1, len(rotations), width).transpose(0, 1)
             return torch.bmm(grouped, rotations).transpose(0, 1).reshape_as(inputs)
