@@ -32,6 +32,13 @@ ActQuant additionally requires the pinned author engine through `--runtime-path`
 and complete HSIC/AMF artifacts. Its floating-runtime control is an auxiliary,
 not a second quantization algorithm or a substitute native reference.
 
+[SmoothQuant](src/efficient_vla_benchmark/methods/quantization/smoothquant/README.md)
+is additionally registered on both backends as a classic decoder W8A8 control,
+with folded channel migration, dynamic token scales and true INT8/INT32 GEMM.
+It requires a checksummed training-only artifact; vision, attention SDPA and action
+heads remain native. Correctness/smoke validation does not establish speedup or
+Dev readiness; the result ledger remains authoritative.
+
 New quantization cores have explicit exclusions: HoloQ follows the released code,
 DA-MPA excludes DA-PTQ's unresolved CSRC, EaqVLA excludes an unspecified activation
 quantizer, and MotionVQ excludes full-model/ASIC co-design. DyQ-VLA uses frozen
