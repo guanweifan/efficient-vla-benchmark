@@ -106,8 +106,9 @@ def test_full_precision_transform_identity():
 
 @pytest.mark.gpu
 @pytest.mark.parametrize("dtype", [torch.bfloat16, torch.float32])
+@pytest.mark.parametrize("frozen_step,row_restore", [(True, True), (False, False)])
 @torch.inference_mode()
-def test_fp16_engine_matches_explicit_unfused_complete_transform(dtype):
+def test_fp16_engine_matches_explicit_unfused_complete_transform(dtype, frozen_step, row_restore):
     torch.manual_seed(817)
     k = n = 256
     b = 64
@@ -116,25 +117,36 @@ def test_fp16_engine_matches_explicit_unfused_complete_transform(dtype):
     ]
     outputs = [torch.linalg.qr(torch.randn(b, b, device="cuda")).Q.to(dtype) for _ in range(n // b)]
     transform = SimpleNamespace(
-        smoothing=torch.ones(k, device="cuda"),
+        smoothing=torch.rand(k, device="cuda") + 0.5,
         permutation=torch.randperm(k, device="cuda"),
         input_rotations=rotations,
         output_rotations=outputs,
-        row_restore=True,
+        row_restore=row_restore,
     )
     codes = torch.randint(-8, 8, (n, k), dtype=torch.int8, device="cuda")
     weight_scale = torch.rand(n, device="cuda") * 0.02 + 0.003
     step = torch.rand(k, device="cuda") * 0.02 + 0.005
     bias = torch.randn(n, device="cuda", dtype=dtype) * 0.01
     op = PackedDuQuantLinear(
-        codes, weight_scale, step, bias, transform, frozen_step=True, runtime="tinychat_fp16"
+        codes, weight_scale, step, bias, transform, frozen_step=frozen_step, runtime="tinychat_fp16"
     )
     input_reference, output_reference = BlockRotation(rotations), BlockRotation(outputs)
-    for m in (34, 279, 280):
+    for m in (1, 16, 17, 34, 279, 280):
         x = torch.randn(1, m, k, device="cuda", dtype=dtype)
-        rotated = input_reference(x.index_select(-1, transform.permutation))
-        quant = (rotated / step.to(dtype)).round().clamp(-128, 127).to(torch.int8)
-        prepared = (quant.to(dtype) * step.to(dtype)).half()
-        expected = output_reference(op.linear.kernel(prepared).to(dtype)) + bias
+        rotated = input_reference(
+            (x * transform.smoothing.to(dtype)).index_select(-1, transform.permutation)
+        )
+        grid = step.to(dtype) if frozen_step else (step.to(dtype) / 127).clamp_min(1e-8)
+        quant = (rotated / grid).round().clamp(-128 if frozen_step else -127, 127).to(torch.int8)
+        prepared = (quant.to(dtype) * grid).half()
+        expected = op.linear.kernel(prepared).to(dtype)
+        if row_restore:
+            expected = output_reference(expected)
+        expected = expected + bias
         torch.testing.assert_close(op(x), expected, atol=0, rtol=0)
+    saved = {key: value.clone() for key, value in op.state_dict().items()}
+    expected = op(x)
+    op.load_state_dict(saved, strict=True)
+    torch.testing.assert_close(op(x), expected, atol=0, rtol=0)
+    assert op(x[:, :0]).shape == (1, 0, n)
     assert op.linear.execution_metadata()["activation_scale_axis"] == "input_channel"

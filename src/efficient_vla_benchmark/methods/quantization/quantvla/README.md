@@ -47,3 +47,11 @@ This is not integer MMA or bitwise native-FP32 execution. The calibration identi
 includes this engine: activation percentiles and packed-student ATM/OHB statistics
 must be regenerated; an old tile-engine artifact is rejected rather than relabeled.
 Registration alone does not admit its performance or inherit earlier Dev results.
+
+The FP16 engine fuses input rotation/channel preparation and output cast/rotation/
+bias into adjacent kernels, preserving native intermediate rounding. Smoothing
+and permutations, when enabled, are still applied before rotation. Short row
+counts retain native CUDA BMM; dynamic token lengths do not specialize dispatch.
+The tile engine and calibration equations remain unchanged. Engine artifacts
+can be reused for this arithmetic-equivalent optimization only after exact
+whole-policy/reference and reload checks; latency requires fresh full-cost timing.

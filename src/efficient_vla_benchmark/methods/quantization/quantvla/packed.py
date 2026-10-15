@@ -103,12 +103,22 @@ class PackedDuQuantLinear(nn.Module):
             activation_step=activation_scale if frozen_step else None,
             activation_qmin=-128 if frozen_step else -127,
         )
+        self.fused_preparation = self.fused_output = None
         if runtime == "tinychat_fp16":
             from efficient_vla_benchmark.model_ops.quantization.channel_linear import (
                 ChannelPackedLinear,
             )
 
             self.linear = ChannelPackedLinear(qweight, weight_scale, **options)
+            from efficient_vla_benchmark.model_ops.quantization.rotated_channel import (
+                RotatedChannelPreparation,
+                RotatedOutput,
+            )
+
+            self.fused_preparation = RotatedChannelPreparation(
+                8, qmin=options["activation_qmin"], amax=not frozen_step
+            )
+            self.fused_output = RotatedOutput() if self.output_rotation is not None else None
         else:
             self.linear = PackedLinear(
                 qweight, weight_scale, bits=4, round_weight_scale=True, **options
@@ -120,6 +130,25 @@ class PackedDuQuantLinear(nn.Module):
         x = inputs if self.identity_smoothing else inputs * self.smoothing.to(inputs.dtype)
         if not self.identity_permutation:
             x = x.index_select(-1, self.permutation)
+        if self.fused_preparation is not None:
+            scale = (
+                self.linear.activation_step
+                if self.linear.activation_step is not None
+                else self.linear.activation_amax
+            )
+            _, prepared = self.fused_preparation(
+                x, self.input_rotation.rotations.to(x.dtype), scale
+            )
+            if not prepared.numel():
+                return inputs.new_empty((*inputs.shape[:-1], self.out_features))
+            output = self.linear.kernel(prepared)
+            self.linear.kernel_invocations += 1
+            if self.fused_output is not None:
+                return self.fused_output(
+                    output, self.output_rotation.rotations.to(x.dtype), self.bias
+                )
+            output = output.to(x.dtype)
+            return output if self.bias is None else output + self.bias.to(output.dtype)
         x = self.input_rotation(x)
         output = self.linear(x)
         if self.output_rotation is not None:
