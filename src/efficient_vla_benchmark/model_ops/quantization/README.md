@@ -29,8 +29,22 @@ These are feasibility primitives, not a selectable quantization algorithm.
   INT32 accumulation and a fused FP32 scale/bias epilogue. W4 storage is expanded
   to INT8 in registers; it is **not** INT4 MMA. Activation quantization is timed.
   This path cannot replace a per-input-channel activation quantizer without
-  changing its mathematics. It is optional infrastructure, not yet a validated
-  end-to-end method or a speed claim. No existing method silently switches to it.
+  changing its mathematics. SmoothQuant validates this engine end to end; other
+  quantizers do not inherit that validation or switch to it implicitly.
+- `channel_prepare.py`: fused per-input-channel quantization, preserving native
+  intermediate rounding, plus explicit FP16 reconstruction for a packed floating
+  kernel. It returns INT8 codes and is not integer MMA. Caller-owned frozen scales
+  remain inside the quantizer; no replacement by per-token/group scales is allowed.
+- `channel_linear.py`: explicitly selected TinyChat W4 execution after that native
+  channel quantizer. It accepts native FP32 boundaries but converts packed GEMM to
+  FP16, unlike native FP32 execution. This precision change needs new policy/Dev
+  validation; it cannot inherit earlier success results by numerical assumption.
+- `../block_rotation.py`: fused uniform block products with optional permutation,
+  without constructing a dense transform. Callers own validated matrices/indices.
+  Fewer than sixteen rows explicitly retain native CUDA BMM reduction order.
+  Both primitives cache compiled dispatch per instance, not tensor values. Dynamic
+  token length must not cause recompilation. No method changes engine implicitly;
+  whole-policy and Dev/timing checks are required before a new runtime is admitted.
 
 The logical packed-weight shape is `(output, packed_input)`, with output-contiguous
 transposed strides for coalesced N-lane loads. This is one physical packed buffer,
