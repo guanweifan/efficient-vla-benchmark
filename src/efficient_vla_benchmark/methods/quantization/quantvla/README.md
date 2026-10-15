@@ -38,3 +38,12 @@ artifact through `--artifact-path`. Changing any calibration parameter requires
 a matching artifact. Legacy handover schema-2 artifacts are diagnostic-only and
 rejected: their scale/permutation/attention formulas differed from the author code.
 Conversion is irreversible; returning to native requires a fresh backend.
+
+The explicit `quantvla_fp16_kernel` preset selects the same core with a different
+execution engine: native-rounded channel A8 followed by packed TinyChat W4 GEMM
+with FP16 scales/products/accumulation, and fused block rotations. Native BF16 LLM
+and FP32 DiT boundaries, biases, attention, ATM/OHB and sampler remain unchanged.
+This is not integer MMA or bitwise native-FP32 execution. The calibration identity
+includes this engine: activation percentiles and packed-student ATM/OHB statistics
+must be regenerated; an old tile-engine artifact is rejected rather than relabeled.
+Registration alone does not admit its performance or inherit earlier Dev results.

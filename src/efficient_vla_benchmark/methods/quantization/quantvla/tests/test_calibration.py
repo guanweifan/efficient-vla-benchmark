@@ -37,6 +37,14 @@ def test_energy_smoothing_does_not_rescale_activation():
     torch.testing.assert_close(y, x @ w.T, atol=2e-5, rtol=2e-5)
 
 
+def test_runtime_change_requires_distinct_calibration_identity():
+    native = QuantVLAConfig()
+    packed = QuantVLAConfig.parse({"runtime": "tinychat_fp16"})
+    assert "runtime" not in native.calibration_parameters()
+    assert packed.calibration_parameters()["runtime"] == "tinychat_fp16"
+    assert native.execution() != packed.execution()
+
+
 def test_mse_scale_matches_author_grid():
     torch.manual_seed(11)
     w = torch.randn(13, 41)

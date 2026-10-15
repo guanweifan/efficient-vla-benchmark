@@ -102,3 +102,39 @@ def test_full_precision_transform_identity():
     wr = torch.cat([r @ wr[i * 32 : (i + 1) * 32] for i, r in enumerate(rout)])
     out = BlockRotation(rout)(F.linear(xr, wr))
     torch.testing.assert_close(out, F.linear(x, w), atol=3e-5, rtol=3e-5)
+
+
+@pytest.mark.gpu
+@pytest.mark.parametrize("dtype", [torch.bfloat16, torch.float32])
+@torch.inference_mode()
+def test_fp16_engine_matches_explicit_unfused_complete_transform(dtype):
+    torch.manual_seed(817)
+    k = n = 256
+    b = 64
+    rotations = [
+        torch.linalg.qr(torch.randn(b, b, device="cuda")).Q.to(dtype) for _ in range(k // b)
+    ]
+    outputs = [torch.linalg.qr(torch.randn(b, b, device="cuda")).Q.to(dtype) for _ in range(n // b)]
+    transform = SimpleNamespace(
+        smoothing=torch.ones(k, device="cuda"),
+        permutation=torch.randperm(k, device="cuda"),
+        input_rotations=rotations,
+        output_rotations=outputs,
+        row_restore=True,
+    )
+    codes = torch.randint(-8, 8, (n, k), dtype=torch.int8, device="cuda")
+    weight_scale = torch.rand(n, device="cuda") * 0.02 + 0.003
+    step = torch.rand(k, device="cuda") * 0.02 + 0.005
+    bias = torch.randn(n, device="cuda", dtype=dtype) * 0.01
+    op = PackedDuQuantLinear(
+        codes, weight_scale, step, bias, transform, frozen_step=True, runtime="tinychat_fp16"
+    )
+    input_reference, output_reference = BlockRotation(rotations), BlockRotation(outputs)
+    for m in (34, 279, 280):
+        x = torch.randn(1, m, k, device="cuda", dtype=dtype)
+        rotated = input_reference(x.index_select(-1, transform.permutation))
+        quant = (rotated / step.to(dtype)).round().clamp(-128, 127).to(torch.int8)
+        prepared = (quant.to(dtype) * step.to(dtype)).half()
+        expected = output_reference(op.linear.kernel(prepared).to(dtype)) + bias
+        torch.testing.assert_close(op(x), expected, atol=0, rtol=0)
+    assert op.linear.execution_metadata()["activation_scale_axis"] == "input_channel"

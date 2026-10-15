@@ -134,7 +134,11 @@ def calibrate(backend, config, dataset, output):
             original.bias,
             transform,
             frozen_step=True,
+            runtime=config.runtime,
         ).to(backend.device)
+        op.input_rotation.to(dtype=original.weight.dtype)
+        if op.output_rotation is not None:
+            op.output_rotation.to(dtype=original.weight.dtype)
         wrapper = CalibrationLinear(op, config)
         wrappers[name] = wrapper
         replace(backend.model, name, wrapper)
@@ -180,7 +184,7 @@ def calibrate(backend, config, dataset, output):
             "freeze_after_complete_author_PercentileCalibrator_budget_not_first_call",
             "packed_student_for_ATM_OHB_statistics",
         ],
-        "execution": "packed_w4a8_tile_dequant_float_gemm_not_integer_mma",
+        "execution": config.execution(),
     }
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     return manifest

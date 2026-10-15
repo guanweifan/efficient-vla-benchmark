@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass, fields
 
 @dataclass(frozen=True)
 class QuantVLAConfig:
+    runtime: str = "tile_float"
     block_size: int = 64
     enable_permutation: bool = False
     energy_smoothing: float = 0.15
@@ -24,6 +25,8 @@ class QuantVLAConfig:
         if set(parameters) - {f.name for f in fields(cls)}:
             raise ValueError("Unknown QuantVLA parameter")
         c = cls(**parameters)
+        if c.runtime not in ("tile_float", "tinychat_fp16"):
+            raise ValueError("Unsupported QuantVLA runtime")
         if type(c.block_size) is not int or c.block_size not in (16, 32, 64, 128):
             raise ValueError("Unsupported block size")
         if type(c.enable_permutation) is not bool:
@@ -55,4 +58,16 @@ class QuantVLAConfig:
         return c
 
     def calibration_parameters(self):
-        return asdict(self)
+        result = asdict(self)
+        # Preserve the original schema-3 identity; new precision needs its own
+        # activation and packed-student ATM/OHB calibration, not relabeled scales.
+        if self.runtime == "tile_float":
+            result.pop("runtime")
+        return result
+
+    def execution(self):
+        return (
+            "packed_w4a8_tinychat_fp16_not_integer_mma"
+            if self.runtime == "tinychat_fp16"
+            else "packed_w4a8_tile_dequant_float_gemm_not_integer_mma"
+        )

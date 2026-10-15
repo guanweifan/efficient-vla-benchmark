@@ -50,6 +50,7 @@ class QuantVLA(InferenceMethod):
                 e["bias"],
                 SimpleNamespace(**e["transform"]),
                 frozen_step=True,
+                runtime=config.runtime,
             )
             # Static rotations use each native layer's dtype. Do not recast
             # their full block stacks on every language/denoising forward.
@@ -71,7 +72,7 @@ class QuantVLA(InferenceMethod):
         torch.cuda.empty_cache()
 
     def metadata(self):
-        return {
+        result = {
             "artifact_sha256": self.identity,
             "weight_bits": 4,
             "activation_bits": 8,
@@ -88,3 +89,13 @@ class QuantVLA(InferenceMethod):
             "calibration_observations": "training_only_balanced_four_suite",
             "no_full_float_weight_cache": True,
         }
+        if self.config.runtime == "tinychat_fp16":
+            result.update(
+                runtime=self.config.execution(),
+                quantized_gemm_precision="float16_products_and_accumulation",
+                native_boundaries="bfloat16_language_float32_dit",
+                activation_preparation="native_rounding_int8_codes_then_fp16",
+                rotations="fused_blocks_native_short_row_bmm",
+                precision_change_requires_new_development_evidence=True,
+            )
+        return result

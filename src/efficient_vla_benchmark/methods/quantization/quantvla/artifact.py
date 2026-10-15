@@ -26,6 +26,7 @@ def read_manifest(root, config):
     if (
         manifest.get("config") != config.calibration_parameters()
         or manifest.get("reference_revision") != REVISION
+        or manifest.get("execution") != config.execution()
     ):
         raise ValueError("QuantVLA artifact configuration/source mismatch")
     files = manifest.get("files", {})
