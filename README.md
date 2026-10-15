@@ -39,6 +39,12 @@ It requires a checksummed training-only artifact; vision, attention SDPA and act
 heads remain native. Correctness/smoke validation does not establish speedup or
 Dev readiness; the result ledger remains authoritative.
 
+[GPTQ](src/efficient_vla_benchmark/methods/quantization/gptq/README.md) supplies the
+classic decoder W4A16 control on both backends. Its full-Hessian, true-sequential
+group-128 calibration uses no AWQ algorithm; only the pinned TinyChat execution
+kernel is shared. Native vision/action heads remain unchanged. Calibration,
+kernel-reference checks and smoke are distinct from measured Dev/timing admission.
+
 New quantization cores have explicit exclusions: HoloQ follows the released code,
 DA-MPA excludes DA-PTQ's unresolved CSRC, EaqVLA excludes an unspecified activation
 quantizer, and MotionVQ excludes full-model/ASIC co-design. DyQ-VLA uses frozen

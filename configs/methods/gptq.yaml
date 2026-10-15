@@ -1,0 +1,6 @@
+method: gptq
+parameters:
+  calibration_samples: 32
+  calibration_seed: 0
+  damp_percent: 0.01
+  block_size: 128
