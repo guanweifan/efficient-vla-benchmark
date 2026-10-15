@@ -12,11 +12,11 @@ def read_manifest(root, config):
     root = Path(root)
     manifest = json.loads((root / "manifest.json").read_text())
     if (
-        manifest.get("schema_version") != 4
+        manifest.get("schema_version") != 5
         or manifest.get("algorithm") != "qvla"
         or manifest.get("complete") is not True
     ):
-        raise ValueError("QVLA requires freshly audited schema 4; legacy gates are unsupported")
+        raise ValueError("QVLA requires schema 5 literal calibration; legacy gates are unsupported")
     if manifest.get("backend") != "openvla_oft" or manifest.get("precision") != "bfloat16":
         raise ValueError("Unsupported QVLA artifact backend/precision")
     if manifest.get("config") != config.calibration_parameters():
@@ -24,7 +24,7 @@ def read_manifest(root, config):
     if (
         manifest.get("reference_revision") != "26cc4821a3be4c003d09d3c7997b38db2a347982"
         or manifest.get("allocation") != "official_absolute_cost_per_saved_bit"
-        or manifest.get("sensitivity") != "official_batch_normalized_damped_inverse_cholesky"
+        or manifest.get("sensitivity") != "official_literal_recurrence_contiguous_diag_division"
     ):
         raise ValueError("QVLA calibration mechanism mismatch")
     if set(manifest.get("files", {})) != {"sensitivity.pt", "gates.json"}:

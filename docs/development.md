@@ -31,7 +31,7 @@ to the primary result table; Dev selection and valid timing are separate gates.
 
 | Scope | Artifact and fidelity contract |
 |---|---|
-| QVLA | Schema 4: training-only batch-normalized Hessian proxy and official absolute-cost channel allocation. This is the public-code proxy, not action-space intervention; old gates are rejected. |
+| QVLA | Schema 5: literal batch-normalized Hessian recurrence, contiguous diagonal reduction and official absolute-cost channel allocation. This is the public-code proxy, not action-space intervention; summed-Gram schema-4 gates require recalibration. |
 | QuantVLA | Schema 3: native-dtype DuQuant, five-point MSE weight scaling, frozen A8 percentiles and calibrated ATM/OHB. All transformations are timed; handover schema 2 is rejected. |
 | ActQuant | Complete training-only HSIC/AMF and checksummed mixed-GGUF artifacts; exact registered/direct-author runtime and lifecycle checks. Dense handover weights are not the author's GGUF calibration/output chain. Dev selection, timing and final results remain separate admission gates. |
 | HoloQ | Pinned official-code variant: block-local LLM GPTQ, composite rotations and per-step DiT scales. Native-FP32 DiT uses explicitly timed transient decoding; the v3 paper's differing activation axes are not silently mixed in. |

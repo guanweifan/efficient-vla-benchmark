@@ -10,6 +10,10 @@ Conv2d input covariance. The released recurrence normalizes by batch examples,
 diagonal weighting and per-output-channel candidate quantization errors follow
 the public code. This is explicitly the **official-code input-Hessian proxy**,
 not a claim to reproduce the paper's action-space intervention formulation.
+Covariance accumulation preserves the author's per-batch input scaling before
+GEMM, contiguous diagonal reduction for damping, and division by the squared
+inverse-Cholesky diagonal. Algebraic rewrites can alter finite-precision scores;
+schema-4 summed-Gram artifacts must be recalibrated, never relabeled.
 
 `allocation.py` uses absolute lower-bit sensitivity cost per saved bit, stable
 candidate insertion order and a global channel-average budget. It is not
@@ -38,7 +42,7 @@ validation and CPU preparation, conversion offloads each original target before
 installing its packed replacement, avoiding simultaneous residency of two models.
 
 Use `evb calibrate` with `openvla_oft/qvla.yaml`, explicit model/dataset/artifact
-locations. The result contains schema-4 manifest, sensitivity scores and gates;
+locations. The result contains schema-5 manifest, sensitivity scores and gates;
 `--artifact-path` validates source/config/checkpoint, checksums and full coverage.
 Legacy handover gates used a different allocator/covariance normalization and
 are rejected for formal evaluation. Conversion is irreversible and native reload
