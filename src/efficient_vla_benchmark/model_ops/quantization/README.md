@@ -39,9 +39,14 @@ These are feasibility primitives, not a selectable quantization algorithm.
   channel quantizer. It accepts native FP32 boundaries but converts packed GEMM to
   FP16, unlike native FP32 execution. This precision change needs new policy/Dev
   validation; it cannot inherit earlier success results by numerical assumption.
+- `rotated_channel.py`: adjacent block rotation/channel preparation and output
+  cast/rotation/bias fusion. Native intermediate rounding and bias order remain
+  explicit; short rows use native CUDA BMM. Per-channel scales are not changed to
+  per-token scales. This reduces dispatch/temporary costs, not GEMM precision.
+  Callers still own any preceding smoothing/permutation and policy validation.
 - `../block_rotation.py`: fused uniform block products with optional permutation,
   without constructing a dense transform. Callers own validated matrices/indices.
-  Fewer than sixteen rows explicitly retain native CUDA BMM reduction order.
+  At most sixteen rows explicitly retain native CUDA BMM reduction order.
   Both primitives cache compiled dispatch per instance, not tensor values. Dynamic
   token length must not cause recompilation. No method changes engine implicitly;
   whole-policy and Dev/timing checks are required before a new runtime is admitted.
