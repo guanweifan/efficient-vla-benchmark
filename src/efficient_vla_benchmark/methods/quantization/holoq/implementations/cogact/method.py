@@ -57,7 +57,7 @@ class HoloQ(InferenceMethod):
                 module.bias is not None and not torch.equal(e["bias"], module.bias.detach().cpu())
             ):
                 raise ValueError("HoloQ native bias mismatch")
-            prepared[name] = HoloQLinear(e, self.current_step)
+            prepared[name] = HoloQLinear(e, self.current_step, runtime=config.runtime)
         self.tracker = DDIMStepTracker(
             backend.model.action_model, backend.parameters.num_ddim_steps
         )
@@ -90,8 +90,17 @@ class HoloQ(InferenceMethod):
             artifact_sha256=self.identity,
             scope="224_language_and_48_dit_attention_mlp",
             variant="official_code_composite_gptq_perstep_cogact",
-            runtime="packed_w4a4_llm_tile_bf16_dit_transient_decode_native_fp32",
-            transient_dit_weight_workspace=True,
+            runtime=(
+                "packed_w4a4_tinychat_fp16_native_channel_quantizer_fused_rotations"
+                if self.config.runtime == "tinychat_fp16"
+                else "packed_w4a4_llm_tile_bf16_dit_transient_decode_native_fp32"
+            ),
+            quantized_gemm_precision=(
+                "float16_scales_products_accumulation_native_boundary_and_bias"
+                if self.config.runtime == "tinychat_fp16"
+                else "native_llm_bfloat16_dit_float32"
+            ),
+            transient_dit_weight_workspace=self.config.runtime == "native_float",
             full_dequantized_weight_cache=False,
             integer_mma=False,
             activation_storage="int8_codes_representing_signed_A4",

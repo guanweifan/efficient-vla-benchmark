@@ -20,9 +20,78 @@ def test_config_rejects_unknowns_and_invalid_geometry():
         {"calibration_samples": 5},
         {"activation_percentile": float("nan")},
         {"gptq_block_size": True},
+        {"runtime": "automatic"},
+        {"runtime": "tinychat_fp16", "gptq_block_size": 64},
     ):
         with pytest.raises(ValueError):
             HoloQConfig.parse(values)
+
+
+def test_execution_engine_preserves_native_calibration_identity():
+    native = HoloQConfig.parse({})
+    packed = HoloQConfig.parse({"runtime": "tinychat_fp16"})
+    assert native.calibration_parameters() == packed.calibration_parameters()
+    assert "runtime" not in native.calibration_parameters()
+    assert HoloQConfig.parse({"gptq_block_size": 64}).runtime == "native_float"
+
+
+@pytest.mark.gpu
+@pytest.mark.parametrize("dtype", [torch.bfloat16, torch.float32])
+@pytest.mark.parametrize("row_restore,with_bias", [(True, True), (False, False)])
+@torch.inference_mode()
+def test_fp16_fusion_matches_explicit_same_engine_reference(dtype, row_restore, with_bias):
+    from efficient_vla_benchmark.methods.quantization.holoq.packed import HoloQLinear
+
+    torch.manual_seed(819)
+    k, n = 256, 128
+    transform = build(torch.randn(n, k), 16, row_restore)
+    entry = dict(
+        codes=torch.randint(-8, 8, (n, k), dtype=torch.int8),
+        weight_scales=torch.rand(n, 2) * 0.02 + 0.003,
+        weight_group_size=128,
+        transform=transform,
+        native_dtype=str(dtype),
+        activation_steps=torch.rand(2 if row_restore else 1, k) * 0.1 + 0.02,
+        bias=torch.randn(n) * 0.01 if with_bias else None,
+        side="dit_attention" if row_restore else "language",
+    )
+    row = [0]
+    op = HoloQLinear(entry, lambda: row[0], runtime="tinychat_fp16").cuda()
+    outputs = []
+    for idx in range(len(op.scale_table)):
+        row[0] = idx
+        for m in (1, 16, 17, 34, 280):
+            x = torch.randn(1, m, k, device="cuda", dtype=dtype)
+            rotated = rotate(
+                x.index_select(-1, op.input_rotation.permutation), op.input_rotation.blocks
+            )
+            step = op.scale_table[idx]
+            codes = (rotated / step).round().clamp(-8, 7).to(torch.int8)
+            prepared = (codes.to(dtype) * step).half()
+            expected = op.linear.kernel(prepared).to(dtype)
+            if row_restore:
+                expected = rotate(expected, op.output_rotation)
+            if with_bias:
+                expected = expected + op.bias
+            torch.testing.assert_close(op(x), expected, atol=0, rtol=0)
+        outputs.append(op(x))
+    if row_restore:
+        row[0] = 0
+        assert not torch.equal(op(x), outputs[1])
+        for invalid in (None, -1, 2, True):
+            row[0] = invalid
+            with pytest.raises(ValueError, match="timestep"):
+                op(x)
+        row[0] = 1
+    saved = {key: value.clone() for key, value in op.state_dict().items()}
+    assert "linear.activation_step" not in saved
+    expected = op(x)
+    op.load_state_dict(saved, strict=True)
+    torch.testing.assert_close(op(x), expected, atol=0, rtol=0)
+    assert op(x[:, :0]).shape == (1, 0, n)
+    assert op.linear.execution_metadata()["activation_scale_axis"] == "input_channel"
+    with pytest.raises(ValueError, match="runtime"):
+        HoloQLinear(entry, lambda: 0, runtime="automatic")
 
 
 @torch.inference_mode()
@@ -136,6 +205,13 @@ def test_packed_composite_a4_matches_dense_oracle(dtype):
     row[0] = None
     with pytest.raises(ValueError):
         op(x)
+    row[0] = 0
+    op(x)
+    saved = {key: value.clone() for key, value in op.state_dict().items()}
+    row[0] = 1
+    expected = op(x)
+    op.load_state_dict(saved, strict=True)
+    torch.testing.assert_close(op(x), expected, atol=0, rtol=0)
 
 
 def test_invalid_composite_transform_is_rejected():

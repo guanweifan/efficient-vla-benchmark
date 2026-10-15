@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass, fields
 
 @dataclass(frozen=True)
 class HoloQConfig:
+    runtime: str = "native_float"
     block_size: int = 64
     gptq_block_size: int = 128
     gptq_damp_percent: float = 0.01
@@ -19,10 +20,14 @@ class HoloQConfig:
         if set(parameters) - {f.name for f in fields(cls)}:
             raise ValueError("Unknown HoloQ parameter")
         c = cls(**parameters)
+        if c.runtime not in ("native_float", "tinychat_fp16"):
+            raise ValueError("Unsupported HoloQ runtime")
         if type(c.block_size) is not int or c.block_size not in (16, 32, 64, 128):
             raise ValueError("Unsupported composite rotation block size")
         if type(c.gptq_block_size) is not int or c.gptq_block_size not in (64, 128, 256):
             raise ValueError("Unsupported GPTQ block size")
+        if c.runtime == "tinychat_fp16" and c.gptq_block_size < 128:
+            raise ValueError("HoloQ FP16 packed execution requires GPTQ blocks of at least 128")
         if (
             type(c.calibration_samples) is not int
             or not 4 <= c.calibration_samples <= 512
@@ -42,4 +47,8 @@ class HoloQConfig:
         return c
 
     def calibration_parameters(self):
-        return asdict(self)
+        result = asdict(self)
+        # Only native policies run during calibration; preserve the same codes,
+        # transforms and complete scale tables across explicit execution engines.
+        result.pop("runtime")
+        return result

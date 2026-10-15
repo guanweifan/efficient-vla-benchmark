@@ -9,7 +9,8 @@ It is not a claim of bitwise end-to-end parity with GR00T or pi0.5.
 All 224 Llama projections and 48 DiT attention/MLP projections are included.
 Language weights retain independent scales for EVERY GPTQ input block; the
 handover's single output-row scale adaptation is not used. DiT uses RTN.
-Native BF16 language and FP32 DiT arithmetic, DDIM10 and H8 remain unchanged.
+The default engine retains native BF16 language and FP32 DiT arithmetic;
+the explicitly selected FP16 engine below does not. Both retain DDIM10 and H8.
 Calibration uses only balanced RLDS training observations, uniform token sampling,
 and a complete table for the actual reversed native denoising timesteps.
 
@@ -40,3 +41,19 @@ Use the portable CogACT preset and explicit model/dataset/artifact CLI paths.
 A fresh native backend is mandatory; hooks are instance-local and detachable,
 but weight conversion is irreversible. Existing Omega handover artifacts are
 rejected and must not be relabeled with the new schema.
+
+`holoq_fp16_kernel` and its block-16 candidate explicitly select packed TinyChat
+W4 execution with FP16 scales/products/accumulation, including the native-FP32
+DiT targets. Native channel-A4 rounding, per-step scales, zigzag permutations,
+composite rotations, biases and output boundary dtypes remain intact. Adjacent
+rotation/activation preparation and output cast/rotation/bias are fused; there is
+no per-call full FP32 weight decode in this engine. All 272 targets remain active.
+This is neither integer MMA nor bitwise equivalence to the native-FP32 engine.
+
+Existing schema-1 artifacts are reusable only for identical calibration settings:
+calibration executes native policies, not either quantized engine. GPTQ blocks
+smaller than 128 are unsupported by this FP16 packing layout and are rejected.
+The changed arithmetic requires fresh whole-policy/reference, reset/reload,
+four-episode smoke, Dev-200 and full-cost timing; no prior success is inherited.
+Only the complete scale table is serialized. The current timestep's scale view
+is transient, so reloading after another denoising step cannot overwrite the table.
