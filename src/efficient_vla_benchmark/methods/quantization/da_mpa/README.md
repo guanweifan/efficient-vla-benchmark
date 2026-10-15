@@ -51,3 +51,9 @@ removing it would disable the ranked-retention contribution.
 The realized allocation must also leave at least one eligible DiT block quantized.
 A ratio below one is insufficient: rounding can retain every block. Such settings
 are rejected instead of silently becoming language-only quantization.
+
+`da_mpa_fp16_kernel_r90` checks the opposite runtime boundary: retain the top nine
+of ten eligible blocks, leaving the least-sensitive block quantized (226 quantized
+linears total). This is still an active ranked allocation, not an all-native action
+head. It tests whether quantization/dispatch overhead on small DiT matrices makes
+greater native retention faster; fresh validation and measurements are required.
