@@ -42,3 +42,9 @@ activation grids, sensitivity scores and allocation do not change. The schema-1
 artifact is reusable because its calibration runs only the native model, never
 the selected packed engine. New whole-policy checks, Dev-200 and full-cost timing
 are compulsory; no old success or speed result is inherited by this preset.
+
+`da_mpa_fp16_kernel_r10` is the speedward allocation candidate: retain the top
+one of ten eligible DiT blocks plus the final two, quantizing 242 linears in total.
+It reuses the same frozen gradient ranking, not a new calibration or a uniform
+allocation. Lower positive retention ratios select the same one protected block;
+removing it would disable the ranked-retention contribution.
