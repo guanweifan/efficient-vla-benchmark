@@ -6,7 +6,7 @@
 
 One selected configuration per backend/method scope. Dev-200 is tuning evidence,
 not final accuracy. Timing uses frozen four-suite prefixes (at most 128 controls each), ten warmup queries, one pass and the mean over all measured controls.
-Native pre/post checks must pass. Final success is measured for 71/74 primary configurations, using one frozen 2,000-episode run per measured configuration.
+Native pre/post checks must pass. Final success is measured for 71/76 primary configurations, using one frozen 2,000-episode run per measured configuration.
 Low success and slowdowns remain reportable. All native references use H8.
 Adaptive rows execute real method-selected prefixes; H8 is their reference/default,
 not their fixed execution length. The shown upper bound is native prediction length.
@@ -20,7 +20,7 @@ Each speedup uses its own same-GPU native pair; the displayed native row is
 not a universal denominator. Absolute latency across GPU pairs is descriptive.
 Measured GPU models: NVIDIA GeForce RTX 3090.
 
-Selection digest: `ea0c0cd7c32b8af1064af13c634e89610bc8def7b89f8759d27e633bfebd939c`.
+Selection digest: `01267603379aa55ee250aa8ba180a201d9f5f83ad92e726fbab11aaded5261bd`.
 
 ## cogact
 
@@ -71,6 +71,7 @@ Selection digest: `ea0c0cd7c32b8af1064af13c634e89610bc8def7b89f8759d27e633bfebd9
 | 5.5 | `pace_p95` | adaptive ≤16 | 90.0% (180) | -1.5 | 12.062 | 1.946× | 14.73 | 89.95% (1799) | Percentile 95 gives 180/200 and 32 replay queries, the minimum for four fixed prefixes under native H16. Only one Dev episode shortens execution at this aggressive setting. Demonstration-calibrated smoothed Cartesian-speed core; excludes joint-space and bimanual variants. Near-full-chunk operation; no measured comparison against a fixed-H16 control. Search: mechanism_limit. |
 | 5.5 | `vote_ensemble_h8` | 8 | 87.0% (174) | -4.5 | 23.720 | 0.996× | 14.73 | 89.35% (1787) | H8 thresholds0.25/0.50/0.75 give174/174/172 of200, all below177; retain reference0.50 as an explicit negative two-vote adaptation. H8 two-vote overlapping-chunk ensemble core; no single-ACT architecture or extra queries. Search: no_feasible_configuration. |
 | 3.3 | `smoothquant` | 8 | 90.0% (180) | -1.5 | 18.733 | 1.250× | 8.71 | — | Fixed classic W8A8 decoder scope meets the matched Dev loss target with validated integer execution and full-cost speedup. Classic SmoothQuant: 224 decoder W8/per-output and dynamic A8/per-token linears; INT8 MMA/INT32 accumulation. Native vision, SDPA and action head unchanged. Search: mechanism_limit. |
+| 3.3 | `gptq` | 8 | 90.0% (180) | -1.5 | 17.167 | 1.351× | 5.90 | — | Fixed classic GPTQ W4g128 decoder scope meets the matched Dev loss target with validated packed execution and full-cost speedup. Classic true-sequential GPTQ: 224 decoder symmetric W4g128/A16 linears; pinned TinyChat FP16 execution, not AWQ calibration. Native vision, SDPA and action head unchanged. Search: mechanism_limit. |
 
 ## openvla_oft
 
@@ -105,6 +106,7 @@ Selection digest: `ea0c0cd7c32b8af1064af13c634e89610bc8def7b89f8759d27e633bfebd9
 | 5.3 | `sp_vla_z025_min_actions3` | 8 | 97.5% (195) | -1.5 | 20.921 | 1.184× | 14.68 | 95.95% (1919) | Minimum three native actions in the unchanged six-command history, with pruning Z threshold 0.25, gives 195/200. Requiring only two native actions gives 191/200. Keep pruning and scheduling together. Pruning plus executed-action scheduling. Search: accuracy_boundary. |
 | 5.5 | `pace_p75` | adaptive ≤8 | 98.5% (197) | -0.5 | 25.420 | 0.969× | 14.98 | 96.60% (1932) | Percentile 75 gives 197/200 and the least overhead among measured eligible presets, but remains slower than native. Its replay uses 57 H8 queries; seven Dev episodes still trigger shorter prefixes. Demonstration-calibrated Cartesian core on native eight-action predictions; no padded or extended action head. Search: mechanism_limit. |
 | 3.3 | `smoothquant` | 8 | 96.5% (193) | -2.5 | 21.719 | 1.139× | 8.95 | — | Fixed classic W8A8 decoder scope meets the matched Dev loss target with validated integer execution and full-cost speedup. Classic SmoothQuant: 224 decoder W8/per-output and dynamic A8/per-token linears; INT8 MMA/INT32 accumulation. Native vision, SDPA and action head unchanged. Search: mechanism_limit. |
+| 3.3 | `gptq` | 8 | 99.5% (199) | +0.5 | 21.082 | 1.168× | 6.12 | — | Fixed classic GPTQ W4g128 decoder scope meets the matched Dev loss target with validated packed execution and full-cost speedup. Classic true-sequential GPTQ: 224 decoder symmetric W4g128/A16 linears; pinned TinyChat FP16 execution, not AWQ calibration. Native vision, SDPA and action head unchanged. Search: mechanism_limit. |
 
 ## Useful auxiliary configurations
 
@@ -223,6 +225,8 @@ Recorded revisions predating history cleanup can be resolved through the
 | openvla_oft / `pace_p75` | `2e34e92ba91fbe225e913e7cd5341acf71609375e3f7ed860e05437c00266be9` | `10d6db50064759363fed6fceeeee6b4aba74d418b0437c5236a5e24d7e00fa0f` | `pace-p75-infra-recheck-v1-124-3-openvla_oft--pace_p75` | `63a662a7bc49f0acf2fb7ed668d832baa5824236` / `63a662a7bc49f0acf2fb7ed668d832baa5824236` | `bcdb72e29eff8cfbc4fa0c130ea1f84dcaa72cf41d4134ac7419a6ff3938321f` |
 | openvla_oft / `smoothquant` | `90d6a6f53c54c7a7c614c1a0e5bdff09100198b4b0dac18802eaba6948caafbc` | — | `quant-p4-runtime-openvla_oft-smoothquant-r1-smoothquant` | `fb5836546bc64c066b475b109ce03c7e23068a13` / `fb5836546bc64c066b475b109ce03c7e23068a13` | `266f7312f123117efe4c747c5ad53b18f3e8d74a2dcd5c5032aee5b124f5e602` |
 | cogact / `smoothquant` | `bf414e83a68cb12c74b8d08f44862fc88a13cf812ebd3a17c3baf9a2947342fc` | — | `quant-p4-runtime-cogact-smoothquant-r1-smoothquant` | `fb5836546bc64c066b475b109ce03c7e23068a13` / `fb5836546bc64c066b475b109ce03c7e23068a13` | `0076b1b8c94e8dde00eccd6196edd20acb3c738a4af7a767d6d237ee4930982b` |
+| openvla_oft / `gptq` | `d69aeef476e3f244af416a5f0cb314f31f394b5dd9320f54c70faab16e07016b` | — | `quant-p4-runtime-openvla_oft-gptq-r1-gptq` | `3200aa7bc685a43d770a7955e931c7324a3495f1` / `3200aa7bc685a43d770a7955e931c7324a3495f1` | `d5e60ab05a36d9a84fb53184f8a3edc20df98ea5c6233414164777689481080e` |
+| cogact / `gptq` | `179efedcda94ff9180919f9a367237ffb542e2f956f2dd01dcb1d17b171b740a` | — | `quant-p4-runtime-cogact-gptq-r2-gptq` | `3200aa7bc685a43d770a7955e931c7324a3495f1` / `3200aa7bc685a43d770a7955e931c7324a3495f1` | `13c5c8a5ff77b6042fa59ab542d3f2c31c0d99b02a523e01733c118010df0445` |
 | openvla_oft / `awq` | `60497c718cb9e9afa95e3804a9f1a156caf2647272f2f90544471328e04e74e4` | — | `quant-p3-runtime-openvla_oft-existing-r1-awq` | `e3dc770ef6ee3336559ad4850bc2ad9490c0a0ad` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `ac024dc5845751d06941363d95f11f00b378120944204be3d7aa384000fe9551` |
 | cogact / `awq` | `8b7c5bc06c3d722d3e21ce1bfc625a6990773624ffd88a6bf5157a5099028a29` | — | `quant-p3-runtime-cogact-existing-r1-awq` | `e3dc770ef6ee3336559ad4850bc2ad9490c0a0ad` / `ef922100b927df6ca750d33206f9be1e2bd297d9` | `67d089d500cfb6bcabc0948dce787b2f8ca59358921cf038ce8fcaff6fc4391e` |
 | cogact / `actuation_slack_refresh_keep50` | `3e9ab07826e30785e609207a39c4c964aadc37185ff424e01b3643cfb527bd3c` | — | `compact-41-4-cogact-1--actuation_slack_refresh_keep50` | `1dc47be1a1e7d1cd8623a50e329d3a72e5daa8ef` / `e6a91178f1a1f6f744878977c34856770ee9f1d9` | `c688748fc315d380b58c73462d81222c806f6ed88f9cf027c16ad63c3ca73762` |
@@ -468,7 +472,12 @@ not for its measured outcome. MotionVQ is excluded from a full VQVLA GPU compari
 because its component omits the defining spatial/temporal multiplication reuse.
 Neither decision discards the underlying diagnostic/calibration evidence.
 
-GPTQ W4A16 is under integration and validation, not yet an admitted result.
+Classic GPTQ W4g128/A16 now has validated development evidence: OFT 199/200 at
+1.168x speedup and CogACT 180/200 at 1.351x, both with zero runtime errors.
+Its true-sequential calibration matches the pinned author solver; runtime reuses
+only the TinyChat packed execution kernel, not AWQ calibration. These are not
+Final-2000 results. One thermally rejected CogACT timing was replaced as a whole
+paired cohort on another idle card; valid results were not selected best-of-repeat.
 HBVLA and deferred VLA-specific scopes retain their documented mechanism/runtime
 conditions. No new Final-2000 evaluation is authorized or launched.
 

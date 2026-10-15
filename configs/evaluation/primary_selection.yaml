@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: 05c4c9ef7ace91c1717eb3682dbe2cdd81213598dbf44584eb5a1e10d18e29ae
+coverage_summary_sha256: 97000232cc636c1d4e6557b7c4004bdd9edc98fdf5e26f3b03d2a66f7cf54d6c
 source_compatibility:
 - development_runtime: 6a29dd2884a1266499a0b507088dc4efeb100b12e821dbaca4ffa9c9f5f492e7
   timing_runtime: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
@@ -2770,6 +2770,58 @@ configurations:
     - development_summary_sha256: 2a48351043da7ed777972dec6abe6c91937655b070697502828d6b0a0f57ba4d
       development_experiment_id: bf414e83a68cb12c74b8d08f44862fc88a13cf812ebd3a17c3baf9a2947342fc
       timing_record: quant-p4-runtime-cogact-smoothquant-r1-smoothquant
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  config: configs/experiments/openvla_oft/gptq.yaml
+  status: primary
+  section: '3.3'
+  scope: 'Classic true-sequential GPTQ: 224 decoder symmetric W4g128/A16 linears; pinned TinyChat FP16
+    execution, not AWQ calibration. Native vision, SDPA and action head unchanged.'
+  timing_record: quant-p4-runtime-openvla_oft-gptq-r1-gptq
+  development_summary_sha256: 7e0295681997261b8a572bf9d7aaee0448079fc90ae267b15de87fa3bcb0c611
+  development_experiment_id: d69aeef476e3f244af416a5f0cb314f31f394b5dd9320f54c70faab16e07016b
+  final_runtime_source_sha256: e8a70595dad149239ff73b4eb3612cf78c85ad454f1c7b0194d31623697cc5c6
+  reason: Fixed classic GPTQ W4g128 decoder scope meets the matched Dev loss target with validated packed
+    execution and full-cost speedup.
+  search:
+    complete: true
+    stop: mechanism_limit
+    reason: Fixed classic GPTQ W4g128 decoder scope meets the matched Dev loss target with validated packed
+      execution and full-cost speedup.
+    limitation: Fixed W4g128/A16 control covers all 224 decoder projections. Hessian damping and calibration
+      samples change offline codes, not the online kernel shapes or operation count. Lower-bit kernels
+      or quantizing additional components define different scopes; no runtime skipping/retention parameter
+      remains in this control.
+    evidence:
+    - development_summary_sha256: 7e0295681997261b8a572bf9d7aaee0448079fc90ae267b15de87fa3bcb0c611
+      development_experiment_id: d69aeef476e3f244af416a5f0cb314f31f394b5dd9320f54c70faab16e07016b
+      timing_record: quant-p4-runtime-openvla_oft-gptq-r1-gptq
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  config: configs/experiments/cogact/gptq.yaml
+  status: primary
+  section: '3.3'
+  scope: 'Classic true-sequential GPTQ: 224 decoder symmetric W4g128/A16 linears; pinned TinyChat FP16
+    execution, not AWQ calibration. Native vision, SDPA and action head unchanged.'
+  timing_record: quant-p4-runtime-cogact-gptq-r2-gptq
+  development_summary_sha256: 7e0295681997261b8a572bf9d7aaee0448079fc90ae267b15de87fa3bcb0c611
+  development_experiment_id: 179efedcda94ff9180919f9a367237ffb542e2f956f2dd01dcb1d17b171b740a
+  final_runtime_source_sha256: e8a70595dad149239ff73b4eb3612cf78c85ad454f1c7b0194d31623697cc5c6
+  reason: Fixed classic GPTQ W4g128 decoder scope meets the matched Dev loss target with validated packed
+    execution and full-cost speedup.
+  search:
+    complete: true
+    stop: mechanism_limit
+    reason: Fixed classic GPTQ W4g128 decoder scope meets the matched Dev loss target with validated packed
+      execution and full-cost speedup.
+    limitation: Fixed W4g128/A16 control covers all 224 decoder projections. Hessian damping and calibration
+      samples change offline codes, not the online kernel shapes or operation count. Lower-bit kernels
+      or quantizing additional components define different scopes; no runtime skipping/retention parameter
+      remains in this control.
+    evidence:
+    - development_summary_sha256: 7e0295681997261b8a572bf9d7aaee0448079fc90ae267b15de87fa3bcb0c611
+      development_experiment_id: 179efedcda94ff9180919f9a367237ffb542e2f956f2dd01dcb1d17b171b740a
+      timing_record: quant-p4-runtime-cogact-gptq-r2-gptq
 timing_protocol: libero_replay4x128_v1
 auxiliary_configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
