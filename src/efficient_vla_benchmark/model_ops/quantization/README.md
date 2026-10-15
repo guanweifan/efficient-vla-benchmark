@@ -21,6 +21,11 @@ These are feasibility primitives, not a selectable quantization algorithm.
   FP16 scale storage/products/accumulation and BF16 boundary casts are explicit.
   It does not accept native-FP32 modules or promise integer MMA. No existing
   method changes its selected engine implicitly.
+  For 8–32 rows, pad to 33 independent rows and slice the result to select the
+  author's single-split kernel: its short-row split-K path uses uninitialized
+  semaphores and can depend on recycled allocator contents. The copy is timed,
+  and changed reduction order needs fresh policy validation for affected shapes.
+  Longer matrices and the fewer-than-eight-row GEMV path are unchanged.
 - `gptq.py`: full-Hessian, cross-block error compensation, optionally dynamic
   input groups. Group scales follow the author's corrected global-weight rule;
   no activation ordering, RTN fallback or policy-target selection is implied.

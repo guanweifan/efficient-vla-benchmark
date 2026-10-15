@@ -75,7 +75,19 @@ class TinyChatLinear(nn.Module):
         if inputs.numel() == 0:
             return inputs.new_empty((*inputs.shape[:-1], self.out_features))
         # Conversion and contiguity costs remain inside the measured forward.
-        return self.packed(inputs.to(torch.float16).contiguous()).to(inputs.dtype)
+        prepared = inputs.to(torch.float16).contiguous()
+        rows = prepared.numel() // self.in_features
+        if 8 <= rows <= 32:
+            # The pinned short-M GEMM allocates split-K semaphores with empty(),
+            # allowing stale allocator contents to release a tile prematurely.
+            # Use its single-split kernel via one independent padded row range.
+            # GEMM never mixes rows; include this allocation/copy in timing.
+            padded = prepared.new_zeros((33, self.in_features))
+            padded[:rows].copy_(prepared.reshape(rows, self.in_features))
+            output = self.packed(padded)[:rows].reshape(*inputs.shape[:-1], self.out_features)
+        else:
+            output = self.packed(prepared)
+        return output.to(inputs.dtype)
 
     def execution_metadata(self):
         return dict(
@@ -89,4 +101,5 @@ class TinyChatLinear(nn.Module):
             integer_mma=False,
             boundary_casts="input_to_fp16_output_to_native",
             full_dequantized_weight_cache=False,
+            short_row_dispatch="M8_to32_pad_to33_single_split_then_slice",
         )
