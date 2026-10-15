@@ -16,6 +16,14 @@ These are feasibility primitives, not a selectable quantization algorithm.
   followed by native GEMM. Use only when native reduction order is required;
   count the decode time and full temporary workspace. No persistent weight cache
   or automatic fallback is allowed. Existing tile execution is unchanged.
+- `tinychat.py`: caller-supplied symmetric W4g128 codes packed for the pinned
+  TinyChat CUDA GEMM/GEMV. This reuses execution kernels, NOT AWQ calibration.
+  FP16 scale storage/products/accumulation and BF16 boundary casts are explicit.
+  It does not accept native-FP32 modules or promise integer MMA. No existing
+  method changes its selected engine implicitly.
+- `gptq.py`: full-Hessian, cross-block error compensation, optionally dynamic
+  input groups. Group scales follow the author's corrected global-weight rule;
+  no activation ordering, RTN fallback or policy-target selection is implied.
 - `integer_linear.py` / `integer_kernel.py`: explicit dynamic per-token A8 and
   per-output-channel weight scales, with signed INT8 Tensor Core multiplication,
   INT32 accumulation and a fused FP32 scale/bias epilogue. W4 storage is expanded
