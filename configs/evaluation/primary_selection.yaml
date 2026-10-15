@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: 3fbef82a9a33705ac605200a89fa2b3ca52844d2a9395805c43b30473557b175
+coverage_summary_sha256: 05c4c9ef7ace91c1717eb3682dbe2cdd81213598dbf44584eb5a1e10d18e29ae
 source_compatibility:
 - development_runtime: 6a29dd2884a1266499a0b507088dc4efeb100b12e821dbaca4ffa9c9f5f492e7
   timing_runtime: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
@@ -2718,6 +2718,58 @@ configurations:
   development_summary_sha256: 8b7333e7b2b148be045ebf79b905399c1dd33c8ef8abfc94653fd2befe2498ea
   development_experiment_id: 2e34e92ba91fbe225e913e7cd5341acf71609375e3f7ed860e05437c00266be9
   timing_record: pace-p75-infra-recheck-v1-124-3-openvla_oft--pace_p75
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
+  config: configs/experiments/openvla_oft/smoothquant.yaml
+  status: primary
+  section: '3.3'
+  scope: 'Classic SmoothQuant: 224 decoder W8/per-output and dynamic A8/per-token linears; INT8 MMA/INT32
+    accumulation. Native vision, SDPA and action head unchanged.'
+  timing_record: quant-p4-runtime-openvla_oft-smoothquant-r1-smoothquant
+  development_summary_sha256: 2a48351043da7ed777972dec6abe6c91937655b070697502828d6b0a0f57ba4d
+  development_experiment_id: 90d6a6f53c54c7a7c614c1a0e5bdff09100198b4b0dac18802eaba6948caafbc
+  final_runtime_source_sha256: 24041a12ce77617412e20fdc69d9c7ae8d56718d0b33ceb49dea03bd5e2138aa
+  reason: Fixed classic W8A8 decoder scope meets the matched Dev loss target with validated integer execution
+    and full-cost speedup.
+  search:
+    complete: true
+    stop: mechanism_limit
+    reason: Fixed classic W8A8 decoder scope meets the matched Dev loss target with validated integer
+      execution and full-cost speedup.
+    limitation: This control fixes W8A8 and quantizes all 224 decoder projections. Alpha and calibration
+      statistics change the quantization grid, not online shapes, precision or operation count. Lower-bit
+      or additional-module scopes are different controls, not undiscovered speed settings of this decoder-W8A8
+      scope.
+    evidence:
+    - development_summary_sha256: 2a48351043da7ed777972dec6abe6c91937655b070697502828d6b0a0f57ba4d
+      development_experiment_id: 90d6a6f53c54c7a7c614c1a0e5bdff09100198b4b0dac18802eaba6948caafbc
+      timing_record: quant-p4-runtime-openvla_oft-smoothquant-r1-smoothquant
+- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
+  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
+  config: configs/experiments/cogact/smoothquant.yaml
+  status: primary
+  section: '3.3'
+  scope: 'Classic SmoothQuant: 224 decoder W8/per-output and dynamic A8/per-token linears; INT8 MMA/INT32
+    accumulation. Native vision, SDPA and action head unchanged.'
+  timing_record: quant-p4-runtime-cogact-smoothquant-r1-smoothquant
+  development_summary_sha256: 2a48351043da7ed777972dec6abe6c91937655b070697502828d6b0a0f57ba4d
+  development_experiment_id: bf414e83a68cb12c74b8d08f44862fc88a13cf812ebd3a17c3baf9a2947342fc
+  final_runtime_source_sha256: 24041a12ce77617412e20fdc69d9c7ae8d56718d0b33ceb49dea03bd5e2138aa
+  reason: Fixed classic W8A8 decoder scope meets the matched Dev loss target with validated integer execution
+    and full-cost speedup.
+  search:
+    complete: true
+    stop: mechanism_limit
+    reason: Fixed classic W8A8 decoder scope meets the matched Dev loss target with validated integer
+      execution and full-cost speedup.
+    limitation: This control fixes W8A8 and quantizes all 224 decoder projections. Alpha and calibration
+      statistics change the quantization grid, not online shapes, precision or operation count. Lower-bit
+      or additional-module scopes are different controls, not undiscovered speed settings of this decoder-W8A8
+      scope.
+    evidence:
+    - development_summary_sha256: 2a48351043da7ed777972dec6abe6c91937655b070697502828d6b0a0f57ba4d
+      development_experiment_id: bf414e83a68cb12c74b8d08f44862fc88a13cf812ebd3a17c3baf9a2947342fc
+      timing_record: quant-p4-runtime-cogact-smoothquant-r1-smoothquant
 timing_protocol: libero_replay4x128_v1
 auxiliary_configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
