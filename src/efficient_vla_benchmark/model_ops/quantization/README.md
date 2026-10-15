@@ -16,6 +16,13 @@ These are feasibility primitives, not a selectable quantization algorithm.
   followed by native GEMM. Use only when native reduction order is required;
   count the decode time and full temporary workspace. No persistent weight cache
   or automatic fallback is allowed. Existing tile execution is unchanged.
+- `integer_linear.py` / `integer_kernel.py`: explicit dynamic per-token A8 and
+  per-output-channel weight scales, with signed INT8 Tensor Core multiplication,
+  INT32 accumulation and a fused FP32 scale/bias epilogue. W4 storage is expanded
+  to INT8 in registers; it is **not** INT4 MMA. Activation quantization is timed.
+  This path cannot replace a per-input-channel activation quantizer without
+  changing its mathematics. It is optional infrastructure, not yet a validated
+  end-to-end method or a speed claim. No existing method silently switches to it.
 
 The logical packed-weight shape is `(output, packed_input)`, with output-contiguous
 transposed strides for coalesced N-lane loads. This is one physical packed buffer,
