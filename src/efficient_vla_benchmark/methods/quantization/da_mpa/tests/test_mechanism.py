@@ -96,6 +96,20 @@ def test_runtime_is_explicit_but_does_not_change_native_calibration_identity():
         DAMPAConfig.parse({"runtime": "auto"})
 
 
+def test_retention_rounding_cannot_silently_disable_ranked_quantization():
+    scores = {i: float(i) for i in range(12)}
+    for ratio in (0.95, 0.99):
+        # A valid scalar below one may still round to every eligible block.
+        DAMPAConfig.parse({"retention_ratio": ratio})
+        with pytest.raises(ValueError, match="leave at least one"):
+            retained_blocks(scores, range(12), ratio, 2)
+    with pytest.raises(ValueError, match="leave at least one"):
+        retained_blocks(scores, range(12), 0.3, 11)
+    assert retained_blocks(scores, range(12), 0.9, 2) == set(range(1, 12))
+    assert retained_blocks(scores, range(12), 0.3, 2) == {7, 8, 9, 10, 11}
+    assert retained_blocks(scores, range(12), 0.1, 2) == {9, 10, 11}
+
+
 @pytest.mark.gpu
 @pytest.mark.parametrize("dtype", [torch.float16, torch.bfloat16, torch.float32])
 @pytest.mark.parametrize("rows", [1, 17, 280])

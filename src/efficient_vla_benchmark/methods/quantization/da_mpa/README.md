@@ -48,3 +48,6 @@ one of ten eligible DiT blocks plus the final two, quantizing 242 linears in tot
 It reuses the same frozen gradient ranking, not a new calibration or a uniform
 allocation. Lower positive retention ratios select the same one protected block;
 removing it would disable the ranked-retention contribution.
+The realized allocation must also leave at least one eligible DiT block quantized.
+A ratio below one is insufficient: rounding can retain every block. Such settings
+are rejected instead of silently becoming language-only quantization.

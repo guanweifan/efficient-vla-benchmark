@@ -48,4 +48,6 @@ def retained_blocks(scores, blocks, ratio, excluded):
     eligible = blocks[:-excluded] if excluded else blocks
     ranked = sorted(eligible, key=lambda b: (-scores[b], b))
     count = max(1, round(len(eligible) * ratio))
+    if count >= len(eligible):
+        raise ValueError("DA-MPA must leave at least one eligible DiT block quantized")
     return set(ranked[:count]) | set(blocks[len(eligible) :])
