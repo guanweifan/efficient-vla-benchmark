@@ -35,11 +35,12 @@ def test_algorithm_one_matches_exhaustive_target_sequences(window):
             assert (d.counter, d.pending_max) == (counter, maximum)
 
 
-def test_routing_parameters_do_not_change_calibration_observation_sensitivity():
+@pytest.mark.parametrize("theta_fp,budget", [(0.65, 0.02), (0.75, 0.02), (0.9, 0.2)])
+def test_routing_parameters_do_not_change_calibration_observation_sensitivity(theta_fp, budget):
     original = make()
     candidate = DyQDispatcher(
-        DyQConfig(hysteresis_window=1, theta_fp=0.75),
-        dict(theta_2_4=0.1, theta_4_8=0.3, theta_fp=0.75),
+        DyQConfig(hysteresis_window=1, theta_fp=theta_fp, accuracy_budget=budget),
+        dict(theta_2_4=0.1, theta_4_8=0.3, theta_fp=theta_fp),
     )
     actions = np.random.default_rng(7).normal(size=(100, 7))
     for action in actions:

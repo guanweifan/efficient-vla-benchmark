@@ -72,6 +72,16 @@ A16 threshold is 0.75. Motion/jerk sensitivity, cold-start A16 and the independe
 fitted A2/A4 boundaries remain active. It is not a fixed-A8 replacement or a
 paper-default configuration. All suites use the same settings.
 
+Two targeted follow-ups expose different tradeoffs, not an exhaustive grid.
+OFT's `dyq_vla_mixed_integer_k1_fp090_budget020` raises the A16 threshold to
+0.9 and the independent action-error calibration budget to 0.2, enabling more
+low-bit routing where its measured branch cost supports it. That calibration
+budget is an action-error bound, NOT the Dev success-loss tolerance.
+CogACT's `dyq_vla_mixed_integer_k1_fp065` instead uses an A16 threshold of 0.65
+to compare accuracy recovery against the 0.75 candidate while keeping K=1.
+Neither preset is admitted by registration; preserve literal fitted boundaries,
+including empty precision intervals, and measure each changed policy separately.
+
 Routing-only candidates may refit thresholds from the identical schema-3
 fixed-precision error records when their full calibration dependency audit proves
 those measurements unchanged. Preserve the original calibration source, sample
