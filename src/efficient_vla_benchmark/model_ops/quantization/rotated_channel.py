@@ -17,12 +17,14 @@ from .channel_prepare import ChannelPreparation
 def _prepare(
     x,
     rotations,
+    permutation,
     scales,
     codes,
     output,
     m,
     k: tl.constexpr,
     width: tl.constexpr,
+    permute: tl.constexpr,
     low: tl.constexpr,
     high: tl.constexpr,
     amax: tl.constexpr,
@@ -32,7 +34,8 @@ def _prepare(
     inner = tl.arange(0, width)
     cols = group * width + inner
     dtype = x.dtype.element_ty
-    values = tl.load(x + rows[:, None] * k + cols[None, :], rows[:, None] < m, other=0)
+    selected = tl.load(permutation + cols) if permute else cols
+    values = tl.load(x + rows[:, None] * k + selected[None, :], rows[:, None] < m, other=0)
     matrix = tl.load(rotations + group * width * width + inner[:, None] * width + inner[None, :])
     rotated = tl.dot(values, matrix, allow_tf32=False).to(dtype).to(tl.float32)
     step = tl.load(scales + cols).to(dtype).to(tl.float32)
@@ -114,7 +117,8 @@ class RotatedChannelPreparation:
 
     Frozen positive scales and rotation values are validated by the caller outside
     inference. Runtime row count and scale contents never enter the dispatch key.
-    No smoothing or permutation is implied; apply those before this operator.
+    Optional input-column permutation is gathered inside the rotation kernel.
+    Callers validate its bijection outside inference; no smoothing is implied.
     """
 
     def __init__(self, bits: int, *, qmin: int | None = None, amax: bool = False):
@@ -123,7 +127,7 @@ class RotatedChannelPreparation:
         self._compiled = {}
 
     @torch.no_grad()
-    def __call__(self, inputs, rotations, scales):
+    def __call__(self, inputs, rotations, scales, permutation=None):
         _validate(inputs, rotations)
         if (
             rotations.dtype != inputs.dtype
@@ -132,11 +136,18 @@ class RotatedChannelPreparation:
             or scales.dtype not in (torch.float16, torch.bfloat16, torch.float32)
         ):
             raise ValueError("Expected native-dtype rotations and colocated channel scales")
+        if permutation is not None and (
+            permutation.device != inputs.device
+            or permutation.dtype != torch.int64
+            or permutation.shape != (inputs.shape[-1],)
+        ):
+            raise ValueError("Expected a colocated INT64 column permutation")
         inputs, rotations, scales = inputs.contiguous(), rotations.contiguous(), scales.contiguous()
+        indices = rotations if permutation is None else permutation.contiguous()
         k, width = inputs.shape[-1], rotations.shape[1]
         m = inputs.numel() // k
         if m <= 16:
-            return self.preparation(self.rotation(inputs, rotations), scales)
+            return self.preparation(self.rotation(inputs, rotations, permutation), scales)
         codes = torch.empty_like(inputs, dtype=torch.int8)
         output = torch.empty_like(inputs, dtype=torch.float16)
         grid = (k // width, triton.cdiv(m, 16), 1)
@@ -144,9 +155,10 @@ class RotatedChannelPreparation:
             inputs.device.index,
             inputs.dtype,
             scales.dtype,
+            permutation is not None,
             k,
             width,
-            tuple(t.data_ptr() % 16 for t in (inputs, rotations, scales, codes, output)),
+            tuple(t.data_ptr() % 16 for t in (inputs, rotations, indices, scales, codes, output)),
         )
         kernel = self._compiled.get(key)
         with torch.cuda.device(inputs.device):
@@ -154,12 +166,14 @@ class RotatedChannelPreparation:
                 kernel = _prepare[grid](
                     inputs,
                     rotations,
+                    indices,
                     scales,
                     codes,
                     output,
                     m,
                     k,
                     width,
+                    permutation is not None,
                     self.preparation.low,
                     self.preparation.high,
                     self.preparation.amax,
@@ -167,7 +181,7 @@ class RotatedChannelPreparation:
                 )
                 self._compiled[key] = kernel
             else:
-                kernel[grid](inputs, rotations, scales, codes, output, m)
+                kernel[grid](inputs, rotations, indices, scales, codes, output, m)
         return codes, output
 
     def clear(self):

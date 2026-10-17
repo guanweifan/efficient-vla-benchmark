@@ -48,7 +48,9 @@ These are feasibility primitives, not a selectable quantization algorithm.
   cast/rotation/bias fusion. Native intermediate rounding and bias order remain
   explicit; short rows use native CUDA BMM. Per-channel scales are not changed to
   per-token scales. This reduces dispatch/temporary costs, not GEMM precision.
-  Callers still own any preceding smoothing/permutation and policy validation.
+  Optional permutation is gathered inside preparation without an intermediate
+  tensor; callers validate its bijection and still own smoothing and policy
+  validation. Short rows retain the native permutation/BMM path.
 - `mixed_linear.py` / `mixed_kernel.py`: one row-major W4 bank with per-token
   dynamic symmetric A2/A4/A8 or native BF16 inputs, for bias-free BF16 decoder
   projections. A2 packs two bits then expands to four in a separate timed kernel;

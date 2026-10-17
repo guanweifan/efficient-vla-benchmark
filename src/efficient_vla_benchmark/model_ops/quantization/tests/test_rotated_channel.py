@@ -27,13 +27,16 @@ def test_invalid_parameters_and_cpu():
 
 
 @pytest.mark.gpu
+@pytest.mark.parametrize("permuted", [False, True])
 @pytest.mark.parametrize("dtype", [torch.float16, torch.bfloat16, torch.float32])
 @pytest.mark.parametrize("width", [16, 32, 64, 128])
 @pytest.mark.parametrize(
     "bits,amax,low_extra", [(2, False, 0), (4, True, 1), (8, False, 1), (8, True, 0)]
 )
 @torch.inference_mode()
-def test_fused_and_native_short_paths_exact_dynamic_lengths(dtype, width, bits, amax, low_extra):
+def test_fused_and_native_short_paths_exact_dynamic_lengths(
+    dtype, width, bits, amax, low_extra, permuted
+):
     if not torch.cuda.is_available():
         pytest.skip("CUDA required")
     torch.manual_seed(8017)
@@ -43,13 +46,15 @@ def test_fused_and_native_short_paths_exact_dynamic_lengths(dtype, width, bits, 
     r = (torch.randn(k // width, width, width, device="cuda") / width**0.5).to(dtype)
     op = RotatedChannelPreparation(bits, qmin=low, amax=amax)
     restore = RotatedOutput()
+    permutation = torch.randperm(k, device="cuda") if permuted else None
     for m in (1, 15, 16, 17, 279, 280):
         x = torch.randn(1, m, k, device="cuda", dtype=dtype)
         # New contents must be read despite compiled dispatch reuse.
         scale = torch.rand(k, device="cuda") * 0.03 + 0.01
         step = (scale.to(dtype) / high).clamp_min(1e-8) if amax else scale.to(dtype)
-        expected_codes = (rotate(x, r) / step).round().clamp(low, high).to(torch.int8)
-        codes, prepared = op(x, r, scale)
+        selected = x if permutation is None else x.index_select(-1, permutation)
+        expected_codes = (rotate(selected, r) / step).round().clamp(low, high).to(torch.int8)
+        codes, prepared = op(x, r, scale, permutation)
         assert torch.equal(codes, expected_codes)
         assert torch.equal(prepared, (expected_codes.to(dtype) * step).half())
         half = x.half()
@@ -60,7 +65,14 @@ def test_fused_and_native_short_paths_exact_dynamic_lengths(dtype, width, bits, 
             assert torch.equal(restore(half, r, bias), expected)
     assert len(op._compiled) == 1
     assert len(restore._compiled) == 2
-    assert op(x[:, :0], r, scale)[1].shape == (1, 0, k)
+    assert op(x[:, :0], r, scale, permutation)[1].shape == (1, 0, k)
+    for invalid in (
+        torch.arange(k),
+        torch.arange(k, device="cuda").int(),
+        torch.arange(k - 1, device="cuda"),
+    ):
+        with pytest.raises(ValueError, match="permutation"):
+            op(x, r, scale, invalid)
     assert restore(half[:, :0], r).shape == (1, 0, k)
     with pytest.raises(ValueError):
         op(x, r, scale[:-1])
