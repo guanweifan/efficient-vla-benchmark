@@ -536,11 +536,19 @@ merely to make a primary-only exporter include them.
    require a fresh fidelity audit. Meeting the accuracy target alone never closes
    search. Freeze one effective configuration across all suites.
 4. Selection target: `Dev_SR >= matched_baseline_Dev_SR - 3 percentage points`.
-   On the current H8 references this is at least 192/200 for OFT and 177/200 for
-   CogACT. These counts follow the observed baseline, not a universal constant.
-   Prefer faster full-cost candidates meeting the target; differences within
+   On the current H8 references the preferred counts are 192/200 for OFT and
+   177/200 for CogACT. These follow the observed baseline, not a universal constant
+   or hard cutoff. Near-target candidates remain selectable when the recorded
+   speed/accuracy tradeoff and suite-level outcomes justify them; do not replace
+   this judgment with another fixed tolerance. A one-episode shortfall on a finite
+   Dev set is not by itself a meaningful degradation boundary. Review concentrated
+   suite losses, implementation evidence and material speed differences instead
+   of rerunning outcomes or tuning solely to cross a numerical line.
+   Prefer faster full-cost candidates with comparable accuracy; differences within
    timing variability are ties, with higher success and then the simpler/reference-
    closer setting preferred. This is a development decision, not a significance test.
+   The result field `target_met` still reports the exact preferred-target comparison;
+   it is not a pass/fail label or permission to launch Final-2000.
 5. If no tested active candidate meets the target, or none accelerates, do not
    exclude a faithfully implemented mechanism for its outcome. Stop when further
    useful tuning is not justified; nominate a representative, preferably reference-

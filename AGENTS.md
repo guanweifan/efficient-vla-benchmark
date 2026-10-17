@@ -61,6 +61,10 @@ of development and Git rules; upstream submodules retain their own instructions.
 - Target at most 3 percentage points of Dev-200 success loss against the matched
   native baseline, then prefer reliably faster full-cost execution among tested
   eligible configurations. This is a selection goal, NOT an admission/reporting filter.
+  It is also not a hard configuration cutoff: near-target candidates may be
+  selected with an explicit speed/accuracy rationale and suite-level review.
+  Do not invent another fixed tolerance or retest merely to cross the target.
+  A one-episode shortfall alone does not establish a meaningful accuracy boundary.
   Never disable the core or substitute a baseline no-op to obtain eligibility.
 - Meeting the accuracy target is NOT search completion. Inspect every admitted
   scope for speedward headroom; test meaningful stronger configurations and record

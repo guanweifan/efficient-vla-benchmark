@@ -175,6 +175,27 @@ def test_negative_outcome_is_ready_but_final_is_unmeasured(reporter):
     assert "0.800×" in reporter.render(report)
 
 
+def test_near_target_selection_keeps_exact_outcome_without_hard_rejection(reporter):
+    selection, summaries, records, quality, manifest = fixture()
+    dev = summaries["summary"]["configurations"][0]
+    dev["successes"], dev["success_rate"] = 191, 191 / 200
+    for i, episode in enumerate(dev["episode_results"]):
+        episode["success"] = i < 191
+    selected = selection["configurations"][0]
+    selected["reason"] = (
+        "One episode below the preferred target; retained after contextual "
+        "speed/accuracy and suite review, not relabeled as target-met."
+    )
+    records["method"]["task_macro_speedup"] = 1.2
+    report = reporter.build(selection, summaries, records, quality, manifest)
+    row = report["primary"][0]
+    assert row["development"]["successes"] == 191
+    assert not row["development"]["target_met"]
+    assert row["reason"] == selected["reason"]
+    assert report["final_launch_candidates"][0]["owner_authorization_required"]
+    assert not report["final_launched_by_this_command"]
+
+
 @pytest.mark.parametrize("measured_count", [0, 1, 2])
 def test_render_describes_actual_final_coverage(reporter, measured_count):
     report = reporter.build(*fixture())
