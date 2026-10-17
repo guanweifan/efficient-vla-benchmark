@@ -12,6 +12,7 @@ from .rotation import InputRotation, rotate
 class HoloQLinear(nn.Module):
     def __init__(self, entry, step_provider, *, runtime="native_float"):
         super().__init__()
+        self.graph = None
         if runtime not in ("native_float", "tinychat_fp16"):
             raise ValueError("Unsupported HoloQ runtime")
         dtype = getattr(torch, entry["native_dtype"].split(".")[-1])
@@ -68,6 +69,7 @@ class HoloQLinear(nn.Module):
 
     def _apply(self, fn, recurse=True):
         # Ordinary Python views are not buffers: release them before a move.
+        self.clear_graph()
         self._clear_scale_views()
         if self.fused_preparation is not None:
             self.fused_preparation.clear()
@@ -76,8 +78,21 @@ class HoloQLinear(nn.Module):
         return super()._apply(fn, recurse=recurse)
 
     def _load_from_state_dict(self, *args, **kwargs):
+        self.clear_graph()
         self._clear_scale_views()
         return super()._load_from_state_dict(*args, **kwargs)
+
+    def configure_dit_graph(self, engine, pool):
+        if not self.is_dit or self.fused_preparation is None:
+            raise ValueError("Only fixed-shape FP16 packed DiT projections support graphs")
+        from efficient_vla_benchmark.model_ops.frozen_graph import FrozenOpGraph
+
+        self.linear.kernel.stream_runtime = engine
+        self.graph = FrozenOpGraph(self._execute, pool)
+
+    def clear_graph(self):
+        if self.graph is not None:
+            self.graph.clear()
 
     def _scale(self, row):
         # In-place value updates remain visible through views; replacement
@@ -94,6 +109,14 @@ class HoloQLinear(nn.Module):
             if type(row) is not int or not 0 <= row < len(self.scale_table):
                 raise ValueError("Missing or invalid native denoising timestep")
         scale = self._scale(row)
+        if self.graph is not None:
+            replay = self.graph.replays > 0
+            result = self.graph(inputs, scale)
+            self.linear.kernel_invocations += int(replay)
+            return result
+        return self._execute(inputs, scale)
+
+    def _execute(self, inputs, scale):
         if self.fused_preparation is not None:
             _, prepared = self.fused_preparation(
                 inputs, self.input_rotation.blocks, scale, self.input_rotation.permutation

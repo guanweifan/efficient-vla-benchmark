@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass, fields
 @dataclass(frozen=True)
 class HoloQConfig:
     runtime: str = "native_float"
+    dit_graphs: bool = False
     block_size: int = 64
     gptq_block_size: int = 128
     gptq_damp_percent: float = 0.01
@@ -22,6 +23,8 @@ class HoloQConfig:
         c = cls(**parameters)
         if c.runtime not in ("native_float", "tinychat_fp16"):
             raise ValueError("Unsupported HoloQ runtime")
+        if type(c.dit_graphs) is not bool or (c.dit_graphs and c.runtime != "tinychat_fp16"):
+            raise ValueError("DiT graphs require explicit FP16 packed execution")
         if type(c.block_size) is not int or c.block_size not in (16, 32, 64, 128):
             raise ValueError("Unsupported composite rotation block size")
         if type(c.gptq_block_size) is not int or c.gptq_block_size not in (64, 128, 256):
@@ -51,4 +54,5 @@ class HoloQConfig:
         # Only native policies run during calibration; preserve the same codes,
         # transforms and complete scale tables across explicit execution engines.
         result.pop("runtime")
+        result.pop("dit_graphs")
         return result

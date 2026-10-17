@@ -1,0 +1,3 @@
+extends: holoq_fp16_kernel_b16.yaml
+parameters:
+  dit_graphs: true

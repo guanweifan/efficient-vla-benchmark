@@ -33,6 +33,11 @@ def test_execution_engine_preserves_native_calibration_identity():
     assert native.calibration_parameters() == packed.calibration_parameters()
     assert "runtime" not in native.calibration_parameters()
     assert HoloQConfig.parse({"gptq_block_size": 64}).runtime == "native_float"
+    graphed = HoloQConfig.parse({"runtime": "tinychat_fp16", "dit_graphs": True})
+    assert graphed.calibration_parameters() == packed.calibration_parameters()
+    for invalid in ({"dit_graphs": True}, {"runtime": "tinychat_fp16", "dit_graphs": 1}):
+        with pytest.raises(ValueError, match="graphs"):
+            HoloQConfig.parse(invalid)
 
 
 @pytest.mark.gpu

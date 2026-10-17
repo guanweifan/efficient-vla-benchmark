@@ -64,3 +64,19 @@ cached only as aliases of the complete table; device/dtype moves and state reloa
 invalidate them, and direct table replacement rebuilds them. No input, output or
 decoded weight is cached. This is an arithmetic-preserving dispatch optimization,
 not a new quantizer; full-policy/reset/reload checks and fresh timing remain gates.
+
+`holoq_fp16_graph_b16` explicitly enables fixed-shape CUDA graphs for the 48 DiT
+quantized projections, using a checksummed current-stream TinyChat derivative
+supplied through `--runtime-path` (build instructions in the shared operations
+README). Language execution is unchanged. Every call copies fresh inputs AND
+the selected timestep's scale vector before replay; one graph per operator does
+not freeze the first timestep's quantizer. Outputs are cloned, not reused as
+policy predictions. No integer-MMA, sampler, rotation or precision change is made.
+
+Graphs clear on state reload/device moves/close; unexpected geometry is rejected.
+Capture is cold-start overhead outside warmed timing; all input/scale/output
+copies remain inside it. Calibration artifacts are reusable only after whole-policy
+exactness checks, and this preset needs fresh smoke, Dev-200 and matched replay
+timing. Registration does not imply admission. Per-step graph banks and variable-
+length language graphs are not deployed: they add initialization/memory costs
+without a reliable additional steady-state benefit in the feasibility checks.

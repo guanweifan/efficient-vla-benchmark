@@ -18,8 +18,18 @@ class HoloQ(InferenceMethod):
     name = "holoq"
     reversible = False
 
-    def __init__(self, backend, config, root):
+    def __init__(self, backend, config, root, runtime_path=None):
         self.tracker = None
+        self.ops = ()
+        self.graph_pool = self.stream_engine = None
+        if config.dit_graphs:
+            from efficient_vla_benchmark.model_ops.frozen_graph import GraphPool
+            from efficient_vla_benchmark.model_ops.quantization.tinychat_runtime import (
+                TinyChatStreamRuntime,
+            )
+
+            self.graph_pool = GraphPool()
+            self.stream_engine = TinyChatStreamRuntime(runtime_path)
         m = read_manifest(root, config)
         if backend.method is not None or backend.metadata()["precision"] != "bfloat16":
             raise ValueError("HoloQ requires fresh native BF16 CogACT")
@@ -65,10 +75,13 @@ class HoloQ(InferenceMethod):
             for name, op in prepared.items():
                 native[name][0].cpu()
                 replace(backend.model, name, op.to(backend.device))
+                if config.dit_graphs and op.is_dit:
+                    op.configure_dit_graph(self.stream_engine, self.graph_pool)
         except Exception:
             self.close()
             raise
         self.identity, self.config, self.schedule = stable_hash(m), config, schedule
+        self.ops = tuple(prepared.values())
         del entries, native, prepared
         gc.collect()
         torch.cuda.empty_cache()
@@ -81,12 +94,14 @@ class HoloQ(InferenceMethod):
             self.tracker.reset()
 
     def close(self):
+        for op in self.ops:
+            op.clear_graph()
         if self.tracker is not None:
             self.tracker.close()
             self.tracker = None
 
     def metadata(self):
-        return dict(
+        result = dict(
             artifact_sha256=self.identity,
             scope="224_language_and_48_dit_attention_mlp",
             variant="official_code_composite_gptq_perstep_cogact",
@@ -113,3 +128,13 @@ class HoloQ(InferenceMethod):
             ),
             backend_adaptation="native CogACT DDIM10/H8; no new sampler or backbone",
         )
+        if self.config.dit_graphs:
+            result["dit_graphs"] = dict(
+                targets=48,
+                fixed_geometry=True,
+                dynamic_scales_copied_each_call=True,
+                input_output_copies_timed=True,
+                cached_policy_outputs=False,
+                stream_runtime=self.stream_engine.metadata(),
+            )
+        return result
