@@ -59,7 +59,7 @@ do not replace missing cores with convenient proxies.
 | Zero-Shot Quantization via Trajectory Curvature and Attention Guidance | Its joint flow-velocity and action-to-image/text-attention objectives are absent together from both native backends. The full primary PDF remains unavailable; indexed primary definitions already rule out substituting epsilon loss or cognition attention under this name. |
 | ActQuant on CogACT | Action-only DDIM differentiation works, but six floating GGUF bridge controls fail the pre-existing 0.01 action-error gate on 12 frozen observations; best maximum error is 0.011224. No calibrated binding or Dev/timing result is admitted. This is a failed numerical bridge, not proof of algorithm incompatibility; OFT remains supported. |
 | QVLA, full paper on either backend | The verified official input-Hessian proxy and absolute-cost allocator do not resolve the paper's action-space estimator, demotion order and pruning regularizer. Full proxy recalibration still nearly deletes early projections. No invented pruning cap or proxy result is admitted as full-paper evidence. |
-| HBVLA | The cutoff v1 still lacks a verified binary bootstrap and consistent shifted-binary/Haar reconstruction recipe. Related HBLLM primitives do not supply the missing VLA mechanism; the later v2 is outside the cutoff. |
+| HBVLA | The binarized probe bootstrap and adaptive grouping/greedy permutation recipe remain unverified. A further v2 check clarifies normalized Haar and inverse transforms, but its referenced implementation appendix is absent from the reviewed 9-page PDF. Related HBLLM primitives do not establish VLA-core fidelity. Closure is not based solely on the revision date. |
 | Full DA-PTQ | CSRC's variance-derived weight and regularization recipe remain unresolved after checking Eq. 7 and Appendix A. Diagonal Hadamard weighting does not specify the claimed cross-channel correction. Do not substitute whitening/coloring; retain the independently scoped DA-MPA core. |
 | Full VQVLA | The existing centroid-gather component omits spatial input aggregation and cached-product reuse across GEMM columns. Completing both requires a separate reuse engine, not a packing fix; this substantial extension is not pursued in the present two-backend GPU batch. No GPU-impossibility or full-method slowdown claim is made. |
 | Mix-QVLA | Its defining teacher-forced action-token likelihood is absent from native OFT L1 and CogACT diffusion heads; an L1/epsilon proxy changes that objective. |
@@ -71,6 +71,9 @@ Coverage uses the agreed 2026-08-17 literature cutoff. The
 [MABR workshop listing](https://adaptfm.gitlab.io/accepted-papers) and
 [author publication list](https://vds.sogang.ac.kr/?p=2234) confirm its July release;
 absence of a verified full recipe is not proof that it cannot be ported.
+The [HB-VLA v2 clarification](https://arxiv.org/pdf/2602.13710v2) was also
+checked for the already-covered work; clarified transform definitions are not
+misreported as remaining blockers. No new post-cutoff method is added.
 [ActQuant Eq. 8](https://arxiv.org/html/2605.24011v1) explicitly permits alpha=1
 for action-only architectures. The current OFT-only AMF/NLL configuration must not
 be mistaken for a universal paper restriction. The CogACT bridge checks cover

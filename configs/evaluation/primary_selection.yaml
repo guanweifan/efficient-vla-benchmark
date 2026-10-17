@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: 289a64a51a9a8544f8b970fa42e21ba08cfd2ae734932b3d664f5c3eb88a64ff
+coverage_summary_sha256: c20670547d0cc3a17aeb7c33629667d6d043514fce5848a48c6d0125ab0c2e96
 source_compatibility:
 - development_runtime: 6a29dd2884a1266499a0b507088dc4efeb100b12e821dbaca4ffa9c9f5f492e7
   timing_runtime: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
@@ -329,33 +329,33 @@ configurations:
       layout was optimized without changing scale axes or precision.
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/holoq_fp16_kernel_b16.yaml
+  config: configs/experiments/cogact/holoq_fp16_graph_b16.yaml
   status: primary
   section: '3.3'
   scope: HoloQ pinned official-code variant, not paper-v3 tokenwise LLM quantization:224 language plus48
     DiT W4/A4 projections, composite rotations and per-step scales; packed FP16 GEMM with fused preparation/permutation,
-    not integer MMA.
-  timing_record: quant-p4-runtime-cogact-holo-perm-r3-holo-perm-b16
-  final_runtime_source_sha256: 3d4ef69ccfc2660a82cdd900e0323a9e38830fe270660e1ca535bf9e3e43f567
-  development_summary_sha256: be0a1bcf62aaffd9045903767d6a3c796ff1284c9a5ce4960b8bafea5ee4e426
-  development_experiment_id: ad5734246636cdea486d0f515a7a10293f4e77b3bca9f437c4e6399ad553b85f
-  reason: Both fused-permutation candidates meet the Dev target. Their0.22% latency gap is a tie; block16
-    has185/200 versus182/200 and lower peak memory. Preserve the measured slowdown as a disclosed memory/latency
-    tradeoff, not a full-paper speed claim.
+    not integer MMA. Fixed-shape DiT operator graphs with a current-stream TinyChat derivative; fresh
+    inputs/scales and output copies remain timed. This is an optimized runtime comparison, not a pure
+    quantizer-only gain.
+  timing_record: quant-p5-runtime-cogact-graphs-r4-holoq-graph
+  final_runtime_source_sha256: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
+  development_summary_sha256: 5d261c489eb3e5d4ff1cf02a51230f3a3e73d8da7b89c1b319ab5d5dcecf5209
+  development_experiment_id: b32560b643bdb92b5042145d1b56583102442abfafdc0bbd407a92bc05675e45
+  reason: Fresh Dev preserves every prior episode outcome (185/200). The fixed-DiT graph engine has a
+    validated speed benefit; keep the prior selected quantizer parameters. Do not inherit or claim Final
+    accuracy.
   search:
     complete: true
-    stop: latency_plateau
-    reason: Both fused-permutation candidates meet the Dev target. Their0.22% latency gap is a tie; block16
-      has185/200 versus182/200 and lower peak memory. Preserve the measured slowdown as a disclosed memory/latency
-      tradeoff, not a full-paper speed claim.
-    limitation: Block64 to16 changes full-policy latency by0.22%. Full FP32 weight decoding, adjacent
-      rotation/quantization/output passes, input gather and repeated step-scale views were addressed and
-      revalidated. Residual profiler shows224 LLM packed GEMMs,480 DiT packed GEMMs and704 input preparations;
-      per-weight composite rotations differ, so sharing Q/K/V prepared inputs would change the mechanism.
-      Channelwise activation scales do not directly permit integer MMA. Whole-model graph/compiler redesign
-      remains untested, so this is not a global-optimality or intrinsic GPU-impossibility claim.
-    tie_reason: Block64 is nominally0.22% faster, within timing variability. Prefer block16 for higher
-      Dev success and lower measured peak memory under the existing tie rule.
+    stop: mechanism_limit
+    reason: Fresh Dev preserves every prior episode outcome (185/200). The fixed-DiT graph engine has
+      a validated speed benefit; keep the prior selected quantizer parameters. Do not inherit or claim
+      Final accuracy.
+    limitation: This bounded pass changes dispatch only, not bits, calibration, rotations, ATM/OHB or
+      DDIM10. Prior block-size sweeps remain evidence; no new graph-specific block sweep or global optimality
+      is claimed. Variable-length language graphs gave no compelling extra diagnostic gain and substantially
+      increased memory/capture cost.
+    tie_reason: The graph preset improves on the retained eager candidates while preserving their selected
+      quantizer and fresh closed-loop outcomes.
     evidence:
     - development_summary_sha256: be0a1bcf62aaffd9045903767d6a3c796ff1284c9a5ce4960b8bafea5ee4e426
       development_experiment_id: ad5734246636cdea486d0f515a7a10293f4e77b3bca9f437c4e6399ad553b85f
@@ -363,6 +363,9 @@ configurations:
     - development_summary_sha256: be0a1bcf62aaffd9045903767d6a3c796ff1284c9a5ce4960b8bafea5ee4e426
       development_experiment_id: 6c9fb8a1bc250b82cc4577f36136a24b8893962521676f9230fac173f5d02526
       timing_record: quant-p4-runtime-cogact-holo-perm-r3-holo-perm-b64
+    - development_summary_sha256: 5d261c489eb3e5d4ff1cf02a51230f3a3e73d8da7b89c1b319ab5d5dcecf5209
+      development_experiment_id: b32560b643bdb92b5042145d1b56583102442abfafdc0bbd407a92bc05675e45
+      timing_record: quant-p5-runtime-cogact-graphs-r4-holoq-graph
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   config: configs/experiments/cogact/motion_vq_t1.yaml
@@ -402,27 +405,30 @@ configurations:
       optimization.
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/quantvla_fp16_kernel.yaml
+  config: configs/experiments/cogact/quantvla_fp16_graph.yaml
   status: primary
   section: '3.3'
   scope: 'QuantVLA released-code CogACT port: 224 language and 24 DiT-MLP W4/A8 projections, block rotations,
-    ATM/OHB on 12 native attention modules. Packed FP16 GEMM, not integer MMA.'
-  timing_record: quant-p4-runtime-cogact-fusion-r10-r1-quantvla-fusion-b64
-  final_runtime_source_sha256: a88b7c8154fd9e9915921c5bf8139886a320aa68f736526db6fe1f2b5eff6212
-  development_summary_sha256: 15f1f67b80225e2ddab70dd9155449a7857e0efff8dfc867c0158a97ff4619a4
-  development_experiment_id: 8db90b057db52eaeeacc1c0612e0182b2b63a0ec333f5d532e00dd0f14c9a32f
-  reason: Both block16 and block64 achieve 180/200. Their sub-1% full-cost latency gap is treated as a
-    timing tie, not a significant advantage. Prefer the reference-closer block64 under the existing tie
-    rule; retain block16 only as search evidence.
+    ATM/OHB on 12 native attention modules. Packed FP16 GEMM, not integer MMA. Fixed-shape DiT operator
+    graphs with a current-stream TinyChat derivative; fresh inputs/scales and output copies remain timed.
+    This is an optimized runtime comparison, not a pure quantizer-only gain.'
+  timing_record: quant-p5-runtime-cogact-graphs-r4-quantvla-graph
+  final_runtime_source_sha256: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
+  development_summary_sha256: 5d261c489eb3e5d4ff1cf02a51230f3a3e73d8da7b89c1b319ab5d5dcecf5209
+  development_experiment_id: ea253042f37e561f169095cb89eac560873bab494a951c9e193df059c27ead0c
+  reason: Fresh Dev preserves every prior episode outcome (180/200). The fixed-DiT graph engine has a
+    validated speed benefit; keep the prior selected quantizer parameters. Do not inherit or claim Final
+    accuracy.
   search:
     complete: true
-    stop: latency_plateau
-    reason: Both block16 and block64 achieve 180/200. Their sub-1% full-cost latency gap is treated as
-      a timing tie, not a significant advantage. Prefer the reference-closer block64 under the existing
-      tie rule; retain block16 only as search evidence.
-    limitation: A fourfold rotation-block reduction gives less than 1% whole-policy latency difference.
-      Validated adjacent-operation fusion removes material avoidable overhead; remaining transforms, packing
-      and native FP32 DiT boundaries stay timed. No core component is disabled.
+    stop: mechanism_limit
+    reason: Fresh Dev preserves every prior episode outcome (180/200). The fixed-DiT graph engine has
+      a validated speed benefit; keep the prior selected quantizer parameters. Do not inherit or claim
+      Final accuracy.
+    limitation: This bounded pass changes dispatch only, not bits, calibration, rotations, ATM/OHB or
+      DDIM10. Prior block-size sweeps remain evidence; no new graph-specific block sweep or global optimality
+      is claimed. Variable-length language graphs gave no compelling extra diagnostic gain and substantially
+      increased memory/capture cost.
     evidence:
     - development_summary_sha256: 15f1f67b80225e2ddab70dd9155449a7857e0efff8dfc867c0158a97ff4619a4
       development_experiment_id: 5d2e0fc918d4e53ac279f8c91068b51cbc2cdab0a2fab37fdd265c86d28b90f1
@@ -430,8 +436,11 @@ configurations:
     - development_summary_sha256: 15f1f67b80225e2ddab70dd9155449a7857e0efff8dfc867c0158a97ff4619a4
       development_experiment_id: 8db90b057db52eaeeacc1c0612e0182b2b63a0ec333f5d532e00dd0f14c9a32f
       timing_record: quant-p4-runtime-cogact-fusion-r10-r1-quantvla-fusion-b64
-    tie_reason: Block16 is nominally faster by less than1%, within accepted timing variability; both score180/200.
-      Select reference-closer block64 rather than treating this gap as a reliable speed advantage.
+    - development_summary_sha256: 5d261c489eb3e5d4ff1cf02a51230f3a3e73d8da7b89c1b319ab5d5dcecf5209
+      development_experiment_id: ea253042f37e561f169095cb89eac560873bab494a951c9e193df059c27ead0c
+      timing_record: quant-p5-runtime-cogact-graphs-r4-quantvla-graph
+    tie_reason: The graph preset improves on the retained eager candidates while preserving their selected
+      quantizer and fresh closed-loop outcomes.
 - config: configs/experiments/cogact/efficient_vla_layer_prune04.yaml
   status: primary
   section: '3.3'
