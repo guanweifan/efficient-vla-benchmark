@@ -87,6 +87,32 @@ def test_fp16_fusion_matches_explicit_same_engine_reference(dtype, row_restore, 
     assert "linear.activation_step" not in saved
     expected = op(x)
     op.load_state_dict(saved, strict=True)
+    assert op._scale_table_ref is None and not op._scale_rows
+    torch.testing.assert_close(op(x), expected, atol=0, rtol=0)
+    cached = op._scale_rows
+    op(x)
+    assert op._scale_rows is cached
+    assert all(not key.startswith("_scale") for key in op.state_dict())
+    op.cpu()
+    assert op._scale_table_ref is None and not op._scale_rows
+    assert not op.fused_preparation._compiled
+    op.cuda()
+    torch.testing.assert_close(op(x), expected, atol=0, rtol=0)
+    # Replacing or updating the authoritative table cannot leave stale views.
+    op.scale_table = op.scale_table.clone()
+    torch.testing.assert_close(op(x), expected, atol=0, rtol=0)
+    assert op._scale_table_ref is op.scale_table
+    op.scale_table.copy_(saved["scale_table"] * 2)
+    rotated = rotate(x.index_select(-1, op.input_rotation.permutation), op.input_rotation.blocks)
+    codes = (rotated / op.scale_table[row[0]]).round().clamp(-8, 7).to(torch.int8)
+    reference = op.linear.kernel((codes.to(dtype) * op.scale_table[row[0]]).half()).to(dtype)
+    if row_restore:
+        reference = rotate(reference, op.output_rotation)
+    if with_bias:
+        reference = reference + op.bias
+    torch.testing.assert_close(op(x), reference, atol=0, rtol=0)
+    op.load_state_dict(saved, strict=True, assign=True)
+    assert op._scale_table_ref is None and not op._scale_rows
     torch.testing.assert_close(op(x), expected, atol=0, rtol=0)
     assert op(x[:, :0]).shape == (1, 0, n)
     assert op.linear.execution_metadata()["activation_scale_axis"] == "input_channel"

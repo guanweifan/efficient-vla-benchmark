@@ -57,3 +57,10 @@ The changed arithmetic requires fresh whole-policy/reference, reset/reload,
 four-episode smoke, Dev-200 and full-cost timing; no prior success is inherited.
 Only the complete scale table is serialized. The current timestep's scale view
 is transient, so reloading after another denoising step cannot overwrite the table.
+
+The FP16 preparation also gathers the zigzag permutation inside the rotation
+kernel, without a separate selected-input tensor. Per-timestep scale views are
+cached only as aliases of the complete table; device/dtype moves and state reload
+invalidate them, and direct table replacement rebuilds them. No input, output or
+decoded weight is cached. This is an arithmetic-preserving dispatch optimization,
+not a new quantizer; full-policy/reset/reload checks and fresh timing remain gates.

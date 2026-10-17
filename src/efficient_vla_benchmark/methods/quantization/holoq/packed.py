@@ -24,6 +24,8 @@ class HoloQLinear(nn.Module):
         )
         self.register_buffer("scale_table", entry["activation_steps"].to(dtype))
         self.register_buffer("bias", None if entry["bias"] is None else entry["bias"].to(dtype))
+        self._scale_table_ref = None
+        self._scale_rows = ()
         self.step_provider = step_provider
         self.is_dit = entry["side"] != "language"
         options = dict(
@@ -60,17 +62,41 @@ class HoloQLinear(nn.Module):
         )
         self.in_features, self.out_features = self.linear.in_features, self.linear.out_features
 
+    def _clear_scale_views(self):
+        self._scale_table_ref = None
+        self._scale_rows = ()
+
+    def _apply(self, fn, recurse=True):
+        # Ordinary Python views are not buffers: release them before a move.
+        self._clear_scale_views()
+        if self.fused_preparation is not None:
+            self.fused_preparation.clear()
+        if self.fused_output is not None:
+            self.fused_output.clear()
+        return super()._apply(fn, recurse=recurse)
+
+    def _load_from_state_dict(self, *args, **kwargs):
+        self._clear_scale_views()
+        return super()._load_from_state_dict(*args, **kwargs)
+
+    def _scale(self, row):
+        # In-place value updates remain visible through views; replacement
+        # of the registered table rebuilds them rather than using old storage.
+        if self._scale_table_ref is not self.scale_table:
+            self._scale_rows = self.scale_table.unbind(0)
+            self._scale_table_ref = self.scale_table
+        return self._scale_rows[row]
+
     def forward(self, inputs):
         row = 0
         if self.is_dit:
             row = self.step_provider()
             if type(row) is not int or not 0 <= row < len(self.scale_table):
                 raise ValueError("Missing or invalid native denoising timestep")
-            self.linear.activation_step = self.scale_table[row]
+        scale = self._scale(row)
         if self.fused_preparation is not None:
-            x = inputs.index_select(-1, self.input_rotation.permutation)
             _, prepared = self.fused_preparation(
-                x, self.input_rotation.blocks, self.scale_table[row]
+                inputs, self.input_rotation.blocks, scale, self.input_rotation.permutation
             )
             if not prepared.numel():
                 return inputs.new_empty((*inputs.shape[:-1], self.out_features))
@@ -80,6 +106,7 @@ class HoloQLinear(nn.Module):
                 return self.fused_output(output, self.output_rotation, self.bias)
             output = output.to(inputs.dtype)
             return output if self.bias is None else output + self.bias.to(output.dtype)
+        self.linear.activation_step = scale
         x = self.input_rotation(inputs)
         output = self.linear(x)
         if self.output_rotation is not None:
