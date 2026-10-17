@@ -22,7 +22,7 @@ where = ["src"]
 exclude = ["*.tests", "*.tests.*"]
 
 [tool.setuptools.package-data]
-efficient_vla_benchmark = ["methods/**/metadata.yaml", "methods/**/components/*.yaml"]
+efficient_vla_benchmark = ["methods/**/metadata.yaml", "methods/**/components/*.yaml", "model_ops/quantization/csrc/*.cu"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "src/efficient_vla_benchmark/methods", "src/efficient_vla_benchmark/action_codecs", "backends/openvla_oft/tests"]

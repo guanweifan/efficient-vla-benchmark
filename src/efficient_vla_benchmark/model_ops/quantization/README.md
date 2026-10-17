@@ -49,6 +49,16 @@ These are feasibility primitives, not a selectable quantization algorithm.
   explicit; short rows use native CUDA BMM. Per-channel scales are not changed to
   per-token scales. This reduces dispatch/temporary costs, not GEMM precision.
   Callers still own any preceding smoothing/permutation and policy validation.
+- `mixed_linear.py` / `mixed_kernel.py`: one row-major W4 bank with per-token
+  dynamic symmetric A2/A4/A8 or native BF16 inputs, for bias-free BF16 decoder
+  projections. A2 packs two bits then expands to four in a separate timed kernel;
+  A2/A4 use CUTLASS INT4 MMA, A8 expands W4 in registers for INT8 MMA, and A16 uses
+  coalesced tile-dequantized BF16 GEMM. There is no dense or second weight bank.
+  Per-output scales are BF16-rounded; the FP32 activation-amax floor is 1e-5.
+  These equations differ from channelwise activation quantization: new calibration
+  and full-policy validation are mandatory. No method switches engines implicitly.
+  `mixed_runtime.py` checks the caller-supplied binary, source, ABI and dependency
+  hashes before loading it. Hardware support is explicitly SM8x, validated on 3090.
 - `../block_rotation.py`: fused uniform block products with optional permutation,
   without constructing a dense transform. Callers own validated matrices/indices.
   At most sixteen rows explicitly retain native CUDA BMM reduction order.
@@ -91,3 +101,22 @@ python -m pytest src/efficient_vla_benchmark/model_ops/quantization/tests
 Full method admission additionally requires checkpoint-matched calibration,
 whole-policy reference checks, native protocol smoke and full-cost replay timing.
 Packing efficiency alone is neither a latency claim nor evidence of task accuracy.
+
+## Optional mixed-precision runtime build
+
+Supply unmodified [CUTLASS 3.5.1](https://github.com/NVIDIA/cutlass/tree/f7b19de32c5d1f3cedfc735c2849f12b537522ee)
+sources and CUDA 12.1 explicitly; the build verifies the complete include-tree hash
+and preserves the BSD-3-Clause license. It does not download or modify dependencies.
+Choose an ignored external artifact location and pass it via `--runtime-path`.
+The CUDA source ships with this package; binaries never enter Git.
+
+```bash
+python scripts/build_mixed_w4_runtime.py --cutlass-path "$CUTLASS_SOURCE" \
+  --nvcc "$CUDA_COMPILER" --output-dir "$RUNTIME_OUTPUT"
+python -m pytest src/efficient_vla_benchmark/model_ops/quantization/tests/test_mixed_linear.py \
+  --runtime-path "$RUNTIME_OUTPUT"
+```
+
+This is shared execution infrastructure, not a standalone quantization method or
+an author-runtime reproduction. Calibration, temporal scheduling, target selection
+and method admission remain outside these operators.
