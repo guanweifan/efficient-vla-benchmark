@@ -1972,13 +1972,12 @@ configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   config: configs/experiments/openvla_oft/qvla_b15p5.yaml
-  status: pending_core
+  status: excluded
   section: '3.3'
-  scope: QVLA official-code proxy under core-definition review; not admitted as the full paper mechanism.
-  reason: Exact official allocator/Hessian-proxy parity does not reproduce the paper action-space intervention
-    objective. Full schema5 recalibration still yields nearly complete early-projection deletion. Core
-    weighting/ordering definitions remain unresolved; old diagnostic outcomes are not a certified paper-method
-    failure.
+  scope: QVLA full-paper scope abandoned for this batch; existing official-code proxy is diagnostic only.
+  reason: Last bounded primary-source review did not resolve action-space estimator versus official input-Hessian
+    proxy, marginal/staged allocation or pruning regularization. Exact proxy parity and full recalibration
+    are insufficient for full-core fidelity; no arbitrary pruning caps or claimed GPU incompatibility.
 - config: configs/experiments/openvla_oft/efficient_vla_layer_prune03.yaml
   status: primary
   section: '3.3'

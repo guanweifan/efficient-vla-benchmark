@@ -1,6 +1,6 @@
 > Quantization results are core-scoped Dev/timing evidence. No new quantization
 > Final-2000 run is authorized; withdrawn premature outcomes remain excluded.
-> Source-held and incomplete components are not certified negative method results.
+> Source-limited and incomplete scopes are not certified negative method results.
 
 # Benchmark results
 
@@ -20,7 +20,7 @@ Each speedup uses its own same-GPU native pair; the displayed native row is
 not a universal denominator. Absolute latency across GPU pairs is descriptive.
 Measured GPU models: NVIDIA GeForce RTX 3090.
 
-Selection digest: `048bfd65616b2020bfe8de8cd6cdf8832998c9afee88e387ebc305f3a19ddcc5`.
+Selection digest: `964edfa765d34294170415135db7fedde030e23d2085085c5869d3fe8b788c53`.
 
 ## cogact
 
@@ -131,7 +131,6 @@ Diagnostic measurements below do NOT certify core fidelity or engineering readin
 | Backend / method | Status | Dev SR (n/200) | ms/control | Speedup | Reason |
 |---|---|---:|---:|---:|---|
 | cogact / `st_merge_keep192` | pending_core | 81.0% (162) | 19.809 | 1.177× | Eq. 4 consumes source into target, unlike the provisional anchor-survival convention; one-to-many collision/mass rules remain unspecified. |
-| openvla_oft / `qvla` | pending_core | — | — | — | Exact official allocator/Hessian-proxy parity does not reproduce the paper action-space intervention objective. Full schema5 recalibration still yields nearly complete early-projection deletion. Core weighting/ordering definitions remain unresolved; old diagnostic outcomes are not a certified paper-method failure. |
 | openvla_oft / `st_merge_keep192` | pending_core | 98.5% (197) | 23.994 | 1.033× | Eq. 4 consumes source into target, unlike the provisional anchor-survival convention; one-to-many collision/mass rules remain unspecified. |
 | openvla_oft / `team_vla_merge160` | pending_core | 83.5% (167) | 19.226 | 1.279× | Joint text/action top-M aggregation, Eq. 5-9 direction and normalization remain unverified; author source has no executable resolution. |
 | openvla_oft / `vla_iap` | pending_core | 94.5% (189) | 24.090 | 1.021× | The semantic encoder/pooling remains unspecified. The post-cutoff IAprune v2 changes core equations, so it cannot silently repair the in-scope v1. |
@@ -139,6 +138,7 @@ Diagnostic measurements below do NOT certify core fidelity or engineering readin
 | cogact / `motion_vq_t1` | excluded | 91.0% (182) | 25.347 | 0.927× | Not a full VQVLA GPU acceleration comparison: this component includes dual codebooks/router but omits the defining spatial/temporal multiplication reuse. Preserve diagnostic evidence; do not attribute its speed to the complete paper. |
 | openvla_oft / `eaqvla` | excluded | 99.5% (199) | 36.067 | 0.687× | Not a formal survey experiment: the authors withdrew arXiv:2505.21567v2 on 2025-07-31 citing a paper error. Existing measurements remain diagnostic, not a reason to exclude an unfavorable outcome. |
 | openvla_oft / `motion_vq_t1` | excluded | 99.0% (198) | 29.857 | 0.832× | Not a full VQVLA GPU acceleration comparison: this component includes dual codebooks/router but omits the defining spatial/temporal multiplication reuse. Preserve diagnostic evidence; do not attribute its speed to the complete paper. |
+| openvla_oft / `qvla` | excluded | — | — | — | Last bounded primary-source review did not resolve action-space estimator versus official input-Hessian proxy, marginal/staged allocation or pruning regularization. Exact proxy parity and full recalibration are insufficient for full-core fidelity; no arbitrary pruning caps or claimed GPU incompatibility. |
 
 ## Evidence index
 
@@ -466,8 +466,8 @@ pair. It demonstrates reduced memory with a residual latency cost, not accelerat
 or a paper-v3 integer-kernel reproduction. All transformations remain timed.
 
 DyQ-VLA now has a selected mixed-integer v2 core on each backend; the primary
-rows and search evidence record the actual speed/accuracy tradeoffs. QVLA remains
-held for unresolved paper/official-code core differences, not merely slow engineering;
+rows and search evidence record the actual speed/accuracy tradeoffs. QVLA is now
+abandoned for this experimental batch after the last paper/official-code core review;
 its proxy diagnostic outcomes must not be cited as a failure of the full method.
 The preferred 3pp Dev loss target is not a hard cutoff: near-target configurations
 may be selected with an explicit speed/accuracy and suite-level justification.
@@ -484,12 +484,13 @@ Its true-sequential calibration matches the pinned author solver; runtime reuses
 only the TinyChat packed execution kernel, not AWQ calibration. These are not
 Final-2000 results. One thermally rejected CogACT timing was replaced as a whole
 paired cohort on another idle card; valid results were not selected best-of-repeat.
-HBVLA and deferred VLA-specific scopes retain their documented mechanism/runtime
-conditions. No new Final-2000 evaluation is authorized or launched.
+HBVLA and the other unresolved VLA-specific scopes are closed for this batch
+with explicit mechanism/runtime reasons, not left as promised integrations. No new Final-2000 evaluation is authorized or launched.
 
-Coverage is explicitly bounded: MABR remains source-held; ActQuant on CogACT
-is an unimplemented second binding, not proven incompatible. Paper-core,
-training and additional-backbone deferrals are listed in the
+Coverage is explicitly bounded: MABR is abandoned this batch for unavailable
+primary equations; ActQuant on CogACT is abandoned after its floating numerical
+bridge failed validation, not declared incompatible. All closed paper-core,
+training and additional-backbone scopes are listed in the
 [development guide](development.md#quantization-runtime-admission). Registry
 coverage is not a claim that every possible quantization port is complete.
 

@@ -5,6 +5,13 @@ The implementation uses the unmodified author revision
 It supports OFT LIBERO joint H8 only. Registration does not imply completed
 measurement; the result ledger distinguishes calibration, Dev, timing and final.
 
+The prospective CogACT binding was closed as abandoned for this batch, not as
+mathematically incompatible: Eq. 8 permits action-only Fisher and differentiation
+through native DDIM was verified. The floating GGUF cognition bridge did not pass
+the existing action-parity gate across six KV/readout precision controls, so no
+CogACT calibration, quantized runtime result or selectable binding is advertised.
+The OFT implementation and its measured identities are unchanged.
+
 ## Mechanism and scope
 
 HSIC-IB scores allocate GGUF types to 224 LLM projection matrices using the author's

@@ -49,7 +49,7 @@ are rejected for formal evaluation. Conversion is irreversible and native reload
 is mandatory before another method. Saved sensitivities can support new channel
 budgets without recollecting observations, with a new immutable artifact identity.
 
-## Core-fidelity hold
+## Closed experimental scope
 
 Exact pinned-author allocator parity was checked on all 430 modules, while six
 representative covariance matrices and all 30 associated bit-score vectors matched
@@ -61,6 +61,11 @@ The released 32-observation input-Hessian proxy differs from the paper's
 action-Jacobian-guided selective interventions; absolute-cost allocation differs
 from marginal error per saved bit, and staged versus immediate demotion descriptions
 also disagree. The stated pruning regularizer lacks an executable definition.
-Consequently the full paper remains `pending_core`, not an admitted negative
-result. Quantization-only presets are diagnostics, not certified alternative
+After the last bounded source/core review, the full paper is **abandoned for this
+experimental batch** (`excluded` in selection), not an admitted negative result
+or an outstanding promised implementation. This applies to a prospective CogACT
+binding as well; changing the backend does not resolve the estimator definition.
+Quantization-only presets remain diagnostics, not certified alternative
 reproductions. Arbitrary per-layer pruning caps would change the mechanism.
+This closure concerns unverifiable full-core fidelity, not a claim of GPU
+incompatibility or proof that the published algorithm fails.

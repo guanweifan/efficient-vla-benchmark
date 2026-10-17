@@ -137,7 +137,8 @@ Current support is listed in README and validated by the lazy catalog. starVLA
 remains source-only. FlashVLA action reuse and VLA-IAP's CogACT semantic construction
 remain unresolved. Native tail refinement is supported only through ActionCache's
 explicitly scoped frozen-bank port, not a trained few-step sampler. SQAP-VLA
-is deferred pending activation-granularity clarification. DepthCache primary and
+is excluded from the current experimental batch because its activation granularity
+remains unverified; do not reopen it without new evidence. DepthCache primary and
 ASR deletion/KV reuse are explicitly scoped components, never full-paper reproductions;
 do not silently promote excluded or unverified mechanisms to implemented status.
 EcoVLA's dynamic channels/heads and EfficientVLA's static layer core require

@@ -47,17 +47,23 @@ DyQ's authorized independent population contains 80 attempts (40 per backend),
 79 successful trajectories and one retained failure, with no replacements or
 Dev/Final initial states. No policy training is performed.
 
-Deferred quantization scopes must not be replaced with convenient proxies:
+The last bounded quantization pass closes the following scopes as **abandoned
+for this experimental batch**, not a queue of promised implementations. This
+does not remove their literature coverage or prove that the algorithms cannot
+work. Reopening one requires new evidence or an explicitly scheduled wider scope;
+do not replace missing cores with convenient proxies.
 
-| Scope | Concrete missing condition |
+| Scope | Concrete reason for closing this batch |
 |---|---|
-| MABR | The authors/workshop confirm this in-cutoff work, but the complete primary PDF/equations remain inaccessible. A third-party summary is insufficient for a faithful implementation; this is a source hold, not an incompatibility claim. |
-| Zero-Shot Quantization via Trajectory Curvature and Attention Guidance | Its joint flow-velocity and action-to-image/text-attention objectives are absent together from both native backends. Do not substitute epsilon loss or cognition attention under the same name. Full-PDF review also remains pending. |
-| ActQuant on CogACT | An unimplemented second binding, not an incompatible algorithm: paper Eq. 8 permits action-only Fisher. Native diffusion action-loss differentiation, HSIC/Fisher calibration and a validated GGUF cognition/runtime bridge remain required; existing OFT evidence cannot be transferred. |
-| HBVLA | Verifiable bootstrap/binarization and local reconstruction details for its gradient-guided binary-frequency allocation; a Haar transform alone is not the core. |
-| Full DA-PTQ | CSRC's weighted covariance objective lacks the required weight/regularization recipe; whitening/coloring is not Eq. 7. DA-MPA is separately scoped above. |
+| MABR | Author/workshop listings confirm the in-cutoff work, but renewed PDF/API/attachment checks did not recover the complete primary equations. No implementation based on a third-party summary. |
+| Zero-Shot Quantization via Trajectory Curvature and Attention Guidance | Its joint flow-velocity and action-to-image/text-attention objectives are absent together from both native backends. The full primary PDF remains unavailable; indexed primary definitions already rule out substituting epsilon loss or cognition attention under this name. |
+| ActQuant on CogACT | Action-only DDIM differentiation works, but six floating GGUF bridge controls fail the pre-existing 0.01 action-error gate on 12 frozen observations; best maximum error is 0.011224. No calibrated binding or Dev/timing result is admitted. This is a failed numerical bridge, not proof of algorithm incompatibility; OFT remains supported. |
+| QVLA, full paper on either backend | The verified official input-Hessian proxy and absolute-cost allocator do not resolve the paper's action-space estimator, demotion order and pruning regularizer. Full proxy recalibration still nearly deletes early projections. No invented pruning cap or proxy result is admitted as full-paper evidence. |
+| HBVLA | The cutoff v1 still lacks a verified binary bootstrap and consistent shifted-binary/Haar reconstruction recipe. Related HBLLM primitives do not supply the missing VLA mechanism; the later v2 is outside the cutoff. |
+| Full DA-PTQ | CSRC's variance-derived weight and regularization recipe remain unresolved after checking Eq. 7 and Appendix A. Diagonal Hadamard weighting does not specify the claimed cross-channel correction. Do not substitute whitening/coloring; retain the independently scoped DA-MPA core. |
+| Full VQVLA | The existing centroid-gather component omits spatial input aggregation and cached-product reuse across GEMM columns. Completing both requires a separate reuse engine, not a packing fix; this substantial extension is not pursued in the present two-backend GPU batch. No GPU-impossibility or full-method slowdown claim is made. |
 | Mix-QVLA | Its defining teacher-forced action-token likelihood is absent from native OFT L1 and CogACT diffusion heads; an L1/epsilon proxy changes that objective. |
-| SQAP-VLA | Unresolved tensorwise versus channelwise activation quantization; owner-requested deferral remains in force. |
+| SQAP-VLA | Tensorwise versus channelwise activation quantization remains unresolved; the rechecked official repository still contains only a README. Abandoned this batch without guessing the axis. |
 | SQIL / BitVLA | Quantization-aware policy training, outside this no-training batch. |
 | QuantWAM and new compact backbones | Require an additional baseline or trained policy, outside the two-backend scope. |
 
@@ -67,7 +73,15 @@ Coverage uses the agreed 2026-08-17 literature cutoff. The
 absence of a verified full recipe is not proof that it cannot be ported.
 [ActQuant Eq. 8](https://arxiv.org/html/2605.24011v1) explicitly permits alpha=1
 for action-only architectures. The current OFT-only AMF/NLL configuration must not
-be mistaken for a universal paper restriction. LiteVLA-Edge's trained compact
+be mistaken for a universal paper restriction. The CogACT bridge checks cover
+FP16/BF16/FP32 KV and both BF16-rounded and direct-FP32 cognition readout, with
+native images, positions, DDIM10, CFG, RNG and action conversion unchanged.
+The independently reconstructed native DDIM path matches saved native actions
+exactly; all bridge gripper decisions match, but continuous-action parity does
+not pass, including within the actually executed H8 prefix (not just the unused
+H16 tail). No diffusion epsilon-loss proxy, policy training, or Dev/Final fitting
+was used. These are floating-runtime diagnostics, not ActQuant quantization results.
+LiteVLA-Edge's trained compact
 policy/GGUF/ROS2 pipeline belongs to deployment coverage, not a new drop-in
 quantizer on these checkpoints. Do not claim all possible backend bindings are
 complete merely because the existing registry has been tested.
