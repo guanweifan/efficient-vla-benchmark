@@ -61,6 +61,7 @@ class TinyChatLinear(nn.Module):
         if bias is not None:
             self.packed.bias.copy_(bias)
         self.in_features, self.out_features = k, n
+        self.stream_runtime = None
 
     @torch.no_grad()
     def forward(self, inputs):
@@ -84,10 +85,15 @@ class TinyChatLinear(nn.Module):
             # GEMM never mixes rows; include this allocation/copy in timing.
             padded = prepared.new_zeros((33, self.in_features))
             padded[:rows].copy_(prepared.reshape(rows, self.in_features))
-            output = self.packed(padded)[:rows].reshape(*inputs.shape[:-1], self.out_features)
+            output = self._execute(padded)[:rows].reshape(*inputs.shape[:-1], self.out_features)
         else:
-            output = self.packed(prepared)
+            output = self._execute(prepared)
         return output.to(inputs.dtype)
+
+    def _execute(self, inputs):
+        if self.stream_runtime is None:
+            return self.packed(inputs)
+        return self.stream_runtime.forward(self.packed, inputs)
 
     def execution_metadata(self):
         return dict(

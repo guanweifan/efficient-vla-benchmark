@@ -26,6 +26,10 @@ These are feasibility primitives, not a selectable quantization algorithm.
   semaphores and can depend on recycled allocator contents. The copy is timed,
   and changed reduction order needs fresh policy validation for affected shapes.
   Longer matrices and the fewer-than-eight-row GEMV path are unchanged.
+  The pinned extension launches on the legacy default CUDA stream and must not
+  be captured directly on a nondefault stream. `tinychat_runtime.py` provides an
+  explicitly supplied, checksummed derivative changing only GEMM/GEMV launch
+  streams; existing engines/environments are not replaced globally.
 - `gptq.py`: full-Hessian, cross-block error compensation, optionally dynamic
   input groups. Group scales follow the author's corrected global-weight rule;
   no activation ordering, RTN fallback or policy-target selection is implied.
@@ -122,3 +126,26 @@ python -m pytest src/efficient_vla_benchmark/model_ops/quantization/tests/test_m
 This is shared execution infrastructure, not a standalone quantization method or
 an author-runtime reproduction. Calibration, temporal scheduling, target selection
 and method admission remain outside these operators.
+
+## Optional fixed-shape DiT graphs
+
+Build the current-stream TinyChat derivative from the same pinned source. It
+retains author arithmetic, includes the MIT notice and targets SM86 explicitly.
+No downloads or installed-package edits occur. Source, derived files, compiled
+binary, compiler and Torch/CUDA versions are recorded and checked at load.
+
+```bash
+python scripts/build_tinychat_stream_runtime.py --source-path "$AWQ_SOURCE" \
+  --nvcc "$CUDA_COMPILER" --output-dir "$STREAM_RUNTIME"
+python -m pytest src/efficient_vla_benchmark/model_ops/quantization/tests/test_stream_graph.py \
+  --runtime-path "$STREAM_RUNTIME"
+```
+
+`model_ops.frozen_graph` owns a per-policy shared scratch pool and one fixed-geometry
+graph per operator. Fresh input/scales are copied on every call, and outputs are
+cloned before scratch reuse. It caches executable graphs, not observations or
+actions. Callers must use deterministic stream-correct operations, clear graphs
+before device/state reload, and reject new geometry rather than accumulate caches.
+Initial capture cost is separate cold-start overhead; all steady-state copies
+and graph launches remain in ordinary replay timing. No policy may inherit Dev
+or timing solely from a successful kernel test.
