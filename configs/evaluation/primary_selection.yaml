@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: 97000232cc636c1d4e6557b7c4004bdd9edc98fdf5e26f3b03d2a66f7cf54d6c
+coverage_summary_sha256: 6f52f9a0d5f055636b3f1e3bc1316df8de9b150f1de7368667000ae27ebc9f2e
 source_compatibility:
 - development_runtime: 6a29dd2884a1266499a0b507088dc4efeb100b12e821dbaca4ffa9c9f5f492e7
   timing_runtime: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
@@ -184,6 +184,10 @@ source_compatibility:
     MotionVQ launch-geometry change, and the independently verified AWQ test-fixture-only mask clarification.
     HoloQ uses only the repaired native-FP32 cohort; QVLA uses only the corrected native-rounding cohort.
     Dependencies/config/artifact/backend metadata are strictly rechecked; actual measured hashes are retained.'
+- development_runtime: 2fea964fb4ad26f77705a92d0d9c7c2435637dff70daff8170d8a4ea4f64decc
+  timing_runtime: a88b7c8154fd9e9915921c5bf8139886a320aa68f736526db6fe1f2b5eff6212
+  reason: 'DA-MPA only: exact scoped source/dependency audit in fusion-r10-measurement-audit.json; changed
+    rotation paths are not imported by DA. Original identities retained.'
 timing_workloads:
   openvla_oft: 01f8a93fc0bd522be3ef1d2dbee981ad1bb53ed9c1bf76b404808060bdedbefe
   cogact: 6c0e509fe062fdc393d7edbf668d29450250b99e9b163a5bad5597796e7420bc
@@ -228,31 +232,35 @@ configurations:
       geometry.
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/da_mpa.yaml
-  status: pending_engineering
+  config: configs/experiments/cogact/da_mpa_fp16_kernel_r90.yaml
+  status: primary
   section: '3.3'
-  scope: DA-PTQ Table4 DA-MPA drift-allocation core only; CSRC excluded. Native FP32 retained DiT blocks;
-    real W4/A8 packed floating GEMM.
-  timing_record: quant-p3-runtime-cogact-modular-r1-da_mpa
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: b4f0b2e364c74b137287ca17887fce1487051f76aa8f8c62aab9478170fcadce
-  development_experiment_id: 237a0364cd1571e18528961afe00fca0028809cd61926b59035fe4ea9ffef217
-  reason: 'Re-audit required: validate drift-allocation fidelity and a performant W4A8 runtime; the separately
-    scoped DA-MPA component does not implement full DA-PTQ CSRC.'
+  scope: DA-PTQ independent DA-MPA drift-allocation core only, no CSRC. 224 language and 2 ranked DiT
+    projections use packed W4/A8 with FP16 GEMM; retained DiT remains native FP32.
+  timing_record: quant-p4-runtime-cogact-holo-r90-r1-da-fp16-r90
+  final_runtime_source_sha256: e569f4343318fd8f56cd7c221657e7be667600a56a23a7a8a1fd7d204e84128c
+  development_summary_sha256: 39eb9cbe69ba6df8117b24de4db7dea2a34e41de1daee588f8beeb6256e28031
+  development_experiment_id: 91a9a887c80b751470decc536edc5355bad1b5ddb8d61214cb095b6e80bf9285
+  reason: Retaining nine ranked eligible DiT blocks is faster than retention10/30 while preserving 182/200
+    Dev success. One least-sensitive eligible block remains quantized; the drift allocation is active.
   search:
-    complete: false
-    stop: latency_plateau
-    reason: Retain30/15 give 187/181 of 200, both eligible; more quantized blocks slow execution (26.532
-      to 27.288 ms/control). Keep the reference 30% allocation.
+    complete: true
+    stop: mechanism_limit
+    reason: Retaining nine ranked eligible DiT blocks is faster than retention10/30 while preserving 182/200
+      Dev success. One least-sensitive eligible block remains quantized; the drift allocation is active.
+    limitation: The speedward retention boundary leaves exactly one eligible DiT block quantized. Further
+      retention disables the action-head allocation; lower retention10/30 was measured slower. Calibration
+      weights do not reduce online operator count.
     evidence:
-    - development_summary_sha256: b4f0b2e364c74b137287ca17887fce1487051f76aa8f8c62aab9478170fcadce
-      development_experiment_id: 237a0364cd1571e18528961afe00fca0028809cd61926b59035fe4ea9ffef217
-      timing_record: quant-p3-runtime-cogact-modular-r1-da_mpa
-    - development_summary_sha256: fe651aa4c5619b3cc806546c1d34cc02faadcf0e930b280cf2eed7435ba7a6c9
-      development_experiment_id: c702960d271373fb721066e2a51ee39940bf2ee03f4165940d652a5014b37885
-      timing_record: quant-p3-runtime-cogact-modular-r1-da_mpa_r15
-    tie_reason: Retain30/15 give 187/181 of 200, both eligible; more quantized blocks slow execution (26.532
-      to 27.288 ms/control). Keep the reference 30% allocation.
+    - development_summary_sha256: 15f1f67b80225e2ddab70dd9155449a7857e0efff8dfc867c0158a97ff4619a4
+      development_experiment_id: 9ce8d8a6dca25bda0a7987f03533a0556d10d68a94c29abedb74c68775a5dc97
+      timing_record: quant-p4-runtime-cogact-fusion-r10-r1-da-fp16-r10
+    - development_summary_sha256: 91d04c27cb6bc30e3d9fad4cbf63ab1539a029e7ee016c081ba3bcc879a78d55
+      development_experiment_id: 3162c5ff18d6cad78d6e10e30c2ef012ade487e70fc8c6b22792096a37566f7c
+      timing_record: quant-p4-runtime-cogact-fusion-r10-r1-da-fp16-r30
+    - development_summary_sha256: 39eb9cbe69ba6df8117b24de4db7dea2a34e41de1daee588f8beeb6256e28031
+      development_experiment_id: 91a9a887c80b751470decc536edc5355bad1b5ddb8d61214cb095b6e80bf9285
+      timing_record: quant-p4-runtime-cogact-holo-r90-r1-da-fp16-r90
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   config: configs/experiments/cogact/dyq_vla.yaml
@@ -309,34 +317,40 @@ configurations:
       layout was optimized without changing scale axes or precision.
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/holoq_b16.yaml
-  status: pending_engineering
+  config: configs/experiments/cogact/holoq_fp16_kernel_b16.yaml
+  status: primary
   section: '3.3'
-  scope: 'Official-code W4A4 variant: LLM block GPTQ and DiT RTN with composite rotations. Packed BF16
-    LLM tiles; explicit per-call FP32 DiT decode/native GEMM, no persistent reconstructed weights. Not
-    the differing paper-v3 activation-axis variant.'
-  timing_record: quant-p3-runtime-cogact-holoq-b16-native-fp32-r1-holoq_b16
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: 40223500d1f3df9a9a58bbdbf9ccc625b5af7e36dcf065cc25efffe835ae160f
-  development_experiment_id: 6d9c2e73ffcd0f4bcdbedd8b5aeea40417ba7cc5a0e79fccde67dea22a13a7d9
-  reason: 'Re-audit required: transient full FP32 weight decoding at every DiT call is a parity workaround,
-    not a mature acceleration implementation; preserve official-code versus paper scope.'
+  scope: HoloQ pinned official-code variant, not paper-v3 tokenwise LLM quantization:224 language plus48
+    DiT W4/A4 projections, composite rotations and per-step scales; packed FP16 GEMM with fused preparation/permutation,
+    not integer MMA.
+  timing_record: quant-p4-runtime-cogact-holo-perm-r3-holo-perm-b16
+  final_runtime_source_sha256: 3d4ef69ccfc2660a82cdd900e0323a9e38830fe270660e1ca535bf9e3e43f567
+  development_summary_sha256: be0a1bcf62aaffd9045903767d6a3c796ff1284c9a5ce4960b8bafea5ee4e426
+  development_experiment_id: ad5734246636cdea486d0f515a7a10293f4e77b3bca9f437c4e6399ad553b85f
+  reason: Both fused-permutation candidates meet the Dev target. Their0.22% latency gap is a tie; block16
+    has185/200 versus182/200 and lower peak memory. Preserve the measured slowdown as a disclosed memory/latency
+    tradeoff, not a full-paper speed claim.
   search:
-    complete: false
-    stop: accuracy_boundary
-    reason: 'Block64/16 give 172/187 of 200. Select block16: it meets the 177/200 target while block64
-      does not; valid full-cost latencies are similar and both slower than native. Ordinary policy arithmetic,
-      reset and fresh reload match the quantized reference exactly.'
+    complete: true
+    stop: latency_plateau
+    reason: Both fused-permutation candidates meet the Dev target. Their0.22% latency gap is a tie; block16
+      has185/200 versus182/200 and lower peak memory. Preserve the measured slowdown as a disclosed memory/latency
+      tradeoff, not a full-paper speed claim.
+    limitation: Block64 to16 changes full-policy latency by0.22%. Full FP32 weight decoding, adjacent
+      rotation/quantization/output passes, input gather and repeated step-scale views were addressed and
+      revalidated. Residual profiler shows224 LLM packed GEMMs,480 DiT packed GEMMs and704 input preparations;
+      per-weight composite rotations differ, so sharing Q/K/V prepared inputs would change the mechanism.
+      Channelwise activation scales do not directly permit integer MMA. Whole-model graph/compiler redesign
+      remains untested, so this is not a global-optimality or intrinsic GPU-impossibility claim.
+    tie_reason: Block64 is nominally0.22% faster, within timing variability. Prefer block16 for higher
+      Dev success and lower measured peak memory under the existing tie rule.
     evidence:
-    - development_summary_sha256: cd2f793014c7bcc8e35b084a2ae54c028da24862557e97421a46f6baaee69009
-      development_experiment_id: c62edad0a72daba619ebc1d7660db296bde3bce44b118ddb4e212d245f4d90bf
-      timing_record: quant-p3-runtime-cogact-holoq-native-fp32-r1-holoq
-    - development_summary_sha256: 40223500d1f3df9a9a58bbdbf9ccc625b5af7e36dcf065cc25efffe835ae160f
-      development_experiment_id: 6d9c2e73ffcd0f4bcdbedd8b5aeea40417ba7cc5a0e79fccde67dea22a13a7d9
-      timing_record: quant-p3-runtime-cogact-holoq-b16-native-fp32-r1-holoq_b16
-    tie_reason: 'Block64/16 give 172/187 of 200. Select block16: it meets the 177/200 target while block64
-      does not; valid full-cost latencies are similar and both slower than native. Ordinary policy arithmetic,
-      reset and fresh reload match the quantized reference exactly.'
+    - development_summary_sha256: be0a1bcf62aaffd9045903767d6a3c796ff1284c9a5ce4960b8bafea5ee4e426
+      development_experiment_id: ad5734246636cdea486d0f515a7a10293f4e77b3bca9f437c4e6399ad553b85f
+      timing_record: quant-p4-runtime-cogact-holo-perm-r3-holo-perm-b16
+    - development_summary_sha256: be0a1bcf62aaffd9045903767d6a3c796ff1284c9a5ce4960b8bafea5ee4e426
+      development_experiment_id: 6c9fb8a1bc250b82cc4577f36136a24b8893962521676f9230fac173f5d02526
+      timing_record: quant-p4-runtime-cogact-holo-perm-r3-holo-perm-b64
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   config: configs/experiments/cogact/motion_vq_t1.yaml
@@ -376,32 +390,36 @@ configurations:
       optimization.
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/quantvla.yaml
-  status: pending_engineering
+  config: configs/experiments/cogact/quantvla_fp16_kernel.yaml
+  status: primary
   section: '3.3'
-  scope: Calibrated DuQuant plus ATM/OHB, W4/A8 storage and tile floating GEMM; native FP32 DiT and all
-    transforms retained.
-  timing_record: quant-p3-runtime-cogact-existing-r1-quantvla
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: b68cc529598d4c4652c93df33b1b87269ed7fd124d7864e67eeb957cc87f5e48
-  development_experiment_id: 75209ba4c175a17b43068bdb982dd01d7117cbb74c002db95090b3c6305f1de3
-  reason: 'Re-audit required: published and released-code activation axes differ; current packed floating
-    GEMM and repeated online transforms need a viable optimized runtime, especially on the native FP32
-    DiT.'
+  scope: 'QuantVLA released-code CogACT port: 224 language and 24 DiT-MLP W4/A8 projections, block rotations,
+    ATM/OHB on 12 native attention modules. Packed FP16 GEMM, not integer MMA.'
+  timing_record: quant-p4-runtime-cogact-fusion-r10-r1-quantvla-fusion-b64
+  final_runtime_source_sha256: a88b7c8154fd9e9915921c5bf8139886a320aa68f736526db6fe1f2b5eff6212
+  development_summary_sha256: 15f1f67b80225e2ddab70dd9155449a7857e0efff8dfc867c0158a97ff4619a4
+  development_experiment_id: 8db90b057db52eaeeacc1c0612e0182b2b63a0ec333f5d532e00dd0f14c9a32f
+  reason: Both block16 and block64 achieve 180/200. Their sub-1% full-cost latency gap is treated as a
+    timing tie, not a significant advantage. Prefer the reference-closer block64 under the existing tie
+    rule; retain block16 only as search evidence.
   search:
-    complete: false
+    complete: true
     stop: latency_plateau
-    reason: Block64/16 give 181/178 of 200 with 34.632/34.880 ms/control, a latency plateau; retain reference
-      block64 with higher success. DiT profiling and native-GEMM diagnostic found no speed recovery.
+    reason: Both block16 and block64 achieve 180/200. Their sub-1% full-cost latency gap is treated as
+      a timing tie, not a significant advantage. Prefer the reference-closer block64 under the existing
+      tie rule; retain block16 only as search evidence.
+    limitation: A fourfold rotation-block reduction gives less than 1% whole-policy latency difference.
+      Validated adjacent-operation fusion removes material avoidable overhead; remaining transforms, packing
+      and native FP32 DiT boundaries stay timed. No core component is disabled.
     evidence:
-    - development_summary_sha256: b68cc529598d4c4652c93df33b1b87269ed7fd124d7864e67eeb957cc87f5e48
-      development_experiment_id: 75209ba4c175a17b43068bdb982dd01d7117cbb74c002db95090b3c6305f1de3
-      timing_record: quant-p3-runtime-cogact-existing-r1-quantvla
-    - development_summary_sha256: b68cc529598d4c4652c93df33b1b87269ed7fd124d7864e67eeb957cc87f5e48
-      development_experiment_id: 1572d5750b6001fddfc1327f3a6fe91c041b544aaf3c52ef8e902b969e97ac40
-      timing_record: quant-p3-runtime-cogact-existing-r1-quantvla_b16
-    tie_reason: Block64/16 give 181/178 of 200 with 34.632/34.880 ms/control, a latency plateau; retain
-      reference block64 with higher success. DiT profiling and native-GEMM diagnostic found no speed recovery.
+    - development_summary_sha256: 15f1f67b80225e2ddab70dd9155449a7857e0efff8dfc867c0158a97ff4619a4
+      development_experiment_id: 5d2e0fc918d4e53ac279f8c91068b51cbc2cdab0a2fab37fdd265c86d28b90f1
+      timing_record: quant-p4-runtime-cogact-fusion-r10-r1-quantvla-fusion-b16
+    - development_summary_sha256: 15f1f67b80225e2ddab70dd9155449a7857e0efff8dfc867c0158a97ff4619a4
+      development_experiment_id: 8db90b057db52eaeeacc1c0612e0182b2b63a0ec333f5d532e00dd0f14c9a32f
+      timing_record: quant-p4-runtime-cogact-fusion-r10-r1-quantvla-fusion-b64
+    tie_reason: Block16 is nominally faster by less than1%, within accepted timing variability; both score180/200.
+      Select reference-closer block64 rather than treating this gap as a reliable speed advantage.
 - config: configs/experiments/cogact/efficient_vla_layer_prune04.yaml
   status: primary
   section: '3.3'
@@ -1930,33 +1948,13 @@ configurations:
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   config: configs/experiments/openvla_oft/qvla_b15p5.yaml
-  status: pending_engineering
+  status: pending_core
   section: '3.3'
-  scope: Official-code input-Hessian joint allocation, not paper action intervention. Channel-average
-    budget is not model bits/weight; packed floating GEMM.
-  timing_record: quant-p3-runtime-openvla_oft-new-r1-qvla_b15p5
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: b68cc529598d4c4652c93df33b1b87269ed7fd124d7864e67eeb957cc87f5e48
-  development_experiment_id: 1d33b5877ec541a97ba19a9444537d5cb7b0345b02832e23e7b616ed29bc58e9
-  reason: 'Re-audit required: current public-code Hessian/absolute-cost allocator differs from the paper
-    action-intervention/marginal allocator; near-native channel budget and fragmented runtime do not close
-    the engineering search.'
-  search:
-    complete: false
-    stop: latency_plateau
-    reason: 'Repaired native-dtype QVLA: budgets 15.5/15 give 196/197 of 200, but 15 is slower (33.523
-      versus 30.781 ms/control). Retain active joint 15.5; lower-budget smoke collapse is diagnostic,
-      not reused old Dev evidence.'
-    evidence:
-    - development_summary_sha256: b68cc529598d4c4652c93df33b1b87269ed7fd124d7864e67eeb957cc87f5e48
-      development_experiment_id: 1d33b5877ec541a97ba19a9444537d5cb7b0345b02832e23e7b616ed29bc58e9
-      timing_record: quant-p3-runtime-openvla_oft-new-r1-qvla_b15p5
-    - development_summary_sha256: b0e23c42450db14a17a10313f7bae18522f371ca89b727b653438b5e3da32746
-      development_experiment_id: 71087af486237e850de2b6eb5ad827e197b441e47f626e7d14fc422913c07391
-      timing_record: quant-p3-runtime-openvla_oft-qvla-b15-r1-qvla_b15
-    tie_reason: 'Repaired native-dtype QVLA: budgets 15.5/15 give 196/197 of 200, but 15 is slower (33.523
-      versus 30.781 ms/control). Retain active joint 15.5; lower-budget smoke collapse is diagnostic,
-      not reused old Dev evidence.'
+  scope: QVLA official-code proxy under core-definition review; not admitted as the full paper mechanism.
+  reason: Exact official allocator/Hessian-proxy parity does not reproduce the paper action-space intervention
+    objective. Full schema5 recalibration still yields nearly complete early-projection deletion. Core
+    weighting/ordering definitions remain unresolved; old diagnostic outcomes are not a certified paper-method
+    failure.
 - config: configs/experiments/openvla_oft/efficient_vla_layer_prune03.yaml
   status: primary
   section: '3.3'
@@ -2868,27 +2866,3 @@ auxiliary_configurations:
   development_summary_sha256: 5759fbb67384510a99adda4c2c13265b2fe2a9bb6656fabf3a01bf4c8138538e
   development_experiment_id: cafc1f861659729e267488d2e62539245572e80056ea6a4ae0a1c5bc6f17ad79
   timing_record: scoped-action-zero90-thermal-replacement-r1-40-g1-cogact--action_zero_t090
-- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  config: configs/experiments/openvla_oft/qvla_quant_only_b8.yaml
-  status: auxiliary
-  section: '3.3'
-  scope: 'Quantization-only diagnostic: excludes pruning and 2-bit choices; NOT the full QVLA joint core.'
-  timing_record: quant-p3-runtime-openvla_oft-new-r1-qvla_quant_only_b8
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: fd9ccc3069c14f810939dfcdd0f345137362e5e1d61b1b849146ab78a2133292
-  development_experiment_id: f6317b675e16d290bdb93c0e9c9bba8fcf0e007b3563c9f22ff4093d1623b879
-  reason: Useful isolation of joint pruning/low-bit degradation; never a second primary or an automatic
-    Final candidate.
-- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  config: configs/experiments/openvla_oft/qvla_quant_only_b4.yaml
-  status: auxiliary
-  section: '3.3'
-  scope: 'Quantization-only diagnostic: excludes pruning and 2-bit choices; NOT the full QVLA joint core.'
-  timing_record: quant-p3-runtime-openvla_oft-new-r1-qvla_quant_only_b4
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: b59f1427810276c668dfd8ca3a1661ea68cb3d8a871d5a4d2d68b5c5a4895115
-  development_experiment_id: 729c0f06d1c037ebddada2a282a3a2a0eed799e6caa39b72bacea824409755f7
-  reason: Useful isolation of joint pruning/low-bit degradation; never a second primary or an automatic
-    Final candidate.
