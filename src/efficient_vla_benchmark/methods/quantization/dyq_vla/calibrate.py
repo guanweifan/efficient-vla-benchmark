@@ -10,20 +10,22 @@ import torch
 from efficient_vla_benchmark.core.provenance import digest_file, source_metadata, stable_hash
 
 from .population import manifest, samples
-from .runtime import DynamicW4Linear
+from .runtime import execution_runtime, make_linear
 from .target import replace, targets
 from .thresholds import fit_thresholds
 
 
 @torch.inference_mode()
-def calibrate(backend, config, population_root, output, prefix):
+def calibrate(backend, config, population_root, output, prefix, runtime_path=None):
     if backend.method is not None or output.exists():
         raise ValueError("DyQ needs a native model and new artifact output")
     backend_id = backend.metadata()["backend"]
     population = manifest(population_root, backend_id)
+    runtime = execution_runtime(config, runtime_path)
     output.mkdir(parents=True)
     start = time.monotonic()
     selected = targets(backend.model, prefix)
+    target_names = list(selected)
     maxima = {}
     handles = []
 
@@ -43,8 +45,9 @@ def calibrate(backend, config, population_root, output, prefix):
 
     records = []
     try:
-        for name, module in selected.items():
-            handles.append(module.register_forward_pre_hook(capture(name)))
+        if runtime is None:
+            for name, module in selected.items():
+                handles.append(module.register_forward_pre_hook(capture(name)))
         for context, obs, identity in samples(population_root, backend_id, config):
             backend.reset(context)
             seed = context.seed + int(identity["step"]) * 1009
@@ -52,7 +55,7 @@ def calibrate(backend, config, population_root, output, prefix):
             torch.cuda.manual_seed_all(seed)
             action = backend.predict_chunk(obs)
             records.append(dict(identity=identity, native=np.asarray(action).copy(), seed=seed))
-        if set(maxima) != set(selected) or not records:
+        if (runtime is None and set(maxima) != set(selected)) or not records:
             raise ValueError("Incomplete DyQ native activation coverage")
     finally:
         for h in handles:
@@ -65,7 +68,7 @@ def calibrate(backend, config, population_root, output, prefix):
         weights[name] = dict(
             codes=q.cpu(),
             weight_scale=scale.cpu(),
-            activation_amax=maxima[name].cpu(),
+            activation_amax=maxima[name].cpu() if runtime is None else None,
             native_dtype=str(module.weight.dtype),
             bias=None if module.bias is None else module.bias.detach().cpu(),
         )
@@ -73,7 +76,7 @@ def calibrate(backend, config, population_root, output, prefix):
     ops = []
     for name, module in selected.items():
         device = module.weight.device
-        op = DynamicW4Linear(weights[name])
+        op = make_linear(weights[name], config, runtime)
         module.cpu()
         op.to(device)
         replace(backend.model, name, op)
@@ -108,7 +111,7 @@ def calibrate(backend, config, population_root, output, prefix):
     thresholds, bins = fit_thresholds(evidence, config)
     identities = [r["identity"] for r in records]
     m = dict(
-        schema_version=2,
+        schema_version=3 if runtime is not None else 2,
         algorithm="dyq_vla",
         complete=True,
         backend=backend_id,
@@ -118,11 +121,7 @@ def calibrate(backend, config, population_root, output, prefix):
         population_sha256=population["sha256"],
         sample_identities=identities,
         sample_identities_sha256=stable_hash(identities),
-        targets=[
-            name
-            for name, module in backend.model.named_modules()
-            if isinstance(module, DynamicW4Linear)
-        ],
+        targets=target_names,
         error_records=evidence,
         threshold_bins=bins,
         thresholds=thresholds,
@@ -134,5 +133,8 @@ def calibrate(backend, config, population_root, output, prefix):
         source=source_metadata(),
         wall_seconds=time.monotonic() - start,
     )
+    if runtime is not None:
+        m["execution_runtime"] = runtime.metadata()
+        m["execution_contract"] = ops[0].execution_metadata()
     (output / "manifest.json").write_text(json.dumps(m, indent=2))
     return m

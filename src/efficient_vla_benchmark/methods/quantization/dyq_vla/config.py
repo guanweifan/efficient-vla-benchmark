@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass, fields
 
 @dataclass(frozen=True)
 class DyQConfig:
+    runtime: str = "native_float"
     frames_per_trajectory: int = 8
     activation_percentile: float = 99.9
     activation_tokens: int = 256
@@ -23,6 +24,8 @@ class DyQConfig:
         if set(parameters) - {f.name for f in fields(cls)}:
             raise ValueError("Unknown DyQ parameter")
         c = cls(**parameters)
+        if c.runtime not in ("native_float", "mixed_integer"):
+            raise ValueError("Unsupported DyQ execution runtime")
         for name in (
             "frames_per_trajectory",
             "activation_tokens",
@@ -55,4 +58,9 @@ class DyQConfig:
         return c
 
     def calibration_parameters(self):
-        return asdict(self)
+        parameters = asdict(self)
+        # Preserve the exact historical schema-2 identity; a new runtime is
+        # explicitly schema-3 and may not reuse its activation thresholds.
+        if self.runtime == "native_float":
+            parameters.pop("runtime")
+        return parameters

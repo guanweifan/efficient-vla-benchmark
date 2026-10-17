@@ -10,7 +10,7 @@ from efficient_vla_benchmark.core.provenance import stable_hash
 
 from .artifact import read_manifest
 from .dispatcher import DyQDispatcher
-from .runtime import DynamicW4Linear
+from .runtime import execution_runtime, make_linear
 from .target import replace, targets
 
 
@@ -19,8 +19,8 @@ class DyQ(InferenceMethod):
     reversible = False
     requires_control_history = True
 
-    def __init__(self, backend, config, root, prefix):
-        m = read_manifest(root, config)
+    def __init__(self, backend, config, root, prefix, runtime_path=None):
+        m = read_manifest(root, config, runtime_path)
         if backend.method is not None or backend.metadata()["precision"] != "bfloat16":
             raise ValueError("DyQ needs a fresh native BF16 model")
         if (m["checkpoint_sha256"], m["backend"]) != (
@@ -29,6 +29,7 @@ class DyQ(InferenceMethod):
         ):
             raise ValueError("DyQ checkpoint/backend mismatch")
         self.dispatcher = DyQDispatcher(config, m["thresholds"])
+        self.execution_runtime = execution_runtime(config, runtime_path)
         native = targets(backend.model, prefix)
         entries = torch.load(root / "weights.pt", map_location="cpu", weights_only=True)
         if set(entries) != set(native) or set(m["targets"]) != set(native):
@@ -44,7 +45,7 @@ class DyQ(InferenceMethod):
                 module.bias is not None and not torch.equal(e["bias"], module.bias.detach().cpu())
             ):
                 raise ValueError("DyQ bias mismatch")
-            prepared[name] = DynamicW4Linear(e)
+            prepared[name] = make_linear(e, config, self.execution_runtime)
         for name, op in prepared.items():
             native[name].cpu()
             replace(backend.model, name, op.to(backend.device))
@@ -86,7 +87,7 @@ class DyQ(InferenceMethod):
         return {**self.dispatcher.metadata(), "activation_bit_queries": dict(self.query_bits)}
 
     def metadata(self):
-        return dict(
+        result = dict(
             artifact_sha256=self.identity,
             scope="language_decoder_224_projections",
             variant="paper_temporal_core_packed_W4_dynamic_activation",
@@ -101,3 +102,12 @@ class DyQ(InferenceMethod):
             threshold_estimator="first conditional-mean-error crossing in equal-count bins",
             requires_control_history=True,
         )
+        if self.execution_runtime is not None:
+            result.update(
+                variant="paper_v2_temporal_core_tokenwise_mixed_integer",
+                runtime="single_bank_W4_mixed_INT4_INT8_BF16",
+                integer_mma=True,
+                execution_contract=self.targets[0].execution_metadata(),
+                exclusions="author register-fused A2 and zero-copy asynchronous pipeline",
+            )
+        return result

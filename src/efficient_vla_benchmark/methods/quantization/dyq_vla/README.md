@@ -1,7 +1,10 @@
 # DyQ-VLA — temporal core on native H8
 
 Reference: [paper v2](https://arxiv.org/abs/2603.07904v2).
-No official implementation was available at this audit. The port implements
+No implementation of the selected v2 controller has been verified. The
+[October 2026 v3 release](https://arxiv.org/abs/2603.07904v3) links public code,
+but changes the controller and falls after the agreed literature cutoff; it is
+not silently substituted for this scope. The port implements
 fixed W4 language projections, dynamic A2/A4/A8/native activation precision,
 motion-fineness/angular-jerk fusion, independently calibrated error-bound
 thresholds, and the exact stateful Algorithm 1 counter. A rising pending
@@ -40,3 +43,25 @@ One canonical implementation serves both bindings. The independent artifact
 schema rejects the old isolated-frame proxy and fake runtime. Fresh native
 models are required to undo irreversible quantization. Runtime registration
 does not imply completed calibration, Dev-200, timing, or owner-approved Final.
+
+## Explicit mixed-integer runtime candidate
+
+`dyq_vla_mixed_integer` keeps the v2 temporal dispatcher, target modules, H8 and
+independent population, but explicitly selects dynamic **per-token symmetric**
+activation quantization. A2 uses [-1, 1], A4 [-7, 7], A8 [-127, 127], nearest-even
+rounding and an FP32 amax floor of 1e-5. Per-output W4 scales are BF16-rounded;
+the A16 branch retains native BF16 activations. These quantizer details remain
+disclosed engineering choices, not author-v2-code parity.
+
+One immutable W4 bank serves all four branches: packed A2 is expanded to INT4 by
+a separate timed kernel, A4 uses INT4 MMA directly, A8 uses INT8 MMA with register
+weight expansion, and A16 uses tile-dequantized BF16 GEMM. No full decoded weight
+bank is cached. The author's register-fused A2 and asynchronous zero-copy pipeline
+are not implemented. The separately built [shared runtime](../../../model_ops/quantization/README.md#optional-mixed-precision-runtime-build)
+is supplied via `--runtime-path`, checked and recorded; no private path is embedded.
+
+The tokenwise quantizer and changed arithmetic require **new schema-3 calibration**
+on the same frozen independent native population. Old channelwise schema-2
+thresholds, Dev success and latency cannot be reused. Calibration records the exact
+binary/source identity; runtime substitution is rejected. No policy training or
+additional trajectory collection is implied. Registration alone is not admission.

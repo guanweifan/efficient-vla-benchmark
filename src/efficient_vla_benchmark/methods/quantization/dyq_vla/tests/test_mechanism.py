@@ -1,4 +1,5 @@
 import itertools
+import json
 
 import numpy as np
 import pytest
@@ -71,9 +72,67 @@ def test_configuration_bounds():
         {"accuracy_budget": float("nan")},
         {"frames_per_trajectory": 1000},
         {"unexpected": 1},
+        {"runtime": "fake"},
     ):
         with pytest.raises(ValueError):
             DyQConfig.parse(values)
+
+
+def test_explicit_runtime_preserves_legacy_identity_and_requires_new_calibration(
+    tmp_path, monkeypatch
+):
+    from efficient_vla_benchmark.core.provenance import digest_file, stable_hash
+    from efficient_vla_benchmark.methods.quantization.dyq_vla.artifact import read_manifest
+    from efficient_vla_benchmark.model_ops.quantization import mixed_runtime
+
+    legacy = DyQConfig()
+    mixed = DyQConfig.parse({"runtime": "mixed_integer"})
+    assert "runtime" not in legacy.calibration_parameters()
+    assert mixed.calibration_parameters()["runtime"] == "mixed_integer"
+    weights = tmp_path / "weights.pt"
+    weights.write_bytes(b"fixture only")
+    samples = [{"flat": i, "step": 0} for i in range(4)]
+    identity = {"engine": "checked test runtime", "files": {"binary": "hash"}}
+    monkeypatch.setattr(mixed_runtime, "read_runtime", lambda _: identity)
+    manifest = dict(
+        schema_version=3,
+        algorithm="dyq_vla",
+        complete=True,
+        config=mixed.calibration_parameters(),
+        files={"weights.pt": digest_file(weights)},
+        population_kind="independent_native_quantization_population",
+        sample_identities=samples,
+        sample_identities_sha256=stable_hash(samples),
+        error_records=[{} for _ in samples],
+        execution_runtime=identity,
+    )
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps(manifest))
+    assert read_manifest(tmp_path, mixed, tmp_path) == manifest
+    with pytest.raises(ValueError, match="not admitted"):
+        read_manifest(tmp_path, legacy)
+    manifest["execution_runtime"] = {"engine": "other runtime"}
+    path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match="exact calibrated"):
+        read_manifest(tmp_path, mixed, tmp_path)
+    manifest.update(schema_version=2, config=legacy.calibration_parameters())
+    manifest.pop("execution_runtime")
+    path.write_text(json.dumps(manifest))
+    assert read_manifest(tmp_path, legacy) == manifest
+    with pytest.raises(ValueError, match="not admitted"):
+        read_manifest(tmp_path, mixed, tmp_path)
+
+
+def test_mixed_runtime_rejects_non_native_boundary_before_conversion():
+    from efficient_vla_benchmark.methods.quantization.dyq_vla.runtime import make_linear
+
+    config = DyQConfig.parse({"runtime": "mixed_integer"})
+    for entry in (
+        {"native_dtype": "torch.float32", "bias": None},
+        {"native_dtype": "torch.bfloat16", "bias": torch.ones(8)},
+    ):
+        with pytest.raises(ValueError, match="bias-free BF16"):
+            make_linear(entry, config, None)
 
 
 @pytest.mark.gpu

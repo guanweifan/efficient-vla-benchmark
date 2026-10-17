@@ -21,3 +21,21 @@ class DynamicW4Linear(PackedLinear):
             raise ValueError("Invalid DyQ activation precision")
         self.activation_bits = bits
         self.activation_qmin = -(1 << (min(bits, 8) - 1))
+
+
+def execution_runtime(config, path):
+    if config.runtime == "native_float":
+        return None
+    from efficient_vla_benchmark.model_ops.quantization.mixed_runtime import MixedW4Runtime
+
+    return MixedW4Runtime(path)
+
+
+def make_linear(entry, config, runtime):
+    if config.runtime == "native_float":
+        return DynamicW4Linear(entry)
+    from efficient_vla_benchmark.model_ops.quantization.mixed_linear import MixedPrecisionW4Linear
+
+    if entry["native_dtype"] != "torch.bfloat16" or entry["bias"] is not None:
+        raise ValueError("DyQ mixed integer runtime requires bias-free BF16 decoder projections")
+    return MixedPrecisionW4Linear(entry["codes"], entry["weight_scale"], runtime=runtime)
