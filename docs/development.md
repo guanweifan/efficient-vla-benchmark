@@ -38,7 +38,7 @@ to the primary result table; Dev selection and valid timing are separate gates.
 | DyQ-VLA | Independently frozen native successful trajectories, error-bound fitting and v2 temporal counter. Native-float schema 2 or explicitly selected mixed-integer schema 3 with fresh thresholds. Quantizer axes/threshold estimator are disclosed choices; author register-fused A2 and async pipeline are excluded. |
 | EaqVLA | Independent modular weight-GPTQ core: vision W4, language W8, native projector/action head. The unspecified activation quantizer is excluded, not invented. |
 | DA-MPA | DA-PTQ's separately evaluated drift-allocation core. Real demonstration chunks and gradient probes; no optimizer updates. CSRC is excluded because the published objective does not define a reproducible weighting recipe. |
-| MotionVQ | Independent dual-codebook/motion-router LLM core, packed centroid-gather GPU execution. Both banks and all routing costs count; full-model export and ASIC-specific reuse are excluded. |
+| MotionVQ | Diagnostic dual-codebook/motion-router component, packed centroid-gather GPU execution. It omits the defining spatial/temporal multiplication reuse and is excluded from full-VQVLA comparisons; these omissions are not merely a different hardware platform. |
 
 Read each method README for its exact contribution boundary. A registered scoped
 core is not a full-paper reproduction. Artifact calibration and kernel feasibility
@@ -51,12 +51,26 @@ Deferred quantization scopes must not be replaced with convenient proxies:
 
 | Scope | Concrete missing condition |
 |---|---|
+| MABR | The authors/workshop confirm this in-cutoff work, but the complete primary PDF/equations remain inaccessible. A third-party summary is insufficient for a faithful implementation; this is a source hold, not an incompatibility claim. |
+| Zero-Shot Quantization via Trajectory Curvature and Attention Guidance | Its joint flow-velocity and action-to-image/text-attention objectives are absent together from both native backends. Do not substitute epsilon loss or cognition attention under the same name. Full-PDF review also remains pending. |
+| ActQuant on CogACT | An unimplemented second binding, not an incompatible algorithm: paper Eq. 8 permits action-only Fisher. Native diffusion action-loss differentiation, HSIC/Fisher calibration and a validated GGUF cognition/runtime bridge remain required; existing OFT evidence cannot be transferred. |
 | HBVLA | Verifiable bootstrap/binarization and local reconstruction details for its gradient-guided binary-frequency allocation; a Haar transform alone is not the core. |
 | Full DA-PTQ | CSRC's weighted covariance objective lacks the required weight/regularization recipe; whitening/coloring is not Eq. 7. DA-MPA is separately scoped above. |
 | Mix-QVLA | Its defining teacher-forced action-token likelihood is absent from native OFT L1 and CogACT diffusion heads; an L1/epsilon proxy changes that objective. |
 | SQAP-VLA | Unresolved tensorwise versus channelwise activation quantization; owner-requested deferral remains in force. |
 | SQIL / BitVLA | Quantization-aware policy training, outside this no-training batch. |
 | QuantWAM and new compact backbones | Require an additional baseline or trained policy, outside the two-backend scope. |
+
+Coverage uses the agreed 2026-08-17 literature cutoff. The
+[MABR workshop listing](https://adaptfm.gitlab.io/accepted-papers) and
+[author publication list](https://vds.sogang.ac.kr/?p=2234) confirm its July release;
+absence of a verified full recipe is not proof that it cannot be ported.
+[ActQuant Eq. 8](https://arxiv.org/html/2605.24011v1) explicitly permits alpha=1
+for action-only architectures. The current OFT-only AMF/NLL configuration must not
+be mistaken for a universal paper restriction. LiteVLA-Edge's trained compact
+policy/GGUF/ROS2 pipeline belongs to deployment coverage, not a new drop-in
+quantizer on these checkpoints. Do not claim all possible backend bindings are
+complete merely because the existing registry has been tested.
 
 Negative GPU latency is valid evidence only after numerical and engineering checks.
 Packed tile-dequantized floating GEMM, integer-MMA execution and a separate GGUF

@@ -22,8 +22,13 @@ banks remain resident, and a Triton kernel decodes 6/8-bit indices and gathers
 centroids inside each GEMM tile. No full BF16 weight cache or hidden fallback.
 Codebook bytes, both index banks and all routing/gather costs count toward runtime.
 The kernel uses native floating matrix multiplication; it does not claim the
-ASIC's spatial centroid merging or temporal centroid multiplication reuse.
-Its speed is therefore a GPU MotionVQ-core measurement, not VQVLA hardware speed.
+paper's spatial input aggregation or temporal cached-product reuse across GEMM
+columns. Temporal reuse here is not cross-frame robot-action caching. Both are
+defining multiplication-reduction mechanisms, not simply accelerator-specific
+implementation details. This registered component remains diagnostic and excluded
+from the full-VQVLA comparison; its speed cannot establish faithful full-method
+GPU performance. The paper's own GPU slowdown does not validate this incomplete
+component or prove a faithful GPU reuse implementation impossible.
 
 Prefill-size-dependent launch tiles preserve the original K=32 reduction and
 match the compact kernel exactly in GPU regression tests. Six-bit packed indices

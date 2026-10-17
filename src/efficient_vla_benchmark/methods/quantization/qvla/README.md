@@ -48,3 +48,19 @@ Legacy handover gates used a different allocator/covariance normalization and
 are rejected for formal evaluation. Conversion is irreversible and native reload
 is mandatory before another method. Saved sensitivities can support new channel
 budgets without recollecting observations, with a new immutable artifact identity.
+
+## Core-fidelity hold
+
+Exact pinned-author allocator parity was checked on all 430 modules, while six
+representative covariance matrices and all 30 associated bit-score vectors matched
+the author's calibration arithmetic exactly. Complete schema-5 recalibration
+still assigns zero bits to nearly every channel of early output/down projections
+at the released budget. This is not resolved by the arithmetic repair.
+
+The released 32-observation input-Hessian proxy differs from the paper's
+action-Jacobian-guided selective interventions; absolute-cost allocation differs
+from marginal error per saved bit, and staged versus immediate demotion descriptions
+also disagree. The stated pruning regularizer lacks an executable definition.
+Consequently the full paper remains `pending_core`, not an admitted negative
+result. Quantization-only presets are diagnostics, not certified alternative
+reproductions. Arbitrary per-layer pruning caps would change the mechanism.
