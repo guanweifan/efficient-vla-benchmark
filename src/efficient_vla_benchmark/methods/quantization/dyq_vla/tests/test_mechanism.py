@@ -14,9 +14,13 @@ def make():
     return DyQDispatcher(DyQConfig(), dict(theta_2_4=0.1, theta_4_8=0.3, theta_fp=0.5))
 
 
-def test_algorithm_one_matches_exhaustive_target_sequences():
+@pytest.mark.parametrize("window", [1, 3])
+def test_algorithm_one_matches_exhaustive_target_sequences(window):
     for sequence in itertools.product((2, 4, 8, 16), repeat=5):
-        d = make()
+        d = DyQDispatcher(
+            DyQConfig(hysteresis_window=window),
+            dict(theta_2_4=0.1, theta_4_8=0.3, theta_fp=0.5),
+        )
         active, counter, maximum = 16, 0, 16
         for target in sequence:
             if target >= active:
@@ -25,10 +29,24 @@ def test_algorithm_one_matches_exhaustive_target_sequences():
                 previous = maximum
                 maximum = max(target, maximum * int(counter > 0))
                 counter = counter * int(maximum == previous) + 1
-                active = maximum if counter == 3 else active
-                counter %= 3
+                active = maximum if counter == window else active
+                counter %= window
             assert d.dispatch_target(target) == active
             assert (d.counter, d.pending_max) == (counter, maximum)
+
+
+def test_routing_parameters_do_not_change_calibration_observation_sensitivity():
+    original = make()
+    candidate = DyQDispatcher(
+        DyQConfig(hysteresis_window=1, theta_fp=0.75),
+        dict(theta_2_4=0.1, theta_4_8=0.3, theta_fp=0.75),
+    )
+    actions = np.random.default_rng(7).normal(size=(100, 7))
+    for action in actions:
+        original.observe(action)
+        candidate.observe(action)
+        assert original.last_sensitivity == candidate.last_sensitivity
+        assert original.motion == candidate.motion and original.jerk == candidate.jerk
 
 
 def test_pending_upgrade_restarts_downgrade_delay():

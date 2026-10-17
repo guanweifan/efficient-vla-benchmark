@@ -65,3 +65,16 @@ on the same frozen independent native population. Old channelwise schema-2
 thresholds, Dev success and latency cannot be reused. Calibration records the exact
 binary/source identity; runtime substitution is rejected. No policy training or
 additional trajectory collection is implied. Registration alone is not admission.
+
+`dyq_vla_mixed_integer_k1_fp075` is a speedward routing candidate: K=1
+removes the nontrivial downgrade delay while preserving Algorithm 1, and the
+A16 threshold is 0.75. Motion/jerk sensitivity, cold-start A16 and the independently
+fitted A2/A4 boundaries remain active. It is not a fixed-A8 replacement or a
+paper-default configuration. All suites use the same settings.
+
+Routing-only candidates may refit thresholds from the identical schema-3
+fixed-precision error records when their full calibration dependency audit proves
+those measurements unchanged. Preserve the original calibration source, sample
+and weight checksums; record the derivation separately in a new artifact. Never
+reuse schema-2 errors or fit on Dev outcomes. Each changed routing configuration
+still requires its own controller/reference checks, Dev-200 and full-cost timing.

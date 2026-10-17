@@ -1,0 +1,5 @@
+extends:
+  - dyq_vla_mixed_integer.yaml
+parameters:
+  hysteresis_window: 1
+  theta_fp: 0.75
