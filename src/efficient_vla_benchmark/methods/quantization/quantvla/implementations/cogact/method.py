@@ -18,7 +18,16 @@ class QuantVLA(InferenceMethod):
     name = "quantvla"
     reversible = False
 
-    def __init__(self, backend, config, root):
+    def __init__(self, backend, config, root, runtime_path=None):
+        self.graph_pool = self.stream_engine = None
+        if config.dit_graphs:
+            from efficient_vla_benchmark.model_ops.frozen_graph import GraphPool
+            from efficient_vla_benchmark.model_ops.quantization.tinychat_runtime import (
+                TinyChatStreamRuntime,
+            )
+
+            self.graph_pool = GraphPool()
+            self.stream_engine = TinyChatStreamRuntime(runtime_path)
         manifest = read_manifest(root, config)
         if backend.method is not None or backend.metadata()["precision"] != "bfloat16":
             raise ValueError("QuantVLA needs a fresh BF16 CogACT instance")
@@ -62,6 +71,8 @@ class QuantVLA(InferenceMethod):
         }
         for name, op in prepared.items():
             replace(backend.model, name, op.to(backend.device))
+            if config.dit_graphs and name.startswith("action_model."):
+                op.configure_dit_graph(self.stream_engine, self.graph_pool)
         for name, op in prepared_attention.items():
             replace(backend.model, name, op)
         self.identity = artifact_identity(manifest)
@@ -70,6 +81,10 @@ class QuantVLA(InferenceMethod):
         del native, entries, prepared
         gc.collect()
         torch.cuda.empty_cache()
+
+    def close(self):
+        for op in self.ops:
+            op.clear_graph()
 
     def metadata(self):
         result = {
@@ -97,5 +112,13 @@ class QuantVLA(InferenceMethod):
                 activation_preparation="native_rounding_int8_codes_then_fp16",
                 rotations="fused_blocks_native_short_row_bmm",
                 precision_change_requires_new_development_evidence=True,
+            )
+        if self.config.dit_graphs:
+            result["dit_graphs"] = dict(
+                targets=24,
+                fixed_geometry=True,
+                input_output_copies_timed=True,
+                cached_policy_outputs=False,
+                stream_runtime=self.stream_engine.metadata(),
             )
         return result

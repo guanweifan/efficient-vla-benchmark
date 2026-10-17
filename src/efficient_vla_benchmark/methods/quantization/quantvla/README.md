@@ -55,3 +55,16 @@ counts retain native CUDA BMM; dynamic token lengths do not specialize dispatch.
 The tile engine and calibration equations remain unchanged. Engine artifacts
 can be reused for this arithmetic-equivalent optimization only after exact
 whole-policy/reference and reload checks; latency requires fresh full-cost timing.
+
+`quantvla_fp16_graph` explicitly enables one fixed-shape CUDA graph for each of
+the 24 DiT-MLP quantized projections. Its stream-correct TinyChat derivative is
+checksummed and supplied via `--runtime-path`; see the shared operations README
+for the portable build. Language, native attention, ATM/OHB, quantizer, sampler
+and precision remain unchanged. Fresh inputs are copied on every call and outputs
+cloned before scratch reuse; no robot observation/action cache is introduced.
+
+Graphs clear on state reload/device moves/close and reject unexpected geometry.
+Capture is separately disclosed cold-start overhead, not warmed inference; every
+replay copy stays timed. Same-arithmetic artifact reuse requires exact full-policy
+and reload checks. The graph preset receives fresh smoke, Dev-200 and original
+replay timing before admission; no accuracy or latency is inherited automatically.

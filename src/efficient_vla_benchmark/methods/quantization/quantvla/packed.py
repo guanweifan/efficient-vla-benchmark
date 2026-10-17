@@ -66,6 +66,7 @@ class PackedDuQuantLinear(nn.Module):
         runtime="tile_float",
     ):
         super().__init__()
+        self.graph = None
         if runtime not in ("tile_float", "tinychat_fp16"):
             raise ValueError("Unsupported packed DuQuant runtime")
         if qweight.ndim != 2 or weight_scale.ndim != 1:
@@ -126,7 +127,35 @@ class PackedDuQuantLinear(nn.Module):
         self.register_buffer("bias", None if bias is None else bias.detach().clone())
         self.in_features, self.out_features = k, n
 
+    def configure_dit_graph(self, engine, pool):
+        if self.fused_preparation is None:
+            raise ValueError("DiT graphs require FP16 packed execution")
+        from efficient_vla_benchmark.model_ops.frozen_graph import FrozenOpGraph
+
+        self.linear.kernel.stream_runtime = engine
+        self.graph = FrozenOpGraph(self._execute, pool)
+
+    def clear_graph(self):
+        if self.graph is not None:
+            self.graph.clear()
+
+    def _apply(self, fn, recurse=True):
+        self.clear_graph()
+        return super()._apply(fn, recurse=recurse)
+
+    def _load_from_state_dict(self, *args, **kwargs):
+        self.clear_graph()
+        return super()._load_from_state_dict(*args, **kwargs)
+
     def forward(self, inputs):
+        if self.graph is not None:
+            replay = self.graph.replays > 0
+            result = self.graph(inputs)
+            self.linear.kernel_invocations += int(replay)
+            return result
+        return self._execute(inputs)
+
+    def _execute(self, inputs):
         x = inputs if self.identity_smoothing else inputs * self.smoothing.to(inputs.dtype)
         if not self.identity_permutation:
             x = x.index_select(-1, self.permutation)
