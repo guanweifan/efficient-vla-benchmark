@@ -1,6 +1,6 @@
 schema_version: 1
 development_manifest_sha256: 9563d840b665740fd8febf728e66d1647d5f8d13c6352b85214f835a1abdf580
-coverage_summary_sha256: 6f52f9a0d5f055636b3f1e3bc1316df8de9b150f1de7368667000ae27ebc9f2e
+coverage_summary_sha256: 289a64a51a9a8544f8b970fa42e21ba08cfd2ae734932b3d664f5c3eb88a64ff
 source_compatibility:
 - development_runtime: 6a29dd2884a1266499a0b507088dc4efeb100b12e821dbaca4ffa9c9f5f492e7
   timing_runtime: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
@@ -263,32 +263,44 @@ configurations:
       timing_record: quant-p4-runtime-cogact-holo-r90-r1-da-fp16-r90
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/dyq_vla.yaml
-  status: pending_engineering
+  config: configs/experiments/cogact/dyq_vla_mixed_integer_k1_fp065.yaml
+  status: primary
   section: '3.3'
-  scope: Paper temporal W4/dynamic-A core; independent successful native trajectories. Disclosed quantizer/threshold
-    estimator; INT8 activation carrier with floating tile GEMM, not unavailable author integer/async runtime.
-  timing_record: quant-p3-runtime-cogact-dynamic-r1-dyq_vla
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: 4b2a38cefa39e90f119c5a3295b7f0c6bc4b5f6c677d4a127851448782e117fa
-  development_experiment_id: ec437d962ea1ca4c4f4ef7e180a55c2cac205744da1856f040ce067bebecb5b2
-  reason: 'Re-audit required: dynamic bit decisions are active, but all quantized activations use INT8
-    storage followed by floating products; bit-specific integer execution/overlap feasibility is not yet
-    established.'
+  scope: DyQ-VLA v2 temporal core, K1 routing; 224 decoder W4 projections, tokenwise A2/A4/A8/native activation
+    choices and independently fitted thresholds. One packed W4 bank uses real INT4/INT8 MMA and BF16 A16
+    GEMM; separate A2 expansion, no author register-fused A2 or async pipeline.
+  timing_record: quant-p4-runtime-cogact-dyq-k1-fp065-r1-dyq-k1-fp065
+  final_runtime_source_sha256: 30e5e121a02bfd6518e1e01ad613a159ec5d18ffc27a233de977b50d642c29bc
+  development_summary_sha256: a55460f17912488d761dc0e1e58efea7fba987e9fc7290cf37debe30d7f89c4d
+  development_experiment_id: 209979b8b6d2b080d50ef84450982ed4e99882a41664254caf27d03ccf2d9ff7
+  reason: K1/thetaFP0.65 gives 178/200 at 1.155x. ThetaFP0.75 gives 176/200 at 1.178x and remains a valid
+    near-target alternative; select0.65 for Long37 versus34, with Goal45 versus46 and other suites unchanged,
+    at about2% lower speed. This is a contextual tradeoff, not a177/200 cutoff.
   search:
-    complete: false
-    stop: mechanism_limit
-    reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or Dev-data
-      calibration. Report the measured backend-specific outcome.
+    complete: true
+    stop: latency_plateau
+    reason: K1/thetaFP0.65 gives 178/200 at 1.155x. ThetaFP0.75 gives 176/200 at 1.178x and remains a
+      valid near-target alternative; select0.65 for Long37 versus34, with Goal45 versus46 and other suites
+      unchanged, at about2% lower speed. This is a contextual tradeoff, not a177/200 cutoff.
+    limitation: Default scores180/200 but only1.060x. The two K1 candidates differ by about2% paired speed;
+      independent native-action routing predicts less than0.3% branch-cost gain from0.75 to0.9 alone.
+      Cold A16 is retained, K1 cannot reduce delay further, and tested CogACT A2/A4 branches are slower
+      thanA8. Thus no broad lower-bit sweep is justified by the measured engine. The finite candidate
+      set does not prove a global optimum or statistical superiority.
+    tie_reason: The faster176/200 candidate is not rejected for missing the preferred reference by one
+      episode. Prefer178/200 because it recovers three Long successes while losing one Goal success, at
+      a small measured speed difference. All200 outcomes and both valid timings remain search evidence;
+      no additional primary or automatic Final row is created.
     evidence:
-    - development_summary_sha256: 4b2a38cefa39e90f119c5a3295b7f0c6bc4b5f6c677d4a127851448782e117fa
-      development_experiment_id: ec437d962ea1ca4c4f4ef7e180a55c2cac205744da1856f040ce067bebecb5b2
-      timing_record: quant-p3-runtime-cogact-dynamic-r1-dyq_vla
-    tie_reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or
-      Dev-data calibration. Report the measured backend-specific outcome.
-    limitation: Logical A2/A4/A8 share INT8 storage and the same floating GEMM geometry. Threshold changes
-      cannot produce the absent lower-bit integer/async engine; unsupported intervals remain disabled
-      by calibration.
+    - development_summary_sha256: 704f3a738351a693cf4cbba50769a78e280522e4166f04c7c3f3e367bb3db19a
+      development_experiment_id: 44e189ea57060d40c7f89fd3bb92c6ba6d172d7a49deea917977fd82748b6981
+      timing_record: quant-p4-runtime-cogact-dyq-mixed-r1-dyq-mixed
+    - development_summary_sha256: 5dbee351574e9b2f7822f81bd51afd7094b3274075fd145abb5ff8eb31034fe3
+      development_experiment_id: 305ecc85c4f019625691ccbeb64c80414f7946a4e8495dc0ed61ee9853e77d05
+      timing_record: quant-p4-runtime-cogact-dyq-k1-fp075-r3-dyq-k1-fp075
+    - development_summary_sha256: a55460f17912488d761dc0e1e58efea7fba987e9fc7290cf37debe30d7f89c4d
+      development_experiment_id: 209979b8b6d2b080d50ef84450982ed4e99882a41664254caf27d03ccf2d9ff7
+      timing_record: quant-p4-runtime-cogact-dyq-k1-fp065-r1-dyq-k1-fp065
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   config: configs/experiments/cogact/eaqvla.yaml
@@ -1857,32 +1869,44 @@ configurations:
       geometry.
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  config: configs/experiments/openvla_oft/dyq_vla.yaml
-  status: pending_engineering
+  config: configs/experiments/openvla_oft/dyq_vla_mixed_integer_k1_fp075.yaml
+  status: primary
   section: '3.3'
-  scope: Paper temporal W4/dynamic-A core; independent successful native trajectories. Disclosed quantizer/threshold
-    estimator; INT8 activation carrier with floating tile GEMM, not unavailable author integer/async runtime.
-  timing_record: quant-p3-runtime-openvla_oft-new-r1-dyq_vla
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: 74b5b41b243e202c87830809dd64a783ee60bd9086e0d70eaf0770e1a8cb8f9c
-  development_experiment_id: 6bf3386916925538aecc4e458f1cf081db436489dde88d50fea2d37db7b8a4bf
-  reason: 'Re-audit required: dynamic bit decisions are active, but all quantized activations use INT8
-    storage followed by floating products; bit-specific integer execution/overlap feasibility is not yet
-    established.'
+  scope: DyQ-VLA v2 temporal core, K1 routing; 224 decoder W4 projections, tokenwise A2/A4/A8/native activation
+    choices and independently fitted thresholds. One packed W4 bank uses real INT4/INT8 MMA and BF16 A16
+    GEMM; separate A2 expansion, no author register-fused A2 or async pipeline.
+  timing_record: quant-p4-runtime-openvla_oft-dyq-k1-fp075-r2-dyq-k1-fp075
+  final_runtime_source_sha256: 3d4ef69ccfc2660a82cdd900e0323a9e38830fe270660e1ca535bf9e3e43f567
+  development_summary_sha256: 5dbee351574e9b2f7822f81bd51afd7094b3274075fd145abb5ff8eb31034fe3
+  development_experiment_id: c14a82999bf0aa359e615762e5f12681fd089ba03bf89de06aca831560b094ef
+  reason: K1/thetaFP0.75 retains 194/200 at 1.186x, versus default 196/200 at 1.032x. Raising thetaFP
+    to 0.9 and the calibration error budget to 0.2 gives only 1.221x but collapses to 6/200. Select the
+    useful measured knee, not the more aggressive low-bit setting.
   search:
-    complete: false
-    stop: mechanism_limit
-    reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or Dev-data
-      calibration. Report the measured backend-specific outcome.
+    complete: true
+    stop: accuracy_boundary
+    reason: K1/thetaFP0.75 retains 194/200 at 1.186x, versus default 196/200 at 1.032x. Raising thetaFP
+      to 0.9 and the calibration error budget to 0.2 gives only 1.221x but collapses to 6/200. Select
+      the useful measured knee, not the more aggressive low-bit setting.
+    limitation: The stronger candidate passed exact fixed-bit and temporal/reset/reload checks but fails
+      broadly across suites (Spatial3, Object0, Goal3, Long0 of50 each). The selected candidate scores50/49/48/47.
+      K1 already removes nontrivial downgrade delay; cold A16 remains required. Independent native-action
+      routing predicts less than0.3% branch-cost improvement from thetaFP0.75 to0.9 alone; broad low-bit
+      use is the measured severe accuracy boundary. This is bounded evidence, not proof of a global optimum
+      or full-v2 author-kernel parity.
+    tie_reason: The 1.221x candidate is not selected because its 6/200 outcome is a severe loss for about3%
+      additional relative speed, not a near-target shortfall. Default is slower and selected accuracy
+      remains comparable to the native reference. No valid measurement was repeated for a favorable outcome.
     evidence:
-    - development_summary_sha256: 74b5b41b243e202c87830809dd64a783ee60bd9086e0d70eaf0770e1a8cb8f9c
-      development_experiment_id: 6bf3386916925538aecc4e458f1cf081db436489dde88d50fea2d37db7b8a4bf
-      timing_record: quant-p3-runtime-openvla_oft-new-r1-dyq_vla
-    tie_reason: Frozen error-bound thresholds retain the stateful temporal core; no policy training or
-      Dev-data calibration. Report the measured backend-specific outcome.
-    limitation: Logical A2/A4/A8 share INT8 storage and the same floating GEMM geometry. Threshold changes
-      cannot produce the absent lower-bit integer/async engine; unsupported intervals remain disabled
-      by calibration.
+    - development_summary_sha256: 704f3a738351a693cf4cbba50769a78e280522e4166f04c7c3f3e367bb3db19a
+      development_experiment_id: fbbd2c99a96ba5608cb949b4d398ca878601a95ac0256a612dc6622a26bde6b5
+      timing_record: quant-p4-runtime-openvla_oft-dyq-mixed-r1-dyq-mixed
+    - development_summary_sha256: 5dbee351574e9b2f7822f81bd51afd7094b3274075fd145abb5ff8eb31034fe3
+      development_experiment_id: c14a82999bf0aa359e615762e5f12681fd089ba03bf89de06aca831560b094ef
+      timing_record: quant-p4-runtime-openvla_oft-dyq-k1-fp075-r2-dyq-k1-fp075
+    - development_summary_sha256: a55460f17912488d761dc0e1e58efea7fba987e9fc7290cf37debe30d7f89c4d
+      development_experiment_id: 6d1deff13d5303a8368a46e04895d978c687a5755358379fbd613a4054668d7a
+      timing_record: quant-p4-runtime-openvla_oft-dyq-k1-fp090-budget020-r2-dyq-k1-fp090-budget020
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   config: configs/experiments/openvla_oft/eaqvla.yaml
