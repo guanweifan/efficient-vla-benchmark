@@ -84,8 +84,9 @@ of development and Git rules; upstream submodules retain their own instructions.
 - Final-2000 is a separate approval gate after the owner reviews the frozen Dev
   and timing results. General permission to continue, use idle GPUs, or complete
   integration is NOT final-run authorization. Never auto-chain Dev into Final.
-  This quantization repair batch is Dev/timing-only; prior prematurely launched
-  quantization Final outcomes are withdrawn from publication, not tuning evidence.
+  The quantization repair stage was Dev/timing-only. Its frozen primary Final
+  campaign was subsequently authorized separately and is recorded in the result
+  ledger. Earlier premature outcomes remain withdrawn, not tuning evidence.
 - Keep one clean primary result row, with Dev selection evidence, final success
   and separately measured speed. Valuable auxiliary configurations are explicitly
   secondary, never additional default report rows. Missing measurements stay missing.

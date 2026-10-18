@@ -188,6 +188,60 @@ source_compatibility:
   timing_runtime: a88b7c8154fd9e9915921c5bf8139886a320aa68f736526db6fe1f2b5eff6212
   reason: 'DA-MPA only: exact scoped source/dependency audit in fusion-r10-measurement-audit.json; changed
     rotation paths are not imported by DA. Original identities retained.'
+- development_runtime: e569f4343318fd8f56cd7c221657e7be667600a56a23a7a8a1fd7d204e84128c
+  timing_runtime: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
+  reason: Authorized quantization Final campaign at 6356913479a855589dba1c6b091ed971a17a84ae. Selected
+    executable method/backend/controller/harness unchanged. SmoothQuant integer engine, ActQuant external
+    GGUF, DyQ mixed engine unchanged. GPTQ uses only long decoder rows; TinyChat M8-32 safety dispatch
+    is inactive there. DA-MPA already measured the short-row fix; later optional stream dispatch stays
+    disabled. HoloQ/QuantVLA match the latest graph runtime exactly. Unrelated new modules are not activated;
+    artifacts and dependencies remain pinned. Scope excludes unselected methods; actual historical measurement
+    identities remain unchanged.
+- development_runtime: 30e5e121a02bfd6518e1e01ad613a159ec5d18ffc27a233de977b50d642c29bc
+  timing_runtime: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
+  reason: Authorized quantization Final campaign at 6356913479a855589dba1c6b091ed971a17a84ae. Selected
+    executable method/backend/controller/harness unchanged. SmoothQuant integer engine, ActQuant external
+    GGUF, DyQ mixed engine unchanged. GPTQ uses only long decoder rows; TinyChat M8-32 safety dispatch
+    is inactive there. DA-MPA already measured the short-row fix; later optional stream dispatch stays
+    disabled. HoloQ/QuantVLA match the latest graph runtime exactly. Unrelated new modules are not activated;
+    artifacts and dependencies remain pinned. Scope excludes unselected methods; actual historical measurement
+    identities remain unchanged.
+- development_runtime: b6c19eca105789631dd05ca5a7e86d43b62e38216c7dec34efda23263279572f
+  timing_runtime: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
+  reason: Authorized quantization Final campaign at 6356913479a855589dba1c6b091ed971a17a84ae. Selected
+    executable method/backend/controller/harness unchanged. SmoothQuant integer engine, ActQuant external
+    GGUF, DyQ mixed engine unchanged. GPTQ uses only long decoder rows; TinyChat M8-32 safety dispatch
+    is inactive there. DA-MPA already measured the short-row fix; later optional stream dispatch stays
+    disabled. HoloQ/QuantVLA match the latest graph runtime exactly. Unrelated new modules are not activated;
+    artifacts and dependencies remain pinned. Scope excludes unselected methods; actual historical measurement
+    identities remain unchanged.
+- development_runtime: 3d4ef69ccfc2660a82cdd900e0323a9e38830fe270660e1ca535bf9e3e43f567
+  timing_runtime: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
+  reason: Authorized quantization Final campaign at 6356913479a855589dba1c6b091ed971a17a84ae. Selected
+    executable method/backend/controller/harness unchanged. SmoothQuant integer engine, ActQuant external
+    GGUF, DyQ mixed engine unchanged. GPTQ uses only long decoder rows; TinyChat M8-32 safety dispatch
+    is inactive there. DA-MPA already measured the short-row fix; later optional stream dispatch stays
+    disabled. HoloQ/QuantVLA match the latest graph runtime exactly. Unrelated new modules are not activated;
+    artifacts and dependencies remain pinned. Scope excludes unselected methods; actual historical measurement
+    identities remain unchanged.
+- development_runtime: 24041a12ce77617412e20fdc69d9c7ae8d56718d0b33ceb49dea03bd5e2138aa
+  timing_runtime: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
+  reason: Authorized quantization Final campaign at 6356913479a855589dba1c6b091ed971a17a84ae. Selected
+    executable method/backend/controller/harness unchanged. SmoothQuant integer engine, ActQuant external
+    GGUF, DyQ mixed engine unchanged. GPTQ uses only long decoder rows; TinyChat M8-32 safety dispatch
+    is inactive there. DA-MPA already measured the short-row fix; later optional stream dispatch stays
+    disabled. HoloQ/QuantVLA match the latest graph runtime exactly. Unrelated new modules are not activated;
+    artifacts and dependencies remain pinned. Scope excludes unselected methods; actual historical measurement
+    identities remain unchanged.
+- development_runtime: e8a70595dad149239ff73b4eb3612cf78c85ad454f1c7b0194d31623697cc5c6
+  timing_runtime: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
+  reason: Authorized quantization Final campaign at 6356913479a855589dba1c6b091ed971a17a84ae. Selected
+    executable method/backend/controller/harness unchanged. SmoothQuant integer engine, ActQuant external
+    GGUF, DyQ mixed engine unchanged. GPTQ uses only long decoder rows; TinyChat M8-32 safety dispatch
+    is inactive there. DA-MPA already measured the short-row fix; later optional stream dispatch stays
+    disabled. HoloQ/QuantVLA match the latest graph runtime exactly. Unrelated new modules are not activated;
+    artifacts and dependencies remain pinned. Scope excludes unselected methods; actual historical measurement
+    identities remain unchanged.
 timing_workloads:
   openvla_oft: 01f8a93fc0bd522be3ef1d2dbee981ad1bb53ed9c1bf76b404808060bdedbefe
   cogact: 6c0e509fe062fdc393d7edbf668d29450250b99e9b163a5bad5597796e7420bc
@@ -238,7 +292,7 @@ configurations:
   scope: DA-PTQ independent DA-MPA drift-allocation core only, no CSRC. 224 language and 2 ranked DiT
     projections use packed W4/A8 with FP16 GEMM; retained DiT remains native FP32.
   timing_record: quant-p4-runtime-cogact-holo-r90-r1-da-fp16-r90
-  final_runtime_source_sha256: e569f4343318fd8f56cd7c221657e7be667600a56a23a7a8a1fd7d204e84128c
+  final_runtime_source_sha256: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
   development_summary_sha256: 39eb9cbe69ba6df8117b24de4db7dea2a34e41de1daee588f8beeb6256e28031
   development_experiment_id: 91a9a887c80b751470decc536edc5355bad1b5ddb8d61214cb095b6e80bf9285
   reason: Retaining nine ranked eligible DiT blocks is faster than retention10/30 while preserving 182/200
@@ -270,7 +324,7 @@ configurations:
     choices and independently fitted thresholds. One packed W4 bank uses real INT4/INT8 MMA and BF16 A16
     GEMM; separate A2 expansion, no author register-fused A2 or async pipeline.
   timing_record: quant-p4-runtime-cogact-dyq-k1-fp065-r1-dyq-k1-fp065
-  final_runtime_source_sha256: 30e5e121a02bfd6518e1e01ad613a159ec5d18ffc27a233de977b50d642c29bc
+  final_runtime_source_sha256: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
   development_summary_sha256: a55460f17912488d761dc0e1e58efea7fba987e9fc7290cf37debe30d7f89c4d
   development_experiment_id: 209979b8b6d2b080d50ef84450982ed4e99882a41664254caf27d03ccf2d9ff7
   reason: K1/thetaFP0.65 gives 178/200 at 1.155x. ThetaFP0.75 gives 176/200 at 1.178x and remains a valid
@@ -342,14 +396,14 @@ configurations:
   development_summary_sha256: 5d261c489eb3e5d4ff1cf02a51230f3a3e73d8da7b89c1b319ab5d5dcecf5209
   development_experiment_id: b32560b643bdb92b5042145d1b56583102442abfafdc0bbd407a92bc05675e45
   reason: Fresh Dev preserves every prior episode outcome (185/200). The fixed-DiT graph engine has a
-    validated speed benefit; keep the prior selected quantizer parameters. Do not inherit or claim Final
-    accuracy.
+    validated speed benefit; keep the prior selected quantizer parameters. Final accuracy requires separate
+    measurement; it is not inherited from earlier runs.
   search:
     complete: true
     stop: mechanism_limit
     reason: Fresh Dev preserves every prior episode outcome (185/200). The fixed-DiT graph engine has
-      a validated speed benefit; keep the prior selected quantizer parameters. Do not inherit or claim
-      Final accuracy.
+      a validated speed benefit; keep the prior selected quantizer parameters. Final accuracy requires
+      separate measurement; it is not inherited from earlier runs.
     limitation: This bounded pass changes dispatch only, not bits, calibration, rotations, ATM/OHB or
       DDIM10. Prior block-size sweeps remain evidence; no new graph-specific block sweep or global optimality
       is claimed. Variable-length language graphs gave no compelling extra diagnostic gain and substantially
@@ -417,14 +471,14 @@ configurations:
   development_summary_sha256: 5d261c489eb3e5d4ff1cf02a51230f3a3e73d8da7b89c1b319ab5d5dcecf5209
   development_experiment_id: ea253042f37e561f169095cb89eac560873bab494a951c9e193df059c27ead0c
   reason: Fresh Dev preserves every prior episode outcome (180/200). The fixed-DiT graph engine has a
-    validated speed benefit; keep the prior selected quantizer parameters. Do not inherit or claim Final
-    accuracy.
+    validated speed benefit; keep the prior selected quantizer parameters. Final accuracy requires separate
+    measurement; it is not inherited from earlier runs.
   search:
     complete: true
     stop: mechanism_limit
     reason: Fresh Dev preserves every prior episode outcome (180/200). The fixed-DiT graph engine has
-      a validated speed benefit; keep the prior selected quantizer parameters. Do not inherit or claim
-      Final accuracy.
+      a validated speed benefit; keep the prior selected quantizer parameters. Final accuracy requires
+      separate measurement; it is not inherited from earlier runs.
     limitation: This bounded pass changes dispatch only, not bits, calibration, rotations, ATM/OHB or
       DDIM10. Prior block-size sweeps remain evidence; no new graph-specific block sweep or global optimality
       is claimed. Variable-length language graphs gave no compelling extra diagnostic gain and substantially
@@ -1827,7 +1881,7 @@ configurations:
   scope: Author GGUF HSIC/AMF runtime; projection-bit budget 4.5, internal Q8_1 activations. Cross-runtime,
     not quantization-only speedup.
   timing_record: quant-p3-runtime-openvla_oft-existing-r1-actquant
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
+  final_runtime_source_sha256: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
   development_summary_sha256: a68d4b3da9bc81c166afab120c0fe761e0d3d5c6ea3f12f06bcecd7b383fdded
   development_experiment_id: c71d808134c35b6e3b6c8d20ed967f21926e6fcd509958df5e7a71baefa822b2
   reason: 'Budgets 4.5/3.5/2.5 retain Dev 198/195/185; new same-cohort timings are 23.115/23.465/25.863
@@ -1885,7 +1939,7 @@ configurations:
     choices and independently fitted thresholds. One packed W4 bank uses real INT4/INT8 MMA and BF16 A16
     GEMM; separate A2 expansion, no author register-fused A2 or async pipeline.
   timing_record: quant-p4-runtime-openvla_oft-dyq-k1-fp075-r2-dyq-k1-fp075
-  final_runtime_source_sha256: 3d4ef69ccfc2660a82cdd900e0323a9e38830fe270660e1ca535bf9e3e43f567
+  final_runtime_source_sha256: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
   development_summary_sha256: 5dbee351574e9b2f7822f81bd51afd7094b3274075fd145abb5ff8eb31034fe3
   development_experiment_id: c14a82999bf0aa359e615762e5f12681fd089ba03bf89de06aca831560b094ef
   reason: K1/thetaFP0.75 retains 194/200 at 1.186x, versus default 196/200 at 1.032x. Raising thetaFP
@@ -2758,7 +2812,7 @@ configurations:
   timing_record: quant-p4-runtime-openvla_oft-smoothquant-r1-smoothquant
   development_summary_sha256: 2a48351043da7ed777972dec6abe6c91937655b070697502828d6b0a0f57ba4d
   development_experiment_id: 90d6a6f53c54c7a7c614c1a0e5bdff09100198b4b0dac18802eaba6948caafbc
-  final_runtime_source_sha256: 24041a12ce77617412e20fdc69d9c7ae8d56718d0b33ceb49dea03bd5e2138aa
+  final_runtime_source_sha256: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
   reason: Fixed classic W8A8 decoder scope meets the matched Dev loss target with validated integer execution
     and full-cost speedup.
   search:
@@ -2784,7 +2838,7 @@ configurations:
   timing_record: quant-p4-runtime-cogact-smoothquant-r1-smoothquant
   development_summary_sha256: 2a48351043da7ed777972dec6abe6c91937655b070697502828d6b0a0f57ba4d
   development_experiment_id: bf414e83a68cb12c74b8d08f44862fc88a13cf812ebd3a17c3baf9a2947342fc
-  final_runtime_source_sha256: 24041a12ce77617412e20fdc69d9c7ae8d56718d0b33ceb49dea03bd5e2138aa
+  final_runtime_source_sha256: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
   reason: Fixed classic W8A8 decoder scope meets the matched Dev loss target with validated integer execution
     and full-cost speedup.
   search:
@@ -2810,7 +2864,7 @@ configurations:
   timing_record: quant-p4-runtime-openvla_oft-gptq-r1-gptq
   development_summary_sha256: 7e0295681997261b8a572bf9d7aaee0448079fc90ae267b15de87fa3bcb0c611
   development_experiment_id: d69aeef476e3f244af416a5f0cb314f31f394b5dd9320f54c70faab16e07016b
-  final_runtime_source_sha256: e8a70595dad149239ff73b4eb3612cf78c85ad454f1c7b0194d31623697cc5c6
+  final_runtime_source_sha256: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
   reason: Fixed classic GPTQ W4g128 decoder scope meets the matched Dev loss target with validated packed
     execution and full-cost speedup.
   search:
@@ -2836,7 +2890,7 @@ configurations:
   timing_record: quant-p4-runtime-cogact-gptq-r2-gptq
   development_summary_sha256: 7e0295681997261b8a572bf9d7aaee0448079fc90ae267b15de87fa3bcb0c611
   development_experiment_id: 179efedcda94ff9180919f9a367237ffb542e2f956f2dd01dcb1d17b171b740a
-  final_runtime_source_sha256: e8a70595dad149239ff73b4eb3612cf78c85ad454f1c7b0194d31623697cc5c6
+  final_runtime_source_sha256: 2ac205a670a7377c5406438054ec9ef91a241af82bf09b4030ebf57cd1bc1e9c
   reason: Fixed classic GPTQ W4g128 decoder scope meets the matched Dev loss target with validated packed
     execution and full-cost speedup.
   search:

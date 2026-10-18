@@ -533,9 +533,11 @@ four smoke episodes never establish formal accuracy.
 
 Final-2000 needs separate, explicit owner approval of the frozen candidates.
 Dev/timing completion or permission to use more GPUs does not grant that approval;
-operational launchers must not automatically enqueue a final campaign. The current
-quantization repair campaign ends at audited Dev-200 and timing. Earlier premature
-quantization finals remain quarantined evidence, excluded from selection/publication.
+operational launchers must not automatically enqueue a final campaign. The
+quantization repair stage ended at audited Dev-200 and timing; the owner then
+separately authorized the frozen primary Final campaign now recorded in the ledger.
+Earlier premature quantization finals remain quarantined evidence, excluded from
+selection/publication. That campaign-specific approval does not authorize future runs.
 
 Owner-specified fixed native controls are a separate supplementary population,
 not additional primary methods or a hyperparameter search. Freeze their declared
