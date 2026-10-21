@@ -2,15 +2,11 @@
 
 The implementation uses the unmodified author revision
 `b64791125070652fe6b554e244fe809c79ef5246`, supplied through `--runtime-path`.
-It supports OFT LIBERO joint H8 only. Registration does not imply completed
-measurement; the result ledger distinguishes calibration, Dev, timing and final.
+It supports OFT LIBERO joint H8 only; see [results](../../../../../docs/benchmark_results.md).
 
-The prospective CogACT binding was closed as abandoned for this batch, not as
-mathematically incompatible: Eq. 8 permits action-only Fisher and differentiation
-through native DDIM was verified. The floating GGUF cognition bridge did not pass
-the existing action-parity gate across six KV/readout precision controls, so no
-CogACT calibration, quantized runtime result or selectable binding is advertised.
-The OFT implementation and its measured identities are unchanged.
+CogACT is unsupported: the floating GGUF bridge did not pass action parity.
+This is an engineering boundary, not mathematical incompatibility; action-only
+Fisher and native DDIM differentiation are available.
 
 ## Mechanism and scope
 

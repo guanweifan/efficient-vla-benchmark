@@ -1,3 +1,32 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/dyq_vla.yaml
+- ../../backends/openvla_oft.yaml
+- ../../methods/dyq_vla.yaml
+parameters:
+  frames_per_trajectory: 8
+  activation_percentile: 99.9
+  activation_tokens: 256
+  motion_window: 10
+  jerk_window: 5
+  sensitivity_lambda: 0.5
+  theta_fp: 0.75
+  hysteresis_window: 1
+  accuracy_budget: 0.02
+  sensitivity_bins: 10
+  eta: 1.0e-06
+  runtime: mixed_integer
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

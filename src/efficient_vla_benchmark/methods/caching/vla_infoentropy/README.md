@@ -1,8 +1,7 @@
 # VLA-InfoEntropy
 
 Independent implementation of [arXiv:2604.05323v1](https://arxiv.org/html/2604.05323v1).
-Primary code category: caching; survey cross-reference: 5.1. This method does NOT
-delete the protected context or simply replace a pruning score. Low-information
+Low-information
 static visual tokens reuse KV; important visual tokens recompute. All visual keys
 remain available. No source-code parity or original-paper score claim.
 
@@ -33,13 +32,6 @@ Use `configs/experiments/openvla_oft/vla_infoentropy.yaml`. Compare against nati
 SDPA for practical speed, optionally against VLA-Cache to isolate the new selector.
 Do not hide attention-backend changes, histogram overhead or negative speed results.
 
-The 2026-09-21 re-audit adds an independent NumPy reference for Eq. 4-6 and
-exhaustive integer-step checks of Eq. 7, including floor and clamping behavior.
-These confirm the explicit second softmax, text-axis entropy and executed-step
-allocation; no evidence justified dropping full-layer statistics to improve speed.
-The inherited cache-engine schedule and two-camera extension remain disclosed
-adaptations, not verified author defaults or a claim of published-score reproduction.
-
 ## CogACT binding
 
 `configs/experiments/cogact/vla_infoentropy.yaml` uses the identical shared selector,
@@ -54,8 +46,7 @@ probabilities supply the statistics; both computations remain in full-cost timin
 Cold/reset/disabled/detach checks, full-key versus sparse-query tests and executed
 step quota tests accompany this independent paper-based port.
 
-
-## Engineering revision
+## Runtime
 
 The default is native SDPA, removing eager-versus-SDPA output differences on
 cold or fully protected frames. Eager remains an explicitly selectable diagnostic.
@@ -68,24 +59,14 @@ the much smaller semantic information signal still uses FP64.
 Static candidate order, original masks/positions, monotonic within-query reuse,
 per-view protection unions and bounded indexed KV storage are unchanged.
 There is no automatic cross-frame refresh or changed control cadence.
-This is an engineering revision of the same paper-based mechanism; previous
-eager-version accuracy/timing must not be relabeled as this implementation.
+Previous eager-version measurements do not describe this SDPA implementation.
 
-## Selected Dev configurations
+## Selected configurations
 
-Use `configs/experiments/openvla_oft/vla_infoentropy_sdpa192.yaml` or
-`configs/experiments/cogact/vla_infoentropy_protect140.yaml`. OFT uses a static
+Use `configs/experiments/openvla_oft/vla_infoentropy.yaml` or
+`configs/experiments/cogact/vla_infoentropy.yaml`. OFT uses a static
 candidate budget of 192 per view and the reference 40/60 protection quotas;
-CogACT uses 150 candidates and 56/84 quotas. Frozen Dev-200 gives 195/200 and
-177/200, respectively, at the fastest eligible measured settings. CogACT is
-exactly at the native-relative 3-percentage-point loss boundary. The 75-candidate
-CogACT alternative gives 184/200 with slightly lower measured speed and remains
-search evidence, not a second primary configuration.
-
-OFT has no reliable end-to-end acceleration at the accuracy target. Report that
-negative result; do not omit entropy costs or transfer old eager-version Final
-scores. Current paired timing and evidence identities are in
-`docs/benchmark_results.md`. Both selected configurations now have one frozen
-Final-2000 run. CogACT's Final loss exceeds its 3-percentage-point Dev selection
-target; report the measured outcome without retuning or treating Dev eligibility
-as a guaranteed final-accuracy bound.
+CogACT uses 150 candidates and 56/84 quotas. See the
+[results](../../../../../docs/benchmark_results.md) for selection evidence, Final
+success and full-cost timing. Dev eligibility is not a guaranteed final-accuracy
+bound; full entropy costs remain included even when there is no speedup.

@@ -27,8 +27,8 @@ joins and all stale/fresh inference. No background cost is discarded. A fixed
 stale budget follows the paper's ablation; this port does not dynamically change
 the budget based on host scheduling or the eventual task outcome.
 
-Initial candidates 1/3/5/7/9 are not final report selections. Zero is a native
-parity diagnostic, never an active primary result. OFT's deterministic L1 action
+The final preset uses one stale step. Zero is a native parity diagnostic.
+OFT's deterministic L1 action
 head has no iterative refinement and is not registered.
 
 ```bash

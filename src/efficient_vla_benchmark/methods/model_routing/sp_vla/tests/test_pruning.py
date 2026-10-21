@@ -3,7 +3,7 @@ import pytest
 import torch
 
 from ..config import SPVLAConfig
-from ..implementations.openvla_oft.method import attention_mass, edge_tokens, semantic_selection
+from ..pruning import attention_mass, edge_tokens, semantic_selection
 
 
 def test_released_mass_rule_is_not_inverted():

@@ -1,3 +1,0 @@
-extends: [bac.yaml]
-parameters:
-  num_updates: 8

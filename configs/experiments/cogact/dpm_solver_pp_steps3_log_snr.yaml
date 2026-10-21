@@ -1,3 +1,0 @@
-extends: dpm_solver_pp_steps3.yaml
-parameters:
-  spacing: log_snr

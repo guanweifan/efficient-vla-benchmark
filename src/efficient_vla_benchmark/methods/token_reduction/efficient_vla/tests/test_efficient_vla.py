@@ -3,11 +3,18 @@ import pytest
 import torch
 
 from ..config import EfficientVLAConfig
-from ..implementations.openvla_oft.method import select_tokens
+
+
+@pytest.fixture
+def select_tokens():
+    pytest.importorskip("efficient_vla_backend_openvla_oft")
+    from ..implementations.openvla_oft.method import select_tokens as select
+
+    return select
 
 
 @pytest.mark.parametrize("fraction", [0, 0.5, 1])
-def test_selection_matches_independent_numpy_equations(fraction):
+def test_selection_matches_independent_numpy_equations(fraction, select_tokens):
     rng = np.random.default_rng(52)
     features, scores = rng.normal(size=(32, 12)), rng.random(32)
     order = np.argsort(-scores, kind="stable")
@@ -20,12 +27,13 @@ def test_selection_matches_independent_numpy_equations(fraction):
     assert set(actual.nonzero().flatten().tolist()) == expected
 
 
-def test_zero_features_and_full_retention():
+def test_zero_features_and_full_retention(select_tokens):
     result = select_tokens(torch.zeros(16, 4), torch.zeros(16), 16, 4, 0.5)
     assert result.all()
 
 
 def test_relevance_uses_visual_queries_and_text_columns_not_transpose():
+    pytest.importorskip("efficient_vla_backend_openvla_oft")
     from types import SimpleNamespace
 
     from efficient_vla_backend_openvla_oft.decoder import DecoderState, TokenLayout

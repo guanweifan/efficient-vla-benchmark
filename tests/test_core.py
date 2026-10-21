@@ -103,7 +103,7 @@ def test_method_controller_receives_every_frame_and_can_replan():
         "method: [awq, vla_cache]",
         "unknown: 1",
         "execution_horizon: 0",
-        "backend: [cogact, starvla]",
+        "backend: [cogact, openvla_oft]",
         "backend: custom\nparameters: {resource: /private/resource}",
     ],
 )

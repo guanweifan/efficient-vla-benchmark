@@ -1,3 +1,24 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/dart.yaml
+- ../../backends/cogact.yaml
+- ../../methods/dart.yaml
+parameters:
+  pruning_layer: 2
+  keep_ratio: 0.25
+  visual_pivots: 4
+  text_pivots: 4
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

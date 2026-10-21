@@ -18,7 +18,7 @@ def main() -> None:
         .decode()
         .split("\0")
     )
-    excluded = {"third_party", "openvla-oft", "cogact", "starvla"}
+    excluded = {"third_party", "openvla-oft", "cogact"}
     private = re.compile(
         r"/(?:home|Users|data)/[A-Za-z0-9_.-]+/"
         r"|(?:192\.168|172\.(?:1[6-9]|2[0-9]|3[01]))\.[0-9]+\.[0-9]+"

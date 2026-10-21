@@ -1,3 +1,0 @@
-extends: holoq_fp16_kernel.yaml
-parameters:
-  block_size: 16

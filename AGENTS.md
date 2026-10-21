@@ -55,7 +55,11 @@ of development and Git rules; upstream submodules retain their own instructions.
 
 ## Selection and reporting contract
 
-- One primary configuration per backend/method scope, shared across four suites.
+- Keep only final measured experiment presets, one per backend/method scope,
+  shared across four suites. Use concise method filenames; keep hyperparameters
+  and precision in YAML. Fixed published controls/codec workpoints may be separate.
+  Delete intermediate candidate presets after preserving required selection evidence.
+  Renaming must preserve effective settings and historical measurement identities.
   Use the fixed Dev-200 subset for selection, not the final 2,000 outcomes. Tune
   selectively when evidence warrants it; no mandatory number of candidate presets.
 - Target at most 3 percentage points of Dev-200 success loss against the matched
@@ -84,9 +88,6 @@ of development and Git rules; upstream submodules retain their own instructions.
 - Final-2000 is a separate approval gate after the owner reviews the frozen Dev
   and timing results. General permission to continue, use idle GPUs, or complete
   integration is NOT final-run authorization. Never auto-chain Dev into Final.
-  The quantization repair stage was Dev/timing-only. Its frozen primary Final
-  campaign was subsequently authorized separately and is recorded in the result
-  ledger. Earlier premature outcomes remain withdrawn, not tuning evidence.
 - Keep one clean primary result row, with Dev selection evidence, final success
   and separately measured speed. Valuable auxiliary configurations are explicitly
   secondary, never additional default report rows. Missing measurements stay missing.
@@ -134,9 +135,9 @@ of development and Git rules; upstream submodules retain their own instructions.
 - Root README owns user entry points; this file owns workflow rules; the development
   guide owns technical interfaces. Avoid repeating the same normative content.
 
-Current support is listed in README and validated by the lazy catalog. starVLA
-remains source-only. FlashVLA action reuse and VLA-IAP's CogACT semantic construction
-remain unresolved. Native tail refinement is supported only through ActionCache's
+Current support is listed in README and validated by the lazy catalog.
+FlashVLA action reuse remains unresolved. Native tail refinement
+is supported only through ActionCache's
 explicitly scoped frozen-bank port, not a trained few-step sampler. SQAP-VLA
 is excluded from the current experimental batch because its activation granularity
 remains unverified; do not reopen it without new evidence. DepthCache primary and
@@ -145,4 +146,4 @@ do not silently promote excluded or unverified mechanisms to implemented status.
 EcoVLA's dynamic channels/heads and EfficientVLA's static layer core require
 training-only calibration artifacts. They do not compose with other methods.
 A learned router/exit/expert cannot be replaced by untrained heuristics; the
-training-dependent candidate audit in the development guide is not runtime support.
+training-dependent boundary in the development guide is not runtime support.

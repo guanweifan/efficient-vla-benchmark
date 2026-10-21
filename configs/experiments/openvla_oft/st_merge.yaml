@@ -1,3 +1,0 @@
-extends:
-  - baseline.yaml
-  - ../../methods/st_merge.yaml

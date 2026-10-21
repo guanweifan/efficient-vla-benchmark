@@ -1,3 +1,0 @@
-extends: dvac.yaml
-parameters:
-  alpha: 16.0

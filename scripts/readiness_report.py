@@ -382,6 +382,7 @@ def build(selection, summaries, records, quality, development_manifest, final_re
             "method": config["method"],
             "section": selected["section"],
             "preset": Path(selected["config"]).stem,
+            "measured_preset": selected.get("measured_preset", Path(selected["config"]).stem),
             "horizon": config["execution_horizon"],
             "execution_horizon_policy": horizon_policy,
             "predicted_horizon": predicted_horizon,
@@ -438,10 +439,25 @@ def build(selection, summaries, records, quality, development_manifest, final_re
                 "owner_authorization_required": True,
             }
         )
+    retired = selection.get("retired_scopes", [])
+    retired_keys = set()
+    for item in retired:
+        if (
+            set(item) != {"backend", "method", "reason"}
+            or not all(isinstance(v, str) and v.strip() for v in item.values())
+            or item["method"] == "none"
+        ):
+            raise ValueError("Retired scope requires explicit backend, method and reason")
+        key = (item["backend"], item["method"], None)
+        if key in retired_keys or key in seen:
+            raise ValueError("Retired scopes must be unique and disjoint from executable scopes")
+        retired_keys.add(key)
     coverage = selection.get("coverage_summary_sha256")
+    if retired and coverage is None:
+        raise ValueError("Retired scopes require frozen review coverage")
     if coverage is not None:
         expected = {scope_key(r["config"]) for r in summaries[coverage]["configurations"]}
-        if seen != expected:
+        if seen | retired_keys != expected:
             raise ValueError(
                 "Selection omits or adds scopes relative to its frozen review coverage"
             )
@@ -467,6 +483,7 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         scoped = dict(selection, configurations=[dict(selected, status=parent_status)])
         scoped.pop("auxiliary_configurations", None)
         scoped.pop("coverage_summary_sha256", None)
+        scoped.pop("retired_scopes", None)
         checked = build(scoped, summaries, records, quality, development_manifest)
         auxiliary.extend(checked["primary"])
         for row in checked["pending_engineering"]:
@@ -482,6 +499,7 @@ def build(selection, summaries, records, quality, development_manifest, final_re
         "pending_engineering": held["pending_engineering"],
         "excluded": held["excluded"],
         "auxiliary": auxiliary,
+        "retired_scopes": retired,
         "final_launch_candidates": launch,
         "final_launched_by_this_command": False,
     }
@@ -578,37 +596,54 @@ def render(report):
                 f"{r['reason']} {r['scope']} |"
             )
         lines.append("")
-    lines += [
-        "## Not certified for final evaluation",
-        "",
-        "Diagnostic measurements below do NOT certify core fidelity or engineering readiness, "
-        "and never authorize final runs. Exclusion reasons are independent of measured outcomes.",
-        "",
-        "| Backend / method | Status | Dev SR (n/200) | ms/control | Speedup | Reason |",
-        "|---|---|---:|---:|---:|---|",
-    ]
-    for r in uncertified:
-        d, t = r.get("development"), r.get("timing")
-        success = f"{d['successes'] / 2:.1f}% ({d['successes']})" if d else "—"
-        latency = f"{t['mean_ms']:.3f}" if t else "—"
-        speedup = f"{t['speedup']:.3f}×" if t else "—"
-        lines.append(
-            f"| {r['backend']} / `{r.get('preset', r['method'])}` | "
-            f"{r.get('status', 'pending_core')} | {success} | {latency} | "
-            f"{speedup} | {r['reason']} |"
-        )
+    if report.get("retired_scopes"):
+        lines += [
+            "## Retired implementations",
+            "",
+            "No runnable proxy or reportable method result is retained for these scopes.",
+            "Retirement is about fidelity/source limitations, not unfavorable outcomes.",
+            "",
+            "| Backend / method | Reason |",
+            "|---|---|",
+        ]
+        for item in report["retired_scopes"]:
+            lines.append(f"| {item['backend']} / `{item['method']}` | {item['reason']} |")
+        lines.append("")
+    if uncertified:
+        lines += [
+            "## Not certified for final evaluation",
+            "",
+            "Diagnostic measurements below do NOT certify core fidelity or engineering readiness, "
+            "and never authorize final runs. "
+            "Exclusion reasons are independent of measured outcomes.",
+            "",
+            "| Backend / method | Status | Dev SR (n/200) | ms/control | Speedup | Reason |",
+            "|---|---|---:|---:|---:|---|",
+        ]
+        for r in uncertified:
+            d, t = r.get("development"), r.get("timing")
+            success = f"{d['successes'] / 2:.1f}% ({d['successes']})" if d else "—"
+            latency = f"{t['mean_ms']:.3f}" if t else "—"
+            speedup = f"{t['speedup']:.3f}×" if t else "—"
+            lines.append(
+                f"| {r['backend']} / `{r.get('preset', r['method'])}` | "
+                f"{r.get('status', 'pending_core')} | {success} | {latency} | "
+                f"{speedup} | {r['reason']} |"
+            )
     lines += [
         "",
         "## Evidence index",
         "",
         "Raw measurements and resource locations are ignored local evidence, not public files.",
         "Use the selection manifest and generated readiness JSON to resolve exact records.",
+        "Public preset names are simplified; measured names and recorded identities are unchanged.",
         "Recorded revisions predating history cleanup can be resolved through the",
         "[history map](../scripts/history_commit_map.json); recorded source IDs are not rewritten.",
         "",
-        "| Backend / preset | Dev experiment | Final experiment | Timing record | "
+        "| Backend / preset | Measured preset | Dev experiment | Final experiment | "
+        "Timing record | "
         "Dev / timing commit | Record digest |",
-        "|---|---|---|---|---|---|",
+        "|---|---|---|---|---|---|---|",
     ]
     for r in (
         report["primary"]
@@ -617,7 +652,8 @@ def render(report):
     ):
         final_id = f"`{r['final']['experiment_id']}`" if r["final"] else "—"
         lines.append(
-            f"| {r['backend']} / `{r['preset']}` | `{r['development']['experiment_id']}` | "
+            f"| {r['backend']} / `{r['preset']}` | "
+            f"`{r.get('measured_preset', r['preset'])}` | `{r['development']['experiment_id']}` | "
             f"{final_id} | `{r['timing']['record']}` | "
             f"`{r.get('development_commit') or 'unknown'}` / "
             f"`{r.get('timing_commit') or 'unknown'}` | `{r['timing']['record_sha256']}` |"

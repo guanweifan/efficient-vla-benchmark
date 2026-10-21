@@ -1,5 +1,31 @@
 Third-party notices for source-based adaptations
 
+The root MIT license covers original first-party contributions. Third-party
+source portions, submodules, optional runtimes, models and datasets retain their
+own notices and terms; inclusion here does not relicense those resources.
+
+Pinned-source availability audit (2026-10-21): all thirteen retained parent gitlinks were
+resolved through their public upstream commit endpoints. At the pinned revisions,
+no explicit license file was found for moojink/dlimp_openvla
+(040105d256bd28866cc6620621a3d5f7b6b91b46) or alexwhz-sjtu/SpecPrune-VLA
+(8091adc4b574ce9008d49a1dc9a210f4eec314c1). Public readability is not permission:
+clarify applicable terms before redistributing their source or source-derived
+portions. Do not assign the first-party MIT license to them by default.
+
+External execution resources are acquired separately: TinyChat/llm-awq retains
+its MIT notice; the current-stream derivative preserves that notice and records
+modified source hashes. CUTLASS 3.5.1 retains its BSD-3-Clause license in each
+mixed-integer runtime artifact. ActQuant uses a separately supplied author engine;
+retain its source and bundled third-party notices when distributing that runtime.
+Codec source acquisition records upstream revisions and license files separately.
+SpatialVLA's pinned README declares MIT without a standalone license file; this
+declaration is preserved, not replaced with invented author copyright text.
+
+OFT's published checkpoint and modified LIBERO demonstrations have their own model
+and dataset cards. The project-trained CogACT LIBERO export, calibration banks and
+evaluation traces are external assets, not automatically granted redistribution
+permission by this code license. Their publication is a separate owner decision.
+
 A3 official-code version: INCEPTIONwang/A3 at
 96a85c698f3848f6e684e36a81caf6e275db2ecc, under Apache-2.0 terms below.
 Copyright 2025 The RLinf Authors.

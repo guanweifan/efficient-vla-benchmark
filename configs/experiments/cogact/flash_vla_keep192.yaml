@@ -1,4 +1,0 @@
-# Dev-200 diagnostic variant; does not replace flash_vla defaults.
-extends: flash_vla.yaml
-parameters:
-  tokens_per_view: 192

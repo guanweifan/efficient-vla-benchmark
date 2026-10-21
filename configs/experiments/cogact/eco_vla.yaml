@@ -1,3 +1,27 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/eco_vla.yaml
+- ../../backends/cogact.yaml
+- ../../methods/eco_vla.yaml
+parameters:
+  keep_ratio: 0.6
+  temporal_inertia: 0.7
+  history_momentum: 0.9
+  trigger_quantile: 0.05
+  history_window: 16
+  calibration_samples: 32
+  calibration_seed: 0
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

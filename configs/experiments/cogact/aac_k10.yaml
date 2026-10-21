@@ -1,3 +1,0 @@
-extends: aac.yaml
-parameters:
-  num_samples: 10

@@ -22,7 +22,7 @@ def test_discovery_does_not_import_model_runtimes():
         "import sys; from efficient_vla_benchmark.core.registry import "
         "backend_entries, method_catalog; backend_entries(); method_catalog(); "
         "assert not any(n in sys.modules for n in "
-        "('torch','transformers','tensorflow','prismatic','libero','starVLA'))"
+        "('torch','transformers','tensorflow','prismatic','libero'))"
     )
     subprocess.run([sys.executable, "-c", code], check=True)
 
@@ -116,7 +116,7 @@ def test_empty_metadata_is_not_a_fake_implementation():
         )
 
 
-@pytest.mark.parametrize("name", ["vla_pruner", "team_vla", "efficient_vla", "vla_iap"])
+@pytest.mark.parametrize("name", ["vla_pruner", "efficient_vla"])
 def test_unresolved_cogact_core_does_not_silently_use_oft_or_cache_component(name):
     spec = BackendSpec("cogact", "x:y", "x:z", ("libero_joint",), frozenset())
     with pytest.raises(ValueError, match="Unsupported"):
@@ -130,6 +130,14 @@ def test_vote_without_native_overlap_is_not_registered_on_oft():
             ExperimentConfig("openvla_oft", method="vote_ensemble", model_variant="libero_joint"),
             spec,
         )
+
+
+@pytest.mark.parametrize("name", ["eaqvla", "qvla", "motion_vq", "st_merge", "team_vla", "vla_iap"])
+def test_retired_proxy_is_not_executable(name):
+    assert name not in method_catalog()
+    spec = BackendSpec("openvla_oft", "x:y", "x:z", ("libero_joint",), frozenset())
+    with pytest.raises(ValueError, match="not been integrated"):
+        select_method(ExperimentConfig("openvla_oft", method=name), spec)
 
 
 @pytest.mark.parametrize(

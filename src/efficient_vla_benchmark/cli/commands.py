@@ -29,7 +29,7 @@ def parser():
     manifest.add_argument("--sample-seed", type=int, default=20260924)
     manifest.add_argument("--policy-seed", type=int, default=0)
     derive = commands.add_parser(
-        "derive-manifest", help="Freeze timing40/final2000 from Dev-200; no rollout"
+        "derive-manifest", help="Freeze timing4/final2000 from Dev-200; no rollout"
     )
     derive.add_argument("--development-manifest", type=Path, required=True)
     derive.add_argument("--purpose", choices=("timing", "final"), required=True)

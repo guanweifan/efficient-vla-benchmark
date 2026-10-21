@@ -34,15 +34,10 @@ The 14-head setting, profile and native-count mapping are disclosed migration
 parameters, not author-tuned LIBERO results. Every probe, selection and correction
 cost is included in full-cost timing. Reset/close release all transient probes.
 
-## Selected Dev configurations
+## Selected configurations
 
-Use `configs/experiments/openvla_oft/sparsevlm_v2_scale0875.yaml` (profile 192,
-scale 0.875) or `configs/experiments/cogact/sparsevlm_v2_128.yaml` (profile 128).
-These give 194/200 and 181/200 on frozen Dev-200, respectively. More aggressive
-tested settings cross the native-relative 3-percentage-point loss boundary.
-They are the fastest eligible measured candidates, not a global optimum.
-See `docs/benchmark_results.md` for paired full-cost timing and evidence identities.
-Old paper-v1 Final scores do not apply to this V2.0 implementation.
-Both selected configurations now have one frozen Final-2000 run. CogACT's
-full-set loss exceeds the Dev selection target; keep the measured outcome and
-the original Dev evidence rather than retuning from Final results.
+Use `configs/experiments/openvla_oft/sparsevlm.yaml` (profile 192,
+scale 0.875) or `configs/experiments/cogact/sparsevlm.yaml` (profile 128).
+See [results](../../../../../docs/benchmark_results.md) for selection evidence,
+Final success and paired timing. Paper-v1 scores do not apply to this V2.0 port;
+Dev selection does not guarantee the same success-loss bound on the full set.

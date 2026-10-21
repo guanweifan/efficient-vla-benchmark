@@ -59,9 +59,30 @@ modify upstream files, global model classes, or the supplied export.
 See [INSTALL.md](INSTALL.md) for setup and [results](../../docs/benchmark_results.md)
 for measurements and limits. Native output/reset parity passed exactly on the tested
 export; four-episode smoke is not a formal success rate. The export names training
-revision `01869b7348b41cb315049f32abc7221fc01897db`, but its actual training-source
-location remains unverified. Native parity does not validate the training fork's
-evaluation conventions; a failed guessed URL is not proof that its source is private.
+revision `01869b7348b41cb315049f32abc7221fc01897db`; its training source and evaluation
+conventions have not been independently verified by the inference-parity checks.
+
+## Model asset
+
+The reported runs use a project-trained LIBERO joint-suite DiT-B checkpoint after
+10,000 updates. No public download endpoint for this exact export is currently
+verified. Publishing that export and its model card is a separate owner decision;
+the official CogACT-Base checkpoint for another benchmark is not an equivalent
+asset. Until the export is available, the published CogACT scores are not an
+end-to-end downloadable reproduction.
+
+The read-only loader requires one checkpoint under `checkpoints/`, `config.json`,
+four-suite `dataset_statistics.json`, and a complete offline `tokenizer/` including
+its Llama `config.json`. It verifies DiT-B, 16 predicted actions, seven action
+dimensions, the Prismatic DINO/SigLIP-224+7B VLM and gripper normalization masks.
+Use `--model-path` to select this export or its explicit checkpoint file. Do not
+substitute per-suite weights or reconstruct statistics from evaluation outcomes.
+
+The audited export's configuration SHA-256 is
+`1c56f556c5abd42f4602cd658e453ce2b3ec159f1237b893a41cbd8e1e052156`; its statistics SHA-256 is
+`7871a3148a761dce14f2159be1d4080206f895fd761e64341cf3f5ca78eb7be6`.
+These identify the checked export, not permission to distribute its weights or
+tokenizer. Runtime checks record the full checkpoint and tokenizer file hashes.
 
 ## Causal visual-token selection
 
@@ -89,9 +110,7 @@ Bindings include ADP (including observed-EEF gating), FlashVLA's ICS core and
 SAFE-Pruner's forecast/refresh mechanism with explicit native-cognition queries.
 Their tests check original positions, protected cognition, causal/padding masks,
 full-retention/reset/detach parity and unchanged diffusion RNG consumption. Paired
-measurements and smoke are in [results](../../docs/benchmark_results.md). VLA-IAP is
-deferred until its defining text/vision semantic-feature construction is verifiable;
-matching dimensions or implementing only edges is insufficient. Additional bindings
+measurements and smoke are in [results](../../docs/benchmark_results.md). Additional bindings
 must preserve their own core mechanisms and pass native-boundary checks.
 
 ## Additional model-access capabilities
@@ -121,7 +140,7 @@ instance attributes on close. Sampler/CFG/noise ownership remains native.
 
 ## Audited ports and unresolved scopes
 
-The 2026-09-22 batch adds SAFE-Pruner, VLA-InfoEntropy, ST-Merge, SpecPrune-VLA
+Supported bindings include SAFE-Pruner, VLA-InfoEntropy, SpecPrune-VLA
 and the explicitly separate EfficientVLA DiT cache core. SAFE/SpecPrune disclose
 native-cognition query adaptations; neither claims measured action-to-patch
 attention inside DiT. Read method READMEs for reference choices and tested scope.
@@ -129,13 +148,13 @@ attention inside DiT. Read method READMEs for reference choices and tested scope
 | Scope not registered on CogACT | Missing core condition |
 |---|---|
 | VLA-Pruner | Independent action-decoder-to-visual-patch attention for its dual scores |
-| TEAM-VLA | Verifiable joint text/action-token guidance for its mid-layer merging |
 | EfficientVLA token core | Eq. 2 visual-to-following-text attention conflicts with native causality |
-| VLA-IAP | Specified aligned semantic visual/text feature construction |
 
 These are scoped fidelity deferrals, not blanket claims of impossibility. Kernel,
 directory or hook work alone is not a reason to defer; inventing a different core
-score is. The existing OFT bindings and historical measurements remain unchanged.
+score is. Retired unverified implementations are not runtime support; compact
+retirement reasons remain in the central ledger. Historical measurements keep
+their actual identities.
 
 FastV, DivPrune, DART, SparseVLM+ v2, DepthCache primary and ASR deletion have
 separate native bindings. FastV uses final cognition attention; DART reads native

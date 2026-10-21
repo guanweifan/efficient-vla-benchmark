@@ -39,6 +39,5 @@ evb evaluate --config configs/experiments/cogact/bac.yaml \
 
 Calibration validates input/checkpoint/sampler identities and checksums; original
 checkpoints are read-only. No training, success-label fitting or Dev/final
-observations are involved. Initial budgets 6/4/2 are search candidates, not selected
-report presets. The original 100-step policy speedup is not a claim about CogACT's
+observations are involved. The original 100-step policy speedup is not a claim about CogACT's
 10-step sampler. OFT L1 has no iterative denoiser and is not registered.

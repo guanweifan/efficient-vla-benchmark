@@ -1,4 +1,0 @@
-# Dev-200 diagnostic variant; does not replace actuation_slack_refresh_deletion defaults.
-extends: actuation_slack_refresh_deletion.yaml
-parameters:
-  keep_ratio: 0.5

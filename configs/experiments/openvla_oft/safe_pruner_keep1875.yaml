@@ -1,4 +1,0 @@
-extends:
-- ./safe_pruner.yaml
-parameters:
-  keep_ratio: 0.1875

@@ -1,4 +1,0 @@
-extends:
-- action_cache.yaml
-parameters:
-  refinement_steps: 0

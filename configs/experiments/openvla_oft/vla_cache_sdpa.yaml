@@ -1,4 +1,0 @@
-# Explicit fused-output comparison; full attention statistics remain enabled.
-extends: vla_cache.yaml
-parameters:
-  attention_backend: sdpa

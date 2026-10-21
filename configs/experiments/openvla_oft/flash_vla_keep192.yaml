@@ -1,4 +1,0 @@
-# Readiness candidate: preserve complete ICS, reduce pruning strength only.
-extends: flash_vla.yaml
-parameters:
-  tokens_per_view: 192

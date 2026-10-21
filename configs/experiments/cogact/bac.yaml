@@ -1,3 +1,25 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/bac.yaml
+- ../../backends/cogact.yaml
+- ../../methods/bac.yaml
+parameters:
+  enabled: true
+  num_updates: 4
+  protected_blocks: 5
+  calibration_samples: 64
+  calibration_seed: 0
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

@@ -1,3 +1,24 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/c3ache_conditioned_residual.yaml
+- ../../backends/cogact.yaml
+- ../../methods/c3ache_conditioned_residual.yaml
+parameters:
+  enabled: true
+  refresh_interval: 2
+  cache_steps: 2
+  live_prefix_blocks: 6
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

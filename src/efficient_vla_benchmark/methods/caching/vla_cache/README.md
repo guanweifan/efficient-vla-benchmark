@@ -1,11 +1,5 @@
 # VLA-Cache
 
-The decoder records selected-row counts from the exact unique-prefix invariant,
-avoiding a redundant device scalar synchronization. Task-protection indices for
-both camera views transfer together after the decoder finishes. These changes
-do not sample/freeze entropy or remove any mechanism; controlled old/new comparisons
-check identical actions, schedules, protected sets and computed-row counts.
-
 Reference: [paper](https://arxiv.org/abs/2502.02175),
 [author implementation](https://github.com/siyuhsu/vla-cache/tree/a4909880573868dee2769343d52e793c0341678b),
 [author Transformers fork](https://github.com/siyuhsu/transformers/tree/9a90a37acacf453433168db8d7769b7ea3c40c06).
@@ -13,6 +7,10 @@ Both source repositories are pinned under `third_party` for inspection; the seco
 Transformers package is not installed into the runtime environment.
 
 ## Complete mechanism
+
+The numeric values below describe reference defaults. The final presets use a
+static-candidate cap of 256 per view, protecting 50 patches on OFT and 75 on
+CogACT. The threshold, entropy equation and reuse-layer schedule are unchanged.
 
 1. Compare current and previous inference-frame RGB patches, select up to 150
    static patches per camera at cosine threshold 0.996.
@@ -64,21 +62,10 @@ fixed-size caches and instruction/episode invalidation. GPU, LIBERO and timing
 checks must also pass before claiming a completed integration. A speedup is not
 assumed: attention-statistics overhead can outweigh savings on a particular GPU.
 
-Initial development checks passed cold-query native parity at 1e-6, bitwise reuse
-of skipped KV rows on real observations, and episode/instruction invalidation.
-All four small LIBERO smoke episodes completed successfully without runtime errors;
-this is not a formal success-rate estimate.
-
-The standard-attention correction has additional real-model cold/reset parity
-checks against an independent eager LlamaAttention reference at 1e-6; the SDPA
-option retains its native-parity check. Shared backend tests ensure eager does
-not call SDPA again. Matching the author execution pattern does not guarantee
-a speedup over an optimized native SDPA baseline; token-count savings are not
-necessarily proportional to GPU latency savings.
-
-Measurements and separate historical cohorts are recorded in `docs/benchmark_results.md`.
-Retain negative results: do not compare only against an artificially slow eager
-baseline or omit the full entropy mechanism to manufacture a speedup.
+Real-model tests check eager cold/reset parity against an independent
+LlamaAttention reference at 1e-6; SDPA uses its native-parity check. Eager must not
+call SDPA again. See [results](../../../../../docs/benchmark_results.md) for measured
+success and speed against native SDPA, including negative outcomes.
 
 ## CogACT binding
 
@@ -93,8 +80,8 @@ computed query set becomes sparse and the full KV set remains in storage.
 The indexed adapter suppresses the unused append-cache return of CogACT's single
 cognition-generation step. Its native generation/readout, FP32 DiT, DDIM10/CFG1.5
 and 16-predict/8-execute protocol are unchanged. Full entropy and task-attention
-costs are timed. Eager is the author-pattern preset, while `vla_cache_sdpa.yaml`
-is an explicit output-kernel comparison with the same complete statistics.
+costs are timed. The final preset selects eager, matching the author execution pattern.
+The optional SDPA output path retains the same complete statistics.
 Compare speed against native SDPA, never solely against a slower eager reference.
 A cold eager reference is used only for independent mechanism/parity validation.
 

@@ -1,3 +1,26 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/probeflow.yaml
+- ../../backends/cogact.yaml
+- ../../methods/probeflow.yaml
+parameters:
+  enabled: true
+  epsilon: 0.015
+  probe_time: 0.5
+  max_steps: 10
+  step_increment: 2
+  diagnostic_fixed_steps: 0
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

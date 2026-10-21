@@ -1,4 +1,0 @@
-extends:
-  - motion_vq.yaml
-parameters:
-  threshold: 1.0

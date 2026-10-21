@@ -1,4 +1,0 @@
-extends:
-- ./efficient_vla.yaml
-parameters:
-  tokens_per_view: 96

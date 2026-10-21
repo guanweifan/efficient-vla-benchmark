@@ -1,7 +1,0 @@
-extends:
-- ./specprune_vla_static96.yaml
-parameters:
-  primary_static_budget: 112
-  wrist_static_budget: 112
-  primary_precise_static_budget: 112
-  wrist_precise_static_budget: 112

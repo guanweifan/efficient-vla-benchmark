@@ -1,5 +1,20 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/depth_cache_primary.yaml
+- ../../backends/openvla_oft.yaml
+- ../../methods/depth_cache_primary.yaml
 evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
   depth: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

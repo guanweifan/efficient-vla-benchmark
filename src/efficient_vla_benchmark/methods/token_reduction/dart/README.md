@@ -27,15 +27,9 @@ replacing SDPA. Language pivots exclude the final cognition EOS. The same shared
 rule retains 132/256 visual rows by default; cognition and diffusion RNG remain
 native. Device-side pivot gathering avoids implicit scalar host synchronization.
 
-## Bounded development diagnostics
+## Selected configurations
 
-OFT Dev-200 presets `dart_keep75` and `dart_layer4` change retention (0.5 to
-0.75) or pruning layer (2 to 4) separately. Post-RoPE key pivots, normalized
-feature distances and sequential exclusion remain unchanged. Budgets retain
-the reference's extra visual pivots rather than silently forcing an exact ratio.
-
-The OFT report presets inherit layer4 from those diagnostics before tuning
-retention; no pivot/scoring rule is replaced. Current choices and their measured
-outcomes live only in the central selection manifest and result ledger. This is
-a VLM-to-VLA parameter study, not an author-released VLA preset or independent
-final-test accuracy.
+The final OFT preset prunes before layer 4; CogACT retains its independently
+selected layer/budget. Post-RoPE pivots, normalized distances and sequential
+exclusion are unchanged. Budgets include the reference's extra visual pivots.
+This is a VLM-to-VLA parameter transfer, not an author-released VLA preset.

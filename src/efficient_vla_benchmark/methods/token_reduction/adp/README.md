@@ -67,7 +67,6 @@ Missing observed state fails, rather than using zero or predicted trajectories.
 Windows close after the actual executed prefix of eight steps, not after the
 sixteen predicted actions. Initialization and dense refresh costs are timed.
 
-Use `configs/experiments/cogact/adp.yaml`. The separate `adp_static.yaml` disables
-the motion gate and is an ablation, not full ADP; it does not consume EEF history.
+Use `configs/experiments/cogact/adp.yaml`. Disabling `dynamic` would remove the motion gate and is not the final full-ADP configuration.
 Source/equation checks establish the core selector and controller, not published
 checkpoint scores or invariance of performance to different baselines.

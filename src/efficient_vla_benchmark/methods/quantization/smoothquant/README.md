@@ -36,13 +36,7 @@ model to undo it. Reset/close own no cross-episode caches.
 
 Use the usual `evb calibrate` / `evaluate` / `benchmark` commands with
 `configs/experiments/<backend>/smoothquant.yaml` and caller-supplied model,
-dataset and artifact paths. Registration is not admission: whole-policy parity,
-LIBERO smoke, original replay timing and Dev-200 must pass before a primary row.
-No formal measurements are claimed by this README.
-
-Validation: 18 mechanism/artifact/lifecycle tests pass. On each backend, all 224
-integer linears executed across 12 frozen observations from four suites; complete
-actions matched an independent Torch INT8/INT32 GEMM oracle exactly, including
-reset/reload and gripper checks. Both common four-episode LIBERO smokes completed
-4/4 without runtime errors. These are correctness gates, not Dev-200 accuracy or
-end-to-end speedup evidence.
+dataset and artifact paths. Tests compare complete actions against an independent
+Torch INT8/INT32 GEMM oracle, including all 224 linears, reset/reload and gripper
+handling. See [results](../../../../../docs/benchmark_results.md) for measured
+success and full-cost timing.

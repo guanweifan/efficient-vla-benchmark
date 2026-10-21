@@ -1,4 +1,0 @@
-extends:
-- ./dart_layer4.yaml
-parameters:
-  keep_ratio: 0.1875

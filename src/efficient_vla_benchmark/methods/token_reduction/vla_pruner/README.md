@@ -11,7 +11,8 @@ the released OFT code, not only language queries. Action guidance comes from the
 three preceding query frames, weighted newest-first by 0.8 decay. Their scores are
 sampled at layer 15, scattered to original patch IDs, and missing positions are
 zero-filled. The first three queries are full-token warm start. Pruning follows
-layer 3 (zero-based), retaining 25% per camera in the supplied preset.
+layer 3 (zero-based). The reference setting retains 25% per camera; the final
+Dev-selected preset retains 12.5% while preserving both scores and temporal history.
 
 ## Integration and explicit differences
 

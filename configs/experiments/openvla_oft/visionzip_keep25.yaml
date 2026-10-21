@@ -1,4 +1,0 @@
-extends:
-- visionzip.yaml
-parameters:
-  keep_ratio: 0.25

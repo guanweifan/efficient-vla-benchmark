@@ -1,90 +1,59 @@
-# DyQ-VLA — temporal core on native H8
+# DyQ-VLA — v2 temporal core
 
-Reference: [paper v2](https://arxiv.org/abs/2603.07904v2).
-No implementation of the selected v2 controller has been verified. The
-[October 2026 v3 release](https://arxiv.org/abs/2603.07904v3) links public code,
-but changes the controller and falls after the agreed literature cutoff; it is
-not silently substituted for this scope. The port implements
-fixed W4 language projections, dynamic A2/A4/A8/native activation precision,
-motion-fineness/angular-jerk fusion, independently calibrated error-bound
-thresholds, and the exact stateful Algorithm 1 counter. A rising pending
-candidate resets the downgrade counter; only the fused sensitivity is clamped.
+Independent implementation of [paper v2](https://arxiv.org/abs/2603.07904v2).
+No author implementation of this v2 controller was verified. The
+[v3 release](https://arxiv.org/abs/2603.07904v3) changes the controller and falls after
+the literature cutoff; it is not substituted here.
 
-All 224 decoder projections are covered. Vision/action heads remain native.
-Weights use FP32 per-output RTN calibration with native-dtype reconstruction.
-Activation scales are per-input-channel maxima of calibrated frame percentiles.
-These quantizer-axis details are engineering choices not specified by the paper.
-W4 remains packed; low-bit activations occupy INT8 storage. The kernel performs
-tile dequantization and floating GEMM. It does NOT implement the unavailable
-author CUTLASS integer-MMA/zero-copy asynchronous engine; low-bit routing alone
-does not imply lower latency on this backend. All dispatch/quantization work is timed.
+## Mechanism
 
-Dispatch uses actually executed environment-native xyz/rotation commands, not
-future predictions, and changes precision at H8 chunk boundaries as permitted
-by the paper. K therefore counts chunk decisions; the motion/jerk windows count
-control actions. Cold start uses A16; history resets per episode/instruction.
-Historical percentiles use all previous commands in the current episode.
-The paper does not fix cold-start normalization; both offline and online paths
-use this identical causal convention.
+All 224 language projections use fixed W4 weights with dynamic A2/A4/A8/native
+activation precision. Motion-fineness/angular-jerk fusion and Algorithm 1's stateful
+counter select precision from actually executed xyz/rotation commands. A rising
+pending candidate resets the downgrade counter; only fused sensitivity is clamped.
+Decisions occur at H8 chunk boundaries, while motion windows count control actions.
+Cold start uses A16; history resets per episode/instruction. Causal normalization
+uses previous commands only, an explicit convention where the paper is underspecified.
+Vision and action heads remain native.
 
-Calibration takes a checksummed independent native trajectory population via
-the dataset CLI argument, NOT the Dev/Final dataset. Every task is attempted
-once; failed episodes are retained and never replaced. Uniformly sampled native
-query frames from successful full trajectories provide native and quantized
-paired commands with identical RNG seeds. Error is mean L2 over xyz/rotation
-of the H8 executed prefix; gripper remains excluded and is evaluated closed-loop.
-The estimator uses the first conditional-mean error-bound crossing in equal-count
-sensitivity bins. This fitting rule is disclosed because the paper leaves its
-estimator unspecified; it is not the handover's unsafe maximum-accepted-frame rule.
-A negative boundary explicitly disables an unsupported lower-bit interval.
-Calibration is frozen before Dev selection; no policy parameter is trained.
+## Selected runtime
 
-One canonical implementation serves both bindings. The independent artifact
-schema rejects the old isolated-frame proxy and fake runtime. Fresh native
-models are required to undo irreversible quantization. Runtime registration
-does not imply completed calibration, Dev-200, timing, or owner-approved Final.
+Both final `dyq_vla.yaml` presets use `runtime: mixed_integer` and dynamic
+per-token symmetric activation quantization: A2 [-1, 1], A4 [-7, 7], A8 [-127, 127],
+nearest-even rounding and an FP32 amax floor of 1e-5. W4 uses per-output RTN scales
+rounded to BF16; A16 retains native BF16 activations. These axes and arithmetic are
+disclosed implementation choices, not author-code parity.
 
-## Explicit mixed-integer runtime candidate
+One immutable packed W4 bank serves every branch. A2 expands to INT4 in a separate
+timed kernel; A4 uses INT4 MMA; A8 expands weights in registers for INT8 MMA;
+A16 uses tile-dequantized BF16 GEMM. No decoded weight bank is cached. The author's
+register-fused A2 and asynchronous zero-copy pipeline are not implemented.
 
-`dyq_vla_mixed_integer` keeps the v2 temporal dispatcher, target modules, H8 and
-independent population, but explicitly selects dynamic **per-token symmetric**
-activation quantization. A2 uses [-1, 1], A4 [-7, 7], A8 [-127, 127], nearest-even
-rounding and an FP32 amax floor of 1e-5. Per-output W4 scales are BF16-rounded;
-the A16 branch retains native BF16 activations. These quantizer details remain
-disclosed engineering choices, not author-v2-code parity.
+Build the [mixed runtime](../../../model_ops/quantization/README.md#optional-mixed-precision-runtime-build)
+and supply it through `--runtime-path`. All dispatch, conversion and synchronization
+costs remain timed. Reverting quantization requires a fresh native model.
 
-One immutable W4 bank serves all four branches: packed A2 is expanded to INT4 by
-a separate timed kernel, A4 uses INT4 MMA directly, A8 uses INT8 MMA with register
-weight expansion, and A16 uses tile-dequantized BF16 GEMM. No full decoded weight
-bank is cached. The author's register-fused A2 and asynchronous zero-copy pipeline
-are not implemented. The separately built [shared runtime](../../../model_ops/quantization/README.md#optional-mixed-precision-runtime-build)
-is supplied via `--runtime-path`, checked and recorded; no private path is embedded.
+## Calibration and use
 
-The tokenwise quantizer and changed arithmetic require **new schema-3 calibration**
-on the same frozen independent native population. Old channelwise schema-2
-thresholds, Dev success and latency cannot be reused. Calibration records the exact
-binary/source identity; runtime substitution is rejected. No policy training or
-additional trajectory collection is implied. Registration alone is not admission.
+Calibration requires a checksummed independent native trajectory population,
+not RLDS frames or Dev/Final episodes. Attempt each task once, retain failures
+without replacement, and sample native query frames from successful trajectories.
+Native and quantized commands share RNG seeds. Fit the first conditional-mean
+error crossing in equal-count sensitivity bins; error is mean L2 over xyz/rotation
+of the executed H8 prefix, excluding gripper. A negative boundary disables an
+unsupported low-bit interval. This estimator is an explicit paper-to-code convention.
 
-`dyq_vla_mixed_integer_k1_fp075` is a speedward routing candidate: K=1
-removes the nontrivial downgrade delay while preserving Algorithm 1, and the
-A16 threshold is 0.75. Motion/jerk sensitivity, cold-start A16 and the independently
-fitted A2/A4 boundaries remain active. It is not a fixed-A8 replacement or a
-paper-default configuration. All suites use the same settings.
+The mixed runtime requires schema-3 calibration bound to its binary/source,
+checkpoint, population and quantizer. Old channelwise schema-2 errors, thresholds
+and measurements are incompatible. No policy training occurs.
 
-Two targeted follow-ups expose different tradeoffs, not an exhaustive grid.
-OFT's `dyq_vla_mixed_integer_k1_fp090_budget020` raises the A16 threshold to
-0.9 and the independent action-error calibration budget to 0.2, enabling more
-low-bit routing where its measured branch cost supports it. That calibration
-budget is an action-error bound, NOT the Dev success-loss tolerance.
-CogACT's `dyq_vla_mixed_integer_k1_fp065` instead uses an A16 threshold of 0.65
-to compare accuracy recovery against the 0.75 candidate while keeping K=1.
-Neither preset is admitted by registration; preserve literal fitted boundaries,
-including empty precision intervals, and measure each changed policy separately.
+Use `evb calibrate` with `--dataset-path` pointing to the frozen population;
+evaluate with `--artifact-path` and `--runtime-path`. Both final presets use K=1;
+the A16 threshold is 0.75 for OFT and 0.65 for CogACT. Independently fitted A2/A4
+boundaries remain active; this is not a fixed-A8 replacement. The calibration
+action-error budget is distinct from the Dev success-loss target.
 
-Routing-only candidates may refit thresholds from the identical schema-3
-fixed-precision error records when their full calibration dependency audit proves
-those measurements unchanged. Preserve the original calibration source, sample
-and weight checksums; record the derivation separately in a new artifact. Never
-reuse schema-2 errors or fit on Dev outcomes. Each changed routing configuration
-still requires its own controller/reference checks, Dev-200 and full-cost timing.
+Routing-only changes may refit thresholds from identical schema-3 fixed-precision
+error records after a dependency audit. Preserve original source/sample/weight
+identities, record the derived artifact, and remeasure Dev and full-cost timing.
+See [results](../../../../../docs/benchmark_results.md) for the selected outcomes.

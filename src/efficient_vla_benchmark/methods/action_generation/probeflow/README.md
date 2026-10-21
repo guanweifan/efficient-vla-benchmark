@@ -25,9 +25,7 @@ preserves success. The conversion does not endow the model with FM straight-path
 training: any curvature/accuracy/latency finding belongs to this disclosed port,
 not a reproduction of the published Evo-1 model's numeric results.
 
-The existing baseline remains native DDIM10/H8. Fixed-Euler2/10 presets are
-explicit **diagnostic controls, not ProbeFlow results**; they isolate uniform-grid
-effects from adaptive scheduling. Discarded native eta-zero random draws are
+The baseline remains native DDIM10/H8. Discarded native eta-zero random draws are
 retained to keep later query noises identical across solver budgets. All probe,
 conversion, RNG and synchronization overhead is inside common full-cost timing.
 No weights, VLM calls, action dimensions or executed horizons change. OFT's L1

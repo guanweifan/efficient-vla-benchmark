@@ -1,3 +1,0 @@
-extends: v_aefusion.yaml
-parameters:
-  stale_steps: 9

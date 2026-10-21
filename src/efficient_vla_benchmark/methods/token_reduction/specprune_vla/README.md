@@ -36,9 +36,9 @@ Internal switches exist for ablations; all three mechanisms are enabled by defau
   Replace its hardcoded 34-token instruction bound with the actual text boundary;
   account explicitly for the proprio token. Prefix skips retain the reference
   offsets; very short text ranges retain at least one text query.
-- Keep the reference schedule: pruning at layer 10 precedes the first importance
+- Reference defaults prune at layer 10 before the first importance
   update at layer 14. Its first dynamic selection therefore sorts tied scores.
-  This is retained and documented, not silently replaced with another algorithm.
+  CogACT retains this schedule; the final OFT override is described below.
 - The pinned "precise" profile actually has smaller text budgets and larger
   unchanged-patch budgets. Defaults follow the code; the name alone does not prove
   more conservative retention. All relevant budgets are exposed in configuration.
@@ -57,12 +57,7 @@ tokens, dynamic budgets, per-episode confidence reset, controller transitions an
 dense equivalence with internal mechanisms disabled. Real-model tests also verify
 all pruning mechanisms run and an episode reset reproduces the same commands.
 
-Development validation on the joint-suite checkpoint completed four real LIBERO
-episodes without runtime errors: Spatial, Object and Long succeeded; Goal reached
-the step limit. Preserve that failure rather than retrying until success. This
-four-episode smoke is not a success-rate estimate.
-
-Timing and historical cohorts are recorded in `docs/benchmark_results.md`.
+Measurements are in [results](../../../../../docs/benchmark_results.md).
 Report both per-query latency and total replay time: extra controller queries can
 reduce the overall benefit. These are not closed-loop task-completion times.
 
@@ -89,19 +84,12 @@ crop. Original causal visibility, positions, final cognition and DDIM remain int
 Reset clears frames, confidence, global saliency and controller state. Probe costs
 and any extra model queries are included in control-replay timing.
 
-## Bounded development diagnostics
+## Selected configurations
 
-Dev-200 compares two explicit variants on each backend. `specprune_vla_static128`
-caps low-change deletion at 128 patches per view in both controller modes,
-without disabling global/local selection, dynamic pruning or control. The
-`specprune_vla_score_first` schedule adds an importance update at layer 9 before
-the first layer-10 pruning; other layers are unchanged. This is an intentional
-schedule ablation, NOT a correction to the pinned author's executable defaults.
-The latter initialize scores to zero and first update at layer 14.
-
-OFT report presets inherit the disclosed score-first schedule and tune dynamic
-retention. CogACT report presets retain the pinned importance schedule and tune
-the static DELETION cap; this number is not the final retained count. Do not
-generalize one backend's schedule choice to the other or call score-first an
-author-code bug fix. Current Dev outcomes, exact timing and chosen configurations
-live in the central ledger/selection manifest rather than stale diagnostic tables.
+The final OFT preset uses an explicit score-first schedule: an importance update
+at layer 9 precedes layer-10 pruning. This is a disclosed schedule adaptation,
+not a correction to the author's zero-initialized scores and layer-14 first update.
+CogACT retains the pinned importance schedule and selects a static deletion cap;
+the cap is not the final retained count. Both retain the full pruning/controller
+mechanism. Exact settings and selection evidence are in the canonical presets
+and central ledger; one backend's schedule must not be attributed to the other.

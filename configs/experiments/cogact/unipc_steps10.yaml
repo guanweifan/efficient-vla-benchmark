@@ -1,3 +1,0 @@
-extends: unipc.yaml
-parameters:
-  num_steps: 10

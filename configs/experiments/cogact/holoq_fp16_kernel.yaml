@@ -1,3 +1,0 @@
-extends: holoq.yaml
-parameters:
-  runtime: tinychat_fp16

@@ -1,7 +1,0 @@
-# Readiness candidate: cap static DELETION at 96; all three mechanisms remain active.
-extends: specprune_vla_static128.yaml
-parameters:
-  primary_static_budget: 96
-  wrist_static_budget: 96
-  primary_precise_static_budget: 96
-  wrist_precise_static_budget: 96

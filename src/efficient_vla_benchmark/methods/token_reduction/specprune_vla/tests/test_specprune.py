@@ -4,7 +4,6 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 import torch
-from efficient_vla_backend_openvla_oft.decoder import DecoderState, TokenLayout
 from transformers import LlamaConfig
 from transformers.models.llama.modeling_llama import LlamaModel
 
@@ -12,13 +11,13 @@ from efficient_vla_benchmark.core.resources import project_source
 from efficient_vla_benchmark.core.types import EpisodeContext
 from efficient_vla_benchmark.methods.token_reduction.specprune_vla.config import SpecPruneConfig
 
-from ..implementations.openvla_oft.method import (
-    SpecPrune,
-    stable_patch_ids,
-)
+from ..method import stable_patch_ids
 
 
 def method(parameters=None):
+    pytest.importorskip("efficient_vla_backend_openvla_oft")
+    from ..implementations.openvla_oft.method import SpecPrune
+
     cfg = LlamaConfig(
         vocab_size=32,
         hidden_size=16,
@@ -70,6 +69,7 @@ def test_model_bounds_are_validated_by_oft_implementation(parameters):
 
 
 def test_patch_selection_matches_pinned_reference():
+    pytest.importorskip("skimage.util", reason="Pinned author reference needs scikit-image")
     source = project_source("third_party/methods/specprune_vla") / (
         "openvla-oft/experiments/robot/spec_prune_vla.py"
     )
@@ -90,6 +90,9 @@ def test_patch_selection_matches_pinned_reference():
 
 
 def test_static_selection_protects_prior_global_and_nonvisual_tokens():
+    pytest.importorskip("efficient_vla_backend_openvla_oft")
+    from efficient_vla_backend_openvla_oft.decoder import DecoderState, TokenLayout
+
     strategy = method({"dynamic_pruning": False, "action_controller": False})
     state = DecoderState(TokenLayout(600), torch.arange(600))
     strategy.last_layout = state.layout
@@ -109,6 +112,9 @@ def test_static_selection_protects_prior_global_and_nonvisual_tokens():
 
 
 def test_dynamic_pruning_keeps_budget_protected_tokens_and_episode_confidence():
+    pytest.importorskip("efficient_vla_backend_openvla_oft")
+    from efficient_vla_backend_openvla_oft.decoder import DecoderState, TokenLayout
+
     strategy = method({"static_pruning": False, "action_controller": False})
     state = DecoderState(TokenLayout(600), torch.arange(600))
     strategy.start(state)

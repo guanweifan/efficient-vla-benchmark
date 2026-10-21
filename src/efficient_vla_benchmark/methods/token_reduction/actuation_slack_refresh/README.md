@@ -61,17 +61,9 @@ Tests check immutable clean KV, missing-base rejection and real-checkpoint
 cold/no-op/reset/detach/RNG behavior. Measurements must additionally pass the common
 smoke, Dev-200 and full-cost replay before this scope enters the primary ledger.
 
-## Deletion-only development diagnostics
+## Selected configurations
 
-The following counts describe deletion only, not the independent KV-reuse scope.
-Consult the central ledger for current selections of both instruments.
-CogACT Dev-200 presets `actuation_slack_refresh_keep25` and
-`actuation_slack_refresh_keep50` raise the primary-view retention ratio from 0.1
-to 0.25 or 0.5. Dense first chunks, unconditional same-frame dense refresh,
-gate provenance and RNG restoration are unchanged. Timing must include refresh;
-a better success rate cannot justify omitting this cost.
-
-Fixed CogACT Dev-200 scored 137/200 at retention 0.1, 178/200 at 0.25 and
-182/200 at 0.5, versus native 183/200. This isolates strong retention sensitivity
-while keeping the refresh mechanism. A near-native success rate does not remove
-the extra dense-pass cost or establish real-robot serve-latency acceleration.
+The final CogACT deletion preset retains 25% of primary-view patches. OFT and
+KV-reuse settings are separately frozen in their canonical presets. Every selected
+configuration includes the unconditional dense refresh; near-native success cannot
+justify omitting its cost. Selection evidence remains in the central ledger.

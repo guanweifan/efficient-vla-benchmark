@@ -1,4 +1,0 @@
-extends:
-  - holoq.yaml
-parameters:
-  block_size: 16

@@ -64,7 +64,7 @@ Existing outputs are rejected. Cache capacity is 3000; overflow is an error, not
 silent test-guided eviction. Population cost excludes loading and is not hidden in
 steady-state speedup.
 
-For a separately authorized clean-endpoint recollection, supply every original
+To rebuild a bank at its original initial states, supply every original
 population shard to `--replay-population "$OLD_SHARD_0" "$OLD_SHARD_1" ...`.
 The collector verifies all eighty original identities and state hashes, replays
 those exact states, and writes an attempt record before each rollout. Failed
@@ -74,16 +74,7 @@ attempt/outcome agreement, native endpoint provenance and all held-out states.
 Both zero-step and few-step evaluation must explicitly select the new artifact;
 older results are not silently relabeled as measurements of the new bank.
 
-The initial schema-1 bank contains 1412 pairs from 77/80 successful independent
-episodes. Initial threshold 0.90 was chosen before Dev evaluation from leave-one-
-episode-out prefill similarity: expected hits span roughly 10–32% across suites,
-whereas 0.95 nearly disables retrieval in some suites. This is a disclosed
-CogACT-specific choice, not the original models' threshold.
-
-The authorized schema-2 recollection completed exactly 80 attempts at the same
-independent initial states: 77 successes, three retained failures and 1412 pairs.
-Keys, intermediate states, partitions and all episode outcomes match the old bank
-bitwise; only the actual clean endpoints are added. There were no replacement
-episodes or Dev/final-data collection. Zero/few-step Dev and replay evidence use
-this new bank explicitly; the ledger separates the primary from the useful
-zero-step endpoint instead of publishing two default configurations.
+Use the final `action_cache.yaml` with a schema-2 bank. Thresholds are CogACT-specific
+selection choices, not the paper's original-model recipe. Population costs and
+primary/auxiliary measurements are recorded in the
+[results](../../../../../docs/benchmark_results.md).

@@ -1,3 +1,0 @@
-extends: a3_official_k4_steps4.yaml
-parameters:
-  verification_chunk_size: 4

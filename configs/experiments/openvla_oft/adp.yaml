@@ -1,3 +1,29 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/adp.yaml
+- ../../backends/openvla_oft.yaml
+- ../../methods/adp.yaml
+parameters:
+  keep_ratio: 0.1875
+  view_weights:
+  - 0.4
+  - 0.6
+  dynamic: true
+  decision: adjacent
+  window: 3
+  delta: net
+  max_consecutive_pruned: 3
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

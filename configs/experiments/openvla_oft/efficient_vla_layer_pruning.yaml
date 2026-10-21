@@ -1,3 +1,0 @@
-extends:
-  - baseline.yaml
-  - ../../methods/efficient_vla_layer_pruning.yaml

@@ -1,6 +1,0 @@
-extends:
-- ./depth_cache_primary.yaml
-parameters:
-  max_merge_ratio: 0.9
-  min_merge_ratio: 0.75
-  merge_window: 2

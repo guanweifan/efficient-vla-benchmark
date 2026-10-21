@@ -1,4 +1,0 @@
-extends:
-- vla_infoentropy.yaml
-parameters:
-  static_budget_per_view: 192

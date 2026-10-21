@@ -1,3 +1,0 @@
-extends: a3_official_k4_steps4.yaml
-parameters:
-  threshold_scale: 1.5

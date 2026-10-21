@@ -28,6 +28,7 @@ def test_invalid_config(bad):
 
 
 def test_dual_score_selection_matches_pinned_source():
+    pytest.importorskip("efficient_vla_backend_openvla_oft")
     import torch
 
     from ..implementations.openvla_oft.method import combine_filter
@@ -77,6 +78,7 @@ def test_dual_score_selection_matches_pinned_source():
 
 
 def test_degenerate_features_have_unique_budget_and_history_is_newest_first():
+    pytest.importorskip("efficient_vla_backend_openvla_oft")
     import torch
 
     from ..implementations.openvla_oft.method import diverse_indices, temporal_scores

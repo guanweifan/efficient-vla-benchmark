@@ -1,70 +1,53 @@
 # QuantVLA — CogACT packed runtime
 
-Identity smoothing/permutation are skipped, and static rotation buffers are cast
-once to each native layer's dtype. GPU tests require exact equivalence to the
-unoptimized path; calibration, precision and quantization equations are unchanged.
-
 Reference: [pinned official source](https://github.com/AIoT-MLSys-Lab/QuantVLA/tree/9e435e56aac4e743526557e5d9ba6e4fddd6ccca).
-The supported port is CogACT LIBERO joint, native BF16 VLM, FP32 DiT and DDIM10 H8.
-Registration is not evidence of completed Dev/final evaluation; see the result ledger.
+The port preserves CogACT's BF16 VLM/FP32 DiT boundaries, DDIM10 and H8.
 
-The complete selected mechanism is block-SVD input/output rotations, optional
-energy-smoothed zigzag permutation, per-row five-point MSE W4 scaling, frozen
-per-input-channel A8 percentile scales, per-head ATM and post-projection OHB.
-There are 224 language and 24 DiT-MLP quantized linears and 12 native FP32 attention
-modules. Vision, projectors, DiT attention weights and sampler precision are unchanged.
+## Mechanism
 
-`energy_smoothing` smooths the column-energy statistic used for the optional
-permutation. It is **not** SmoothQuant activation/weight rescaling. ATM uses the
-author's clipped ratio and neutral band; OHB uses a separate log-clipped ratio.
-W4 codes are -8..7; A8 codes are -128..127. Scales use the native module dtype.
+The mechanism combines block-SVD input/output rotations, optional energy-smoothed
+zigzag permutation, per-row five-point MSE W4 scaling, frozen per-channel A8 scales,
+per-head ATM and post-projection OHB. Quantized targets are 224 language and 24 DiT-MLP
+linears; twelve native FP32 attention modules receive ATM/OHB. Vision, projectors,
+DiT attention weights and sampler precision are unchanged.
 
-Calibration uses only the fixed four-suite RLDS training pool. Per-channel
-activation percentiles are maximized across 32 observed calls per module, then
-frozen. DiT calls include diffusion steps, not 32 distinct episodes. Attention
-statistics use 128 balanced training observations for both native and packed
-student inference. The released wrapper can freeze its first-call fallback;
-this port explicitly completes its intended percentile-calibrator window offline.
-That engineering adaptation is disclosed, not called bitwise application parity.
+`energy_smoothing` affects the optional permutation's column-energy statistic,
+not SmoothQuant rescaling. ATM uses the author's clipped ratio/neutral band;
+OHB uses a separate log-clipped ratio. W4 codes span -8..7 and A8 spans -128..127.
 
-Runtime weights are physically packed W4 and activations are INT8. The Triton
-kernel locally dequantizes tiles for floating GEMM with FP32 accumulation:
-**not integer W4A8 MMA**, not a full floating-weight cache, and not guaranteed faster.
-Rotations, A8 conversion, ATM/OHB and transfers remain inside common timing.
+Calibration uses the four-suite RLDS training pool. Frozen per-channel percentiles
+take maxima across 32 observed calls per module; DiT calls include diffusion steps.
+Attention statistics use 128 balanced observations with both native and packed
+student inference. Completing the percentile window offline avoids the released
+wrapper's first-call fallback; this adaptation is not bitwise application parity.
 
-Use `evb calibrate` with the portable `cogact/quantvla.yaml` preset, explicit model,
-dataset and artifact destinations. Evaluation requires the resulting schema-3
-artifact through `--artifact-path`. Changing any calibration parameter requires
-a matching artifact. Legacy handover schema-2 artifacts are diagnostic-only and
-rejected: their scale/permutation/attention formulas differed from the author code.
-Conversion is irreversible; returning to native requires a fresh backend.
+## Selected runtime
 
-The explicit `quantvla_fp16_kernel` preset selects the same core with a different
-execution engine: native-rounded channel A8 followed by packed TinyChat W4 GEMM
-with FP16 scales/products/accumulation, and fused block rotations. Native BF16 LLM
-and FP32 DiT boundaries, biases, attention, ATM/OHB and sampler remain unchanged.
-This is not integer MMA or bitwise native-FP32 execution. The calibration identity
-includes this engine: activation percentiles and packed-student ATM/OHB statistics
-must be regenerated; an old tile-engine artifact is rejected rather than relabeled.
-Registration alone does not admit its performance or inherit earlier Dev results.
+The final `quantvla.yaml` selects block size 64, no permutation,
+`runtime: tinychat_fp16` and `dit_graphs: true`. Native-rounded channel A8 preparation
+feeds packed TinyChat W4 GEMM with FP16 scales/products/accumulation. This is
+floating GEMM over packed weights, not integer W4A8 MMA or native-FP32 accumulation.
 
-The FP16 engine fuses input rotation/channel preparation and output cast/rotation/
-bias into adjacent kernels, preserving native intermediate rounding. Smoothing
-and permutations, when enabled, are still applied before rotation. Short row
-counts retain native CUDA BMM; dynamic token lengths do not specialize dispatch.
-The tile engine and calibration equations remain unchanged. Engine artifacts
-can be reused for this arithmetic-equivalent optimization only after exact
-whole-policy/reference and reload checks; latency requires fresh full-cost timing.
+Adjacent rotation/preparation and output cast/rotation/bias are fused while
+preserving intermediate rounding. Short rows retain native CUDA BMM; dynamic token
+lengths do not specialize dispatch. Identity smoothing/permutation is skipped, and
+static rotation buffers are converted once. Enabled permutations still precede rotation.
 
-`quantvla_fp16_graph` explicitly enables one fixed-shape CUDA graph for each of
-the 24 DiT-MLP quantized projections. Its stream-correct TinyChat derivative is
-checksummed and supplied via `--runtime-path`; see the shared operations README
-for the portable build. Language, native attention, ATM/OHB, quantizer, sampler
-and precision remain unchanged. Fresh inputs are copied on every call and outputs
-cloned before scratch reuse; no robot observation/action cache is introduced.
+Each of the 24 DiT-MLP projections uses one fixed-shape CUDA graph with the
+[current-stream TinyChat runtime](../../../model_ops/quantization/README.md#optional-fixed-shape-dit-graphs).
+Supply it through `--runtime-path`. Fresh inputs are copied and outputs cloned on
+every call; this is not observation/action caching. Graphs clear on state/device
+changes and reject unexpected geometry. Capture is cold-start cost; replay copies,
+rotations, ATM/OHB and transfers stay timed.
 
-Graphs clear on state reload/device moves/close and reject unexpected geometry.
-Capture is separately disclosed cold-start overhead, not warmed inference; every
-replay copy stays timed. Same-arithmetic artifact reuse requires exact full-policy
-and reload checks. The graph preset receives fresh smoke, Dev-200 and original
-replay timing before admission; no accuracy or latency is inherited automatically.
+## Calibration and validation
+
+Use `evb calibrate` with `configs/experiments/cogact/quantvla.yaml`, then supply its
+schema-3 artifact through `--artifact-path`. Calibration identity includes the engine:
+activation percentiles and packed-student ATM/OHB statistics must match. Legacy
+handover schema-2 and tile-engine artifacts are not interchangeable with this preset.
+Quantization is irreversible; returning to native requires a fresh backend.
+
+Arithmetic-preserving fusion/graph changes require exact whole-policy and reload
+checks before artifact reuse; latency needs fresh full-cost timing. See
+[results](../../../../../docs/benchmark_results.md) for selected Dev, Final and timing.

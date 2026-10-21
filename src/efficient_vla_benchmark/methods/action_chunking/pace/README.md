@@ -31,6 +31,19 @@ one global percentile selects all task thresholds. Changing smoothing/spacing
 requires a separately compatible training artifact. Dataset/model paths are CLI
 inputs. PyArrow is calibration-only; inference needs NumPy/SciPy.
 
+The compatible public training conversion is
+[physical-intelligence/libero](https://huggingface.co/datasets/physical-intelligence/libero)
+at revision `a4336d589d589045d1c56423ffdf3b88a0e19b1f`. Its metadata declares
+LeRobot v2.0 and forty tasks; later v3 conversions are not accepted by this reader.
+Install `.[pace-calibration]` in the chosen backend environment when preparing
+the artifact. Calibration reads only the training metadata and Parquet files:
+
+```bash
+hf download physical-intelligence/libero --repo-type dataset \
+  --revision a4336d589d589045d1c56423ffdf3b88a0e19b1f \
+  --include 'meta/*' 'data/*' --local-dir "$TRAINING_DATA"
+```
+
 ```bash
 python -m efficient_vla_benchmark.methods.action_chunking.pace.calibrate \
   --dataset-path "$TRAINING_DATA" --output "$CALIBRATION_DIR"

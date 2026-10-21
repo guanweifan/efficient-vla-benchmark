@@ -1,3 +1,32 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/vla_infoentropy.yaml
+- ../../backends/cogact.yaml
+- ../../methods/vla_infoentropy.yaml
+parameters:
+  attention_backend: sdpa
+  static_budget_per_view: 150
+  similarity_threshold: 0.996
+  low_quota: 56
+  high_quota: 84
+  transition_steps: 100
+  reuse_layers:
+  - 2
+  - 6
+  - 9
+  - 11
+  growth_factor: 0.55
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

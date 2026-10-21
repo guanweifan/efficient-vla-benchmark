@@ -1,4 +1,0 @@
-extends:
-- sparsevlm.yaml
-parameters:
-  budget_profile: 128

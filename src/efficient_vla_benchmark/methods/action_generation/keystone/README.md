@@ -17,7 +17,7 @@ This is the author's optional executed-prefix selection, not a changed cadence.
 uses deterministic first-C initialization, up to ten Lloyd updates, allclose
 stopping, and clustering only when spread > tau. We follow these executable
 conventions; the paper prose instead mentions random centroid initialization.
-Default C=2, tau=0.3. K=3,4,8,16 are profiling candidates, not certified selections.
+Default C=2, tau=0.3; the final preset selects K=3.
 K=1 disables consensus; with K=C=2 both singleton clusters tie and select the first
 sample. Neither is admitted as an active speed-oriented primary configuration.
 

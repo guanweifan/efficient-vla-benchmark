@@ -1,4 +1,0 @@
-extends:
-- ./flash_vla_keep224.yaml
-parameters:
-  tokens_per_view: 232

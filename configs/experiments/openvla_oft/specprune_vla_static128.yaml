@@ -1,7 +1,0 @@
-# Dev-200 diagnostic variant; does not replace specprune_vla defaults.
-extends: specprune_vla.yaml
-parameters:
-  primary_static_budget: 128
-  wrist_static_budget: 128
-  primary_precise_static_budget: 128
-  wrist_precise_static_budget: 128

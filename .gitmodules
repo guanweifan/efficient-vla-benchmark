@@ -4,9 +4,6 @@
 [submodule "backends/cogact/upstream"]
 	path = backends/cogact/upstream
 	url = https://github.com/microsoft/CogACT.git
-[submodule "backends/starvla/upstream"]
-	path = backends/starvla/upstream
-	url = https://github.com/starVLA/starVLA.git
 [submodule "third_party/benchmarks/libero"]
 	path = third_party/benchmarks/libero
 	url = https://github.com/Lifelong-Robot-Learning/LIBERO.git

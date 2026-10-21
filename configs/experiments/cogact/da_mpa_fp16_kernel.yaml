@@ -1,3 +1,0 @@
-extends: da_mpa.yaml
-parameters:
-  runtime: tinychat_fp16

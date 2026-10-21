@@ -1,3 +1,0 @@
-# Explicit precision control, not a replacement for the common BF16 baseline.
-extends: baseline.yaml
-precision: float16

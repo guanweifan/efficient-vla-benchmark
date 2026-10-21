@@ -1,3 +1,23 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/eta_vla_ilsa.yaml
+- ../../backends/cogact.yaml
+- ../../methods/eta_vla_ilsa.yaml
+parameters:
+  pruning_layer: 3
+  keep_ratio: 0.35
+  recycle_ratio: 0.1
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

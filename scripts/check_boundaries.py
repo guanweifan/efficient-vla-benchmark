@@ -50,7 +50,7 @@ def violations(root):
                     or (
                         not optional_ops
                         and not codec_impl
-                        and name.split(".")[0] in {"torch", "transformers", "prismatic", "starVLA"}
+                        and name.split(".")[0] in {"torch", "transformers", "prismatic"}
                     )
                     or (not optional_ops and name.startswith("efficient_vla_benchmark.model_ops"))
                 ):

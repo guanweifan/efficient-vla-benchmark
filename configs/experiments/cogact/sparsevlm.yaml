@@ -1,3 +1,27 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/sparsevlm.yaml
+- ../../backends/cogact.yaml
+- ../../methods/sparsevlm.yaml
+parameters:
+  pruning_layers:
+  - 2
+  - 6
+  - 15
+  budget_profile: 128
+  budget_scale: 1.0
+  priority_heads: 14
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

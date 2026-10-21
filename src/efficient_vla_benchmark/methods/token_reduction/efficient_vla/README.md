@@ -18,9 +18,7 @@ separate budgets. Tokens retain original order, RoPE positions and action readou
 
 Task relevance follows Eq. 2: each visual QUERY's attention to contextual TEXT
 KEYS is summed after head averaging. OFT's native bidirectional mask permits
-this directly. The earlier implementation reversed the direction based on the
-original CogACT's causal layout; that justification does not apply to OFT, and
-historical results from that implementation are superseded, not relabeled.
+this directly; the reverse direction is not equivalent.
 Min-max normalization is omitted because only score rankings are used; it is
 monotonic and cannot change selected tokens (stable original-order ties).
 
@@ -30,13 +28,13 @@ anchors per view, task fraction 0.5. All are explicit configuration. No extra
 full forward, finetuning or change of checkpoint. Full retention/disabled mode
 does not attach a decoder adapter. Measure attention-probe and selection overhead.
 
-Use `configs/experiments/openvla_oft/efficient_vla.yaml`. A migration experiment
+Use `configs/experiments/openvla_oft/efficient_vla_token.yaml`. A migration experiment
 tests this core on OFT; neither its latency nor smoke outcomes are the paper's
 published CogACT results. Original complete-pipeline results must remain separate.
 
 ## CogACT diffusion-cache core
 
-Use `configs/experiments/cogact/efficient_vla_diffusion_cache.yaml`. Equations 6–11
+Use `configs/experiments/cogact/efficient_vla_cache.yaml`. Equations 6–11
 cache each DiT block's self-attention and MLP outputs **separately**. At the first
 denoiser call and every N calls afterwards, both outputs are recomputed; intervening
 calls reuse them while retaining live residual inputs, native normalization,
@@ -95,14 +93,9 @@ Calibration scores and their training/checkpoint/source identities live in a
 separate checksummed-provenance artifact; changing the number of removed layers
 does not require recalibration. Every selected count gets its own Dev/timing pair.
 
-## Bounded development diagnostics
+## Selected configurations
 
-CogACT Dev-200 presets `efficient_vla_cache2` and `efficient_vla_cache3`
-change the per-query refresh interval from 5 to 2 or 3 denoiser calls. They
-retain separate attention/MLP caches, live residuals and conditioning, CFG
-branches, native DDIM steps and native action RNG. No token pruning is combined.
-
-The report selection additionally tests intermediate refresh intervals, without
-changing the ten native denoising calls. Equal aggregate success counts do not
-imply identical episode outcomes. Consult the central selection manifest and
-ledger for current choices, paired timing and retained accuracy-boundary evidence.
+The three independent scopes use `efficient_vla_token.yaml`,
+`efficient_vla_layer.yaml` and `efficient_vla_cache.yaml` on their supported
+backends. Cache intervals count feature refreshes, not fewer DDIM calls. Final
+settings and accuracy-boundary evidence are in the central selection manifest.

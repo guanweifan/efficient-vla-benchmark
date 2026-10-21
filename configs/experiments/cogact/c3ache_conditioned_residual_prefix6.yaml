@@ -1,3 +1,0 @@
-extends: c3ache_conditioned_residual_conservative.yaml
-parameters:
-  live_prefix_blocks: 6

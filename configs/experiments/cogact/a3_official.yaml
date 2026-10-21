@@ -1,3 +1,35 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/a3_official.yaml
+- ../../backends/cogact.yaml
+- ../../methods/a3_official.yaml
+parameters:
+  enabled: true
+  num_samples: 4
+  num_denoising_steps: 5
+  action_horizon: 16
+  verification_chunk_size: 16
+  confidence_alpha: 0.8
+  confidence_epsilon: 1.0e-08
+  delta_thresholds:
+  - 0.41
+  - 0.35
+  - 0.5
+  - 0.5
+  - 0.5
+  - 0.5
+  threshold_scale: 1.0
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

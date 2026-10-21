@@ -10,14 +10,11 @@ from transformers.models.llama.modeling_llama import LlamaModel
 from efficient_vla_benchmark.core.resources import project_source
 from efficient_vla_benchmark.methods.caching.vla_cache.config import VLACacheConfig
 
-from ..implementations.openvla_oft.method import (
-    VLACache,
-    reuse_schedule,
-    static_patch_ids,
-)
+from ..selection import reuse_schedule, static_patch_ids
 
 
 def reference_utils():
+    pytest.importorskip("skimage.util", reason="Pinned author reference needs scikit-image")
     source = project_source("third_party/methods/vla_cache") / (
         "src/openvla-oft/experiments/robot/vla_cache_utils.py"
     )
@@ -74,6 +71,9 @@ def test_entropy_schedule_matches_reference():
 
 @torch.inference_mode()
 def test_complete_cache_cold_parity_warm_reuse_and_language_invalidation():
+    pytest.importorskip("efficient_vla_backend_openvla_oft")
+    from ..implementations.openvla_oft.method import VLACache
+
     torch.manual_seed(9)
     config = LlamaConfig(
         vocab_size=32,

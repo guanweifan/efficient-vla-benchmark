@@ -94,6 +94,7 @@ def test_awq_scale_transfer_preserves_unquantized_layer():
 
 @torch.inference_mode()
 def test_scale_search_restores_weights_and_ignores_padding():
+    pytest.importorskip("awq_inference_engine", reason="Author quantizer needs optional kernel")
     torch.manual_seed(13)
     linear = torch.nn.Linear(64, 64, bias=False)
     original = linear.weight.clone()

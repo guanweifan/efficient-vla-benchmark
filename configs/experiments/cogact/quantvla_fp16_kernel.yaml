@@ -1,3 +1,0 @@
-extends: quantvla.yaml
-parameters:
-  runtime: tinychat_fp16

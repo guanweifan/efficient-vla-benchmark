@@ -148,6 +148,7 @@ def test_real_oft_disabled_parity_active_pruning_and_reset(model_path, trace_pat
 
 @pytest.mark.parametrize("parameters", [{"enabled": False}, {"keep_ratio": 1}])
 def test_noop_does_not_require_control_observations(parameters):
+    pytest.importorskip("efficient_vla_backend_openvla_oft")
     from types import SimpleNamespace
 
     from ..implementations.openvla_oft.method import ADP

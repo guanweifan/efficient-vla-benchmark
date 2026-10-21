@@ -1,3 +1,0 @@
-extends: ./efficient_vla_layer_pruning.yaml
-parameters:
-  prune_layers: 3

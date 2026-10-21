@@ -12,15 +12,12 @@ Full-retention/disabled mode is native and installs no hooks. SVD runs ONLINE an
 its complete cost is included in timing, even if the method is slower.
 
 `svd_driver: auto` uses PyTorch's complete Jacobi SVD with `gesvd` fallback on
-nonconvergence. The earlier implementation forced the slower QR-based `gesvd`
-driver; `flash_vla_gesvd.yaml` retains it as a numerical/performance reference.
+nonconvergence. Final presets select `auto`; `gesvd` is the explicit QR-based option.
 Both keep every singular direction and use the same FP32 L1 scoring equation.
 `gesvda`, randomized SVD, rank truncation and Gram-matrix approximations are not
 supported. Floating-point scores need not be bitwise equal across solvers;
 nearly repeated singular values can rotate singular vectors and affect L1 ranks.
 Driver choice and any numerical discrepancies must remain visible in evidence.
-An explicit QR pre-reduction was investigated but not adopted: it added complexity
-without a meaningful improvement over direct `gesvd` on the measured shapes.
 
 OFT conventions: layer 1 (zero-based), 160/256 tokens per camera, all singular
 directions, native original RoPE/action positions. Per-camera scoring extends the
@@ -31,8 +28,7 @@ FlashTrigger action reuse is deliberately unresolved: Eq. 7 defines an angle,
 Eq. 10 triggers when the angle is GREATER than epsilon, while the narrative argues
 for reuse of stable actions. The default epsilon=2 does not disambiguate units.
 No verified author implementation was found. We do not silently reverse the
-inequality or use a guessed chunk-reuse policy. Reuse remains pending an explicit
-interpretation decision; runtime metadata and tables label this as ICS core only.
+inequality or use a guessed chunk-reuse policy. Metadata labels the ICS-only scope.
 
 Use `configs/experiments/openvla_oft/flash_vla.yaml` for the same native H=8 replay
 and four-episode smoke. Published full-FlashVLA speedups include action reuse and
@@ -57,15 +53,9 @@ Use `configs/experiments/cogact/flash_vla.yaml`. No action reuse, low-rank
 approximation or alternate scoring equation is introduced. These results test
 the independent ICS contribution on this checkpoint, not full FlashVLA scores.
 
-## Bounded development diagnostics
+## Selected configurations
 
-CogACT Dev-200 presets `flash_vla_keep192` and `flash_vla_layer4` vary only
-retention (160 to 192) or pruning layer (1 to 4). Complete FP32 SVD and its L1
-score remain unchanged. Action reuse remains excluded, including in all tables.
-
-Later candidates refine retention around the observed accuracy boundary while
-keeping the scoring equation, complete SVD solver, pruning layer and ICS-only
-scope unchanged. Current selected presets and their Dev/timing evidence live in
-the central ledger and selection manifest. Complete SVD checks alone do not
-establish that lost accuracy is intrinsic to ICS; a near-unity speedup is not a
-reliable acceleration claim. No retention result validates missing action reuse.
+Final presets retain complete FP32 SVD/L1 scoring and the ICS-only scope.
+Their selected per-view budgets are explicit in YAML. The result ledger owns
+Dev selection and measured speed; near-unity speedup is not a reliable gain.
+No retention result validates the unresolved action-reuse mechanism.

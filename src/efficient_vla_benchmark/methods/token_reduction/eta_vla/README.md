@@ -40,12 +40,6 @@ uniform or visual-only substitute is passed off as ILSA. Disabled/full-retention
 modes install no hooks. Ephemeral selections clear on reset/detach; weights,
 preprocessing, native action head, DDIM/CFG, RNG and H8 cadence are unchanged.
 
-Registration is not certification. Independent equation tests, native boundary
-tests, four-suite smoke, Dev-200 and paired replay are separate acceptance gates.
-
-Initial validation passed 18 independent equation/config/lifecycle tests and one
-real-model parity/active/reset/detach test on each backend. Four-suite smoke
-completed 4/4 successes with zero errors on each backend; this is a connectivity
-check, not a formal accuracy or speed claim. The central result ledger owns the
-subsequent Dev-200 selection, stronger-budget boundaries and paired full-cost
-timing; selected presets do not expand this ILSA-only mechanism scope.
+Tests cover equations, native parity, active selection and reset/detach.
+Selected presets and [results](../../../../../docs/benchmark_results.md) retain the
+ILSA-only scope; they do not include temporal fusion or driving optimization.

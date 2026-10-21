@@ -1,3 +1,0 @@
-extends: ./eco_vla.yaml
-parameters:
-  keep_ratio: 0.6

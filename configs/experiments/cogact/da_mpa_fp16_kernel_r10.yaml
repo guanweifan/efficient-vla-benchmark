@@ -1,3 +1,0 @@
-extends: da_mpa_fp16_kernel.yaml
-parameters:
-  retention_ratio: 0.1

@@ -1,3 +1,32 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/vla_cache.yaml
+- ../../backends/openvla_oft.yaml
+- ../../methods/vla_cache.yaml
+parameters:
+  attention_backend: eager
+  static_budget_per_view: 256
+  similarity_threshold: 0.996
+  protected_tokens_per_view: 50
+  task_attention_layer: 15
+  reuse_layers:
+  - 2
+  - 6
+  - 9
+  - 11
+  weighted_growth: true
+  growth_factor: 0.55
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

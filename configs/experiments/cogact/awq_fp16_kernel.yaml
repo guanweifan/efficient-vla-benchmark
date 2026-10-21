@@ -1,4 +1,0 @@
-extends:
-  - awq.yaml
-parameters:
-  kernel_precision: float16

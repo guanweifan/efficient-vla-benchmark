@@ -1,4 +1,0 @@
-extends:
-- teacache.yaml
-parameters:
-  threshold: 0.5

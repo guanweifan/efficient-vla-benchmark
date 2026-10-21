@@ -25,6 +25,64 @@ def test_primary_report_without_supplement_is_writable(reporter, tmp_path, conte
     reporter.protect_supplementary_output(path)
 
 
+def retired_fixture():
+    inputs = fixture()
+    selected, summaries = inputs[:2]
+    selected["coverage_summary_sha256"] = "coverage"
+    config = copy.deepcopy(summaries["summary"]["configurations"][0]["config"])
+    config["method"] = "retired_example"
+    summaries["coverage"] = {
+        "configurations": [summaries["summary"]["configurations"][0], {"config": config}]
+    }
+    selected["retired_scopes"] = [
+        {
+            "backend": config["backend"],
+            "method": config["method"],
+            "reason": "Defining mechanism is unverified; no proxy remains.",
+        }
+    ]
+    return inputs
+
+
+def test_retired_scope_preserves_coverage_without_loading_deleted_preset(reporter):
+    report = reporter.build(*retired_fixture())
+    assert len(report["primary"]) == 1
+    assert len(report["retired_scopes"]) == 1
+    assert "Retired implementations" in reporter.render(report)
+
+
+@pytest.mark.parametrize(
+    "mutation", ["missing", "extra", "duplicate", "overlap", "reason", "coverage"]
+)
+def test_retirement_cannot_bypass_coverage(reporter, mutation):
+    inputs = retired_fixture()
+    selection = inputs[0]
+    retired = selection["retired_scopes"]
+    if mutation == "missing":
+        retired.clear()
+    elif mutation == "extra":
+        retired.append(dict(retired[0], method="foreign"))
+    elif mutation == "duplicate":
+        retired.append(dict(retired[0]))
+    elif mutation == "overlap":
+        retired[0]["method"] = "fastv"
+    elif mutation == "reason":
+        retired[0]["reason"] = ""
+    else:
+        selection.pop("coverage_summary_sha256")
+    with pytest.raises(ValueError):
+        reporter.build(*inputs)
+
+
+def test_public_preset_rename_does_not_relabel_measured_identity(reporter):
+    inputs = fixture()
+    inputs[0]["configurations"][0]["measured_preset"] = "historical_fastv_candidate"
+    row = reporter.build(*inputs)["primary"][0]
+    assert row["preset"] == "fastv"
+    assert row["measured_preset"] == "historical_fastv_candidate"
+    assert row["development"]["experiment_id"] == "candidate"
+
+
 def test_independent_supplement_cannot_be_silently_erased(reporter, tmp_path):
     path = tmp_path / "report.md"
     content = "# Results\n<!-- supplementary-native-controls -->\nFrozen evidence\n"

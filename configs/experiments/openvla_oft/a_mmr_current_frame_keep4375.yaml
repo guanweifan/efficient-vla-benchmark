@@ -1,4 +1,0 @@
-extends:
-- a_mmr_current_frame.yaml
-parameters:
-  keep_ratio: 0.4375

@@ -1,4 +1,20 @@
-extends:
-  - baseline.yaml
+# Final measured configuration; resource paths are supplied through the CLI.
+extends: ../../backends/cogact.yaml
 backend_parameters:
   num_ddim_steps: 5
+  cfg_scale: 1.5
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

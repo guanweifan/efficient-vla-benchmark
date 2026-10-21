@@ -1,5 +1,30 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/depth_cache_primary.yaml
+- ../../backends/cogact.yaml
+- ../../methods/depth_cache_primary.yaml
+parameters:
+  warmup_queries: 5
+  depth_clusters: 3
+  merge_window: 2
+  min_merge_ratio: 0.75
+  max_merge_ratio: 0.9
+  edge_threshold_m: 0.03
+  static_threshold_m: 0.01
+  dynamic_fraction: 0.2
+  attention_layer: 31
 evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
   depth: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

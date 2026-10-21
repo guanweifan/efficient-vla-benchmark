@@ -1,3 +1,0 @@
-extends: deis.yaml
-parameters:
-  num_steps: 4

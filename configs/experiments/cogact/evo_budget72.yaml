@@ -1,3 +1,0 @@
-extends: evo.yaml
-parameters:
-  refresh_budget: 72

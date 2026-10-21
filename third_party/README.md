@@ -3,6 +3,7 @@
 - `benchmarks/libero`: official simulator tasks and resources.
 - `runtimes/transformers_openvla_oft`: the native OFT Transformers fork.
 - `runtimes/dlimp`: OFT training-data dependencies.
+- `runtimes/prismatic_cogact`: CogACT's pinned Prismatic/OpenVLA classes.
 - `runtimes/llm_awq`: AWQ source primitives and packed-kernel source.
 - `methods/specprune_vla`: the paper reference implementation.
 - `methods/vla_cache`, `methods/vla_cache_transformers`: VLA-Cache reference sources.
@@ -14,9 +15,12 @@ Method READMEs distinguish runtime imports from audit-only reference code. Do no
 install reference application stacks when their dependencies conflict with the
 selected backend. Retain upstream licenses and copyright notices. First-party
 adaptations belong in methods/, never as unexplained changes to reference sources.
-The root `NOTICE` preserves terms and attribution for the new source-based token
-ports. TEAM-VLA and VLA-IAP have paper-only implementations with no runtime source
-dependency; their READMEs identify the missing author-code verification.
+The root `NOTICE` preserves terms and attribution for source-based ports.
+
+The fixed commits of all fourteen submodules were verified publicly readable on
+2026-10-21. `dlimp` and `methods/specprune_vla` have no explicit license file at
+those revisions; applicable permissions remain to be confirmed. Source availability
+is not a license grant. See the unresolved entries in [NOTICE](../NOTICE).
 
 Optional standalone action codecs use pinned release assets and source subsets,
 never the policy application's dependency stack. Run

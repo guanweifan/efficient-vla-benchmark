@@ -1,3 +1,0 @@
-extends:
-  - baseline.yaml
-  - ../../methods/sp_vla_scheduling.yaml

@@ -12,7 +12,7 @@ predicted actions, native clipping/unnormalization and H8 execution remain uncha
 The finite-noise start stays at the native DDIM10 training index 90; changing the
 budget never moves it to index 99 or assumes a zero-SNR start. The selected integer
 grid ends with an evaluation at index zero and then the analytical clean endpoint.
-Uniform-time and rounded log-SNR grids are explicit presets; repeated indices fail.
+The final preset uses a rounded log-SNR grid; repeated indices fail.
 The library's generic initial-noise scaling is NOT applied to native CogACT noise.
 
 The shared sampler executor only owns geometry, lifecycle and accounting. This
@@ -24,9 +24,9 @@ action noises aligned across budgets. All overhead remains in full-cost timing.
 
 Order two requires at least three evaluations; order three requires five.
 Smaller budgets would disable the defining high-order update under endpoint
-safeguards and are not primary method configurations. Six evaluations are the
-initial candidate, NOT a selected optimal result. Search explores fewer calls and
-refines the Dev-200 accuracy boundary. No successful outcome or speedup is promised.
+safeguards and are not primary method configurations. The final preset uses 4 evaluations. Its Dev-selected
+workpoint and measured outcomes are in the central ledger; this is not a claim
+of global optimality or a guarantee of acceleration.
 
 OFT's deterministic L1 head has no diffusion ODE and is unsupported.
 No training, model replacement, action-cache combination or horizon modification.

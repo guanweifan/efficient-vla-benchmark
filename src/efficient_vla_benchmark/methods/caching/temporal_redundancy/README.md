@@ -24,10 +24,8 @@ all episode/instruction history; close restores instance forwards. The checkpoin
 LLM attention/masks and action sampler are not modified. No training is required
 for this visual-only core; no claim is made for the omitted trained action branch.
 
-The report selects update_ratio=0.50 on OFT and the explicit
-`temporal_redundancy_visual_update75.yaml` preset on CogACT. CogACT's bounded
-retention adjustment improved Dev-200 from 168 to 180 successes; OFT retained
-192 successes. Both measured ports include all cache/indexing overhead and
-were slower than their paired native references in the compact workload.
-These are scoped implementation/backbone results, not a rejection of the
-paper's full system or a claim about its excluded trained action generator.
+Use `configs/experiments/<backend>/temporal_redundancy_visual.yaml`:
+update_ratio=0.50 on OFT and 0.75 on CogACT. See the
+[results](../../../../../docs/benchmark_results.md) for success and full-cost timing,
+including cache/indexing overhead. These visual-core results do not cover the
+paper's trained action generator.

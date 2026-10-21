@@ -1,5 +1,51 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/specprune_vla.yaml
+- ../../backends/cogact.yaml
+- ../../methods/specprune_vla.yaml
 parameters:
+  static_pruning: true
+  dynamic_pruning: true
+  action_controller: true
+  static_ratio: 0.8
+  dynamic_keep_ratio: 0.9
+  importance_beta: 0.2
   min_visual_tokens: 30
+  importance_layers:
+  - 14
+  - 19
+  - 24
+  pruning_layers:
+  - 10
+  - 15
+  - 20
+  - 25
+  global_layers:
+  - 14
+  - 30
+  primary_similarity: 0.986
+  wrist_similarity: 0.98
+  primary_static_budget: 112
+  wrist_static_budget: 112
+  primary_precise_static_budget: 112
+  wrist_precise_static_budget: 112
+  velocity_threshold: 0.35
+  rotation_threshold: 0.2
+  xy_threshold: 0.1
+  z_threshold: 0.1
+  exit_z_threshold: 0.2
+  exit_rotation_threshold: 0.3
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

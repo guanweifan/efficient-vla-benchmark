@@ -257,9 +257,10 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   timing_record: compact-41-4-cogact-1--native-pre
+  measured_preset: baseline
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/awq_fp16_kernel.yaml
+  config: configs/experiments/cogact/awq.yaml
   status: primary
   section: '3.3'
   scope: W4A16 with explicitly cast FP16 author kernel; training-only AWQ calibration.
@@ -284,9 +285,10 @@ configurations:
       eligible option. Historical Final outcomes remain unchanged, not retuned.
     limitation: Pinned W4/group128 author kernels; calibration tuning does not shrink online operator
       geometry.
+  measured_preset: awq_fp16_kernel
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/da_mpa_fp16_kernel_r90.yaml
+  config: configs/experiments/cogact/da_mpa.yaml
   status: primary
   section: '3.3'
   scope: DA-PTQ independent DA-MPA drift-allocation core only, no CSRC. 224 language and 2 ranked DiT
@@ -315,9 +317,10 @@ configurations:
     - development_summary_sha256: 39eb9cbe69ba6df8117b24de4db7dea2a34e41de1daee588f8beeb6256e28031
       development_experiment_id: 91a9a887c80b751470decc536edc5355bad1b5ddb8d61214cb095b6e80bf9285
       timing_record: quant-p4-runtime-cogact-holo-r90-r1-da-fp16-r90
+  measured_preset: da_mpa_fp16_kernel_r90
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/dyq_vla_mixed_integer_k1_fp065.yaml
+  config: configs/experiments/cogact/dyq_vla.yaml
   status: primary
   section: '3.3'
   scope: DyQ-VLA v2 temporal core, K1 routing; 224 decoder W4 projections, tokenwise A2/A4/A8/native activation
@@ -355,35 +358,10 @@ configurations:
     - development_summary_sha256: a55460f17912488d761dc0e1e58efea7fba987e9fc7290cf37debe30d7f89c4d
       development_experiment_id: 209979b8b6d2b080d50ef84450982ed4e99882a41664254caf27d03ccf2d9ff7
       timing_record: quant-p4-runtime-cogact-dyq-k1-fp065-r1-dyq-k1-fp065
+  measured_preset: dyq_vla_mixed_integer_k1_fp065
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/eaqvla.yaml
-  status: excluded
-  section: '3.3'
-  scope: 'Independent modular weight-GPTQ core: vision W4/language W8, native projector/action head. Unspecified
-    activation quantizer excluded; packed floating GEMM.'
-  timing_record: quant-p3-runtime-cogact-modular-r1-eaqvla
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: d7626e43fa7ed9794db1becce9114f1901d6e44e2399d1051f5db30cb8169b8b
-  development_experiment_id: 92ecfbe513af045670c25d6475ffa724114b7707176276c4e526090da434cd1e
-  reason: 'Not a formal survey experiment: the authors withdrew arXiv:2505.21567v2 on 2025-07-31 citing
-    a paper error. Existing measurements remain diagnostic, not a reason to exclude an unfavorable outcome.'
-  search:
-    complete: false
-    stop: mechanism_limit
-    reason: Fixed paper module precision policy is active and numerically checked; retain measured success
-      and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
-    evidence:
-    - development_summary_sha256: d7626e43fa7ed9794db1becce9114f1901d6e44e2399d1051f5db30cb8169b8b
-      development_experiment_id: 92ecfbe513af045670c25d6475ffa724114b7707176276c4e526090da434cd1e
-      timing_record: quant-p3-runtime-cogact-modular-r1-eaqvla
-    tie_reason: Fixed paper module precision policy is active and numerically checked; retain measured
-      success and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
-    limitation: Changing the fixed vision-W4/language-W8 allocation removes the retained core; kernel
-      layout was optimized without changing scale axes or precision.
-- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/holoq_fp16_graph_b16.yaml
+  config: configs/experiments/cogact/holoq.yaml
   status: primary
   section: '3.3'
   scope: HoloQ pinned official-code variant, not paper-v3 tokenwise LLM quantization:224 language plus48
@@ -420,46 +398,10 @@ configurations:
     - development_summary_sha256: 5d261c489eb3e5d4ff1cf02a51230f3a3e73d8da7b89c1b319ab5d5dcecf5209
       development_experiment_id: b32560b643bdb92b5042145d1b56583102442abfafdc0bbd407a92bc05675e45
       timing_record: quant-p5-runtime-cogact-graphs-r4-holoq-graph
+  measured_preset: holoq_fp16_graph_b16
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/motion_vq_t1.yaml
-  status: excluded
-  section: '3.3'
-  scope: VQVLA independent LLM dual-codebook/motion-router core, both resident banks and packed centroid-gather
-    GPU costs included. Native FP32 diffusion head unchanged; excludes full-model export and ASIC-specific
-    reuse.
-  timing_record: quant-p3-runtime-cogact-motion-vq-r1-motion_vq_t1
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
-  development_experiment_id: fd1874d63b12e55628dfec7e77f5b1ae545a64e42b9183ddb135e8f2744d7cf4
-  reason: 'Not a full VQVLA GPU acceleration comparison: this component includes dual codebooks/router
-    but omits the defining spatial/temporal multiplication reuse. Preserve diagnostic evidence; do not
-    attribute its speed to the complete paper.'
-  search:
-    complete: false
-    stop: mechanism_limit
-    reason: Thresholds 0.8/1.0 both give 182 of 200, with 26.139/25.347 ms/control; select the faster
-      eligible 1.0. Both banks remain active (13 of 63 measured queries use the low bank at 1.0). Kernel
-      tile reuse was optimized and independently checked. Report a negative GPU outcome, not an optimality
-      or paper-failure claim.
-    evidence:
-    - development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
-      development_experiment_id: aed0a15d75d70f5e27c427f703f7851fc14f94b5c353fa04889cbc26e9d0ea7a
-      timing_record: quant-p3-runtime-cogact-motion-vq-r1-motion_vq
-    - development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
-      development_experiment_id: fd1874d63b12e55628dfec7e77f5b1ae545a64e42b9183ddb135e8f2744d7cf4
-      timing_record: quant-p3-runtime-cogact-motion-vq-r1-motion_vq_t1
-    tie_reason: Thresholds 0.8/1.0 both give 182 of 200, with 26.139/25.347 ms/control; select the faster
-      eligible 1.0. Both banks remain active (13 of 63 measured queries use the low bank at 1.0). Kernel
-      tile reuse was optimized and independently checked. Report a negative GPU outcome, not an optimality
-      or paper-failure claim.
-    limitation: The fixed author codebook shapes retain centroid-gather overhead; changing a routing threshold
-      does not replace that engine. Do not promote an all-high disabled-router control or arbitrary codebook
-      sizes to the method. Search closure is scoped to this active two-bank GPU core, not exhaustive threshold
-      optimization.
-- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/quantvla_fp16_graph.yaml
+  config: configs/experiments/cogact/quantvla.yaml
   status: primary
   section: '3.3'
   scope: 'QuantVLA released-code CogACT port: 224 language and 24 DiT-MLP W4/A8 projections, block rotations,
@@ -495,7 +437,8 @@ configurations:
       timing_record: quant-p5-runtime-cogact-graphs-r4-quantvla-graph
     tie_reason: The graph preset improves on the retained eager candidates while preserving their selected
       quantizer and fresh closed-loop outcomes.
-- config: configs/experiments/cogact/efficient_vla_layer_prune04.yaml
+  measured_preset: quantvla_fp16_graph
+- config: configs/experiments/cogact/efficient_vla_layer.yaml
   status: primary
   section: '3.3'
   reason: 'layer_prune04 gives 186/200, fastest valid timing among tested configurations meeting >= 177/200.
@@ -524,7 +467,8 @@ configurations:
     - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
       development_experiment_id: ffc87b7975d78aff0ed47b5e2a5db588c9cdd0486959b4ee34f3a9b3b1aeae37
       timing_record: routing-layers-v5-45-7-cogact--layer_prune05
-- config: configs/experiments/cogact/a_mmr_current_frame_keep4375.yaml
+  measured_preset: efficient_vla_layer_prune04
+- config: configs/experiments/cogact/a_mmr_current_frame.yaml
   status: primary
   section: '5.1'
   reason: Keep43.75% gives 179/200; keep37.5% falls to 175. Keep50% gives 177 with only about 2% higher
@@ -556,7 +500,8 @@ configurations:
   development_summary_sha256: babdf686664e007bd1f2ff6f275445c103edbdb457b6086ab51fe566521d7f13
   development_experiment_id: 49d963de78d72de16e8800148ab541df1654c905c5d74eaf5e8525d416921764
   timing_record: scoped-retained-r3-r1-41-g1-cogact--a_mmr_keep4375
-- config: configs/experiments/cogact/actuation_slack_refresh_keep25.yaml
+  measured_preset: a_mmr_current_frame_keep4375
+- config: configs/experiments/cogact/actuation_slack_refresh_deletion.yaml
   status: primary
   section: '5.1'
   reason: Keep25% gives178/200; stronger keep17.5% gives169/200. Retain the faithful full-cost slowdown.
@@ -580,7 +525,8 @@ configurations:
     - development_summary_sha256: bc2f4761463e0c32c50922fd4bad2e2707cca97e96db11738ec7f6a7b7c62e34
       development_experiment_id: b8990adbad77e39403c4b4b79409b22dd259cfc2e37136d1f72008660801587c
       timing_record: search-r1-recheck2-41-7-cogact--actuation_slack_refresh_deletion_keep175
-- config: configs/experiments/cogact/adp_keep125.yaml
+  measured_preset: actuation_slack_refresh_keep25
+- config: configs/experiments/cogact/adp.yaml
   status: primary
   section: '5.1'
   reason: Keep12.5% gives182/200 and the fastest eligible timing;6.25% falls to170/200. Preserve the reference
@@ -612,7 +558,8 @@ configurations:
     - development_summary_sha256: 64d6001f4285588bb850a2190a8d0e967ac6afe0c8a5494980b2621b7665cd3f
       development_experiment_id: a21d05912633745d269f877956a739f077a23a3487e2a7cd9a8dbb77048f7d1f
       timing_record: search-r24-recheck-125-6-cogact--adp_keep0625
-- config: configs/experiments/cogact/dart_keep25.yaml
+  measured_preset: adp_keep125
+- config: configs/experiments/cogact/dart.yaml
   status: primary
   section: '5.1'
   reason: Keep25% gives179/200; stronger18.75% and12.5% fall to164/200 and141/200.
@@ -637,7 +584,8 @@ configurations:
       development_experiment_id: 5970da5f88c61c0b2a15972d4ca4f08a95790f0d5aac3c8b1418ba6733c34bc4
     - development_summary_sha256: 3a09185e2cf7744313cd58c740eed9a8f547909c93e913011a03de8164f337e5
       development_experiment_id: 46204a0a46133c72c7c2cf62afd8f19f35fc7a6bb1a69bfdcf5392fcbcd8b07f
-- config: configs/experiments/cogact/depth_cache_primary_floor75.yaml
+  measured_preset: dart_keep25
+- config: configs/experiments/cogact/depth_cache_primary.yaml
   status: primary
   section: '5.1'
   reason: Minimum merge0.75 gives177/200 and1.159x;0.85 also gives177/200 with only0.73% more measured
@@ -678,7 +626,8 @@ configurations:
     - development_summary_sha256: d833e0fb6a68cc41a3f27933e968b1abfa698fc7a21e22b8f10e58f5080c5e30
       development_experiment_id: 2d2189af4d3d7dfc56d4f9f196ec42fcf5d2f3fc86e9de7cc4288140ee7be6ce
       timing_record: search-r28-recheck-41-7-cogact--depth_cache_primary_floor85
-- config: configs/experiments/cogact/divprune_keep375.yaml
+  measured_preset: depth_cache_primary_floor75
+- config: configs/experiments/cogact/divprune.yaml
   status: primary
   section: '5.1'
   reason: Keep37.5% gives185/200 and improves paired speed; keep25% falls to175/200.
@@ -702,7 +651,8 @@ configurations:
     - development_summary_sha256: ce57dc5ea4a63a71d42ae51dfdc004d19e88cf4f7424fe5a27cd5eb7e206931b
       development_experiment_id: 8ceb735ef7bd3a36c56740eb4661dd497c9a412f102fecbbdca11adf306167ea
       timing_record: search-r1-45-5-cogact-0--divprune_keep25
-- config: configs/experiments/cogact/eta_vla_ilsa_keep35.yaml
+  measured_preset: divprune_keep375
+- config: configs/experiments/cogact/eta_vla_ilsa.yaml
   status: primary
   section: '5.1'
   reason: Keep35% gives 180/200; keep20% gives 179 with under 1% speed difference, while keep10% falls
@@ -733,7 +683,8 @@ configurations:
   development_summary_sha256: 20b9345161b0209ad77a529d8f396e3712202d17d4fa14b830286b4190fb2804
   development_experiment_id: d2517995bb45aa422ce16688e054240a515dc5ca237a95f1f4676d0b642b3f37
   timing_record: scoped-ilsa-strong-r1-124-g5-cogact--ilsa_keep35
-- config: configs/experiments/cogact/fastv_keep25.yaml
+  measured_preset: eta_vla_ilsa_keep35
+- config: configs/experiments/cogact/fastv.yaml
   status: primary
   section: '5.1'
   reason: Keep25% gives180/200 and the fastest eligible measured timing;18.75% gives178/200 without further
@@ -761,7 +712,8 @@ configurations:
       timing_record: search-r20-41-7-cogact--fastv_keep1875
     - development_summary_sha256: 4656c26e2e070a77f3416714e6bfefc2271625a377242fbbc3782675941cf13e
       development_experiment_id: d8582efcc1f43b55affec40df1f93cccad83e9965df88bacad21ec98f3718293
-- config: configs/experiments/cogact/flash_vla_keep232.yaml
+  measured_preset: fastv_keep25
+- config: configs/experiments/cogact/flash_vla.yaml
   status: primary
   section: '5.1'
   reason: Keep232 recovers179/200 versus176/200 at224 and is faster than240; near-unity speed is not a
@@ -787,6 +739,7 @@ configurations:
     - development_summary_sha256: 12b1771c3d2f4a38b48f338baf5b0c49645653eb568320b8a6d4c5c305284d9f
       development_experiment_id: c99d5ebc1c167c6678a6cda1fbc71bf2c4f930cb6f7483b453ecad6c56c6bd88
       timing_record: search-r1-recheck2-41-7-cogact--flash_vla_keep240
+  measured_preset: flash_vla_keep232
 - config: configs/experiments/cogact/safe_pruner.yaml
   status: primary
   section: '5.1'
@@ -810,7 +763,8 @@ configurations:
     - development_summary_sha256: 00d2044694e1ae351e2ed4ceed0a79dfae5efad1ea4728ec6c5028e83ce9be68
       development_experiment_id: 86f7898a3c323721cb7d9be47013a019276f51ff75e9f40511652de340901a4c
       timing_record: search-r1-45-6-cogact-1--safe_pruner_keep125
-- config: configs/experiments/cogact/sparsevlm_v2_128.yaml
+  measured_preset: safe_pruner
+- config: configs/experiments/cogact/sparsevlm.yaml
   final_runtime_source_sha256: fe6e13a3995cba0138156d8e5ecac0c515210894c5e166aabf784a839d660e08
   status: primary
   section: '5.1'
@@ -841,7 +795,8 @@ configurations:
   development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
   development_experiment_id: bcf7adcaf806a3f66f2750eaed0ab7d2b5ba26bd4f9495e9b7f3642c6944e601
   timing_record: se2-r1-repaired-cogact--sparsevlm_v2_128
-- config: configs/experiments/cogact/specprune_vla_static112.yaml
+  measured_preset: sparsevlm_v2_128
+- config: configs/experiments/cogact/specprune_vla.yaml
   status: primary
   section: '5.1'
   reason: Static deletion112 gives180/200 and the fastest tested eligible timing; deletion128 gives174/200.
@@ -864,18 +819,8 @@ configurations:
       timing_record: search-r1-recheck2-41-7-cogact--specprune_vla_static112
     - development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
       development_experiment_id: b222be6835713b1bb7b490fd083736c4ac616b7a52b34f8e38a94c347d58c257
-- config: configs/experiments/cogact/st_merge_keep192.yaml
-  status: pending_core
-  section: '5.1'
-  reason: Eq. 4 consumes source into target, unlike the provisional anchor-survival convention; one-to-many
-    collision/mass rules remain unspecified.
-  scope: Uncertified spatial-temporal merging.
-  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
-  development_experiment_id: 2715131409b114d95dc8dc1349d3ea4da8b4baa5ab6f0e78127aff0d3dc431eb
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-43-2-cogact-3--st_merge_keep192
-- config: configs/experiments/cogact/ties_keep575_h48.yaml
+  measured_preset: specprune_vla_static112
+- config: configs/experiments/cogact/ties.yaml
   status: primary
   section: '5.1'
   reason: Keep57.5%/refresh48 gives 177/200. Keep50% at refresh48 falls to 171; refresh96 at keep57.5%
@@ -922,6 +867,7 @@ configurations:
   development_summary_sha256: ca73cf8d17ecb5896c8ad3cdc022b1358d4bf2e9926c7fa747d20ffc0bd919b3
   development_experiment_id: 61427584620a852d356394b0988b2ff5ecb1d4693e6fded4547f29b9d0359e45
   timing_record: scoped-ties-cog-boundary-r1-124-g4-cogact--ties_keep575_h48
+  measured_preset: ties_keep575_h48
 - config: configs/experiments/cogact/tome.yaml
   status: primary
   section: '5.1'
@@ -957,6 +903,7 @@ configurations:
   development_summary_sha256: 1b62e41716f753a3edf900fd62c4310db29bb31ba05b5cf3a71fd2f0d15bd506
   development_experiment_id: 8f1aac48a4d142d8ea5c03a9538b91a329c717f15ee4bb3ed002b01317424f42
   timing_record: final-r1-45-g3-cogact-tome--tome
+  measured_preset: tome
 - config: configs/experiments/cogact/visionzip.yaml
   status: primary
   section: '5.1'
@@ -989,7 +936,8 @@ configurations:
   development_summary_sha256: 08483345391f5a6fc4551bdc322f11ea8aff1ea150077463c7ef897eafee44c9
   development_experiment_id: 582fa08229544e485c67f97a3035e7ee7f30a16d96bb99063b5a99dae859215d
   timing_record: final-r15-41-g1-cogact-visionzip--visionzip
-- config: configs/experiments/cogact/action_cache_threshold80.yaml
+  measured_preset: visionzip
+- config: configs/experiments/cogact/action_cache.yaml
   status: primary
   section: '5.2'
   reason: Two-tail-step threshold0.8 gives 178/200. Clean zero-step thresholds0.8/0.85 give 163/176; threshold0.9
@@ -1027,7 +975,8 @@ configurations:
   development_summary_sha256: 5759fbb67384510a99adda4c2c13265b2fe2a9bb6656fabf3a01bf4c8138538e
   development_experiment_id: 2a8c58aa70873bd5b38a2b902d32a7b002bd68e2474d53d5d48e5725d8f32c54
   timing_record: scoped-action-zero90-thermal-replacement-r1-40-g1-cogact--action_few2_t080
-- config: configs/experiments/cogact/actuation_slack_refresh_kv_keep50.yaml
+  measured_preset: action_cache_threshold80
+- config: configs/experiments/cogact/actuation_slack_refresh_kv_reuse.yaml
   status: primary
   section: '5.2'
   reason: 'asr_kv_keep50 gives 179/200, fastest valid timing among tested configurations meeting >= 177/200.
@@ -1061,7 +1010,8 @@ configurations:
     - development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
       development_experiment_id: c7f748e2fd8bcb21637d94ecb2adc6db91feaa222b9785a86d50d1b117d855b8
       timing_record: routing-asr-v4-45-6-cogact--asr_kv_keep375
-- config: configs/experiments/cogact/bac_updates4.yaml
+  measured_preset: actuation_slack_refresh_kv_keep50
+- config: configs/experiments/cogact/bac.yaml
   status: primary
   section: '5.2'
   reason: Four ACS updates gives177/200. Stronger three/two updates give169/152; six gives175 and is slower.
@@ -1091,7 +1041,8 @@ configurations:
       development_experiment_id: f4e5e70dcbf812eaa59955720a10f8911d4678a59fbb5cff686e6e2a633114ee
       timing_record: bac-v1-41-7-cogact--bac
     - timing_record: bac-v1-41-7-cogact--bac_updates8
-- config: configs/experiments/cogact/c3ache_conditioned_residual_prefix6.yaml
+  measured_preset: bac_updates4
+- config: configs/experiments/cogact/c3ache_conditioned_residual.yaml
   status: primary
   section: '5.2'
   reason: Prefix4 is not faster than prefix6 and lowers success; caching four steps falls to162/200. Retain183/200
@@ -1117,7 +1068,8 @@ configurations:
     - development_summary_sha256: 553bdb2687887df33f0d3ae355b506b63ea90fa438e95c88f0683151006f9d13
       development_experiment_id: dd56a938ebbfaa65e475f7a9bd9475af98d064ab4142c849065722f8332d76f1
       timing_record: search-r1112-124-6-cogact--c3ache_conditioned_residual_prefix4_steps4
-- config: configs/experiments/cogact/dp_cache_interval6.yaml
+  measured_preset: c3ache_conditioned_residual_prefix6
+- config: configs/experiments/cogact/dp_cache.yaml
   status: primary
   section: '5.2'
   reason: Interval6 fills the profiled middle window2..7 and gives182/200 with1.110x. Extending to2..8
@@ -1149,7 +1101,8 @@ configurations:
     - development_summary_sha256: f1743528105287eed407b46fd53e478471d6cecd8890a640a6eb6328aaa81100
       development_experiment_id: 614061951bc6ea904240842aa0a26579c5edca286982f1e4ca31d5eb847b3ac9
       timing_record: search-r21-125-5-cogact--dp_cache_window1_8_interval8
-- config: configs/experiments/cogact/efficient_vla_diffusion_cache_interval4.yaml
+  measured_preset: dp_cache_interval6
+- config: configs/experiments/cogact/efficient_vla_cache.yaml
   status: primary
   section: '5.2'
   reason: Interval4 gives186/200; interval5 falls to165/200. Choose the eligible stronger cache with its
@@ -1174,7 +1127,8 @@ configurations:
       timing_record: search-r1-recheck-41-7-cogact-5--efficient_vla_diffusion_cache_interval4
     - development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
       development_experiment_id: 2e99d4df59fd76c5961cbf0ce7b5e263c64eb81b2b7f72f60da5893bac5920e3
-- config: configs/experiments/cogact/evo_budget168.yaml
+  measured_preset: efficient_vla_diffusion_cache_interval4
+- config: configs/experiments/cogact/evo.yaml
   status: primary
   section: '5.2'
   reason: 'Measured candidates: evo_budget168=179/200, evo=165/200, evo_budget72=146/200. Choose the fastest
@@ -1202,7 +1156,8 @@ configurations:
     - development_summary_sha256: adf0316479cfbe9d82fda8288f366d6db2b2da0bcff9a294bb6e80a7c8afe2a2
       development_experiment_id: a868bb187c1fca4c3c5fee289b116b8c8b408da37ea2f872ed2514b184a242cc
       timing_record: evo-v1-124-7-cogact--evo_budget72
-- config: configs/experiments/cogact/teacache_threshold05.yaml
+  measured_preset: evo_budget168
+- config: configs/experiments/cogact/teacache.yaml
   status: primary
   section: '5.2'
   reason: Threshold0.5 gives 184/200. Threshold0.75 gives 181 with under 2% speed improvement; 0.875 and
@@ -1236,7 +1191,8 @@ configurations:
   development_summary_sha256: b0e44564b22078238ca295111c224061aa48dffbbf2b5aaa4cb40117e0090a3d
   development_experiment_id: 5ec401498f2f120061fc6f6fd368690e08fe5f54c529d0b72f5dd735094bb659
   timing_record: final-r4-41-g4-cogact-teacache--teacache_strong
-- config: configs/experiments/cogact/temporal_redundancy_visual_update75.yaml
+  measured_preset: teacache_threshold05
+- config: configs/experiments/cogact/temporal_redundancy_visual.yaml
   status: primary
   section: '5.2'
   reason: Update75% gives180/200; update62.5% falls to174/200. No tested reliable acceleration at the
@@ -1259,7 +1215,8 @@ configurations:
     - development_summary_sha256: a3b4438bf5efa80d6f37378fb7537b34441ecabcc3362be693d0708eeb2b79fe
       development_experiment_id: 14f2132ff07c5cef4640bd7c37dfbbd47717e74e51be90abb891b3aaaabb40bb
       timing_record: search-r1-recheck-41-7-cogact-5--temporal_redundancy_visual_update625
-- config: configs/experiments/cogact/v_aefusion_s1.yaml
+  measured_preset: temporal_redundancy_visual_update75
+- config: configs/experiments/cogact/v_aefusion.yaml
   status: primary
   section: '5.2'
   reason: S1 gives183/200 and the fastest full-cost timing among all five active overlap windows; S5=177
@@ -1288,7 +1245,8 @@ configurations:
     - development_summary_sha256: 68e14d7699104179c6c22bef1c7fad029a6af3ad07a710a74ee05f1614bfc3a8
       development_experiment_id: 73b965992450bc2e91c838add5a1c7360a47298b991c7cd79539235a3300a54a
       timing_record: v-aefusion-v1-125-7-cogact--v_aefusion_s9
-- config: configs/experiments/cogact/vla_cache_budget256_protect75.yaml
+  measured_preset: v_aefusion_s1
+- config: configs/experiments/cogact/vla_cache.yaml
   status: primary
   section: '5.2'
   reason: Budget256 with75 protected tokens gives179/200 and1.272x;50 protected tokens falls to161/200.
@@ -1320,7 +1278,8 @@ configurations:
     - development_summary_sha256: a564d59e4b30373fe8b562e4435961c71c36ba498c185d6f14cee0f6cb313110
       development_experiment_id: cc588e44494703fbf11755837843c301ca1b1b8975b2119a934f50b7cabb3e31
       timing_record: search-r18-125-5-cogact--vla_cache_budget256_protect50
-- config: configs/experiments/cogact/vla_infoentropy_protect140.yaml
+  measured_preset: vla_cache_budget256_protect75
+- config: configs/experiments/cogact/vla_infoentropy.yaml
   final_runtime_source_sha256: fe6e13a3995cba0138156d8e5ecac0c515210894c5e166aabf784a839d660e08
   status: primary
   section: '5.2'
@@ -1358,7 +1317,8 @@ configurations:
   development_summary_sha256: f5e89807c973c137541883c64a583dd96b33689b697627a1df20adce139d85c9
   development_experiment_id: 85f2b3711700b9ca9428932bba6ae435f7e40798274003e841e06ee2a93a7398
   timing_record: se2-r1-repaired-cogact--vla_infoentropy_protect140
-- config: configs/experiments/cogact/eco_vla_keep60.yaml
+  measured_preset: vla_infoentropy_protect140
+- config: configs/experiments/cogact/eco_vla.yaml
   status: primary
   section: '5.3'
   reason: 'eco_keep60 gives 184/200, fastest valid timing among tested configurations meeting >= 177/200.
@@ -1387,7 +1347,8 @@ configurations:
     - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
       development_experiment_id: 7d8b6b13ed6f748d1a289a7a02590b820e54d4c4321f4a483d38543575ede5da
       timing_record: routing-eco-dyn4-45-6-cogact--eco_keep55
-- config: configs/experiments/cogact/sp_vla_z025_min_actions3.yaml
+  measured_preset: eco_vla_keep60
+- config: configs/experiments/cogact/sp_vla.yaml
   status: primary
   section: '5.3'
   reason: Minimum three native actions in the unchanged six-command history, with pruning Z threshold
@@ -1418,7 +1379,8 @@ configurations:
     - development_summary_sha256: 710f7e136d18f48bf89ead1fff593259e3f53e0652c64de688edb62e58eba46a
       development_experiment_id: 70b0de49da529b130793f3c22bedbdb5339cb51c8db2f235b9740553230ee798
       timing_record: search-r10-recheck-41-7-cogact--sp_vla_z025_history2
-- config: configs/experiments/cogact/deis_steps4_log_snr.yaml
+  measured_preset: sp_vla_z025_min_actions3
+- config: configs/experiments/cogact/deis.yaml
   status: primary
   section: '5.4'
   reason: Four log-SNR evaluations give 181/200 and 1.2104x. Three give 174/200 below 177; five gives
@@ -1456,7 +1418,8 @@ configurations:
   development_summary_sha256: db99817e28be20f50d0d1793147973c19796ee187f15bd8cbaedac0e5f722500
   development_experiment_id: dc1e9de85d1f757ecdd3858b4c1afcef07824477522fee1941e070d34b31d4f4
   timing_record: action-boundary-v1-41-4--deis_steps4_log_snr
-- config: configs/experiments/cogact/dpm_solver_pp_steps5_log_snr.yaml
+  measured_preset: deis_steps4_log_snr
+- config: configs/experiments/cogact/dpm_solver_pp.yaml
   status: primary
   section: '5.4'
   reason: Five log-SNR evaluations give 186/200. Four give 178/200 and only approximately 0.7% higher
@@ -1498,6 +1461,7 @@ configurations:
   development_summary_sha256: 47778d5512624ef7aee1975dd8a332c1e97809a7623fbc8ce3385f46f57106a8
   development_experiment_id: 1b547fe83c074247bb74416d6adbcbc23da32485504606d80e450a554027cde5
   timing_record: solver-logsnr-v1-124-3--dpm_solver_pp_steps5_log_snr
+  measured_preset: dpm_solver_pp_steps5_log_snr
 - config: configs/experiments/cogact/falcon.yaml
   status: primary
   section: '5.4'
@@ -1537,7 +1501,8 @@ configurations:
   development_summary_sha256: 88b65e870fa8fc2829eac9b548434de1cc14c5cc45cd8ec62104a44441c2de8e
   development_experiment_id: a535296a1663098a15937a0e061b1b48e9f6979a489acaffdac7e11b586370ae
   timing_record: final-r24-41-g1-cogact-falcon-boundary--falcon
-- config: configs/experiments/cogact/keystone_k3.yaml
+  measured_preset: falcon
+- config: configs/experiments/cogact/keystone.yaml
   status: primary
   section: '5.4'
   reason: K3 gives184/200 and is fastest among measured active candidate counts; K4 gives178/200, while
@@ -1564,7 +1529,8 @@ configurations:
     - timing_record: keystone-v1-125-7-cogact--keystone_k16
     limitation: Three is the smallest nondegenerate guarded cluster-medoid candidate count; native K1
       is not a KeyStone reproduction.
-- config: configs/experiments/cogact/probeflow_eps0015.yaml
+  measured_preset: keystone_k3
+- config: configs/experiments/cogact/probeflow.yaml
   status: primary
   section: '5.4'
   reason: 'Measured candidates: probeflow=182/200, probeflow_eps0015=181/200, probeflow_eps03=176/200,
@@ -1593,7 +1559,8 @@ configurations:
     - development_summary_sha256: a7115dbad1441c02f54ca3a8c89d998f0db17cce02fa330b6091d465af46945e
       development_experiment_id: a9d6fa9cb03c4c303485ae4e363a4c195876afde9799ecd581de091ebe49d1cb
       timing_record: probeflow-v1-41-7-cogact--probeflow_eps01
-- config: configs/experiments/cogact/unipc_steps5_log_snr.yaml
+  measured_preset: probeflow_eps0015
+- config: configs/experiments/cogact/unipc.yaml
   status: primary
   section: '5.4'
   reason: Five log-SNR evaluations give 183/200; four give 171/200. Uniform five steps and its order-three
@@ -1631,7 +1598,8 @@ configurations:
   development_summary_sha256: ccd1ea52f6853a976d539ac6a2f7b0b3e33d1eed01dee8a128f1c136a246bb54
   development_experiment_id: cf8068e163cf89f2debf324104e2e7cd79a8499929585b4551622218df296333
   timing_record: unipc-grid-v1-41-4--unipc_steps5_log_snr
-- config: configs/experiments/cogact/a3_official_k4_steps5.yaml
+  measured_preset: unipc_steps5_log_snr
+- config: configs/experiments/cogact/a3_official.yaml
   status: primary
   section: '5.5'
   scope: A3 official-code version; GR00T global confidence and dual verification through native conditional
@@ -1686,7 +1654,8 @@ configurations:
   timing_record: a3-official-refine-v1-124-7--a3_official_k4_steps5
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-- config: configs/experiments/cogact/aac_k4_m10.yaml
+  measured_preset: a3_official_k4_steps5
+- config: configs/experiments/cogact/aac.yaml
   status: primary
   section: '5.5'
   reason: K4 with movement threshold 10 gives 179/200 and 37 replay queries. Threshold 8 gives 181/200
@@ -1727,7 +1696,8 @@ configurations:
   development_summary_sha256: dec96b8d38b9494090f13a126b43e9c47288173490bc147da9dd57fdf0decc06
   development_experiment_id: fa975a896114f7549968864960fe908aa4c1fdc1bae29e9f0bc28e0e6a179542
   timing_record: aac-midpoint-v1-124-7--aac_k4_m10
-- config: configs/experiments/cogact/autohorizon_zero_plateau.yaml
+  measured_preset: aac_k4_m10
+- config: configs/experiments/cogact/autohorizon.yaml
   status: primary
   section: '5.5'
   reason: Hold threshold 1e-6 gives 182/200. Hold 0.03 and 0.01 both give 181/200; all three give 36 replay
@@ -1768,7 +1738,8 @@ configurations:
   development_summary_sha256: b1fecad48b92ffab1f8ea885004340be9b429cea4dfaff20dc49d4800a7f3e74
   development_experiment_id: 8d7946f564951304d00c6c201e4e29020090c9c8bd637646e4805ef2f478bdbb
   timing_record: terminal-boundary-v1-124-7--autohorizon_zero_plateau
-- config: configs/experiments/cogact/dvac_alpha16.yaml
+  measured_preset: autohorizon_zero_plateau
+- config: configs/experiments/cogact/dvac.yaml
   status: primary
   section: '5.5'
   reason: Alpha 16 gives 179/200 and the fastest tested eligible execution. Its 35 replay queries reach
@@ -1801,7 +1772,8 @@ configurations:
   development_summary_sha256: 20a58c12af8e419138513e974f1c902d87bf825e120b2920575e5750794eeaad
   development_experiment_id: 013a316e42b4389e0133d66b66fe8d5171c2ecc6d718893044ba79122c793675
   timing_record: action-boundary-v1-41-4--dvac_alpha16
-- config: configs/experiments/cogact/pace_p95.yaml
+  measured_preset: dvac_alpha16
+- config: configs/experiments/cogact/pace.yaml
   status: primary
   section: '5.5'
   reason: Percentile 95 gives 180/200 and 32 replay queries, the minimum for four fixed prefixes under
@@ -1834,7 +1806,8 @@ configurations:
   development_summary_sha256: 20a58c12af8e419138513e974f1c902d87bf825e120b2920575e5750794eeaad
   development_experiment_id: 1be3bc0431ea8a702c1293340180bfd62cb49d12277955aca6700897aa10140a
   timing_record: action-boundary-v1-41-4--pace_p95
-- config: configs/experiments/cogact/vote_ensemble_h8.yaml
+  measured_preset: pace_p95
+- config: configs/experiments/cogact/vote_ensemble.yaml
   status: primary
   section: '5.5'
   reason: H8 thresholds0.25/0.50/0.75 give174/174/172 of200, all below177; retain reference0.50 as an
@@ -1863,6 +1836,7 @@ configurations:
     - development_summary_sha256: 53b0882c6647f039c44e32b6e8d9464fef316c4bc723e5f6babbd700fac2e64d
       development_experiment_id: 33c7619175d6c0660aff06ad13616dbbddbd657a78195b65049e91b30ebd973e
       timing_record: search-r15-41-6-cogact--vote_ensemble_h8_threshold75
+  measured_preset: vote_ensemble_h8
 - config: configs/experiments/openvla_oft/baseline.yaml
   status: primary
   section: Reference
@@ -1873,6 +1847,7 @@ configurations:
   baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   timing_record: compact-124-7-openvla_oft-quant--native-pre
+  measured_preset: baseline
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   config: configs/experiments/openvla_oft/actquant.yaml
@@ -1903,9 +1878,10 @@ configurations:
       timing_record: quant-p3-runtime-openvla_oft-existing-r1-actquant_b2p5
     tie_reason: 'Budgets 4.5/3.5/2.5 retain Dev 198/195/185; new same-cohort timings are 23.115/23.465/25.863
       ms/control. Select 4.5: no faster eligible lower-bit candidate.'
+  measured_preset: actquant
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  config: configs/experiments/openvla_oft/awq_fp16_kernel.yaml
+  config: configs/experiments/openvla_oft/awq.yaml
   status: primary
   section: '3.3'
   scope: W4A16 with explicitly cast FP16 author kernel; training-only AWQ calibration.
@@ -1930,9 +1906,10 @@ configurations:
       eligible option. Historical Final outcomes remain unchanged, not retuned.
     limitation: Pinned W4/group128 author kernels; calibration tuning does not shrink online operator
       geometry.
+  measured_preset: awq_fp16_kernel
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  config: configs/experiments/openvla_oft/dyq_vla_mixed_integer_k1_fp075.yaml
+  config: configs/experiments/openvla_oft/dyq_vla.yaml
   status: primary
   section: '3.3'
   scope: DyQ-VLA v2 temporal core, K1 routing; 224 decoder W4 projections, tokenwise A2/A4/A8/native activation
@@ -1970,78 +1947,8 @@ configurations:
     - development_summary_sha256: a55460f17912488d761dc0e1e58efea7fba987e9fc7290cf37debe30d7f89c4d
       development_experiment_id: 6d1deff13d5303a8368a46e04895d978c687a5755358379fbd613a4054668d7a
       timing_record: quant-p4-runtime-openvla_oft-dyq-k1-fp090-budget020-r2-dyq-k1-fp090-budget020
-- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  config: configs/experiments/openvla_oft/eaqvla.yaml
-  status: excluded
-  section: '3.3'
-  scope: 'Independent modular weight-GPTQ core: vision W4/language W8, native projector/action head. Unspecified
-    activation quantizer excluded; packed floating GEMM.'
-  timing_record: quant-p3-runtime-openvla_oft-new-r1-eaqvla
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: 853756359389223c757ae492f6dbf801d0012e01afc0d3118f463396ffcd8d50
-  development_experiment_id: 21d44e48ffdc9ebff83b03bf72fc07f735d16aa78944359a008776a15d42b352
-  reason: 'Not a formal survey experiment: the authors withdrew arXiv:2505.21567v2 on 2025-07-31 citing
-    a paper error. Existing measurements remain diagnostic, not a reason to exclude an unfavorable outcome.'
-  search:
-    complete: false
-    stop: mechanism_limit
-    reason: Fixed paper module precision policy is active and numerically checked; retain measured success
-      and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
-    evidence:
-    - development_summary_sha256: 853756359389223c757ae492f6dbf801d0012e01afc0d3118f463396ffcd8d50
-      development_experiment_id: 21d44e48ffdc9ebff83b03bf72fc07f735d16aa78944359a008776a15d42b352
-      timing_record: quant-p3-runtime-openvla_oft-new-r1-eaqvla
-    tie_reason: Fixed paper module precision policy is active and numerically checked; retain measured
-      success and negative latency without replacing W4/W8 with an unrelated uniform-bit method.
-    limitation: Changing the fixed vision-W4/language-W8 allocation removes the retained core; kernel
-      layout was optimized without changing scale axes or precision.
-- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  config: configs/experiments/openvla_oft/motion_vq_t1.yaml
-  status: excluded
-  section: '3.3'
-  scope: VQVLA independent LLM dual-codebook/motion-router core, both resident banks and packed centroid-gather
-    GPU costs included. Excludes full-model export and ASIC-specific reuse.
-  timing_record: quant-p3-runtime-openvla_oft-motion-vq-r1-motion_vq_t1
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
-  development_experiment_id: 7e83bf47cee1a48e915570707ed91d7b815b0d6af3edc083169570a157bd2c6e
-  reason: 'Not a full VQVLA GPU acceleration comparison: this component includes dual codebooks/router
-    but omits the defining spatial/temporal multiplication reuse. Preserve diagnostic evidence; do not
-    attribute its speed to the complete paper.'
-  search:
-    complete: false
-    stop: mechanism_limit
-    reason: Thresholds 0.8/1.0 give 196/198 of 200 and 30.878/29.857 ms/control; select the faster eligible
-      1.0. Both banks remain active (6 of 57 measured queries use the low bank at 1.0). Kernel tile reuse
-      was optimized and independently checked. Report a negative GPU outcome, not an optimality or paper-failure
-      claim.
-    evidence:
-    - development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
-      development_experiment_id: 74fb5f84ee77acebd1dc913783a14b1d39a4f4990c44ad63e5f0b137dc2fbfdd
-      timing_record: quant-p3-runtime-openvla_oft-motion-vq-r1-motion_vq
-    - development_summary_sha256: 107c4304b67447b31a508f0088a107635994f93d77dc2a89ecc95353aa92a4a9
-      development_experiment_id: 7e83bf47cee1a48e915570707ed91d7b815b0d6af3edc083169570a157bd2c6e
-      timing_record: quant-p3-runtime-openvla_oft-motion-vq-r1-motion_vq_t1
-    tie_reason: Thresholds 0.8/1.0 give 196/198 of 200 and 30.878/29.857 ms/control; select the faster
-      eligible 1.0. Both banks remain active (6 of 57 measured queries use the low bank at 1.0). Kernel
-      tile reuse was optimized and independently checked. Report a negative GPU outcome, not an optimality
-      or paper-failure claim.
-    limitation: The fixed author codebook shapes retain centroid-gather overhead; changing a routing threshold
-      does not replace that engine. Do not promote an all-high disabled-router control or arbitrary codebook
-      sizes to the method. Search closure is scoped to this active two-bank GPU core, not exhaustive threshold
-      optimization.
-- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  config: configs/experiments/openvla_oft/qvla_b15p5.yaml
-  status: excluded
-  section: '3.3'
-  scope: QVLA full-paper scope abandoned for this batch; existing official-code proxy is diagnostic only.
-  reason: Last bounded primary-source review did not resolve action-space estimator versus official input-Hessian
-    proxy, marginal/staged allocation or pruning regularization. Exact proxy parity and full recalibration
-    are insufficient for full-core fidelity; no arbitrary pruning caps or claimed GPU incompatibility.
-- config: configs/experiments/openvla_oft/efficient_vla_layer_prune03.yaml
+  measured_preset: dyq_vla_mixed_integer_k1_fp075
+- config: configs/experiments/openvla_oft/efficient_vla_layer.yaml
   status: primary
   section: '3.3'
   reason: 'layer_prune03 gives 193/200, fastest valid timing among tested configurations meeting >= 192/200.
@@ -2073,7 +1980,8 @@ configurations:
     - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
       development_experiment_id: 4d5841c74fa9f501a353b8e29e29afb085d26b3b1af36d17906060b696e5c792
       timing_record: routing-layers-v3-45-5-openvla_oft--layer_prune03
-- config: configs/experiments/openvla_oft/a_mmr_current_frame_keep4375.yaml
+  measured_preset: efficient_vla_layer_prune03
+- config: configs/experiments/openvla_oft/a_mmr_current_frame.yaml
   status: primary
   section: '5.1'
   reason: Keep43.75% gives 196/200 and improves over keep50%; keep37.5% falls to 191 and keep25% to 181.
@@ -2101,6 +2009,7 @@ configurations:
   development_summary_sha256: 0ae8cdc54afa900d25dc82c200941f3b95d131c84c036aba295338c830f21fea
   development_experiment_id: 66a171af08f81a0606d70a2d11896f249e8f7bb72659d192c72d7ebdb2aece2e
   timing_record: scoped-r1-41-g0-openvla_oft--a_mmr_keep4375
+  measured_preset: a_mmr_current_frame_keep4375
 - config: configs/experiments/openvla_oft/actuation_slack_refresh_deletion.yaml
   status: primary
   section: '5.1'
@@ -2124,7 +2033,8 @@ configurations:
     - development_summary_sha256: c1e6ce41e3e80cf23109472ea4de5576d9ef0037b04258ee147f0a63edb206f8
       development_experiment_id: 2842374ae2419be0d06657bafe503fe0b586983da2e8130dd791bf9f3c69e02d
       timing_record: search-r1-45-6-openvla_oft-4--actuation_slack_refresh_deletion_keep05
-- config: configs/experiments/openvla_oft/adp_keep1875.yaml
+  measured_preset: actuation_slack_refresh_deletion
+- config: configs/experiments/openvla_oft/adp.yaml
   status: primary
   section: '5.1'
   reason: Keep18.75% gives195/200 and the fastest eligible timing; keep12.5% falls to189/200 without further
@@ -2153,7 +2063,8 @@ configurations:
     - development_summary_sha256: f96ccd8f15c956eabbec575c186c857ea23d935f7aaac76d51a47609e04a8b2b
       development_experiment_id: aca05b865ebaaa4a2756c1cfdca8aed263b51a9f2e4e7b3c0b1f574fc81adb43
       timing_record: search-r78-124-6-openvla_oft--adp_keep125
-- config: configs/experiments/openvla_oft/dart_keep1875.yaml
+  measured_preset: adp_keep1875
+- config: configs/experiments/openvla_oft/dart.yaml
   status: primary
   section: '5.1'
   reason: Keep18.75% is the fastest tested eligible point (195/200); keep12.5% gives191/200.
@@ -2180,6 +2091,7 @@ configurations:
     - development_summary_sha256: 7d3ac9b4810c022ec2dacaba0c26bea83532b7032f487877e3033f927fdf3143
       development_experiment_id: ad73a798f928eb51dc0c37bbc2453cfe7c0803faa6af04cb1cc1c5986466c8b2
       timing_record: search-r23-124-7-openvla_oft-1--dart_keep125
+  measured_preset: dart_keep1875
 - config: configs/experiments/openvla_oft/depth_cache_primary.yaml
   status: primary
   section: '5.1'
@@ -2210,6 +2122,7 @@ configurations:
     - development_summary_sha256: 65ccd9ea03a7c5cb1b70c2b54d15fedba83b655a527832ec10d3a7d46c681277
       development_experiment_id: 56b8c44a33e92732aabe3048edd7ba16e74cfeb751ab645c42ec0949f5f520af
       timing_record: search-recovery-125-6-openvla_oft-1--depth_cache_primary_floor25
+  measured_preset: depth_cache_primary
 - config: configs/experiments/openvla_oft/divprune.yaml
   status: primary
   section: '5.1'
@@ -2237,7 +2150,8 @@ configurations:
     - development_summary_sha256: 2e2b5bef3b234297177f25b2160a8eb3d923e63cdcf9c482123002fd4762c405
       development_experiment_id: c02b514a2b5a121bc2d2fbfcfe494309b695e957b9e266e6126a1387aeca07f5
       timing_record: search-r1-45-5-openvla_oft-0--divprune_keep25
-- config: configs/experiments/openvla_oft/efficient_vla_keep96.yaml
+  measured_preset: divprune
+- config: configs/experiments/openvla_oft/efficient_vla_token.yaml
   status: primary
   section: '5.1'
   reason: Keep96/view gives197/200; stronger80 and64 give191/200 and182/200. Preserve all selection components.
@@ -2265,7 +2179,8 @@ configurations:
     - development_summary_sha256: a5566ba04caa42d865547c78f0403852dd5295ecc22752222321665a8e866d45
       development_experiment_id: 72668ab9cb7d7292b5bdb0b2bdc121842857fb5fca45169ec7345fb2460e97d0
       timing_record: search-r1-45-5-openvla_oft-3--efficient_vla_keep64
-- config: configs/experiments/openvla_oft/eta_vla_ilsa_keep35.yaml
+  measured_preset: efficient_vla_keep96
+- config: configs/experiments/openvla_oft/eta_vla_ilsa.yaml
   status: primary
   section: '5.1'
   reason: Keep35% gives 193/200; keep27.5% and keep20% both fall to 191. All semantic/diversity selection
@@ -2294,7 +2209,8 @@ configurations:
   development_summary_sha256: 20b9345161b0209ad77a529d8f396e3712202d17d4fa14b830286b4190fb2804
   development_experiment_id: 3157a825330b27f0933447b028ad50eca148110d1f88720eb0b5a27522a35ac5
   timing_record: scoped-ilsa-strong-r1-124-g4-openvla_oft--ilsa_keep35
-- config: configs/experiments/openvla_oft/fastv_keep3125.yaml
+  measured_preset: eta_vla_ilsa_keep35
+- config: configs/experiments/openvla_oft/fastv.yaml
   status: primary
   section: '5.1'
   reason: Keep31.25% is the fastest tested eligible point (193/200); keep25% falls to183/200.
@@ -2321,7 +2237,8 @@ configurations:
     - development_summary_sha256: 19a674a5eb91600bbbf01216b6c3a669622e7abfcc234911759be85becdfc535
       development_experiment_id: ff76090f2e8e56522cc2d2cecc989b31dc3ba8ba69a8a054abb583add82f24c0
       timing_record: search-r1-45-5-openvla_oft-0--fastv_keep25
-- config: configs/experiments/openvla_oft/flash_vla_keep192.yaml
+  measured_preset: fastv_keep3125
+- config: configs/experiments/openvla_oft/flash_vla.yaml
   status: primary
   section: '5.1'
   reason: Keep176 retains 196/200 but is not faster; retain keep192 and report the full-cost slowdown.
@@ -2342,7 +2259,8 @@ configurations:
     - development_summary_sha256: 739312f5d398ba8bff8118068e2535a1fc38cb7dab29af90d818f684667d8d8c
       development_experiment_id: 80814b68af6d575252526e2765c6ca00d0de19a590325a1d013a173b6931d685
       timing_record: search-r1-45-5-openvla_oft-3--flash_vla_keep176
-- config: configs/experiments/openvla_oft/safe_pruner_keep1875.yaml
+  measured_preset: flash_vla_keep192
+- config: configs/experiments/openvla_oft/safe_pruner.yaml
   status: primary
   section: '5.1'
   reason: Keep18.75% meets192/200; stronger keep12.5% falls to189/200.
@@ -2366,7 +2284,8 @@ configurations:
     - development_summary_sha256: 063da1efb43c2dad9ab14a8b146723f39cdb525fd6f6e04cf211625518f07db8
       development_experiment_id: ca75ecc11fe121380ec814a04b3649bb223bfa3935d8eb4341bd3d3a8d66e4de
       timing_record: search-r1-45-6-openvla_oft-1--safe_pruner_keep125
-- config: configs/experiments/openvla_oft/sparsevlm_v2_scale0875.yaml
+  measured_preset: safe_pruner_keep1875
+- config: configs/experiments/openvla_oft/sparsevlm.yaml
   final_runtime_source_sha256: fe6e13a3995cba0138156d8e5ecac0c515210894c5e166aabf784a839d660e08
   status: primary
   section: '5.1'
@@ -2403,7 +2322,8 @@ configurations:
   development_summary_sha256: e9fee3f5972cbb18120d1a9123482fd7c091c2f3a250ee4473aab77ef9414a37
   development_experiment_id: 03d079a435ae20348a6cdde1bc3d3a1a7ec36ea57dada24f84d7c4599e9c84d0
   timing_record: se2-r2-openvla_oft--sparsevlm_v2_scale0875
-- config: configs/experiments/openvla_oft/specprune_vla_dynamic80.yaml
+  measured_preset: sparsevlm_v2_scale0875
+- config: configs/experiments/openvla_oft/specprune_vla.yaml
   status: primary
   section: '5.1'
   reason: Dynamic keep80% gives195/200; keep60% gives190/200. Score-first migration scope remains explicit.
@@ -2427,29 +2347,8 @@ configurations:
     - development_summary_sha256: 89de3035fa7b26fe3c5015105d04bbe5c64a8d14bc03c127bd5b888b103b2120
       development_experiment_id: 8885083b5f6c14b47f52e590f40ca7dab45f8a434d5e550e6db2a97b541b0cdd
       timing_record: search-r14-124-6-openvla_oft--specprune_vla_dynamic60
-- config: configs/experiments/openvla_oft/st_merge_keep192.yaml
-  status: pending_core
-  section: '5.1'
-  reason: Eq. 4 consumes source into target, unlike the provisional anchor-survival convention; one-to-many
-    collision/mass rules remain unspecified.
-  scope: Uncertified spatial-temporal merging.
-  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
-  development_experiment_id: d6e8965949d65ac92a7079a13bbe478bc63fd38ef9d9657f513d8051b75f9a46
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-5-openvla_oft-recheck--st_merge_keep192
-- config: configs/experiments/openvla_oft/team_vla_merge160.yaml
-  status: pending_core
-  section: '5.1'
-  reason: Joint text/action top-M aggregation, Eq. 5-9 direction and normalization remain unverified;
-    author source has no executable resolution.
-  scope: Uncertified merging equations.
-  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
-  development_experiment_id: 02fc7c9f038ee76b07c85196460993479de227eba74c4343cca09310552f327c
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-7-openvla_oft-3--team_vla_merge160
-- config: configs/experiments/openvla_oft/ties_keep3125_h48.yaml
+  measured_preset: specprune_vla_dynamic80
+- config: configs/experiments/openvla_oft/ties.yaml
   status: primary
   section: '5.1'
   reason: Keep31.25%/refresh48 gives 192/200. At refresh48, keep25% falls to 183; at keep31.25%, refresh96
@@ -2485,6 +2384,7 @@ configurations:
   development_summary_sha256: 0c766f9758746cd86f8114b00e7ac4ef9da548c1897abc8ddedc0c15b3e7025d
   development_experiment_id: 31254c8a85efccc60e16a1fde54c6b3d5fbd8c73f4ec67cc6c360207afd9b1a2
   timing_record: scoped-ties-oft-refine-r1-124-g4-openvla_oft--ties_keep3125_h48
+  measured_preset: ties_keep3125_h48
 - config: configs/experiments/openvla_oft/tome.yaml
   status: primary
   section: '5.1'
@@ -2520,7 +2420,8 @@ configurations:
   development_summary_sha256: 1b62e41716f753a3edf900fd62c4310db29bb31ba05b5cf3a71fd2f0d15bd506
   development_experiment_id: c6ea7e725aff569e8d525b3f060537340a0b2d95c15ecd4483ca57b3b42af6fe
   timing_record: final-r1-45-g1-openvla_oft-tome--tome
-- config: configs/experiments/openvla_oft/visionzip_keep25.yaml
+  measured_preset: tome
+- config: configs/experiments/openvla_oft/visionzip.yaml
   status: primary
   section: '5.1'
   reason: Keep25% gives 194/200. Stronger 21.875% and 18.75% fall to 191/189; select the fastest eligible
@@ -2552,18 +2453,8 @@ configurations:
   development_summary_sha256: 08483345391f5a6fc4551bdc322f11ea8aff1ea150077463c7ef897eafee44c9
   development_experiment_id: 55a7bc9b7524a7e075006d2ffd6d2e87e9650f71bdafc82966fe32fd08e2f822
   timing_record: final-r15-41-g4-openvla_oft-visionzip--visionzip_strong
-- config: configs/experiments/openvla_oft/vla_iap.yaml
-  status: pending_core
-  section: '5.1'
-  reason: The semantic encoder/pooling remains unspecified. The post-cutoff IAprune v2 changes core equations,
-    so it cannot silently repair the in-scope v1.
-  scope: Uncertified semantic-information scorer.
-  development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  development_experiment_id: 0a6a2c9c71aefa83b1f9ce71ac8d7813d3bb4ed9c4494769d977fdf123756ae0
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  timing_record: compact-45-7-openvla_oft-3--vla_iap
-- config: configs/experiments/openvla_oft/vla_pruner_keep125.yaml
+  measured_preset: visionzip_keep25
+- config: configs/experiments/openvla_oft/vla_pruner.yaml
   status: primary
   section: '5.1'
   reason: Keep12.5% gives193/200; stronger9.375% and6.25% give181/200 and171/200. Preserve dual-score
@@ -2592,7 +2483,8 @@ configurations:
     - development_summary_sha256: 3f06ec25d8c0d17b9470d2f6be32bcb933d930297846984ea44ffa3a5751318b
       development_experiment_id: 8a9decc7d2ed1ea85b59c406f0204ee830a0002da28555513cb0185c9d06f569
       timing_record: search-r10-124-6-openvla_oft--vla_pruner_keep0625
-- config: configs/experiments/openvla_oft/actuation_slack_refresh_kv_keep175.yaml
+  measured_preset: vla_pruner_keep125
+- config: configs/experiments/openvla_oft/actuation_slack_refresh_kv_reuse.yaml
   status: primary
   section: '5.2'
   reason: 'asr_kv_keep175 gives 194/200, fastest valid timing among tested configurations meeting >= 192/200.
@@ -2626,6 +2518,7 @@ configurations:
     - development_summary_sha256: 6ba72518e5328da5d88be8997bbe90fcb35b3b18171db43ea0d6ac9d578bde70
       development_experiment_id: 05a0210e3be30b69e8bfdf6a755eb172425012bd4ed16f6ede86b35f62e27ddf
       timing_record: routing-asr-v3-45-5-openvla_oft--asr_kv_keep175
+  measured_preset: actuation_slack_refresh_kv_keep175
 - config: configs/experiments/openvla_oft/temporal_redundancy_visual.yaml
   status: primary
   section: '5.2'
@@ -2647,7 +2540,8 @@ configurations:
     - development_summary_sha256: c81cc81766bf6b8828043ff1d3ed431b86173778c13e355eaf1b109be8c7ff2f
       development_experiment_id: c76e246e169473b07975a71a82daa9cd83997d2d89250d46ac52ca3f1acd6fc8
       timing_record: search-r1-45-6-openvla_oft-4--temporal_redundancy_visual_update25
-- config: configs/experiments/openvla_oft/vla_cache_budget256_protect50.yaml
+  measured_preset: temporal_redundancy_visual
+- config: configs/experiments/openvla_oft/vla_cache.yaml
   status: primary
   section: '5.2'
   reason: Budget256 with50 protected tokens gives194/200 and1.043x full-cost speed;25 protected tokens
@@ -2679,7 +2573,8 @@ configurations:
     - development_summary_sha256: 2f4e0059819b9e9b6591ee8918b799d8cf338aa8f40ca9d1cc40d1f5a3f5d3c3
       development_experiment_id: 8929e53f6faafe9666aeb79b7771bf565593c0cfd1ed9905a820e0ee1eaac8d9
       timing_record: search-r24-125-6-openvla_oft--vla_cache_budget256_protect25
-- config: configs/experiments/openvla_oft/vla_infoentropy_sdpa192.yaml
+  measured_preset: vla_cache_budget256_protect50
+- config: configs/experiments/openvla_oft/vla_infoentropy.yaml
   final_runtime_source_sha256: fe6e13a3995cba0138156d8e5ecac0c515210894c5e166aabf784a839d660e08
   status: primary
   section: '5.2'
@@ -2710,7 +2605,8 @@ configurations:
   development_summary_sha256: e9fee3f5972cbb18120d1a9123482fd7c091c2f3a250ee4473aab77ef9414a37
   development_experiment_id: 079a455f6d895e8890c4f6a38e259960b313394edd4847c536c38e3278996825
   timing_record: se2-r2-openvla_oft--vla_infoentropy_sdpa192
-- config: configs/experiments/openvla_oft/eco_vla_keep625.yaml
+  measured_preset: vla_infoentropy_sdpa192
+- config: configs/experiments/openvla_oft/eco_vla.yaml
   status: primary
   section: '5.3'
   reason: 'eco_keep625 gives 193/200, fastest valid timing among tested configurations meeting >= 192/200.
@@ -2743,7 +2639,8 @@ configurations:
     - development_summary_sha256: 14f632fc113e8fbdfebce6cfe4170c9bd761a8abba082f4f33a2c92e5bac966e
       development_experiment_id: 420ed8a10ec07dafaa45251f29e974609a77d157b8a62e3fd5c2212a0924d73a
       timing_record: routing-eco-dyn3-45-5-openvla_oft--eco_keep625
-- config: configs/experiments/openvla_oft/sp_vla_z025_min_actions3.yaml
+  measured_preset: eco_vla_keep625
+- config: configs/experiments/openvla_oft/sp_vla.yaml
   status: primary
   section: '5.3'
   reason: Minimum three native actions in the unchanged six-command history, with pruning Z threshold
@@ -2773,7 +2670,8 @@ configurations:
       timing_record: search-r78-124-6-openvla_oft--sp_vla_z025_history3
     - development_summary_sha256: a1e6339862135e81ad33f177733233d3374e5efef40f8a3a5d14d3b2c0170170
       development_experiment_id: 859578dfea8c90d01617bc49ad2f4d7aa012b7cf52b3ed5f6c7315e3d01f1c00
-- config: configs/experiments/openvla_oft/pace_p75.yaml
+  measured_preset: sp_vla_z025_min_actions3
+- config: configs/experiments/openvla_oft/pace.yaml
   status: primary
   section: '5.5'
   reason: Percentile 75 gives 197/200 and the least overhead among measured eligible presets, but remains
@@ -2802,6 +2700,7 @@ configurations:
   development_summary_sha256: 8b7333e7b2b148be045ebf79b905399c1dd33c8ef8abfc94653fd2befe2498ea
   development_experiment_id: 2e34e92ba91fbe225e913e7cd5341acf71609375e3f7ed860e05437c00266be9
   timing_record: pace-p75-infra-recheck-v1-124-3-openvla_oft--pace_p75
+  measured_preset: pace_p75
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   config: configs/experiments/openvla_oft/smoothquant.yaml
@@ -2828,6 +2727,7 @@ configurations:
     - development_summary_sha256: 2a48351043da7ed777972dec6abe6c91937655b070697502828d6b0a0f57ba4d
       development_experiment_id: 90d6a6f53c54c7a7c614c1a0e5bdff09100198b4b0dac18802eaba6948caafbc
       timing_record: quant-p4-runtime-openvla_oft-smoothquant-r1-smoothquant
+  measured_preset: smoothquant
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   config: configs/experiments/cogact/smoothquant.yaml
@@ -2854,6 +2754,7 @@ configurations:
     - development_summary_sha256: 2a48351043da7ed777972dec6abe6c91937655b070697502828d6b0a0f57ba4d
       development_experiment_id: bf414e83a68cb12c74b8d08f44862fc88a13cf812ebd3a17c3baf9a2947342fc
       timing_record: quant-p4-runtime-cogact-smoothquant-r1-smoothquant
+  measured_preset: smoothquant
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
   config: configs/experiments/openvla_oft/gptq.yaml
@@ -2880,6 +2781,7 @@ configurations:
     - development_summary_sha256: 7e0295681997261b8a572bf9d7aaee0448079fc90ae267b15de87fa3bcb0c611
       development_experiment_id: d69aeef476e3f244af416a5f0cb314f31f394b5dd9320f54c70faab16e07016b
       timing_record: quant-p4-runtime-openvla_oft-gptq-r1-gptq
+  measured_preset: gptq
 - baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
   baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
   config: configs/experiments/cogact/gptq.yaml
@@ -2906,49 +2808,33 @@ configurations:
     - development_summary_sha256: 7e0295681997261b8a572bf9d7aaee0448079fc90ae267b15de87fa3bcb0c611
       development_experiment_id: 179efedcda94ff9180919f9a367237ffb542e2f956f2dd01dcb1d17b171b740a
       timing_record: quant-p4-runtime-cogact-gptq-r2-gptq
+  measured_preset: gptq
 timing_protocol: libero_replay4x128_v1
-auxiliary_configurations:
-- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: 83a2952de24bf599cafcbe504ce1b8e0c5f91824411122370deec9846dbaa71e
-  config: configs/experiments/openvla_oft/awq.yaml
-  status: auxiliary
-  section: '3.3'
-  scope: BF16-kernel W4A16 accuracy/precision alternative, not a second primary.
-  timing_record: quant-p3-runtime-openvla_oft-existing-r1-awq
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: e2fccdf01f219fd92aaefa728bf83ab71757a71e5c9dceda1abc531587d6d0a4
-  development_experiment_id: 60497c718cb9e9afa95e3804a9f1a156caf2647272f2f90544471328e04e74e4
-  reason: Retained alternative; fresh same-environment Dev-200 and timing.
-- baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  config: configs/experiments/cogact/awq.yaml
-  status: auxiliary
-  section: '3.3'
-  scope: BF16-kernel W4A16 accuracy/precision alternative, not a second primary.
-  timing_record: quant-p3-runtime-cogact-existing-r1-awq
-  final_runtime_source_sha256: 07ddc3d5ba77bd21c82ed141da24e44e6e7bb9136718e9670513c276adc09ecc
-  development_summary_sha256: e2fccdf01f219fd92aaefa728bf83ab71757a71e5c9dceda1abc531587d6d0a4
-  development_experiment_id: 8b7c5bc06c3d722d3e21ce1bfc625a6990773624ffd88a6bf5157a5099028a29
-  reason: Retained alternative; fresh same-environment Dev-200 and timing.
-- config: configs/experiments/cogact/actuation_slack_refresh_keep50.yaml
-  status: auxiliary
-  section: '5.1'
-  reason: 182/200 at higher full refresh cost than keep25.
-  scope: Deletion core; full auxiliary cost.
-  development_summary_sha256: 937026eb6c9d518a777dbfd5fec4cd9c7528f04689e2b0140cd427c31a031d6d
-  development_experiment_id: 3e9ab07826e30785e609207a39c4c964aadc37185ff424e01b3643cfb527bd3c
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  timing_record: compact-41-4-cogact-1--actuation_slack_refresh_keep50
-- config: configs/experiments/cogact/action_cache_zero_threshold90.yaml
-  status: auxiliary
-  section: '5.2'
-  scope: Native DDIM refinement/clean-endpoint transfer; 1412 pairs from 77/80 independent episodes, no
-    online population.
-  reason: Verified zero-denoiser-call cache-hit endpoint; 179/200 with less speed than the two-step primary.
-    A distinct useful core endpoint, not a second default final run.
-  baseline_development_summary_sha256: 1c2d721f1bc8a034aae078d7a94a2ef7787f4c10e149f15047524e51ab94dcdf
-  baseline_development_experiment_id: a293c4ce24a5b840f961549f41769a1f59f1952c990b14d0ebef644ce8bda358
-  development_summary_sha256: 5759fbb67384510a99adda4c2c13265b2fe2a9bb6656fabf3a01bf4c8138538e
-  development_experiment_id: cafc1f861659729e267488d2e62539245572e80056ea6a4ae0a1c5bc6f17ad79
-  timing_record: scoped-action-zero90-thermal-replacement-r1-40-g1-cogact--action_zero_t090
+retired_scopes:
+- backend: cogact
+  method: eaqvla
+  reason: Withdrawn paper; no admitted faithful runtime evidence.
+- backend: cogact
+  method: motion_vq
+  reason: Defining multiplication-reuse mechanism is absent; LLM-only proxy is not the method.
+- backend: cogact
+  method: st_merge
+  reason: Fusion direction and collision-mass semantics remain unverified.
+- backend: openvla_oft
+  method: eaqvla
+  reason: Withdrawn paper; no admitted faithful runtime evidence.
+- backend: openvla_oft
+  method: motion_vq
+  reason: Defining multiplication-reuse mechanism is absent; LLM-only proxy is not the method.
+- backend: openvla_oft
+  method: qvla
+  reason: Released input-Hessian proxy does not establish the paper's action-space objective.
+- backend: openvla_oft
+  method: st_merge
+  reason: Fusion direction and collision-mass semantics remain unverified.
+- backend: openvla_oft
+  method: team_vla
+  reason: Defining joint score, aggregation and normalization remain unverified.
+- backend: openvla_oft
+  method: vla_iap
+  reason: Semantic encoder, alignment and pooling remain unverified.

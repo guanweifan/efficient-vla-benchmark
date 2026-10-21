@@ -1,214 +1,262 @@
-# efficient-vla-benchmark
+# Efficient-VLA-Benchmark
 
-A modular benchmark for VLA acceleration on pinned native backends. One run uses
-one method or the native baseline; algorithms share evaluation and timing harnesses.
-This repository contains code, configuration and summarized results, not model
-weights, datasets or raw experiment artifacts.
+[![arXiv](https://img.shields.io/badge/arXiv-2510.17111-b31b1b.svg)](https://arxiv.org/pdf/2510.17111)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/guanweifan/efficient-vla-benchmark/commits/main/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](https://github.com/guanweifan/efficient-vla-benchmark/pulls)
+[![Paper List](https://img.shields.io/badge/Papers-Awesome--Efficient--VLA-1677FF.svg)](https://github.com/guanweifan/awesome-efficient-vla)
 
-## Supported backends
+![Final-2000 success versus full-cost speedup on OpenVLA-OFT and CogACT.](assets/benchmark_results.svg)
 
-| Backend / variant | Token reduction | Caching | Model routing | Action chunking | Quantization |
-|---|---|---|---|---|---|
-| OpenVLA-OFT / libero_joint | See token methods below | VLA-Cache, VLA-InfoEntropy, Temporal Redundancy visual core, ASR KV reuse | SP-VLA, EcoVLA | PACE Cartesian core | AWQ, QVLA official-code proxy, ActQuant, DyQ-VLA temporal core, EaqVLA weight core, MotionVQ LLM core |
-| CogACT / libero_joint | See token methods below | Above, EfficientVLA DiT cache, DP-Cache, C³ache conditioned residual, ActionCache, BAC, V-AEFusion, EVO, TeaCache | SP-VLA, EcoVLA | VOTE H8 two-vote adaptation, PACE Cartesian core, AutoHorizon, DVAC, AAC, A³ official-code version | AWQ, QuantVLA, HoloQ official-code variant, DyQ-VLA temporal core, EaqVLA weight core, DA-MPA allocation core, MotionVQ LLM core |
-| starVLA | Source pinned only; runtime not implemented | — | — | — | — |
+📖 The experimental companion to our **[Efficient VLA survey](https://arxiv.org/pdf/2510.17111)**
+and **[paper list](https://github.com/guanweifan/awesome-efficient-vla)**.
+Benchmark acceleration methods on **OpenVLA-OFT** and **CogACT** through configurable
+algorithms, modular backends and shared LIBERO evaluation.
 
-Action generation additionally exposes KeyStone (batched native candidates and
-guarded cluster-medoid selection), ProbeFlow (lookahead-guided adaptive steps),
-and DPM-Solver++, UniPC and DEIS (high-order few-step sampling) on CogACT.
-The fixed-grid solvers preserve native finite-noise initialization and CFG.
-ProbeFlow uses an explicitly tested DDIM coordinate bridge, not a claim
-that CogACT was flow-matching trained. Fixed-Euler presets are diagnostic controls.
-Registration is not a measured acceleration claim; consult the result ledger for
-completed measurements. Diffusion-sampler replacements and stochastic-candidate
-methods do not support OFT's deterministic L1 head.
+<p align="left">
+  <a href="#quick-start">Quick Start</a> ·
+  <a href="#supported-methods">Methods</a> ·
+  <a href="#benchmarking">Benchmarking</a> ·
+  <a href="#development">Development</a>
+</p>
 
-QVLA follows the released input-Hessian proxy, not the paper's action-space
-intervention formulation. QuantVLA includes calibrated rotations and ATM/OHB.
-Both require checksummed training-only artifacts. Their packed kernels locally
-dequantize tiles for floating GEMM; they are not integer-MMA implementations or
-measured speedup claims. Read the method scope before using any result.
-ActQuant additionally requires the pinned author engine through `--runtime-path`
-and complete HSIC/AMF artifacts. Its floating-runtime control is an auxiliary,
-not a second quantization algorithm or a substitute native reference.
+## Quick Start
 
-[SmoothQuant](src/efficient_vla_benchmark/methods/quantization/smoothquant/README.md)
-is additionally registered on both backends as a classic decoder W8A8 control,
-with folded channel migration, dynamic token scales and true INT8/INT32 GEMM.
-It requires a checksummed training-only artifact; vision, attention SDPA and action
-heads remain native. Correctness/smoke validation does not establish speedup or
-Dev readiness; the result ledger remains authoritative.
+![Python 3.10](https://img.shields.io/badge/Python-3.10-3776AB.svg)
+![PyTorch 2.2](https://img.shields.io/badge/PyTorch-2.2-EE4C2C.svg)
+![CUDA 12.1](https://img.shields.io/badge/CUDA-12.1-76B900.svg)
 
-[GPTQ](src/efficient_vla_benchmark/methods/quantization/gptq/README.md) supplies the
-classic decoder W4A16 control on both backends. Its full-Hessian, true-sequential
-group-128 calibration uses no AWQ algorithm; only the pinned TinyChat execution
-kernel is shared. Native vision/action heads remain unchanged. Calibration,
-kernel-reference checks and smoke are distinct from measured Dev/timing admission.
+Install OpenVLA-OFT below, or follow the [CogACT guide](backends/cogact/INSTALL.md)
+in a separate environment.
 
-New quantization cores have explicit exclusions: HoloQ follows the released code,
-DA-MPA excludes DA-PTQ's unresolved CSRC, EaqVLA excludes an unspecified activation
-quantizer, and MotionVQ excludes full-model/ASIC co-design. DyQ-VLA uses frozen
-independent native trajectories, not Dev/Final calibration. Read the
-[admission contracts](docs/development.md#quantization-runtime-admission) and each
-method README. Packed execution can be slower than native; only the ledger's
-measured runtime and success evidence are reportable. Final-2000 remains a separate
-owner-approval gate after Dev/timing review.
-
-PACE, AutoHorizon, DVAC and AAC select a real prefix of the unchanged native
-prediction; no padding or longer learned action head is introduced. Native H8
-remains the comparator, not a claim that their executed length is fixed at eight.
-PACE supports both backends; the other three use native CogACT denoiser signals.
-AAC includes all independent candidates and entropy computation in its full cost.
-OFT PACE can shorten but cannot extend its eight-action native prediction.
-
-A³ is explicitly the [official-code version](src/efficient_vla_benchmark/methods/action_chunking/a3_official/README.md):
-global confidence, dual speculative verification and conditional rejection-action
-append, not the paper's clustering/medoid and strict-prefix variant. Its CogACT
-binding maps noisy-action conditioning to native DDIM coordinates. Every draft
-and verifier batch counts toward full cost; registration alone is not a result.
-
-OFT token methods: SpecPrune-VLA, ADP, VLA-Pruner, SAFE-Pruner, TEAM-VLA, VLA-IAP,
-EfficientVLA token core, ST-Merge and FlashVLA ICS, plus FastV, DivPrune, DART,
-SparseVLM+ v2, DepthCache primary-view core, ASR deletion instrument, ToMe,
-VisionZip, A-MMR current-frame core, ETA-VLA ILSA core and TIES.
-CogACT supports the same token scopes except VLA-Pruner, TEAM-VLA, VLA-IAP and
-EfficientVLA token core; its README explains those fidelity deferrals.
-SP-VLA includes pruning and
-scheduling in one method. Kernel precision options and scheduling-only ablations
-are not additional algorithms.
-
-These are common-checkpoint adaptations, not reproductions of published scores.
-TEAM-VLA, VLA-IAP and ST-Merge retain unverified paper interpretation choices.
-EfficientVLA exposes token pruning on OFT, a separately named DiT cache core
-on CogACT, and calibrated static layer pruning on both. Each is an independent
-scope, never the complete pipeline or a combination. Layer pruning belongs to
-model compression, not dynamic routing. EcoVLA conditionally prunes coupled FFN
-channels and whole attention heads with real sparse GEMMs, not whole layers.
-FlashVLA excludes unresolved
-action reuse; VOTE implements H8 overlapping-chunk voting, not its trained architecture.
-Native CogACT provides two aligned votes after warmup; its equation-defined tie
-selects the older prediction. OFT's eight-predict/eight-execute chunks do not
-overlap, so VOTE is not registered there. No H1 exception enters the primary table.
-DepthCache requires measured metric depth and excludes unresolved grasp/wrist
-control. ASR includes every auxiliary dense refresh in reported total cost;
-its primary-forward diagnostic is not end-to-end serving latency. SQAP-VLA remains
-deferred: activation quantization granularity is contradictory and no verifiable
-implementation is available. It is not counted as supported.
-The new caches have distinct scopes: DP-Cache reuses native denoiser outputs;
-C³ache retains a live conditioning prefix and reuses cross-chunk suffix residuals;
-Temporal Redundancy reuses visual attention rows, excluding its trained action branch.
-ActionCache retrieves independently collected, frozen intermediate actions and
-refines them with the native DDIM tail, or reuses a separately captured native
-clean endpoint at zero steps; it is not a reproduction of flow-model scores.
-No trained few-step sampler is advertised. Read each
-[method README](src/efficient_vla_benchmark/methods/) before using its results.
-
-Additional comparison scopes are deliberately limited: ToMe and VisionZip provide
-general visual-token controls; TeaCache provides a general diffusion-cache control.
-A-MMR implements current-frame selection only. Falcon provides historical-latent
-selection and partial native DDIM sampling on CogACT. These implementations are
-not a claim of completed Dev-200 selection or certified speedup; only frozen
-entries in the result ledger are reportable results.
-ETA-VLA supports only its training-free intra-LLM semantic selection and
-within-view diversity recycling; temporal fusion and the driving optimizer are
-excluded. This is an explicitly scoped manipulation transfer, not full ETA-VLA.
-TIES follows the supplied OpenReview revision's Kendall-guided allocation, with
-training-only quantiles and all prefix-probe costs included. CogACT uses K=30;
-OFT uses the owner-approved K=192 ranking-window transfer because K=30 produces
-undefined correlations on its calibration frames. Both keep native H8, with
-24-control-step refresh; these parameter changes are not the published recipe.
-
-Executable bindings do not by themselves certify fidelity. The result ledger
-separates admitted method scopes from unresolved TEAM-VLA, VLA-IAP and ST-Merge
-interpretations. Their diagnostic outcomes are not certified algorithm findings.
-
-## Install and run
-
-Install only the selected backend, following its pinned environment recipe:
-[OpenVLA-OFT](backends/openvla_oft/INSTALL.md) or [CogACT](backends/cogact/INSTALL.md).
-Their Transformers/runtime requirements differ; use separate environments.
-For lightweight development without a model runtime:
+### 1. Install
 
 ```bash
-python -m pip install -e '.[dev]'
-evb list
-evb validate-config --config configs/experiments/openvla_oft/specprune_vla.yaml
+git clone https://github.com/guanweifan/efficient-vla-benchmark.git
+cd efficient-vla-benchmark
+git submodule update --init --recursive -- \
+  backends/openvla_oft/upstream third_party/runtimes/transformers_openvla_oft \
+  third_party/runtimes/dlimp third_party/benchmarks/libero
 ```
 
-After backend installation, supply resource locations at launch:
+Set these variables to your own paths:
+
+| Variable | Value |
+|:---|:---|
+| `ENV_DIR` | New Python environment directory |
+| `FLASH_ATTN_WHEEL` | Compatible FlashAttention 2.5.5 wheel; see the [installation recipe](backends/openvla_oft/INSTALL.md) |
+| `MODEL_DIR` | Checkpoint directory |
+| `RUN_DIR` | Evaluation output directory |
 
 ```bash
+python3.10 scripts/create_environment.py --backend openvla_oft \
+  --venv "$ENV_DIR" --flash-attn-wheel "$FLASH_ATTN_WHEEL"
+source "$ENV_DIR/bin/activate"
+
+hf download moojink/openvla-7b-oft-finetuned-libero-spatial-object-goal-10 \
+  --revision 638918f3d1c2e43a39a8a20772bdb8b91835e4b7 \
+  --exclude 'lora_adapter/*' --local-dir "$MODEL_DIR"
+```
+
+### 2. Run the baseline
+
+```bash
+evb check-model --config configs/experiments/openvla_oft/baseline.yaml \
+  --model-path "$MODEL_DIR"
+
 evb evaluate --config configs/experiments/openvla_oft/baseline.yaml \
   --model-path "$MODEL_DIR" --libero-root third_party/benchmarks/libero \
-  --output-dir "$SMOKE_DIR" --record-traces
-
-python scripts/timing_workload.py --reference-workload "$REFERENCE_WORKLOAD" \
-  --output "$WORKLOAD"
-
-evb benchmark --config configs/experiments/openvla_oft/specprune_vla.yaml \
-  --model-path "$MODEL_DIR" \
-  --traces "$SPATIAL_TRACE" "$OBJECT_TRACE" "$GOAL_TRACE" "$LONG_TRACE" \
-  --workload-manifest "$WORKLOAD" --repeats 1 --warmup 10 --output-dir "$TIMING_DIR"
+  --output-dir "$RUN_DIR/baseline" --record-traces
 ```
 
-The caller defines the resource variables. Change the experiment YAML to select a
-supported backend/method pair and parameters; AWQ, ActionCache, EcoVLA, PACE and
-EfficientVLA layer pruning also need
-`--artifact-path`. BAC also requires frozen training-only branch statistics for its
-ACS schedules and Bubbling Union protection. ActionCache requires its independently
-collected frozen bank; see its
-[population instructions](src/efficient_vla_benchmark/methods/caching/action_cache/README.md).
-EVO requires frozen globally budgeted layouts selected using independent rollouts,
-never Dev/final feedback. Its offline search is separately authorized and costed.
-PACE needs frozen task-level prominence statistics from training demonstrations;
-its artifact is not built from Dev or final outcomes. See its
-[calibration instructions](src/efficient_vla_benchmark/methods/action_chunking/pace/README.md).
-Timing uses the four trace files selected by the frozen workload, not arbitrary
-smoke observations: at most 128 continuous controls per suite, one measured pass.
-Matched native references use the same inputs and GPU at H8; adaptive-prefix
-methods disclose their actual cadence and include selection overhead.
-LIBERO defaults to four smoke episodes, not a formal success-rate campaign.
-For depth-aware methods, record native baseline traces with `--depth` first;
-their method presets enable depth during evaluation. RGB-only traces are rejected.
-CUDA/EGL device selections must match. Closed-loop evaluation does not require
-the offline training dataset. See the [development guide](docs/development.md)
-for calibration, measurement boundaries and result recording.
+Runs **four smoke episodes**, one per suite. No demonstration dataset is required.
 
-## Repository layout
+### 3. Switch methods
 
-Independent [action codec evaluation](src/efficient_vla_benchmark/action_codecs/README.md)
-supports FAST+, BEAST, VQ-VLA, MiniVLA RVQ, ActionCodec Base/RVQ, MINT, SpatialVLA,
-X-Tokenizer and a scalar-binning reference in an isolated optional environment.
-Matched H40/H16 groups compare reconstruction/rate/latency; representation-transfer
-diagnostics are separate. These are not policy-success or VLA-acceleration results.
+```bash
+evb evaluate --config configs/experiments/openvla_oft/fastv.yaml \
+  --model-path "$MODEL_DIR" --libero-root third_party/benchmarks/libero \
+  --output-dir "$RUN_DIR/fastv" --record-traces
+```
 
-- `src/efficient_vla_benchmark/`: lightweight contracts and common harnesses;
-  `methods/<category>/<method>/` owns each paper, with per-backend implementations.
-  `action_codecs/implementations/<codec>/` owns independent discrete representations.
-- `backends/<backend>/`: optional integration package and pinned native `upstream/`.
-- `configs/`: portable experiment presets; no machine-local resource locations.
-- `third_party/`: pinned algorithm references, runtimes and LIBERO.
-- `tests/`, `templates/`, `scripts/`: contracts, extension examples and maintenance tools.
-- `docs/`: [development](docs/development.md) and [results](docs/benchmark_results.md).
-- `outputs/`: ignored local experiments, calibration artifacts and result records.
+Use `evb list` for compatibility and `evb validate-config --config "$PRESET"` to
+check settings. Each run uses one method. Calibrated methods need `--artifact-path`;
+external engines need `--runtime-path`.
 
-## Development and results
+**Assets:** the exact [CogACT LIBERO checkpoint](backends/cogact/README.md#model-asset)
+is not yet public. Check [artifact requirements](docs/development.md#external-assets)
+before running methods that need offline preparation.
 
-Read [AGENTS.md](AGENTS.md) for the single development/Git contract.
-[Development](docs/development.md) covers interfaces and extension workflows.
-[Benchmark results](docs/benchmark_results.md) joins selected Dev-200 outcomes with
-separately measured compact-replay latency and frozen 2,000-episode success where available.
-Missing final measurements remain explicitly unmeasured.
-The [selection workflow](docs/development.md#selection-and-final-measurement-workflow)
-targets one primary configuration per backend/method; poor faithful results remain
-reportable. Useful raw evidence stays local under `outputs/result_records/`, outside Git;
-unneeded results are retired after dependency checks, not archived indefinitely.
-Use [primary_selection.yaml](configs/evaluation/primary_selection.yaml) to select
-the currently frozen report presets. Generic method presets retain reference or
-initial migration defaults; they are not necessarily the selected hyperparameters.
-Do not equate replay speed, mechanism tests or four-episode smoke with formal
-accuracy or closed-loop task completion time.
+## Supported Methods
 
-This is a private development repository without a selected first-party
-open-source license. Preserve [LICENSE](LICENSE), [NOTICE](NOTICE) and upstream
-licenses; publication and license selection require the owner's decision.
+Method names link to scope and dependencies; **✓** links to the final config.
+**—** = no provided binding; `None` = no offline artifact required.
+
+<details>
+<summary><strong>Token reduction</strong></summary>
+
+| Method | OpenVLA-OFT | CogACT | Preparation |
+|:---|:---:|:---:|:---|
+| [A-MMR · Current-frame core](src/efficient_vla_benchmark/methods/token_reduction/a_mmr/README.md) | [✓](configs/experiments/openvla_oft/a_mmr_current_frame.yaml) | [✓](configs/experiments/cogact/a_mmr_current_frame.yaml) | None |
+| [ASR · Deletion core](src/efficient_vla_benchmark/methods/token_reduction/actuation_slack_refresh/README.md) | [✓](configs/experiments/openvla_oft/actuation_slack_refresh_deletion.yaml) | [✓](configs/experiments/cogact/actuation_slack_refresh_deletion.yaml) | None |
+| [ADP](src/efficient_vla_benchmark/methods/token_reduction/adp/README.md) | [✓](configs/experiments/openvla_oft/adp.yaml) | [✓](configs/experiments/cogact/adp.yaml) | None |
+| [DART](src/efficient_vla_benchmark/methods/token_reduction/dart/README.md) | [✓](configs/experiments/openvla_oft/dart.yaml) | [✓](configs/experiments/cogact/dart.yaml) | None |
+| [DepthCache · Primary-view core](src/efficient_vla_benchmark/methods/token_reduction/depth_cache/README.md) | [✓](configs/experiments/openvla_oft/depth_cache_primary.yaml) | [✓](configs/experiments/cogact/depth_cache_primary.yaml) | Aligned depth |
+| [DivPrune](src/efficient_vla_benchmark/methods/token_reduction/divprune/README.md) | [✓](configs/experiments/openvla_oft/divprune.yaml) | [✓](configs/experiments/cogact/divprune.yaml) | None |
+| [EfficientVLA · Token core](src/efficient_vla_benchmark/methods/token_reduction/efficient_vla/README.md) | [✓](configs/experiments/openvla_oft/efficient_vla_token.yaml) | — | None |
+| [ETA-VLA · ILSA core](src/efficient_vla_benchmark/methods/token_reduction/eta_vla/README.md) | [✓](configs/experiments/openvla_oft/eta_vla_ilsa.yaml) | [✓](configs/experiments/cogact/eta_vla_ilsa.yaml) | None |
+| [FastV](src/efficient_vla_benchmark/methods/token_reduction/fastv/README.md) | [✓](configs/experiments/openvla_oft/fastv.yaml) | [✓](configs/experiments/cogact/fastv.yaml) | None |
+| [FlashVLA · ICS only](src/efficient_vla_benchmark/methods/token_reduction/flash_vla/README.md) | [✓](configs/experiments/openvla_oft/flash_vla.yaml) | [✓](configs/experiments/cogact/flash_vla.yaml) | None |
+| [SAFE-Pruner](src/efficient_vla_benchmark/methods/token_reduction/safe_pruner/README.md) | [✓](configs/experiments/openvla_oft/safe_pruner.yaml) | [✓](configs/experiments/cogact/safe_pruner.yaml) | None |
+| [SparseVLM+ · V2](src/efficient_vla_benchmark/methods/token_reduction/sparsevlm/README.md) | [✓](configs/experiments/openvla_oft/sparsevlm.yaml) | [✓](configs/experiments/cogact/sparsevlm.yaml) | None |
+| [SpecPrune-VLA · Native-head adaptation](src/efficient_vla_benchmark/methods/token_reduction/specprune_vla/README.md) | [✓](configs/experiments/openvla_oft/specprune_vla.yaml) | [✓](configs/experiments/cogact/specprune_vla.yaml) | None |
+| [TIES](src/efficient_vla_benchmark/methods/token_reduction/ties/README.md) | [✓](configs/experiments/openvla_oft/ties.yaml) | [✓](configs/experiments/cogact/ties.yaml) | Calibration |
+| [ToMe](src/efficient_vla_benchmark/methods/token_reduction/tome/README.md) | [✓](configs/experiments/openvla_oft/tome.yaml) | [✓](configs/experiments/cogact/tome.yaml) | None |
+| [VisionZip](src/efficient_vla_benchmark/methods/token_reduction/visionzip/README.md) | [✓](configs/experiments/openvla_oft/visionzip.yaml) | [✓](configs/experiments/cogact/visionzip.yaml) | None |
+| [VLA-Pruner](src/efficient_vla_benchmark/methods/token_reduction/vla_pruner/README.md) | [✓](configs/experiments/openvla_oft/vla_pruner.yaml) | — | None |
+
+</details>
+
+<details>
+<summary><strong>Caching</strong></summary>
+
+| Method | OpenVLA-OFT | CogACT | Preparation |
+|:---|:---:|:---:|:---|
+| [ActionCache](src/efficient_vla_benchmark/methods/caching/action_cache/README.md) | — | [✓](configs/experiments/cogact/action_cache.yaml) | Frozen trajectory cache |
+| [ASR · KV-reuse core](src/efficient_vla_benchmark/methods/token_reduction/actuation_slack_refresh/README.md) | [✓](configs/experiments/openvla_oft/actuation_slack_refresh_kv_reuse.yaml) | [✓](configs/experiments/cogact/actuation_slack_refresh_kv_reuse.yaml) | None |
+| [BAC](src/efficient_vla_benchmark/methods/caching/bac/README.md) | — | [✓](configs/experiments/cogact/bac.yaml) | Calibration |
+| [C³ache · Conditioned-residual core](src/efficient_vla_benchmark/methods/caching/c3ache/README.md) | — | [✓](configs/experiments/cogact/c3ache_conditioned_residual.yaml) | None |
+| [DP-Cache · Denoiser-reuse core](src/efficient_vla_benchmark/methods/caching/dp_cache/README.md) | — | [✓](configs/experiments/cogact/dp_cache.yaml) | None |
+| [EfficientVLA · DiT-cache core](src/efficient_vla_benchmark/methods/token_reduction/efficient_vla/README.md) | — | [✓](configs/experiments/cogact/efficient_vla_cache.yaml) | None |
+| [EVO](src/efficient_vla_benchmark/methods/caching/evo/README.md) | — | [✓](configs/experiments/cogact/evo.yaml) | Frozen searched layout† |
+| [TeaCache](src/efficient_vla_benchmark/methods/caching/teacache/README.md) | — | [✓](configs/experiments/cogact/teacache.yaml) | Calibration |
+| [Temporal Redundancy · Visual core](src/efficient_vla_benchmark/methods/caching/temporal_redundancy/README.md) | [✓](configs/experiments/openvla_oft/temporal_redundancy_visual.yaml) | [✓](configs/experiments/cogact/temporal_redundancy_visual.yaml) | None |
+| [V-AEFusion](src/efficient_vla_benchmark/methods/caching/v_aefusion/README.md) | — | [✓](configs/experiments/cogact/v_aefusion.yaml) | None |
+| [VLA-Cache](src/efficient_vla_benchmark/methods/caching/vla_cache/README.md) | [✓](configs/experiments/openvla_oft/vla_cache.yaml) | [✓](configs/experiments/cogact/vla_cache.yaml) | None |
+| [VLA-InfoEntropy](src/efficient_vla_benchmark/methods/caching/vla_infoentropy/README.md) | [✓](configs/experiments/openvla_oft/vla_infoentropy.yaml) | [✓](configs/experiments/cogact/vla_infoentropy.yaml) | None |
+
+</details>
+
+<details>
+<summary><strong>Model routing</strong></summary>
+
+| Method | OpenVLA-OFT | CogACT | Preparation |
+|:---|:---:|:---:|:---|
+| [EcoVLA · Channel/head core](src/efficient_vla_benchmark/methods/model_routing/eco_vla/README.md) | [✓](configs/experiments/openvla_oft/eco_vla.yaml) | [✓](configs/experiments/cogact/eco_vla.yaml) | Calibration |
+| [SP-VLA · Pruning + scheduling](src/efficient_vla_benchmark/methods/model_routing/sp_vla/README.md) | [✓](configs/experiments/openvla_oft/sp_vla.yaml) | [✓](configs/experiments/cogact/sp_vla.yaml) | None |
+
+</details>
+
+<details>
+<summary><strong>Action generation</strong></summary>
+
+| Method | OpenVLA-OFT | CogACT | Preparation |
+|:---|:---:|:---:|:---|
+| [DEIS](src/efficient_vla_benchmark/methods/action_generation/deis/README.md) | — | [✓](configs/experiments/cogact/deis.yaml) | Sampler dependency |
+| [DPM-Solver++](src/efficient_vla_benchmark/methods/action_generation/dpm_solver_pp/README.md) | — | [✓](configs/experiments/cogact/dpm_solver_pp.yaml) | Sampler dependency |
+| [Falcon](src/efficient_vla_benchmark/methods/action_generation/falcon/README.md) | — | [✓](configs/experiments/cogact/falcon.yaml) | None |
+| [KeyStone](src/efficient_vla_benchmark/methods/action_generation/keystone/README.md) | — | [✓](configs/experiments/cogact/keystone.yaml) | None |
+| [ProbeFlow · DDIM-coordinate port](src/efficient_vla_benchmark/methods/action_generation/probeflow/README.md) | — | [✓](configs/experiments/cogact/probeflow.yaml) | None |
+| [UniPC](src/efficient_vla_benchmark/methods/action_generation/unipc/README.md) | — | [✓](configs/experiments/cogact/unipc.yaml) | Sampler dependency |
+
+</details>
+
+<details>
+<summary><strong>Action chunking</strong></summary>
+
+| Method | OpenVLA-OFT | CogACT | Preparation |
+|:---|:---:|:---:|:---|
+| [A³ · Official code](src/efficient_vla_benchmark/methods/action_chunking/a3_official/README.md) | — | [✓](configs/experiments/cogact/a3_official.yaml) | None |
+| [AAC](src/efficient_vla_benchmark/methods/action_chunking/aac/README.md) | — | [✓](configs/experiments/cogact/aac.yaml) | None |
+| [AutoHorizon](src/efficient_vla_benchmark/methods/action_chunking/autohorizon/README.md) | — | [✓](configs/experiments/cogact/autohorizon.yaml) | None |
+| [DVAC](src/efficient_vla_benchmark/methods/action_chunking/dvac/README.md) | — | [✓](configs/experiments/cogact/dvac.yaml) | None |
+| [PACE](src/efficient_vla_benchmark/methods/action_chunking/pace/README.md) | [✓](configs/experiments/openvla_oft/pace.yaml) | [✓](configs/experiments/cogact/pace.yaml) | Demonstration calibration |
+| [VOTE · H8 overlap adaptation](src/efficient_vla_benchmark/methods/action_chunking/vote_ensemble/README.md) | — | [✓](configs/experiments/cogact/vote_ensemble.yaml) | None |
+
+</details>
+
+<details>
+<summary><strong>Quantization</strong></summary>
+
+| Method | OpenVLA-OFT | CogACT | Preparation |
+|:---|:---:|:---:|:---|
+| [ActQuant](src/efficient_vla_benchmark/methods/quantization/actquant/README.md) | [✓](configs/experiments/openvla_oft/actquant.yaml) | — | Calibrated GGUF + runtime† |
+| [AWQ](src/efficient_vla_benchmark/methods/quantization/awq/README.md) | [✓](configs/experiments/openvla_oft/awq.yaml) | [✓](configs/experiments/cogact/awq.yaml) | Calibration + kernels |
+| [DA-PTQ · DA-MPA core](src/efficient_vla_benchmark/methods/quantization/da_mpa/README.md) | — | [✓](configs/experiments/cogact/da_mpa.yaml) | Calibration + kernels |
+| [DyQ-VLA · V2 temporal core](src/efficient_vla_benchmark/methods/quantization/dyq_vla/README.md) | [✓](configs/experiments/openvla_oft/dyq_vla.yaml) | [✓](configs/experiments/cogact/dyq_vla.yaml) | Trajectory calibration + runtime† |
+| [GPTQ](src/efficient_vla_benchmark/methods/quantization/gptq/README.md) | [✓](configs/experiments/openvla_oft/gptq.yaml) | [✓](configs/experiments/cogact/gptq.yaml) | Calibration + kernels |
+| [HoloQ · Official-code variant](src/efficient_vla_benchmark/methods/quantization/holoq/README.md) | — | [✓](configs/experiments/cogact/holoq.yaml) | Calibration + kernels |
+| [QuantVLA](src/efficient_vla_benchmark/methods/quantization/quantvla/README.md) | — | [✓](configs/experiments/cogact/quantvla.yaml) | Calibration + kernels |
+| [SmoothQuant](src/efficient_vla_benchmark/methods/quantization/smoothquant/README.md) | [✓](configs/experiments/openvla_oft/smoothquant.yaml) | [✓](configs/experiments/cogact/smoothquant.yaml) | Calibration + kernels |
+
+</details>
+
+<details>
+<summary><strong>Model compression</strong></summary>
+
+| Method | OpenVLA-OFT | CogACT | Preparation |
+|:---|:---:|:---:|:---|
+| [EfficientVLA · Layer-pruning core](src/efficient_vla_benchmark/methods/token_reduction/efficient_vla/README.md) | [✓](configs/experiments/openvla_oft/efficient_vla_layer.yaml) | [✓](configs/experiments/cogact/efficient_vla_layer.yaml) | Calibration |
+
+</details>
+
+† See [artifact availability](docs/development.md#external-assets).
+These are common-checkpoint adaptations; partial cores are labeled explicitly.
+
+[Action tokenizer / codec evaluation](src/efficient_vla_benchmark/action_codecs/README.md)
+uses a separate environment and reconstruction benchmark.
+
+## Benchmarking
+
+Success is measured over **2,000 LIBERO episodes** per configuration. Speedup measures
+full policy/control cost on **RTX 3090**, against a matched native reference on the
+same GPU; simulation time is excluded.
+
+| Task | Start here |
+|:---|:---|
+| Compare methods | [Success, latency and memory](docs/benchmark_results.md) · [Selected configurations](configs/evaluation/primary_selection.yaml) |
+| Measure success | [Fixed episode sets and parallel evaluation](docs/development.md#fixed-development-validation) |
+| Measure latency | [Replay inputs and timing commands](docs/development.md#rebuilding-evaluation-inputs) · [Timing protocol](docs/development.md#calibration-evaluation-and-timing) |
+
+## Development
+
+```text
+backends/<backend>/               Optional plugin + pinned native source
+src/efficient_vla_benchmark/
+  core/                           Contracts, config and discovery
+  methods/<category>/<method>/    One method, explicit backend bindings
+  model_ops/                      Shared tensor operations
+  control/                        Action queue and scheduling
+  evaluation/                     Shared LIBERO harness
+  profiling/                      Replay timing and accounting
+  action_codecs/                  Independent reconstruction benchmark
+configs/                          Final presets and reusable defaults
+third_party/                      Pinned references, runtimes and simulator
+tests/ · templates/ · scripts/    Checks, extension examples and tools
+docs/                             Development guide and result ledger
+```
+
+See the [development guide](docs/development.md), [method template](templates/method/README.md)
+and [backend template](templates/backend/README.md). [AGENTS.md](AGENTS.md) defines
+contribution and Git rules. Regenerate the chart with the
+[figure script](scripts/plot_benchmark_results.py) (requires Matplotlib).
+
+## Citation
+
+If you find this benchmark useful, please cite our survey:
+
+```bibtex
+@misc{guan2025efficientvisionlanguageactionmodelsembodied,
+  title         = {Efficient Vision-Language-Action Models for Embodied Manipulation: A Systematic Survey},
+  author        = {Weifan Guan and Qinghao Hu and Aosheng Li and Jian Cheng},
+  year          = {2025},
+  eprint        = {2510.17111},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.RO},
+  url           = {https://arxiv.org/abs/2510.17111}
+}
+```
+
+## License
+
+First-party contributions use [MIT](LICENSE); third-party terms remain in [NOTICE](NOTICE).
+The pinned dlimp and SpecPrune-VLA sources need license clarification before redistribution.

@@ -1,3 +1,0 @@
-extends: autohorizon.yaml
-parameters:
-  hold_threshold: 0.5

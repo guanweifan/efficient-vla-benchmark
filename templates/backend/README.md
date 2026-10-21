@@ -8,7 +8,7 @@ actions; replace the fixture with a real compatible model before LIBERO use.
 
 Copy this directory into a new project, rename the distribution, import package and
 entry-point ID, then implement your native model. No main-package registry edit is
-needed. Read docs/development.md (Add a backend) first. Never publish the example as model support.
+needed. Follow [Add a backend](../../docs/development.md#add-a-backend).
 
 ```bash
 python -m pip install -e templates/backend

@@ -1,6 +1,0 @@
-extends:
-  - baseline.yaml
-  - ../../methods/qvla.yaml
-parameters:
-  target_avg_bits: 8.0
-  candidate_bits: [4, 8, 16]

@@ -1,3 +1,25 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/pace.yaml
+- ../../backends/openvla_oft.yaml
+- ../../methods/pace.yaml
+parameters:
+  enabled: true
+  smoothing_window: 3
+  minimum_spacing: 2
+  calibration_percentile: 75.0
+  max_horizon: null
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

@@ -1,3 +1,0 @@
-extends: aac_k4_m5.yaml
-parameters:
-  movement_threshold: 8.0

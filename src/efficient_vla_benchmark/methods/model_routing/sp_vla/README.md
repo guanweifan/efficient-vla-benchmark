@@ -1,13 +1,9 @@
 # SP-VLA: scheduling and visual token pruning
 
-The canonical method ID/directory is now `sp_vla`. The existing experiment file
-`sp_vla_scheduling.yaml` remains a scheduling-only preset using this same method;
-`sp_vla.yaml` enables both contributions. Old recorded run IDs are unchanged.
-Direct users of the old method ID must change it to `sp_vla`. There is one owned
-implementation, not two independently composable methods.
-Primary category remains model_routing; cross-reference survey 5.1 for token pruning.
+The method ID and final preset are `sp_vla`. Both pruning and scheduling are
+enabled in one implementation under `model_routing`.
 
-The full preset additionally reads the released last-block SigLIP Q/K, selects by
+Visual pruning reads the released last-block SigLIP Q/K, selects by
 cumulative attention mass and protects Canny-edge patches in each camera. DINO
 and SigLIP share selected patch indices; the LLM retains original positions. The
 native vision output is second-to-last-block features; the last-block probe follows
@@ -17,13 +13,7 @@ contrary to comments in that repository. We preserve the code formula and label
 it in runtime metadata. Cold/low-Z queries retain every token; we do not reverse
 the rule to manufacture a speedup. One fixed spatial preset is used across suites.
 
-The following describes the retained scheduling-only ablation:
-
-Category: model_routing (survey §5.3, cross-reference §5.5).
-Inference-only on the unmodified joint-suite OpenVLA-OFT checkpoint.
-
-Scope: independently port the paper's model scheduling contribution. Token pruning
-is excluded, not composed with another method. This is not full SP-VLA reproduction.
+## Scheduling mechanism
 
 - [Paper](https://arxiv.org/abs/2506.12723), version 3.
 - [Official source](https://github.com/ChildTang/SP-VLA/tree/61872a4d6d8e9c18f08b6474ceca2ff2fe08e942), MIT.
@@ -48,7 +38,7 @@ may change the pruning Z threshold and minimum number of native actions in the
 history. `min_model_actions: 3` still uses a SIX-command history; it does not
 shorten that history to three. All thresholds/window/fit parameters live in YAML.
 
-Use `configs/experiments/openvla_oft/sp_vla_scheduling.yaml` through the same evaluate
+Use `configs/experiments/openvla_oft/sp_vla.yaml` through the same evaluate
 and benchmark commands as baseline. Set `enabled: false` for a native control no-op.
 Requires control replay; query/prepared-only timing cannot execute this mechanism.
 Report actual query count, replacement count and total policy time/per-control-step

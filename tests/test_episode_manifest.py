@@ -179,7 +179,11 @@ def test_current_campaign_matrix_is_executable(manifest):
     )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    matrix = yaml.safe_load(Path("configs/evaluation/dev200_campaign.yaml").read_text())
+    selection = yaml.safe_load(Path("configs/evaluation/primary_selection.yaml").read_text())
+    matrix = {}
+    for row in selection["configurations"]:
+        config = Path(row["config"])
+        matrix.setdefault(config.parent.name, []).append(config.stem)
     complete = module.plan(matrix, manifest, "example", 8)
     baseline = module.plan(matrix, manifest, "example", 8, True)
     assert len(complete["jobs"]) == sum(len(presets) for presets in matrix.values()) * 8

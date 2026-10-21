@@ -1,4 +1,0 @@
-extends:
-- ./specprune_vla_score_first.yaml
-parameters:
-  dynamic_keep_ratio: 0.8

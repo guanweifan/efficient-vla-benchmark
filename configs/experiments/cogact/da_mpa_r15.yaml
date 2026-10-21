@@ -1,4 +1,0 @@
-extends:
-  - da_mpa.yaml
-parameters:
-  retention_ratio: 0.15

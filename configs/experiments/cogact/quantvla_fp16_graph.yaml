@@ -1,3 +1,0 @@
-extends: quantvla_fp16_kernel.yaml
-parameters:
-  dit_graphs: true

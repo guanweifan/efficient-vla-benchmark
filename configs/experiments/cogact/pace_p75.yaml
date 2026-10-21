@@ -1,3 +1,0 @@
-extends: pace.yaml
-parameters:
-  calibration_percentile: 75.0

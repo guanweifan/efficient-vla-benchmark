@@ -4,8 +4,7 @@ This scope follows the released GR00T implementation at
 [INCEPTIONwang/A3, revision 96a85c6](https://github.com/INCEPTIONwang/A3/blob/96a85c698f3848f6e684e36a81caf6e275db2ecc/rlinf/models/embodiment/gr00t/gr00t_action_model.py),
 not the clustering/medoid procedure in [paper v4](https://arxiv.org/html/2605.11567v4).
 Use the explicit ID `a3_official` and label **A³ official-code version** in results.
-The owner authorized this distinction; do not silently rename it a full paper
-reproduction. Apache-2.0 attribution and modification notice are in the root NOTICE.
+Apache-2.0 attribution and modification notice are in the root NOTICE.
 
 ## Retained official mechanism
 

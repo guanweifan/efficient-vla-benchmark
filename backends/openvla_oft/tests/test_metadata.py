@@ -15,6 +15,7 @@ def test_metadata_reports_selected_attention_without_overwriting_native_config(s
         config=SimpleNamespace(_attn_implementation="sdpa"),
     )
     backend.method, backend.method_name, backend.precision = None, "none", "bfloat16"
+    backend.execution_runtime = None
     backend._model_manifest = {"sha256": "test"}
     data = backend.metadata()
     assert data["attention_implementation"] == (selected or "sdpa")

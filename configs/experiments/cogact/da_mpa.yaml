@@ -1,3 +1,30 @@
+# Final measured configuration; resource paths are supplied through the CLI.
 extends:
-  - baseline.yaml
-  - ../../methods/da_mpa.yaml
+- ../../backends/cogact.yaml
+- ../../methods/da_mpa.yaml
+parameters:
+  calibration_samples: 512
+  calibration_seed: 0
+  probe_steps: 16
+  damping: 0.0003
+  translation_weight: 1.8
+  rotation_weight: 0.15
+  retention_ratio: 0.9
+  exclude_final_blocks: 2
+  activation_percentile: 99.9
+  runtime: tinychat_fp16
+evaluation:
+  suites:
+  - libero_spatial
+  - libero_object
+  - libero_goal
+  - libero_10
+  tasks:
+  - 0
+  trials: 1
+  seed: 0
+  record_traces: true
+profiling:
+  mode: control
+  repeats: 1
+  warmup: 10

@@ -1,4 +1,0 @@
-extends:
-  - sp_vla.yaml
-parameters:
-  token_pruning: false

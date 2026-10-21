@@ -174,6 +174,7 @@ def test_native_precision_guard():
 
 
 def test_artifact_value_failure_does_not_partially_convert_model(tmp_path):
+    pytest.importorskip("awq_inference_engine", reason="Optional packed runtime is not installed")
     from efficient_vla_benchmark.methods.quantization.gptq.method import GPTQ
 
     root = tmp_path / "atomic"
