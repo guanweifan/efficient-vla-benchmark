@@ -12,6 +12,7 @@ from efficient_vla_benchmark.core.provenance import digest_file, source_metadata
 from efficient_vla_benchmark.core.types import EpisodeContext
 
 from .runner import MAX_STEPS, SUITES, WAIT_STEPS, configure_libero, run_episode
+from .runtime import load_environment
 
 
 def validate_independent_state(state, standard, previous=()):
@@ -29,9 +30,10 @@ def validate_independent_state(state, standard, previous=()):
         raise ValueError("Independent placement overlaps standard or another search state")
 
 
-def _task(suite_name, task_id):
+def _task(suite_name, task_id, runtime_dir):
     from libero.libero import benchmark, get_libero_path
-    from libero.libero.envs import OffScreenRenderEnv
+
+    OffScreenRenderEnv = load_environment(runtime_dir)
 
     suite = benchmark.get_benchmark_dict()[suite_name]()
     task = suite.get_task(task_id)
@@ -58,7 +60,7 @@ def create_population(libero_root, output, groups):
         for context in values:
             random.seed(context.seed)
             np.random.seed(context.seed)
-            task, suite, env, bddl = _task(context.suite, context.task_id)
+            task, suite, env, bddl = _task(context.suite, context.task_id, output / "_private")
             try:
                 env.seed(context.seed)
                 env.reset()
@@ -159,7 +161,7 @@ def evaluate_population(policy, metadata, population_root, group, output, before
     records, started = [], time.monotonic()
     for entry in selected:
         context = EpisodeContext(**entry["context"])
-        task, suite, env, bddl = _task(context.suite, context.task_id)
+        task, suite, env, bddl = _task(context.suite, context.task_id, output / "_private")
         try:
             with np.load(population_root / entry["filename"], allow_pickle=False) as archive:
                 state = archive["state"]

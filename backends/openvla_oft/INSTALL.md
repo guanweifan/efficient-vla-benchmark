@@ -5,9 +5,17 @@ Ampere GPUs. The recorded functional and timing checks use RTX 3090. Other GPUs
 need compatible extension builds and their own validation; no cross-device
 performance portability is implied.
 
-Initialize Git submodules at the parent repository's recorded commits. Do not
+From the repository root, initialize only this backend's runtime submodules:
+
+```bash
+git submodule update --init --recursive -- \
+  backends/openvla_oft/upstream third_party/runtimes/transformers_openvla_oft \
+  third_party/runtimes/dlimp third_party/benchmarks/libero
+```
+
+These use the parent repository's recorded commits. Do not
 replace OFT's pinned Transformers with stock Transformers or another algorithm's
-fork. CogACT and StarVLA sources are present but are not installed in this process.
+fork. CogACT sources are not installed in this process.
 
 `backends/openvla_oft/requirements.txt` pins the dependency closure of the tested runtime
 and CPU development tools. Source projects are installed separately with
@@ -21,14 +29,15 @@ is insufficient: the independent installation was also exercised through real
 LIBERO episodes.
 OFT and LIBERO use editable compatibility mode to expose their namespace packages.
 
-Supply compatible FlashAttention and AWQ extension wheels and a new environment
-location explicitly:
+Supply a compatible FlashAttention wheel and a new environment location explicitly.
+The pinned native source imports FlashAttention even though the selected baseline
+uses SDPA. AWQ's extension is optional; baseline and token-pruning methods do not
+require it:
 
 ```bash
-python3.10 backends/openvla_oft/scripts/create_environment.py \
-  --venv "$ENV_DIR" \
-  --flash-attn-wheel "$FLASH_ATTN_WHEEL" \
-  --awq-wheel "$AWQ_WHEEL"
+python3.10 scripts/create_environment.py --backend openvla_oft \
+  --venv "$ENV_DIR" --flash-attn-wheel "$FLASH_ATTN_WHEEL"
+source "$ENV_DIR/bin/activate"
 ```
 
 For restricted or slow networks, build/download the pinned wheels on a
@@ -43,6 +52,9 @@ python3.10 -m pip wheel --wheel-dir "$WHEELHOUSE_DIR" \
 The script refuses an existing environment and does not modify system CUDA, global
 Python packages, another project environment or Conda configuration. Generated
 environment files are private machine-local assets, not repository configuration.
+Online installation needs Python's `venv`/`ensurepip` support. Offline installation
+bootstraps pip from the explicit wheelhouse and does not require system pip or
+an administrator to modify Python; include the pinned pip wheel in that collection.
 An interrupted installation is left for inspection; use another new destination
 or repair that isolated environment explicitly rather than deleting user data.
 
@@ -77,12 +89,33 @@ metadata requires different Torch/Transformers versions. Selected source
 primitives are loaded under a private namespace; their actual packed kernels
 receive numerical tests on the installed runtime.
 
-The same AWQ extension includes BF16 and FP16 execution branches with different
-accumulation precision. The optional `awq_fp16_kernel.yaml` preset exposes FP16
-execution explicitly; it needs no replacement Torch/Transformers package or new
-calibration. See the method README for numeric and measurement caveats.
+Initialize `third_party/runtimes/llm_awq` only when using its source primitives or
+packed extension. Add `--awq-wheel "$AWQ_WHEEL"` during environment creation, or
+install that wheel later with `python -m pip install --no-deps "$AWQ_WHEEL"`.
+AWQ and GPTQ use this extension; SmoothQuant uses the separate shared INT8 engine,
+and DyQ-VLA/ActQuant require their own explicitly supplied runtimes. Follow the
+selected method README, not the dependency list of another quantizer.
+
+The final `configs/experiments/openvla_oft/awq.yaml` selects FP16 packed execution
+with native BF16 model boundaries. It needs no replacement Torch/Transformers
+package or FP16 recalibration. See the method README for numerical caveats.
 
 After installation, run `python -m pip check`, CPU tests, the privacy scanner and
 explicit GPU checks. Configure LIBERO through the CLI's `--libero-root` and output
 directory; do not overwrite a user's global LIBERO configuration. The dataset is
 needed for AWQ calibration, not for ordinary closed-loop evaluation.
+
+Use the [joint-suite model](README.md#model-asset), then run a four-episode smoke:
+
+```bash
+evb validate-config --config configs/experiments/openvla_oft/baseline.yaml
+evb check-model --config configs/experiments/openvla_oft/baseline.yaml \
+  --model-path "$MODEL_DIR"
+evb evaluate --config configs/experiments/openvla_oft/baseline.yaml \
+  --model-path "$MODEL_DIR" --libero-root third_party/benchmarks/libero \
+  --output-dir "$SMOKE_DIR" --record-traces
+```
+
+This is installation validation, not Dev-200, Final-2000 or reported latency.
+For the frozen workload and paired timing procedure, see
+[evaluation inputs](../../docs/development.md#rebuilding-evaluation-inputs).

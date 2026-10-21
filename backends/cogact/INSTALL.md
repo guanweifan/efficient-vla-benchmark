@@ -4,24 +4,30 @@ Use a separate Python 3.10 environment. Stock Transformers 4.40.1 is required;
 the OFT fork with the same version string is not an interchangeable dependency.
 Never replace packages in the OFT environment or a global site-packages directory.
 
-Initialize the existing project submodules for this backend, the Prismatic runtime,
-dlimp and LIBERO. Their exact revisions are recorded by the parent gitlinks.
-Install PyTorch 2.2.0 / torchvision 0.17.0 for the appropriate CUDA runtime and the
-dependencies declared by the native packages. Then install native packages without
-letting pip fetch unpinned Git dependencies:
+Run from the repository root. Initialize only the CogACT runtime sources at the
+parent gitlinks; no OFT fork is needed:
 
 ```bash
-python -m pip install transformers==4.40.1 timm==0.9.10
-python -m pip install --no-deps --no-build-isolation \
-  third_party/runtimes/dlimp third_party/runtimes/prismatic_cogact backends/cogact/upstream
-python -m pip install --no-deps --no-build-isolation -e third_party/benchmarks/libero
-python -m pip install --no-deps --no-build-isolation -e . -e backends/cogact
+git submodule update --init --recursive -- \
+  backends/cogact/upstream third_party/runtimes/prismatic_cogact \
+  third_party/runtimes/dlimp third_party/benchmarks/libero
+python3.10 scripts/create_environment.py --backend cogact \
+  --venv "$ENV_DIR" --flash-attn-wheel "$FLASH_ATTN_WHEEL"
+source "$ENV_DIR/bin/activate"
+python -m pip check
 ```
 
-When using an explicitly selected existing environment as read-only system packages,
-install stock Transformers and native packages into the new backend environment
-with `--ignore-installed --no-deps` where necessary. Verify actual module locations;
-a satisfied version string alone does not prove that the stock implementation won.
+The installer uses `requirements.txt`, stock Transformers 4.40.1 and pinned native
+sources with `--no-deps`; it never inherits another environment's site-packages.
+The native packages import FlashAttention even with SDPA. Supply the Linux x86-64,
+Python 3.10/Torch 2.2 FlashAttention 2.5.5 wheel from its
+[official release](https://github.com/Dao-AILab/flash-attention/releases/tag/v2.5.5).
+An existing destination is rejected. `--wheelhouse "$WHEELHOUSE_DIR"` enables
+offline installation from a complete wheel collection; see the
+[wheel preparation example](../openvla_oft/INSTALL.md), using this backend's
+requirements file instead. Do not install packages into a global environment.
+An offline wheelhouse including `pip-26.0.1-py3-none-any.whl` can bootstrap the
+isolated environment even when the system Python lacks `ensurepip`.
 
 A model export must contain one complete checkpoint under `checkpoints/`,
 `config.json`, four-suite `dataset_statistics.json`, and an offline `tokenizer/`
@@ -45,12 +51,22 @@ python -m efficient_vla_benchmark.cli benchmark \
 GPU selection and CUDA/EGL device mapping are caller-controlled. Development
 evaluation is four episodes total, not a formal success-rate estimate. Do not
 compare timings from different trajectories/horizons as paired speedups.
+The shared evaluator redirects robosuite's hard-coded temporary log to the run's
+`_private/robosuite.log` during simulator import. No administrator access, shared
+log-file deletion or edits to installed packages are needed.
 
-## Optional AWQ kernel
+## Optional quantization runtimes
 
-Only AWQ needs the pinned `third_party/runtimes/llm_awq` extension. Compile it
-inside this CogACT environment against its Torch/CUDA ABI; do not copy the OFT
-binary or install the author's conflicting application dependency stack. Select
+AWQ, GPTQ and DA-MPA use the pinned `third_party/runtimes/llm_awq` extension;
+QuantVLA and HoloQ also require the current-stream derivative for their selected
+DiT graph runtime. SmoothQuant and DyQ-VLA use different engines. Consult the
+selected method's README before building optional components.
+
+Initialize `third_party/runtimes/llm_awq`, then compile against this environment's
+Torch/CUDA/Python ABI, or supply a separately verified matching wheel via the
+installer's optional `--awq-wheel`. A wheel working in another environment does
+not by itself validate this one. Do not install the author's conflicting
+application dependency stack. Select
 a compatible CUDA toolkit through `CUDA_HOME` and its `bin` on `PATH`, then run:
 
 ```bash
@@ -72,3 +88,9 @@ For rendering on a selected physical GPU, the installed robosuite version checks
 that `MUJOCO_EGL_DEVICE_ID` appears in `CUDA_VISIBLE_DEVICES`. A remapped Torch
 `cuda:0` is not necessarily physical EGL device zero; configure both variables
 consistently at launch. This mapping does not belong in experiment YAML.
+
+The trace replay above is a smoke diagnostic, not the frozen four-prefix timing
+protocol. For comparable reported measurements, follow
+[evaluation inputs](../../docs/development.md#rebuilding-evaluation-inputs).
+The exact experimental model is described under [model asset](README.md#model-asset);
+an official CogACT checkpoint trained for another benchmark is not a replacement.

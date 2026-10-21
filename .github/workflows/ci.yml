@@ -11,8 +11,8 @@ jobs:
       - run: python -m pip install -e '.[dev]'
       - run: python -m pip install ./templates/backend ./templates/method
       - run: python -m pytest tests -m 'not gpu and not libero'
-      - run: python -m ruff check src tests scripts templates backends/openvla_oft/src backends/openvla_oft/tests backends/openvla_oft/scripts backends/cogact/src backends/cogact/tests backends/cogact/scripts
-      - run: python -m ruff format --check src tests scripts templates backends/openvla_oft/src backends/openvla_oft/tests backends/openvla_oft/scripts backends/cogact/src backends/cogact/tests backends/cogact/scripts
+      - run: python -m ruff check src tests scripts templates backends/openvla_oft/src backends/openvla_oft/tests backends/cogact/src backends/cogact/tests backends/cogact/scripts
+      - run: python -m ruff format --check src tests scripts templates backends/openvla_oft/src backends/openvla_oft/tests backends/cogact/src backends/cogact/tests backends/cogact/scripts
       - run: python scripts/check_boundaries.py
       - run: python scripts/check_private_paths.py
       - run: python scripts/check_repository.py

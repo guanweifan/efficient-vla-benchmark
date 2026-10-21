@@ -16,6 +16,7 @@ from efficient_vla_benchmark.evaluation.traces import save_trace
 
 from .manifest import episode_key, select_shard
 from .observations import make_observation
+from .runtime import load_environment
 
 SUITES = ("libero_spatial", "libero_object", "libero_goal", "libero_10")
 MAX_STEPS = dict(zip(SUITES, (220, 280, 300, 520)))
@@ -127,7 +128,8 @@ def evaluate(
 ):
     validate_protocol(suites, task_ids, trials, formal or manifest is not None)
     from libero.libero import benchmark, get_libero_path
-    from libero.libero.envs import OffScreenRenderEnv
+
+    OffScreenRenderEnv = load_environment(output_dir / "_private")
 
     selected = (
         select_shard(manifest, shard_index, num_shards)
