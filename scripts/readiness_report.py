@@ -506,158 +506,98 @@ def build(selection, summaries, records, quality, development_manifest, final_re
 
 
 def render(report):
-    uncertified = (
-        report["pending_core"] + report.get("pending_engineering", []) + report.get("excluded", [])
-    )
-    measured = report["primary"] + report.get("auxiliary", []) + uncertified
-    devices = sorted({r["hardware"]["gpu"] for r in measured if r.get("hardware", {}).get("gpu")})
-    timing_description = (
-        "Timing uses frozen four-suite prefixes (at most 128 controls each), ten warmup "
-        "queries, one pass and the mean over all measured controls."
-        if report.get("timing_protocol") == "libero_replay4x128_v1"
-        else "Historical timing uses the protocol and aggregation recorded in each source."
-    )
-    final_count = sum(row["final"] is not None for row in report["primary"])
-    final_description = (
-        f"Final success is measured for {final_count}/{len(report['primary'])} primary "
-        "configurations, using one frozen 2,000-episode run per measured configuration."
-        if final_count
-        else "Final success is unmeasured until the owner schedules the frozen "
-        "2,000-episode campaign."
-    )
+    """Keep the public ledger focused on outcomes; the JSON retains full evidence."""
+    primary = report["primary"]
+    devices = sorted({r["hardware"]["gpu"] for r in primary if r.get("hardware", {}).get("gpu")})
+    final_count = sum(row["final"] is not None for row in primary)
     lines = [
         "# Benchmark results",
         "",
-        "One selected configuration per backend/method scope. Dev-200 is tuning evidence,",
-        "not final accuracy. " + timing_description,
-        "Native pre/post checks must pass. " + final_description,
-        "Low success and slowdowns remain reportable. All native references use H8.",
-        "Adaptive rows execute real method-selected prefixes; H8 is their reference/default,",
-        "not their fixed execution length. The shown upper bound is native prediction length.",
-        "Complete measurements do not certify parameter-search completion; unfinished",
-        "searches are excluded from the final launch list even when Dev meets the target.",
-        "Selection targets at most 3 percentage points of Dev loss versus the matched",
-        "native; this is not an outcome filter. Δ pp uses that same native-H8 reference.",
-        "Speedup >1 means faster and <1 means slower. Near-1 differences from one pass",
-        "do not establish a reliable gain; no repeat standard deviation is claimed.",
-        "Each speedup uses its own same-GPU native pair; the displayed native row is",
-        "not a universal denominator. Absolute latency across GPU pairs is descriptive.",
-        "Measured GPU models: " + (", ".join(devices) or "see retained source metadata") + ".",
+        f"Success rates cover 2,000 LIBERO episodes per configuration ({final_count}/"
+        f"{len(primary)} configurations measured). "
+        + "Hardware: " + (", ".join(devices) or "see measurement records") + ".",
+        "Latency is full policy cost per control step, including preprocessing, method work "
+        "and postprocessing. Speedup uses each configuration's paired native measurement.",
+        "All native references use H8; adaptive methods choose their executed prefix. "
+        "Peak memory is CUDA allocation. Missing measurements are shown as —.",
         "",
-        f"Selection digest: `{report['selection_sha256']}`.",
+        "Configuration names link to runnable presets; "
+        "[method descriptions](../README.md#supported-methods) specify implemented mechanisms.",
         "",
     ]
-    for backend in sorted({r["backend"] for r in report["primary"]}):
+    for backend in sorted({r["backend"] for r in primary}):
         lines += [
-            f"## {backend}",
+            "## " + {"cogact": "CogACT", "openvla_oft": "OpenVLA-OFT"}.get(backend, backend),
             "",
-            "| Section | Preset | Execution H | Dev SR (n/200) | Δ pp | ms/control | "
-            "Speedup | Peak GiB | Final SR (n/2000) | Selection / scope |",
-            "|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
+            "| Configuration | Success rate | ms/control | Speedup | Peak GiB | Execution H |",
+            "|---|---:|---:|---:|---:|---:|",
         ]
-        for r in report["primary"]:
-            if r["backend"] != backend:
+        for row in primary:
+            if row["backend"] != backend:
                 continue
-            d, t = r["development"], r["timing"]
+            timing = row["timing"]
             final = "—"
-            if r["final"]:
-                f = r["final"]["full_2000"]
-                final = f"{100 * f['success_rate']:.2f}% ({f['successes']})"
+            if row["final"]:
+                measured = row["final"]["full_2000"]
+                final = f"{100 * measured['success_rate']:.2f}% ({measured['successes']})"
             memory = (
-                f"{t['peak_allocated_bytes'] / 2**30:.2f}"
-                if t["peak_allocated_bytes"] is not None
-                else "—"
+                f"{timing['peak_allocated_bytes'] / 2**30:.2f}"
+                if timing["peak_allocated_bytes"] is not None else "—"
             )
+            preset = row["preset"]
             lines.append(
-                f"| {r['section']} | `{r['preset']}` | {cadence_label(r)} | "
-                f"{d['successes'] / 2:.1f}% ({d['successes']}) | {d['delta_pp']:+.1f} | "
-                f"{t['mean_ms']:.3f} | {t['speedup']:.3f}× | "
-                f"{memory} | {final} | "
-                f"{r['reason']} {r['scope']} "
-                f"Search: {r['search']['stop']}. |"
+                f"| [`{preset}`](../configs/experiments/{backend}/{preset}.yaml) | "
+                f"{final} | {timing['mean_ms']:.3f} | {timing['speedup']:.3f}× | "
+                f"{memory} | {cadence_label(row)} |"
             )
-        lines += [""]
+        lines.append("")
     if report.get("auxiliary"):
         lines += [
-            "## Useful auxiliary configurations",
-            "",
-            "Secondary evidence only; these do not enter the default final-evaluation queue.",
-            "",
-            "| Backend / preset | Execution H | Dev SR (n/200) | ms/control | "
-            "Speedup | Reason / scope |",
-            "|---|---|---:|---:|---:|---|",
+            "## Useful auxiliary configurations", "",
+            "These configurations have tuning measurements only.", "",
+            "| Backend / preset | Tuning SR (n/200) | ms/control | Speedup | Scope |",
+            "|---|---:|---:|---:|---|",
         ]
-        for r in report["auxiliary"]:
-            d, t = r["development"], r["timing"]
+        for row in report["auxiliary"]:
+            d, t = row["development"], row["timing"]
             lines.append(
-                f"| {r['backend']} / `{r['preset']}` | {cadence_label(r)} | "
-                f"{d['successes'] / 2:.1f}% "
+                f"| {row['backend']} / `{row['preset']}` | {d['successes'] / 2:.1f}% "
                 f"({d['successes']}) | {t['mean_ms']:.3f} | {t['speedup']:.3f}× | "
-                f"{r['reason']} {r['scope']} |"
+                f"{row['scope']} |"
             )
         lines.append("")
-    if report.get("retired_scopes"):
+    pending = (
+        report["pending_core"] + report.get("pending_engineering", []) + report.get("excluded", [])
+    )
+    if pending:
         lines += [
-            "## Retired implementations",
-            "",
-            "No runnable proxy or reportable method result is retained for these scopes.",
-            "Retirement is about fidelity/source limitations, not unfavorable outcomes.",
-            "",
-            "| Backend / method | Reason |",
-            "|---|---|",
+            "<details>", "<summary>Incomplete implementations</summary>", "",
+            "| Backend / method | Status | ms/control | Speedup | Reason |",
+            "|---|---|---:|---:|---|",
         ]
-        for item in report["retired_scopes"]:
-            lines.append(f"| {item['backend']} / `{item['method']}` | {item['reason']} |")
-        lines.append("")
-    if uncertified:
-        lines += [
-            "## Not certified for final evaluation",
-            "",
-            "Diagnostic measurements below do NOT certify core fidelity or engineering readiness, "
-            "and never authorize final runs. "
-            "Exclusion reasons are independent of measured outcomes.",
-            "",
-            "| Backend / method | Status | Dev SR (n/200) | ms/control | Speedup | Reason |",
-            "|---|---|---:|---:|---:|---|",
-        ]
-        for r in uncertified:
-            d, t = r.get("development"), r.get("timing")
-            success = f"{d['successes'] / 2:.1f}% ({d['successes']})" if d else "—"
-            latency = f"{t['mean_ms']:.3f}" if t else "—"
-            speedup = f"{t['speedup']:.3f}×" if t else "—"
+        for row in pending:
+            timing = row.get("timing")
+            latency = f"{timing['mean_ms']:.3f}" if timing else "—"
+            speedup = f"{timing['speedup']:.3f}×" if timing else "—"
             lines.append(
-                f"| {r['backend']} / `{r.get('preset', r['method'])}` | "
-                f"{r.get('status', 'pending_core')} | {success} | {latency} | "
-                f"{speedup} | {r['reason']} |"
+                f"| {row['backend']} / `{row.get('preset', row['method'])}` | "
+                f"{row.get('status', 'pending_core')} | {latency} | {speedup} | {row['reason']} |"
             )
-    lines += [
-        "",
-        "## Evidence index",
-        "",
-        "Raw measurements and resource locations are ignored local evidence, not public files.",
-        "Use the selection manifest and generated readiness JSON to resolve exact records.",
-        "Public preset names are simplified; measured names and recorded identities are unchanged.",
-        "Recorded revisions predating history cleanup can be resolved through the",
-        "[history map](../scripts/history_commit_map.json); recorded source IDs are not rewritten.",
-        "",
-        "| Backend / preset | Measured preset | Dev experiment | Final experiment | "
-        "Timing record | "
-        "Dev / timing commit | Record digest |",
-        "|---|---|---|---|---|---|---|",
-    ]
-    for r in (
-        report["primary"]
-        + report.get("auxiliary", [])
-        + [p for p in uncertified if p.get("timing")]
-    ):
-        final_id = f"`{r['final']['experiment_id']}`" if r["final"] else "—"
-        lines.append(
-            f"| {r['backend']} / `{r['preset']}` | "
-            f"`{r.get('measured_preset', r['preset'])}` | `{r['development']['experiment_id']}` | "
-            f"{final_id} | `{r['timing']['record']}` | "
-            f"`{r.get('development_commit') or 'unknown'}` / "
-            f"`{r.get('timing_commit') or 'unknown'}` | `{r['timing']['record_sha256']}` |"
-        )
+        lines += ["", "</details>", ""]
+    revisions = sorted({
+        value for row in primary + report.get("auxiliary", [])
+        for value in (row.get("development_commit"), row.get("timing_commit")) if value
+    })
+    if revisions:
+        lines += [
+            "<details>", "<summary>Measurement sources</summary>", "",
+            "Selected configurations and timing records are indexed in the "
+            "[selection manifest](../configs/evaluation/primary_selection.yaml). "
+            "Recorded source revisions resolve through the "
+            "[history map](../scripts/history_commit_map.json).", "",
+            ", ".join(f"`{revision}`" for revision in revisions),
+            "", "</details>", "",
+        ]
     return "\n".join(lines) + "\n"
 
 

@@ -5,7 +5,9 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](https://github.com/guanweifan/efficient-vla-benchmark/pulls)
 [![Paper List](https://img.shields.io/badge/Papers-Awesome--Efficient--VLA-1677FF.svg)](https://github.com/guanweifan/awesome-efficient-vla)
 
-![Final-2000 success versus full-cost speedup on OpenVLA-OFT and CogACT.](assets/benchmark_results.svg)
+<p align="center">
+  <img src="assets/success-speedup-landscape.svg" width="900" alt="Success rate versus native-relative speedup for representative acceleration methods.">
+</p>
 
 📖 The experimental companion to our **[Efficient VLA survey](https://arxiv.org/pdf/2510.17111)**
 and **[paper list](https://github.com/guanweifan/awesome-efficient-vla)**.
@@ -82,9 +84,9 @@ Use `evb list` for compatibility and `evb validate-config --config "$PRESET"` to
 check settings. Each run uses one method. Calibrated methods need `--artifact-path`;
 external engines need `--runtime-path`.
 
-**Assets:** the exact [CogACT LIBERO checkpoint](backends/cogact/README.md#model-asset)
-is not yet public. Check [artifact requirements](docs/development.md#external-assets)
-before running methods that need offline preparation.
+**Models:** [OpenVLA-OFT](backends/openvla_oft/README.md#model-asset) ·
+[CogACT-LIBERO](https://huggingface.co/guanweifan/CogACT-LIBERO).
+See [preparation requirements](docs/development.md#external-assets) for calibrated methods.
 
 ## Supported Methods
 
@@ -237,8 +239,8 @@ docs/                             Development guide and result ledger
 
 See the [development guide](docs/development.md), [method template](templates/method/README.md)
 and [backend template](templates/backend/README.md). [AGENTS.md](AGENTS.md) defines
-contribution and Git rules. Regenerate the chart with the
-[figure script](scripts/plot_benchmark_results.py) (requires Matplotlib).
+contribution and Git rules. The [plotting script](scripts/plot_benchmark_results.py)
+generates a comparison from the complete results ledger (requires Matplotlib).
 
 ## Citation
 

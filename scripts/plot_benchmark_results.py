@@ -100,22 +100,24 @@ def load_points(root):
     for line in (root / "docs/benchmark_results.md").read_text().splitlines():
         if line.startswith("## "):
             heading = line.removeprefix("## ")
-            backend = heading if heading in BACKENDS else None
+            backend = {"CogACT": "cogact", "OpenVLA-OFT": "openvla_oft"}.get(heading)
         if not line.startswith("|"):
             continue
         cells = [cell.strip() for cell in line.strip("|").split("|")]
-        if backend and len(cells) == 10 and re.fullmatch(r"`[a-z0-9_]+`", cells[1]):
-            preset = cells[1].strip("`")
+        linked_preset = re.fullmatch(r"\[`([a-z0-9_]+)`\]\([^)]+\)", cells[0])
+        if backend and len(cells) == 6 and linked_preset:
+            preset = linked_preset.group(1)
             key = backend, preset
             if key not in catalog or key in points:
                 raise ValueError(f"Unknown/duplicate ledger row: {key}")
             points[key] = measured_point(
-                backend, preset, catalog[key]["spec"]["category"], cells[6], cells[8]
+                backend, preset, catalog[key]["spec"]["category"], cells[3], cells[1]
             )
-        if cells[0] == "Native DDIM10/H16":
-            if h16 is not None or len(cells) != 7:
+        control_name = re.sub(r"\[([^]]+)\]\([^)]+\)", r"\1", cells[0])
+        if control_name == "Native DDIM10/H16":
+            if h16 is not None or len(cells) != 6:
                 raise ValueError("Ambiguous native H16 control")
-            h16 = measured_point("cogact", "native_h16", "native_control", cells[4], cells[2], True)
+            h16 = measured_point("cogact", "native_h16", "native_control", cells[3], cells[1], True)
     if points.keys() != catalog.keys():
         raise ValueError(f"Primary coverage mismatch: {catalog.keys() ^ points.keys()}")
     if h16 is None:
@@ -298,7 +300,7 @@ def render(points, output):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=Path("assets/benchmark_results.svg"))
+    parser.add_argument("--output", type=Path, default=Path("outputs/benchmark_results.svg"))
     args = parser.parse_args()
     if args.output.suffix.lower() not in {".svg", ".png"}:
         parser.error("--output must be SVG (publication) or PNG (local preview)")

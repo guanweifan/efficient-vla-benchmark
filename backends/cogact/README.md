@@ -57,32 +57,23 @@ strictly, and resolves the tokenizer from the caller-selected export. It does no
 modify upstream files, global model classes, or the supplied export.
 
 See [INSTALL.md](INSTALL.md) for setup and [results](../../docs/benchmark_results.md)
-for measurements and limits. Native output/reset parity passed exactly on the tested
-export; four-episode smoke is not a formal success rate. The export names training
-revision `01869b7348b41cb315049f32abc7221fc01897db`; its training source and evaluation
-conventions have not been independently verified by the inference-parity checks.
+for measurements. Training settings accompany the published model.
 
 ## Model asset
 
-The reported runs use a project-trained LIBERO joint-suite DiT-B checkpoint after
-10,000 updates. No public download endpoint for this exact export is currently
-verified. Publishing that export and its model card is a separate owner decision;
-the official CogACT-Base checkpoint for another benchmark is not an equivalent
-asset. Until the export is available, the published CogACT scores are not an
-end-to-end downloadable reproduction.
+Download [CogACT-LIBERO](https://huggingface.co/guanweifan/CogACT-LIBERO), the
+joint-four-suite DiT-B checkpoint used in the reported experiments. It was fine-tuned
+from CogACT-Base for 10,000 updates. The model card includes the training recipe.
 
-The read-only loader requires one checkpoint under `checkpoints/`, `config.json`,
-four-suite `dataset_statistics.json`, and a complete offline `tokenizer/` including
-its Llama `config.json`. It verifies DiT-B, 16 predicted actions, seven action
-dimensions, the Prismatic DINO/SigLIP-224+7B VLM and gripper normalization masks.
-Use `--model-path` to select this export or its explicit checkpoint file. Do not
-substitute per-suite weights or reconstruct statistics from evaluation outcomes.
+```bash
+hf download guanweifan/CogACT-LIBERO --local-dir "$MODEL_DIR"
+```
 
-The audited export's configuration SHA-256 is
-`1c56f556c5abd42f4602cd658e453ce2b3ec159f1237b893a41cbd8e1e052156`; its statistics SHA-256 is
-`7871a3148a761dce14f2159be1d4080206f895fd761e64341cf3f5ca78eb7be6`.
-These identify the checked export, not permission to distribute its weights or
-tokenizer. Runtime checks record the full checkpoint and tokenizer file hashes.
+The export includes `checkpoints/cogact-libero.pt`, portable `config.json`,
+four-suite `dataset_statistics.json`, an offline `tokenizer/` and `SHA256SUMS`.
+The original checkpoint weights and normalization statistics are preserved.
+Pass the export directory through `--model-path`; the loader checks architecture,
+action dimensions, normalization and tokenizer completeness.
 
 ## Causal visual-token selection
 

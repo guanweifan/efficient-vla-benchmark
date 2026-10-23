@@ -29,10 +29,14 @@ requirements file instead. Do not install packages into a global environment.
 An offline wheelhouse including `pip-26.0.1-py3-none-any.whl` can bootstrap the
 isolated environment even when the system Python lacks `ensurepip`.
 
-A model export must contain one complete checkpoint under `checkpoints/`,
-`config.json`, four-suite `dataset_statistics.json`, and an offline `tokenizer/`
-with tokenizer files and the Llama configuration. Supply its root (or the explicit
-checkpoint file) via `--model-path`; training-time resource paths are never reused.
+Download the [joint-four-suite checkpoint](https://huggingface.co/guanweifan/CogACT-LIBERO):
+
+```bash
+hf download guanweifan/CogACT-LIBERO --local-dir "$MODEL_DIR"
+```
+
+The download includes the checkpoint, model configuration, action statistics and
+offline tokenizer. Supply its directory through `--model-path`:
 
 ```bash
 OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \

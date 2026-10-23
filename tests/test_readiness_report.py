@@ -48,7 +48,7 @@ def test_retired_scope_preserves_coverage_without_loading_deleted_preset(reporte
     report = reporter.build(*retired_fixture())
     assert len(report["primary"]) == 1
     assert len(report["retired_scopes"]) == 1
-    assert "Retired implementations" in reporter.render(report)
+    assert "retired_example" not in reporter.render(report)
 
 
 @pytest.mark.parametrize(
@@ -265,11 +265,11 @@ def test_render_describes_actual_final_coverage(reporter, measured_count):
         }
     text = reporter.render(report)
     if measured_count:
-        assert f"Final success is measured for {measured_count}/2 primary configurations" in text
-        assert "Final success is unmeasured" not in text
-        assert "`final-experiment`" in text
+        assert f"({measured_count}/2 configurations measured)" in text
+        assert "90.00% (1800)" in text
     else:
-        assert "Final success is unmeasured" in text
+        assert "(0/2 configurations measured)" in text
+        assert "90.00% (1800)" not in text
 
 
 def test_completed_final_is_not_scheduled_again(reporter, monkeypatch):

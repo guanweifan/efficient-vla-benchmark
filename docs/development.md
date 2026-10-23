@@ -1,180 +1,112 @@
 # Development guide
 
-[README](../README.md) covers installation and supported methods.
-[AGENTS.md](../AGENTS.md) defines contribution, Git and resource-use rules.
-This guide covers interfaces, evaluation and result provenance.
+[README](../README.md) covers installation and supported methods;
+[AGENTS.md](../AGENTS.md) defines contribution and resource-use rules.
 
 ## Architecture
 
-| Component | Owns | Must not own |
-|---|---|---|
-| core | Types, lifecycle, config, discovery and provenance | Model internals or paper decisions |
-| model_ops | Optional shared tensor operations | Backend imports or paper policy |
-| backend | Native loading, preprocessing, model access and actions | Paper algorithms or simulator loops |
-| method | One declared mechanism, bindings and per-instance state | Other methods or environment stepping |
-| control | Action queue, executed history and scheduling | Backend/method-name branches |
-| calibration | Read-only training-observation sampling | Quantizer search or packing |
-| evaluation | LIBERO protocol, seeds, stopping and outcomes | Concrete model or method imports |
-| profiling | Replay, timing boundaries and aggregation | Policy changes |
-| action_codecs | Independent action reconstruction | Policy heads or closed-loop success claims |
+| Component | Responsibility |
+|---|---|
+| `core` | Types, lifecycle, configuration, discovery and provenance |
+| `model_ops` | Shared tensor operations |
+| `backend` | Native loading, preprocessing, model access and action conversion |
+| `method` | One acceleration mechanism and its backend bindings |
+| `control` | Action queue, executed history and query scheduling |
+| `calibration` | Read-only training-observation sampling |
+| `evaluation` | LIBERO manifests, seeds, stopping and outcomes |
+| `profiling` | Replay, timing boundaries and aggregation |
+| `action_codecs` | Independent action reconstruction |
 
-Backends are optional packages under `backends/<id>/`; `upstream/` pins native source.
-Discovery is lightweight and loads tensor runtimes only when selected. Unsupported
-method/backend pairs fail explicitly, never fall back to baseline. External plugins
-register through entry points without editing core. Methods may use backend APIs;
-backends and shared infrastructure must not import methods.
+Backends live under `backends/<id>/`; methods live under
+`src/efficient_vla_benchmark/methods/<category>/<paper_id>/`.
+Core and discovery load without tensor or simulator dependencies. Methods use backend
+interfaces; shared infrastructure remains independent of specific models and papers.
 
 ## Policy and method lifecycle
 
 Policies expose `reset`, `observe`, `predict_chunk`, `after_action`, `metadata` and
-`close`. `MethodHost` delegates method callbacks. State and hooks belong to one
-policy; reset clears episode state, and idempotent close releases or restores it.
-Instruction changes clear the action queue and reset the predictor.
+`close`. State belongs to each policy; reset clears episode state and close restores hooks.
 
-1. `observe(observation)` receives every control frame.
-2. At an empty queue, `before_plan(observation, step)` may supply one environment-ready
-   replacement action. The first step after reset always queries the model.
-3. A model query invokes `on_plan(full_chunk_copy, step)` before prefix selection.
-   Optional `select_execution_horizon(full_chunk_copy, default_horizon)` returns an
-   integer from 1 to the actual predicted length. It cannot pad or extend predictions.
-4. `transform_action(action_copy, step)` may aggregate predictions.
-   `after_action(final_action_copy, remaining)` receives the emitted command;
-   returning true clears the remaining queue before the next step.
-5. `control_diagnostics()` reports counters without changing behavior.
+1. `observe` receives every control frame.
+2. With an empty queue, `before_plan` may supply a replacement action; the first step queries the model.
+3. `on_plan` receives the predicted chunk. `select_execution_horizon` may select an existing prefix.
+4. `transform_action` may aggregate predictions; `after_action` may clear the remaining queue.
+5. `control_diagnostics` reports counters without changing execution.
 
-Hooks do not run the simulator or invoke inference themselves. Actions already use
-the backend's environment convention; core assumes neither seven dimensions nor a
-gripper index. Invalid/nonfinite outputs fail before execution. Record predicted
-length, selected prefix, emitted actions and served query counts separately.
-
-`wants_auxiliary_query()` requests one same-observation auxiliary pass owned by the
-backend. Its output is discarded; all compute and joins remain timed. The worker
-must finish before the next native query, reset or detach, and restore stochastic
-head RNG. One policy owns the process; concurrent global-RNG manipulation is unsupported.
+The backend owns auxiliary queries requested through `wants_auxiliary_query`, including
+synchronization and RNG restoration. All auxiliary work remains inside timing.
 
 ## Model-access boundaries
 
-- [OFT decoder](../backends/openvla_oft/DECODER.md): preserve original positions,
-  protected nonvisual rows, bidirectional visibility and the native action readout.
-- [CogACT](../backends/cogact/README.md): preserve causal visibility, cognition EOS,
-  native preprocessing, CFG, DDIM coordinates and RNG. Fresh-prefill selection does
-  not imply arbitrary past-KV decoding or action-to-image attention inside DiT.
-- `TokenReduction` selects/merges visual rows only. Causal groups anchor at or after
-  their latest original member. Fused vision branches must preserve corresponding
-  patch membership, not merely equal output counts.
-- `NativeAttentionProbe` and `VisionAttentionProbe` inspect native Q/K without
-  changing attention output. Statistics normalize over all current keys; transient
-  tensors clear after the call. Probing costs belong in timing.
-- Indexed KV reuse retains the full key context while skipping selected query/MLP
-  rows. It is not context-token deletion. Original causal rows remain authoritative.
-- `ForwardPatches` restores instance attributes and never patches model classes.
-  Denoiser caching retains native conditioning, residuals and CFG rows; within-query
-  caches clear at action-query boundaries.
-- Candidate generation shares one cognition encoding. Count every candidate,
-  discarded probe and verification branch; return an actual selected chunk.
-- `EpsilonSamplerContract` and `model_ops.scheduled_diffusion` preserve the native
-  finite-noise start, training-noise table, CFG pairing and RNG advancement.
-  Methods own update equations; histories reset per query and duplicate grid indices fail.
-
-Native/no-op and detach checks are mandatory. Eager/SDPA and packed-kernel precision
-differences must be explicit, not asserted bitwise equal. Method READMEs own
-paper-specific conventions, backend adaptations and exclusions.
+- [OFT](../backends/openvla_oft/DECODER.md): preserve native positions, bidirectional visibility and action readout.
+- [CogACT](../backends/cogact/README.md): preserve causal visibility, cognition EOS, preprocessing and diffusion conventions.
+- `TokenReduction` selects or merges visual rows. Causal groups anchor at their latest original member.
+- Indexed KV reuse retains context while reducing computed queries; it differs from token deletion.
+- Attention probes preserve native outputs. Instance-scoped patches restore on detach; caches reset at their declared boundaries.
+- Candidate generation and diffusion samplers account for all candidates, probes, CFG work and RNG advancement.
 
 ## Add a method
 
-Use [templates/method](../templates/method/README.md). Create one directory at
-`src/efficient_vla_benchmark/methods/<category>/<paper_id>/`:
+Start from [templates/method](../templates/method/README.md). Provide a mechanism README,
+`metadata.yaml`, typed configuration and backend-specific factories under `implementations/`.
+A factory receives `(backend, method_config, RuntimeResources)`; preflight validates
+resources before model loading. Optional `validate_experiment` checks cadence and protocol.
 
-- `README.md`: source revision, mechanism, adaptations, supported variants and usage.
-- `metadata.yaml`: ID/category, typed config, capabilities and lazy binding factories.
-- `config.py`: portable validated parameters; native geometry checks belong in bindings.
-- `implementations/<backend>/`: backend-specific factories and behavior.
-- Shared equations only where actually shared; tests beside their owning method.
-
-Factory `(backend, method_config, RuntimeResources)` returns an `InferenceMethod`.
-Preflight `(method_config, RuntimeResources)` rejects missing resources before loading.
-Optional `validate_experiment(ExperimentConfig, method_config)` checks cadence/protocol.
-Calibration uses the factory signature and writes a separate artifact.
-
-Independently evaluated cores use `components/<scope>.yaml` with explicit IDs,
-backends and exclusions. An owner with no complete selectable method may declare
-`selectable: false`; it must expose at least one valid component. Each run still
-selects one core, never an implicit composition.
-
-Add reusable defaults under `configs/methods/` and final compatible presets under
-`configs/experiments/`. A second backend extends the same method, not a copied directory.
-Test equations, active behavior, reset/detach, unsupported inputs and native boundaries;
-then use the shared smoke, Dev and timing workflow.
+Independent cores use `components/<scope>.yaml` with their own IDs and boundaries.
+Add final presets under `configs/experiments/`. Test equations, active execution,
+reset/detach, unsupported inputs and native behavior before evaluation.
 
 ## Add a backend
 
-Use [templates/backend](../templates/backend/README.md). Name its distribution
-`efficient-vla-backend-<name>` and package `efficient_vla_backend_<name>`.
-
-1. Register API-v1 `BackendSpec` with a lazy factory, validator, variants and capabilities.
-2. Implement policy lifecycle and `RuntimeMonitor`, including synchronization and reset.
-3. Expose APIs required by supported methods without moving paper decisions into the backend.
-4. Pin fetchable native sources, provide an isolated installation recipe and explicit bindings.
-5. Test loading, native actions/normalization, RNG, checkpoint immutability and shared LIBERO/timing.
-
-Registration or a CPU fixture alone is not validated model support.
+Start from [templates/backend](../templates/backend/README.md). Register a lazy API-v1
+`BackendSpec`, implement policy lifecycle and `RuntimeMonitor`, and expose method-facing
+capabilities. Pin upstream sources and provide an isolated installation recipe.
+Validate loading, normalization, native action parity, checkpoint immutability and timing.
 
 ## Training-dependent boundary
 
-Learned selectors, routers, exits and distilled denoisers require trained parameters
-and an explicitly agreed training budget. Untrained heuristics are not reproductions.
-Calibration without optimizer updates is distinct from policy training; neither may
-use Dev/Final outcomes as training labels.
+Learned selectors, routers and distilled heads require trained parameters. Calibration
+samples training observations and is separate from gradient-based policy training.
+Method READMEs specify the required assets and implemented scope.
 
 ## Final configuration contract
 
-Keep one final measured preset per backend/method scope, shared across four suites.
-Use short filenames; parameters, precision and scope remain in YAML. Fixed published
-controls and useful codec workpoints are separate. Remove obsolete candidate presets
-after retaining selection evidence.
-
-`configs/evaluation/primary_selection.yaml` is the sole primary selection list,
-not a launcher. `measured_preset` retains original measurement names after renaming.
-Compare fully resolved settings before consolidation; never rewrite source, config,
-checkpoint or artifact identities to make old results appear current.
+`configs/evaluation/primary_selection.yaml` records one selected preset per method/backend,
+plus fixed controls and useful alternatives. Hyperparameters live in YAML; `measured_preset`
+preserves the original name when a preset is renamed. Effective settings and measurement
+identities remain attached to the results they produced.
 
 ## External assets
 
-All locations are CLI arguments. [OFT weights](../backends/openvla_oft/README.md#model-asset)
-are publicly downloadable; the exact [CogACT export](../backends/cogact/README.md#model-asset)
-is not. Ordinary rollouts need LIBERO resources, not demonstration datasets.
-
-RLDS calibration uses the four `*_no_noops/1.0.0` training datasets:
+Use CLI arguments for resource locations. Model download instructions are in the
+[OFT](../backends/openvla_oft/README.md#model-asset) and
+[CogACT](../backends/cogact/README.md#model-asset) guides.
+Ordinary rollouts need LIBERO resources; calibration additionally uses training data.
 
 ```bash
 hf download openvla/modified_libero_rlds --repo-type dataset \
   --revision 6ce6aaaaabdbe590b1eef5cd29c0d33f14a08551 --local-dir "$RLDS_DIR"
-```
-
-| Scope | Required preparation |
-|---|---|
-| AWQ, GPTQ, SmoothQuant, DA-MPA, QuantVLA, HoloQ, TIES, EcoVLA, EfficientVLA layer core, BAC, TeaCache | `evb calibrate` on RLDS; method README specifies budget and optional runtime |
-| PACE | Separate demonstration-action calibration on the pinned LeRobot-v2 conversion |
-| ActionCache | Independent native population and freeze CLIs; no Dev/Final collection |
-| DyQ-VLA | Frozen complete independent trajectories and mixed-integer runtime; historical population is not distributed |
-| EVO | Externally supplied frozen search artifact; historical population/layout and a complete search driver are not distributed |
-| ActQuant | HSIC/AMF calibration, floating GGUF conversion and author-engine packing; historical floating/runtime bundle is not distributed |
-| Action codecs | [Separate environment, corpus and asset preparation](../src/efficient_vla_benchmark/action_codecs/README.md) |
-
-```bash
 evb calibrate --config "$PRESET" --model-path "$MODEL_DIR" \
   --dataset-path "$RLDS_DIR" --artifact-dir "$ARTIFACT_DIR"
 evb check-model --config "$PRESET" --model-path "$MODEL_DIR" \
   --artifact-path "$ARTIFACT_DIR"
 ```
 
-Add `--runtime-path "$RUNTIME_DIR"` when required. Original data/checkpoints are
-read-only. A rebuilt artifact has new checksums; it is not the historical artifact
-by filename alone. Missing assets must remain explicit, not replaced by a baseline.
+Add `--runtime-path` for external engines. Calibration artifacts remain separate from weights.
+
+| Methods | Preparation |
+|---|---|
+| AWQ, GPTQ, SmoothQuant, DA-MPA, QuantVLA, HoloQ, TIES, EcoVLA, EfficientVLA layer core, BAC, TeaCache | RLDS calibration; method README specifies budget/runtime |
+| PACE | Demonstration-action calibration on the pinned LeRobot-v2 conversion |
+| ActionCache | Native population collection and freeze CLIs |
+| DyQ-VLA | Independent trajectories and mixed-integer runtime; historical population is not distributed |
+| EVO | External frozen search artifact; complete search driver and historical population are not distributed |
+| ActQuant | HSIC/AMF calibration, GGUF conversion and author-engine packing; historical engine bundle is not distributed |
+| Action codecs | [Codec environment and assets](../src/efficient_vla_benchmark/action_codecs/README.md) |
 
 ### Rebuilding evaluation inputs
 
-Create fixed manifests before observing outcomes; these commands run no policy:
+Generate manifests before evaluation:
 
 ```bash
 evb evaluation-manifest --libero-root "$LIBERO_ROOT" --output "$DEV_MANIFEST"
@@ -184,7 +116,7 @@ evb derive-manifest --development-manifest "$DEV_MANIFEST" \
   --purpose final --output "$FINAL_MANIFEST"
 ```
 
-Collect a native four-episode timing bank for one backend, then replay it:
+Collect native traces and replay the same workload for each comparison:
 
 ```bash
 evb evaluate --config "$BASELINE_PRESET" --model-path "$MODEL_DIR" \
@@ -197,35 +129,23 @@ evb benchmark --config "$PRESET" --model-path "$MODEL_DIR" \
   --repeats 1 --warmup 10 --output-dir "$TIMING_DIR"
 ```
 
-Supply artifact/runtime arguments as needed. Measure native references before and
-after methods on the same GPU and frozen bank. Historical traces are not distributed;
-a new bank supports within-bank comparisons, not direct pairing with published latency.
+Add artifact/runtime arguments as required. Measure paired native references on the
+same GPU and trace bank. Historical traces are not included in the repository.
 
 ## Calibration, evaluation and timing
 
-The RLDS sampler balances distinct training episodes across suites and selects one
-seeded observation per episode. RGB already has policy orientation: do not rotate it
-again. Preserve raw state, language, native preprocessing and content digests.
-TFDS episode indices are not LIBERO task IDs. Search and packing belong to methods.
+RLDS sampling balances training episodes across suites and selects one seeded observation
+per episode. Preserve policy-oriented RGB, raw state and language. Independent rollout
+calibration uses placements disjoint from evaluation states and retains failed trajectories.
 
-Independent rollout calibration/search uses frozen placements disjoint from all
-fifty standard states per task and other independent groups. Simulator time alone
-does not make placements distinct. Reserve the complete budget, retain failures
-without replacement, freeze artifacts before evaluation and report collection/search
-cost separately. Method READMEs define the specific populations and freezing rules.
-
-Smoke runs task/state/seed zero in each suite with ten settling steps and control
-limits 220/280/300/520 for Spatial/Object/Goal/Long. Four episodes validate connectivity,
-not accuracy. `--libero-root` and output-local configuration avoid global LIBERO edits.
-Map CUDA and EGL to the same physical GPU; numeric IDs can differ after remapping.
-Depth methods require aligned real metric depth via `--depth` or `evaluation.depth`.
+Smoke runs one episode per suite with ten settling steps and control limits
+220/280/300/520 for Spatial/Object/Goal/Long. Depth methods require aligned metric depth.
+CUDA and EGL must address the same physical GPU.
 
 ### Fixed development validation
 
-`libero_dev200_v1` freezes five sampled states from indices 0–49 for each of forty
-tasks, with explicit seeds and resource hashes. Dev-200 is a tuning subset of
-Final-2000, not an independent test. Retain the remaining 1,800 outcomes as untuned
-evidence from the same final run.
+`libero_dev200_v1` selects five of the fifty standard states per task for configuration
+selection; the complete evaluation contains 2,000 episodes across forty tasks.
 
 ```bash
 evb evaluate --config "$PRESET" --model-path "$MODEL_DIR" \
@@ -233,139 +153,61 @@ evb evaluate --config "$PRESET" --model-path "$MODEL_DIR" \
   --shard-index 0 --num-shards 8 --output-dir "$RUN_DIR" --no-record-traces
 ```
 
-Run every shard once with its own index/output. The manifest owns episodes; do not
-combine it with `--formal` or task/trial/seed overrides. Identical-run resume preserves
-recorded outcomes and rejects changed identities. Infrastructure retries retain
-attempt history; ordinary unsuccessful episodes remain failures.
-
-`scripts/evaluation_results.py plan` creates portable jobs; `merge` rejects duplicate,
-foreign or incompatible episodes and reports missing records/errors. Machine-specific
-scheduling stays outside Git. Freeze worker source throughout a campaign and verify
-environment/extension identities before assigning shards. A complete Dev result needs
-200 records and zero runtime errors. Parallel wall time is not policy latency.
+Each shard uses a separate output directory. `scripts/evaluation_results.py` plans and
+merges jobs, checking duplicate, missing and incompatible episodes. Resume preserves
+existing outcomes and verifies configuration, checkpoint and environment identities.
 
 ### Selection and final-measurement workflow
 
-1. Verify the core mechanism, declared adaptations, active execution, native/reset
-   boundaries and shared smoke before selecting parameters.
-2. Evaluate on fixed Dev-200 and audit meaningful speedward headroom. Prefer faster
-   full-cost candidates targeting at most 3 percentage points of native-relative
-   success loss. This is not a hard cutoff or an outcome filter: justify near-target
-   trade-offs with suite-level evidence. Timing differences within variability are ties.
-3. Close search with an accuracy boundary, latency plateau or concrete mechanism limit,
-   not merely a passing candidate. Faithful slowdowns/low-success results remain valid;
-   an unresolved core is not a certified negative finding.
-4. Freeze one configuration, checkpoint, artifact, runtime and selection rationale.
-   Final-2000 needs separate explicit owner approval and `--authorize-final`;
-   general development permission never authorizes an automatic final queue.
-5. Run all 2,000 episodes once, preserving failures and exact resume identities.
-   Do not retune from final outcomes, select a favorable repeat or splice old Dev
-   results into a new 1,800-episode run. Derive the untuned subset from that same final run.
-6. Publish one primary row with separate Dev, Final and timing evidence. Keep fixed
-   native controls and useful alternatives explicitly supplementary.
+Verify the mechanism and smoke behavior, select parameters, then freeze the configuration,
+checkpoint, calibration and runtime. Follow the approval and outcome-retention rules in
+[AGENTS.md](../AGENTS.md) before launching full evaluations.
 
-Timing uses `libero_replay4x128_v1`: one frozen native prefix per suite, at most
-128 controls each, ten warmup queries and one measured pass. Select prefixes by
-fixed episode IDs, not outcomes; reset history after warmup. Include preprocessing,
-transfers, method/control work, auxiliary passes and postprocessing; exclude loading,
-disk I/O and simulation. Average all controls, including queue-consumption steps.
-This is representative-input policy compute, not closed-loop completion time.
+`libero_replay4x128_v1` measures four frozen native prefixes of at most 128 controls each,
+with ten warmup queries and one measured pass. Mean cost includes preprocessing, transfers,
+method/control work and postprocessing; loading, disk I/O and simulation are excluded.
+Use fresh processes, fixed CPU threads and same-GPU native pre/post references. Accepted
+pairs have at most 3% latency drift and no thermal slowdown.
 
-Use fresh model processes, fixed CPU threads, idle GPUs and disjoint CPU affinities.
-Accept same-GPU native pre/post pairs only with at most 3% latency drift and no
-thermal slowdown during measured intervals. Reject affected measurements, preserve
-reasons and use the first valid replacement, never the fastest repeat. Do not change
-power, clocks or fans. A >10% change from compatible old timing requires diagnosis.
-
-Primary references use native H8. Adaptive methods execute their real selected
-prefixes; include selection and candidate costs. Record query/first/steady latency,
-control latency, percentiles, query/replacement counts and allocated/reserved memory.
-Do not infer repeat variance from a single pass or compare absolute latencies from
-different GPU pairs as if paired. Query/prepared-only diagnostics cannot replace
-stateful control replay. The [native controls](../backends/cogact/README.md#fixed-native-controls)
-retain their declared contrasts and are not extra primary methods.
+Primary references execute eight actions per query. Adaptive methods use their selected
+prefixes. Peak CUDA allocation excludes external-engine memory; unavailable values remain
+missing. Query counters distinguish model calls, reused actions and auxiliary computation.
 
 ## Quantization runtime admission
 
-Formal results require real packed execution, not dense fake-quantization latency.
-Disclose packing, scale axes, activation storage, product/accumulation precision,
-target coverage and all casts/reorders. Tile-dequantized floating GEMM is not integer
-MMA. External allocations invisible to Torch are unavailable, never zero.
+Quantized timing uses actual packed execution. Record weight/activation precision,
+accumulation type, target layers and conversion costs. Tile-dequantized floating GEMM
+and integer MMA are distinct runtimes. Shared kernels live in
+[model_ops/quantization](../src/efficient_vla_benchmark/model_ops/quantization/README.md);
+method READMEs own calibration and numerical conventions.
 
-[Shared operations](../src/efficient_vla_benchmark/model_ops/quantization/README.md)
-own kernels, not quantizer algorithms. Method READMEs own calibration, numerical
-conventions and selected runtime. Changes require affected parity/reset/reload,
-smoke, Dev and timing checks; unchanged evidence keeps its original identity.
-`pending_engineering` excludes unresolved ports from primary/final queues;
-`excluded` records a fidelity/source boundary, not an unfavorable outcome.
-
-| Unsupported scope | Remaining condition |
-|---|---|
-| ActQuant on CogACT | Floating GGUF bridge fails action parity; not mathematical incompatibility |
-| MABR / HBVLA | Primary equations / probe bootstrap and adaptive grouping remain unverified |
-| Full DA-PTQ | CSRC weighting and regularization unresolved; only DA-MPA is supported |
-| Full VQVLA | Spatial/temporal multiplication reuse requires a separate engine |
-| Mix-QVLA | Native heads lack its action-token-likelihood objective |
-| SQAP-VLA | Contradictory activation granularity remains unresolved |
-| Trajectory-curvature/attention-guided zero-shot quantization | Required native flow-velocity and action-to-image/text objectives are absent |
-| SQIL / BitVLA / QuantWAM | Policy training or another baseline is required |
-
-These boundaries use the 2026-08-17 literature cutoff and inspected primary sources.
-They do not establish that every future adaptation is impossible.
+The supported catalog is in [README](../README.md#supported-methods); unresolved scopes
+and their reasons remain in the selection manifest. Runtime changes require affected
+parity, smoke and timing checks before results are reused.
 
 ## Record results
 
-Canonical JSON and raw runs stay in ignored `outputs/result_records/` or explicit
-caller-owned output directories. Commit only the generated
-[results ledger](benchmark_results.md), selected presets and necessary source notices.
-Never recreate `docs/results/` or store private paths/launchers in Git.
-
-`record_result.py export` validates checkpoint, config, source, dependencies,
-hardware, protocol and trace compatibility. Each speedup has its own native pair.
-`readiness_report.py` joins selection, actual Dev outcomes, search closure, accepted
-timing quality and final evidence; it never launches evaluations.
+Canonical JSON and raw runs stay in ignored output directories. Publish the concise
+[results ledger](benchmark_results.md) and selected presets. The reporter checks actual
+source revisions, checkpoint/configuration identity and each method's paired native.
 
 ```bash
 python scripts/record_result.py export \
   --run-dir "$TIMING_DIR" --baseline-dir "$BASELINE_TIMING_DIR" \
-  --smoke-dir "$SMOKE_DIR" \
-  --section '5.3 Layer Skipping, Early Exit, and Model Routing' \
+  --smoke-dir "$SMOKE_DIR" --section 'Dynamic Computation' \
   --label 'SP-VLA pruning + scheduling' \
   --preset configs/experiments/cogact/sp_vla.yaml
-
 python scripts/readiness_report.py --selection configs/evaluation/primary_selection.yaml \
   --development-summary "$DEV_SUMMARY" --development-manifest "$DEV_MANIFEST" \
   --records-dir "$RECORDS_DIR" --timing-quality "$TIMING_QUALITY" \
   --output "$GENERATED_LEDGER" --evidence-output "$READINESS_JSON"
 ```
 
-Generate to ignored output first. Repeat `--development-summary` for all referenced
-selection/coverage summaries; add retained `--final-summary` inputs for complete final
-campaigns and `--codec-run` / `--codec-auxiliary-run` for codecs. Preserve independent
-native/runtime-control sections when updating the public ledger: the reporter refuses
-to overwrite those in place. Legacy `record_result.py render` cannot overwrite a
-primary ledger with a selection manifest.
-
-Cross-revision reuse needs identical effective settings/assets and an explicit scoped
-source audit. Record actual measured revisions and dirty flags; never relabel outcomes
-as a new clean source. [history_commit_map.json](../scripts/history_commit_map.json)
-maps cleaned history without changing original evidence identities.
-`final_partition()` derives untuned outcomes from one complete final aggregate.
-
-External engines require `--allow-execution-runtime-change` and checksummed runtime
-metadata; label cross-runtime gains rather than quantization-only gains. For nonruntime
-edits, `--allow-nonruntime-source-change` still requires identical runtime fingerprints.
-Neither flag permits changed inference to inherit old accuracy.
-
-Retained evidence is immutable. Remove obsolete trials only after checking selection,
-calibration, paired-baseline, quality and provenance dependencies; keep every outcome
-of retained campaigns. Invalid/superseded runs cannot be primary. Preserve compact
-retirement reasons without backups or duplicate result tables. `--supersedes` is for
-corrected implementations, not unfavorable results or valid ablations.
-
-Token diagnostics distinguish retained context (`visual_tokens_final` /
-`visual_kv_tokens`) from computed queries (`visual_query_tokens_final`).
-Auxiliary work has separate counters but remains inside full-cost timing.
+Supply each referenced summary and complete final campaign with `--development-summary`
+and `--final-summary`; add codec inputs with `--codec-run` and `--codec-auxiliary-run`.
+Generate to ignored output, then reconcile the independent native/runtime controls.
+The JSON output retains full selection, measurement and provenance records.
+[history_commit_map.json](../scripts/history_commit_map.json) resolves historical sources.
 
 ## Local checks
 
@@ -376,6 +218,5 @@ python scripts/check_private_paths.py
 python scripts/check_repository.py
 ```
 
-Run method/backend tests in their own runtime. OFT's Transformers fork is not CogACT's
-stock Transformers. GPU/LIBERO checks need explicitly assigned resources; lightweight
-CI alone does not certify model correctness or benchmark performance.
+Run backend-specific tests in its own environment; OFT's Transformers fork and CogACT's
+stock Transformers have separate dependency stacks.

@@ -141,15 +141,11 @@ def render(records, auxiliary=()):
         "",
         "## Independent action codec reconstruction",
         "",
-        f"Frozen corpus `{first['corpus_sha256']}`; {first['horizon']}-frame windows, "
-        "one per episode, disjoint calibration/evaluation episodes; "
-        f"{len(records[0]['suite_windows'])} evaluated suites.",
-        "This is in-domain demonstration reconstruction, not policy success or VLA speedup.",
-        "Latency includes representation transforms and CPU/device transfers; native CPU "
-        "and GPU implementations are labeled separately. Nominal bits are not entropy-coded size.",
-        "Rate variants are retained rate–distortion points, not extra methods. "
-        "Representation transfers and state-conditioned results are separate groups.",
-        "Pretraining overlap is not excluded; native block sizes/receptive fields differ.",
+        f"{first['horizon']}-frame windows from {len(records[0]['suite_windows'])} LIBERO suites; "
+        "calibration and evaluation use disjoint episodes.",
+        "Reconstruction metrics measure action coding, not policy success or VLA speedup.",
+        "Timing includes representation transforms and device transfers; "
+        "bits/frame is nominal payload.",
         "",
         "| Codec / preset | Device | Windows | Raw MSE | Raw MAE | Gripper sign | "
         "Tokens/frame | Bits/frame | Encode ms/window | Decode ms/window |",
@@ -167,12 +163,6 @@ def render(records, auxiliary=()):
             f"{s['gripper_sign_agreement']:.4f} | {s['tokens_per_frame']:.3f} | "
             f"{s['nominal_bits_per_frame']:.3f} | {s['encode_ms']:.3f} | {s['decode_ms']:.3f} |"
         )
-    lines += ["", "| Codec run | Measurement commit | Summary SHA256 |", "|---|---|---|"]
-    for r in records:
-        lines.append(
-            f"| `{r['run_id']}` | `{r['provenance']['source']['commit']}` | "
-            f"`{r['files_sha256']['summary.json']}` |"
-        )
     if auxiliary:
         if any(r["metadata"]["corpus_sha256"] != first["corpus_sha256"] for r in auxiliary):
             raise ValueError("Auxiliary codec device checks use a different corpus")
@@ -181,18 +171,16 @@ def render(records, auxiliary=()):
             "<details>",
             "<summary>Codec device checks (auxiliary, not default rows)</summary>",
             "",
-            "The small spline workload is faster on native CPU; both devices use four OpenMP "
-            "threads and the same corpus. Retain the CUDA comparison, not a second primary.",
+            "CPU and GPU checks use the same corpus and four OpenMP threads.",
             "",
-            "| Run | Device | Raw MSE | Encode / decode ms per window | Summary SHA256 |",
-            "|---|---|---:|---:|---|",
+            "| Run | Device | Raw MSE | Encode / decode ms per window |",
+            "|---|---|---:|---:|",
         ]
         for r in auxiliary:
             s, m = r["summary"], r["metadata"]["codec"]
             lines.append(
                 f"| `{r['run_id']}` | {m.get('gpu') or m['device']} | {s['mse']:.7f} | "
-                f"{s['encode_ms']:.3f} / {s['decode_ms']:.3f} | "
-                f"`{r['files_sha256']['summary.json']}` |"
+                f"{s['encode_ms']:.3f} / {s['decode_ms']:.3f} |"
             )
         lines += ["", "</details>"]
     return "\n".join(lines) + "\n"
@@ -218,7 +206,14 @@ def render_groups(records, auxiliary=()):
         if scope not in SCOPES:
             raise ValueError("Unknown codec comparison scope")
         groups.setdefault((m["horizon"], m["corpus_sha256"], scope), []).append(record)
-    sections = ["", "## Independent action codec reconstruction", ""]
+    sections = [
+        "", "## Independent action codec reconstruction", "",
+        "Reconstruction metrics measure action coding, not policy success or VLA speedup.",
+        "Timing includes representation transforms and device transfers; "
+        "bits/frame is nominal payload.",
+        "[Codec setup and model assets](../src/efficient_vla_benchmark/action_codecs/README.md).",
+        "",
+    ]
     for (horizon, corpus, scope), members in groups.items():
         checks = [
             r
@@ -227,6 +222,12 @@ def render_groups(records, auxiliary=()):
             and r["metadata"]["codec"].get("comparison_scope", "command_reconstruction") == scope
         ]
         body = render(members, checks).split("## Independent action codec reconstruction\n", 1)[1]
+        body = body.replace(
+            "Reconstruction metrics measure action coding, not policy success or VLA speedup.\n", ""
+        ).replace(
+            "Timing includes representation transforms and device transfers; "
+            "bits/frame is nominal payload.\n", ""
+        )
         sections += [f"### {SCOPES[scope]} — H{horizon}", body]
     for record in auxiliary:
         m = record["metadata"]
@@ -237,11 +238,11 @@ def render_groups(records, auxiliary=()):
         )
         if key not in groups:
             raise ValueError("Auxiliary codec check has no matching comparison group")
+    revisions = sorted({r["provenance"]["source"]["commit"] for r in records})
     sections += [
-        "Only compare rows within a group. H16 is a frozen prefix of H40 with the same "
-        "episode identities, but its calibration statistics and workload differ. "
-        "Conditional/context-transfer diagnostics are not a codec leaderboard.",
-        "",
+        "H16/H40 and representation-transfer groups use separate workloads "
+        "and are compared within groups.",
+        "Measured source: " + ", ".join(f"`{revision}`" for revision in revisions) + ".", "",
     ]
     return "\n".join(sections)
 
